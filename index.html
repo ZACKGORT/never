@@ -55,8 +55,6 @@
   #lift-hint { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; z-index: 15; opacity: 0; transition: opacity 0.4s; }
   #lift-hint.visible { opacity: 1; }
   #lift-hint p { color: #fff; font-size: 1.3em; font-weight: 700; text-shadow: 0 2px 12px rgba(0,0,0,.5); letter-spacing: 1px; }
-  #lift-hint .lift-bar-wrap { width: 180px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; margin: 10px auto 0; }
-  #lift-bar { height: 100%; width: 0%; background: #68c3c0; border-radius: 3px; transition: width 0.1s; }
   .screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; pointer-events: none; opacity: 0; transition: opacity .5s; }
   .screen.visible { opacity: 1; pointer-events: all; }
   .screen h1 { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(3em, 8vw, 5.5em); font-weight: 700; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,.2); margin-bottom: .15em; letter-spacing: -1px; }
@@ -66,7 +64,6 @@
   .btn-play:active { transform: translateY(0) scale(.98); }
   #hit-flash { position: fixed; inset: 0; background: #f25346; opacity: 0; pointer-events: none; z-index: 30; mix-blend-mode: multiply; }
   #coin-flash { position: fixed; inset: 0; background: #68c3c0; opacity: 0; pointer-events: none; z-index: 30; mix-blend-mode: screen; }
-
   #cursor {
     position: fixed;
     width: 40px;
@@ -81,38 +78,37 @@
   #cursor.active {
     width: 50px;
     height: 30px;
-    border-color: rgba(242, 83, 70, 0.8); 
+    border-color: rgba(242, 83, 70, 0.8);
   }
 </style>
 </head>
 <body>
 
 <div id="cursor"></div>
-
 <div id="world"></div>
 <div id="hit-flash"></div>
 <div id="coin-flash"></div>
 
 <div id="ui">
   <div id="level-wrap">
-    <svg width="0" height="90" viewBox="0 0 0 0">
+    <svg width="90" height="90" viewBox="0 0 200 200">
       <circle r="82" cx="100" cy="100" fill="none" stroke="#d1b790" stroke-width="20" opacity=".4"/>
       <circle id="lvlRing" r="82" cx="100" cy="100" fill="none" stroke="#68c3c0"
               stroke-width="14" stroke-dasharray="515" stroke-dashoffset="515"
               transform="rotate(-90 100 100)" stroke-linecap="round"/>
     </svg>
     <div id="level-inner">
-      <span id="level-num"></span>
-      <span id="level-lbl"></span>
+      <span id="level-num">1</span>
+      <span id="level-lbl">level</span>
     </div>
   </div>
   <div id="score-wrap">
-    <div id="score-label"></div>
-    <div id="score"></div>
+    <div id="score-label">score</div>
+    <div id="score">0</div>
   </div>
-  <div id="dist-wrap"><span id="dist"></span></div>
+  <div id="dist-wrap"><span id="dist">0</span></div>
   <div id="hearts-wrap">
-    <span id="hearts-label"></span>
+    <span id="hearts-label">lives</span>
     <div id="hearts"></div>
   </div>
 </div>
@@ -137,991 +133,800 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
 
 <script>
-  "use strict";
-  
-  var C = {
-    red:       0xf25346,
-    white:     0xd8d0d1,
-    brown:     0x59332e,
-    pink:      0xF5986E,
-    brownDark: 0x23190f,
-    blue:      0x68c3c0,
-    yellow:    0xf4e783,
-    cloud:     0xffffff,
-    charRed:   0xdd3322,
-    charDark:  0xaa2211,
-  };
-  
-  var planetColors = [0x68c3c0, 0x4a3b69, 0x2b596b, 0x5c3a41];
-  
-  var scene, camera, renderer;
-  var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
-  
-  // Variables to hold scroll-based world speed
-  var targetRotSpeed = 1.0;
-  var currentRotSpeed = 1.0;
-  
-  function createScene() {
-    scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x1a1025, 100, 950);
-    camera = new THREE.PerspectiveCamera(60, WIDTH / HEIGHT, 1, 10000);
-    camera.position.set(0, 100, 200);
-    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+"use strict";
+
+var C = {
+  red: 0xf25346, white: 0xd8d0d1, brown: 0x59332e, pink: 0xF5986E,
+  brownDark: 0x23190f, blue: 0x68c3c0, yellow: 0xf4e783,
+  cloud: 0xffffff, charRed: 0xdd3322, charDark: 0xaa2211,
+};
+
+var planetColors = [0x68c3c0, 0x4a3b69, 0x2b596b, 0x5c3a41];
+
+var scene, camera, renderer;
+var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
+
+var targetRotSpeed = 1.0, currentRotSpeed = 1.0;
+
+function createScene() {
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x1a1025, 100, 950);
+  camera = new THREE.PerspectiveCamera(60, WIDTH / HEIGHT, 1, 10000);
+  camera.position.set(0, 100, 200);
+  renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(WIDTH, HEIGHT);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.getElementById('world').appendChild(renderer.domElement);
+  window.addEventListener('resize', function() {
+    WIDTH = window.innerWidth; HEIGHT = window.innerHeight;
+    camera.aspect = WIDTH / HEIGHT;
+    camera.updateProjectionMatrix();
     renderer.setSize(WIDTH, HEIGHT);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    document.getElementById('world').appendChild(renderer.domElement);
-    window.addEventListener('resize', function() {
-      WIDTH = window.innerWidth; HEIGHT = window.innerHeight;
-      camera.aspect = WIDTH / HEIGHT;
-      camera.updateProjectionMatrix();
-      renderer.setSize(WIDTH, HEIGHT);
+  });
+}
+
+function createLights() {
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x000000, 0.5));
+  scene.add(new THREE.AmbientLight(0x404040, 0.7));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.9);
+  sun.position.set(150, 350, 350);
+  sun.castShadow = true;
+  sun.shadow.camera.left = -500; sun.shadow.camera.right = 500;
+  sun.shadow.camera.top = 500; sun.shadow.camera.bottom = -500;
+  sun.shadow.camera.near = 1; sun.shadow.camera.far = 1000;
+  sun.shadow.mapSize.width = 2048; sun.shadow.mapSize.height = 2048;
+  scene.add(sun);
+}
+
+function Sea() {
+  var geom = new THREE.CylinderGeometry(600, 600, 800, 40, 10);
+  geom.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+  var pos = geom.attributes.position;
+  this.waveData = [];
+  for (var i = 0; i < pos.count; i++) {
+    this.waveData.push({
+      x: pos.getX(i), y: pos.getY(i), z: pos.getZ(i),
+      ang: Math.random() * Math.PI * 2,
+      amp: 5 + Math.random() * 15,
+      speed: 0.016 + Math.random() * 0.032,
     });
   }
-  
-  function createLights() {
-    var hemi = new THREE.HemisphereLight(0xffffff, 0x000000, 0.5);
-    scene.add(hemi);
-    var ambient = new THREE.AmbientLight(0x404040, 0.7);
-    scene.add(ambient);
-    var sun = new THREE.DirectionalLight(0xffffff, 0.9);
-    sun.position.set(150, 350, 350);
-    sun.castShadow = true;
-    sun.shadow.camera.left = -500; sun.shadow.camera.right = 500;
-    sun.shadow.camera.top = 500; sun.shadow.camera.bottom = -500;
-    sun.shadow.camera.near = 1; sun.shadow.camera.far = 1000;
-    sun.shadow.mapSize.width = 2048; sun.shadow.mapSize.height = 2048;
-    scene.add(sun);
+  var mat = new THREE.MeshPhongMaterial({ color: planetColors[0], transparent: true, opacity: 0.8, flatShading: true });
+  this.mesh = new THREE.Mesh(geom, mat);
+  this.mesh.receiveShadow = true;
+}
+Sea.prototype.moveWaves = function() {
+  var pos = this.mesh.geometry.attributes.position;
+  for (var i = 0, d; i < this.waveData.length; i++) {
+    d = this.waveData[i];
+    pos.setX(i, d.x + Math.cos(d.ang) * d.amp);
+    pos.setY(i, d.y + Math.sin(d.ang) * d.amp);
+    d.ang += d.speed;
   }
-  
-  function Sea() {
-    var geom = new THREE.CylinderGeometry(600, 600, 800, 40, 10);
-    geom.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
-    var pos = geom.attributes.position;
-    this.waveData = [];
-    for (var i = 0; i < pos.count; i++) {
-      this.waveData.push({
-        x: pos.getX(i), y: pos.getY(i), z: pos.getZ(i),
-        ang: Math.random() * Math.PI * 2,
-        amp: 5 + Math.random() * 15,
-        speed: 0.016 + Math.random() * 0.032,
-      });
-    }
-    var mat = new THREE.MeshPhongMaterial({ color: planetColors[0], transparent: true, opacity: 0.8, flatShading: true });
-    this.mesh = new THREE.Mesh(geom, mat);
-    this.mesh.receiveShadow = true;
+  pos.needsUpdate = true;
+  this.mesh.geometry.computeVertexNormals();
+};
+
+function Star() {
+  var m = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+  this.mesh = new THREE.Object3D();
+  this.mesh.add(m);
+}
+
+function Sky() {
+  this.mesh = new THREE.Object3D();
+  for (var i = 0; i < 150; i++) {
+    var s = new Star();
+    var a = Math.random() * Math.PI * 2;
+    var h = 650 + Math.random() * 300;
+    s.mesh.position.set(Math.cos(a) * h, Math.sin(a) * h, -200 - Math.random() * 600);
+    this.mesh.add(s.mesh);
   }
-  Sea.prototype.moveWaves = function() {
-    var pos = this.mesh.geometry.attributes.position;
-    for (var i = 0, d; i < this.waveData.length; i++) {
-      d = this.waveData[i];
-      pos.setX(i, d.x + Math.cos(d.ang) * d.amp);
-      pos.setY(i, d.y + Math.sin(d.ang) * d.amp);
-      d.ang += d.speed;
-    }
-    pos.needsUpdate = true;
-    this.mesh.geometry.computeVertexNormals();
-  };
-  
-  function Star() {
-    this.mesh = new THREE.Object3D();
-    var geom = new THREE.BoxGeometry(2, 2, 2);
-    var mat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    var m = new THREE.Mesh(geom, mat);
-    this.mesh.add(m);
+}
+
+function makeBox(w, h, d, mat) {
+  return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+}
+
+// ─── RAGDOLL with orientation-relative arm physics ─────────────────────────
+function RagdollHuman() {
+  this.mesh = new THREE.Object3D();
+  this.mesh.rotation.y = Math.PI / 5;  // face forward toward horizon
+  this.baseRotX = -0.72;   // start at correct forward-down pitch immediately
+  this.baseRotZ = 0;
+  this.flipX = 0;
+  this.flipZ = 0;
+  this.mesh.rotation.x = -0.72;
+
+  var suitMat  = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true });
+  var jointMat = new THREE.MeshPhongMaterial({ color: 0x666666, flatShading: true });
+  var visorMat = new THREE.MeshPhongMaterial({ color: 0x111115, flatShading: true, shininess: 100, specular: 0xffffff });
+  var packMat  = new THREE.MeshPhongMaterial({ color: 0xdddddd, flatShading: true });
+  var thrusterMat = new THREE.MeshPhongMaterial({ color: 0x444444, flatShading: true });
+  var flameMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+
+  var head = makeBox(18, 18, 18, suitMat);
+  head.position.set(0, 34, 0); head.castShadow = true;
+  this.mesh.add(head); this.head = head;
+
+  var visor = makeBox(14, 10, 4, visorMat);
+  visor.position.set(0, 2, 8);
+  head.add(visor);
+
+  var neck = makeBox(12, 4, 12, jointMat);
+  neck.position.set(0, 24, 0);
+  this.mesh.add(neck);
+
+  var torsoU = makeBox(24, 16, 16, suitMat);
+  torsoU.position.set(0, 15, 0); torsoU.castShadow = true;
+  this.mesh.add(torsoU);
+
+  var pack = makeBox(18, 22, 10, packMat);
+  pack.position.set(0, 0, -12); pack.castShadow = true;
+  torsoU.add(pack);
+
+  var lThruster = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 3.5, 8, 8), thrusterMat);
+  lThruster.position.set(-6, -11, 0); pack.add(lThruster);
+  var rThruster = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 3.5, 8, 8), thrusterMat);
+  rThruster.position.set(6, -11, 0); pack.add(rThruster);
+
+  this.lFlame = new THREE.Mesh(new THREE.ConeGeometry(2.5, 12, 8), flameMat);
+  this.lFlame.position.set(0, -9, 0); this.lFlame.rotation.x = Math.PI;
+  lThruster.add(this.lFlame);
+  this.rFlame = new THREE.Mesh(new THREE.ConeGeometry(2.5, 12, 8), flameMat);
+  this.rFlame.position.set(0, -9, 0); this.rFlame.rotation.x = Math.PI;
+  rThruster.add(this.rFlame);
+
+  var torsoL = makeBox(22, 12, 14, suitMat);
+  torsoL.position.set(0, 3, 0); torsoL.castShadow = true;
+  this.mesh.add(torsoL);
+
+  var pelvis = makeBox(20, 8, 12, jointMat);
+  pelvis.position.set(0, -5, 0);
+  this.mesh.add(pelvis);
+
+  // Arms
+  this.rShoulderPivot = new THREE.Object3D();
+  this.rShoulderPivot.position.set(-15, 16, 0);
+  this.rShoulderPivot.rotation.x =  0.28;
+  this.rShoulderPivot.rotation.z = -1.05;   // lower arms, less horizontal
+  this.rShoulderPivot.userData = { velX: 0, velZ: 0 };
+  var rUpperArm = makeBox(8, 18, 8, suitMat);
+  rUpperArm.position.set(0, -9, 0);
+  this.rShoulderPivot.add(rUpperArm);
+  this.rElbowPivot = new THREE.Object3D();
+  this.rElbowPivot.position.set(0, -18, 0);
+  this.rElbowPivot.rotation.x =  0.10;
+  this.rElbowPivot.rotation.z = -0.20;   // slight outward follow
+  this.rElbowPivot.userData = { velX: 0, velZ: 0 };
+  var rForearm = makeBox(7, 14, 7, suitMat);
+  rForearm.position.set(0, -7, 0);
+  this.rElbowPivot.add(rForearm);
+  this.rShoulderPivot.add(this.rElbowPivot);
+  this.mesh.add(this.rShoulderPivot);
+
+  this.lShoulderPivot = new THREE.Object3D();
+  this.lShoulderPivot.position.set(15, 16, 0);
+  this.lShoulderPivot.rotation.x =  0.28;
+  this.lShoulderPivot.rotation.z =  1.05;   // lower arms
+  this.lShoulderPivot.userData = { velX: 0, velZ: 0 };
+  var lUpperArm = makeBox(8, 18, 8, suitMat);
+  lUpperArm.position.set(0, -9, 0);
+  this.lShoulderPivot.add(lUpperArm);
+  this.lElbowPivot = new THREE.Object3D();
+  this.lElbowPivot.position.set(0, -18, 0);
+  this.lElbowPivot.rotation.x =  0.10;
+  this.lElbowPivot.rotation.z =  0.20;   // slight outward follow
+  this.lElbowPivot.userData = { velX: 0, velZ: 0 };
+  var lForearm = makeBox(7, 14, 7, suitMat);
+  lForearm.position.set(0, -7, 0);
+  this.lElbowPivot.add(lForearm);
+  this.lShoulderPivot.add(this.lElbowPivot);
+  this.mesh.add(this.lShoulderPivot);
+
+  // Legs
+  this.rHipPivot = new THREE.Object3D();
+  this.rHipPivot.position.set(-8, -9, 0);
+  this.rHipPivot.userData = { velX: 0, velZ: 0 };
+  var rThigh = makeBox(10, 18, 10, suitMat);
+  rThigh.position.set(0, -9, 0);
+  this.rHipPivot.add(rThigh);
+  this.rKneePivot = new THREE.Object3D();
+  this.rKneePivot.position.set(0, -18, 0);
+  this.rKneePivot.userData = { velX: 0, velZ: 0 };
+  var rShin = makeBox(9, 16, 9, suitMat);
+  rShin.position.set(0, -8, 0);
+  this.rKneePivot.add(rShin);
+  this.rHipPivot.add(this.rKneePivot);
+  this.mesh.add(this.rHipPivot);
+
+  this.lHipPivot = new THREE.Object3D();
+  this.lHipPivot.position.set(8, -9, 0);
+  this.lHipPivot.userData = { velX: 0, velZ: 0 };
+  var lThigh = makeBox(10, 18, 10, suitMat);
+  lThigh.position.set(0, -9, 0);
+  this.lHipPivot.add(lThigh);
+  this.lKneePivot = new THREE.Object3D();
+  this.lKneePivot.position.set(0, -18, 0);
+  this.lKneePivot.userData = { velX: 0, velZ: 0 };
+  var lShin = makeBox(9, 16, 9, suitMat);
+  lShin.position.set(0, -8, 0);
+  this.lKneePivot.add(lShin);
+  this.lHipPivot.add(this.lKneePivot);
+  this.mesh.add(this.lHipPivot);
+
+  this.animTime = 0;
+
+  this.joints = [
+    { pivot: this.rShoulderPivot, stiffX: 0.06, stiffZ: 0.06, dampX: 0.90, dampZ: 0.90, limX: 3.2, limZ: 2.8 },
+    { pivot: this.lShoulderPivot, stiffX: 0.06, stiffZ: 0.06, dampX: 0.90, dampZ: 0.90, limX: 3.2, limZ: 2.8 },
+    { pivot: this.rElbowPivot,    stiffX: 0.05, stiffZ: 0.04, dampX: 0.93, dampZ: 0.93, limX: 1.6, limZ: 1.0 },
+    { pivot: this.lElbowPivot,    stiffX: 0.05, stiffZ: 0.04, dampX: 0.93, dampZ: 0.93, limX: 1.6, limZ: 1.0 },
+    { pivot: this.rHipPivot,      stiffX: 0.18, stiffZ: 0.14, dampX: 0.68, dampZ: 0.68, limX: 1.4, limZ: 0.6 },
+    { pivot: this.rKneePivot,     stiffX: 0.15, stiffZ: 0.11, dampX: 0.68, dampZ: 0.68, limX: 1.5, limZ: 0.3 },
+    { pivot: this.lHipPivot,      stiffX: 0.18, stiffZ: 0.14, dampX: 0.68, dampZ: 0.68, limX: 1.4, limZ: 0.6 },
+    { pivot: this.lKneePivot,     stiffX: 0.15, stiffZ: 0.11, dampX: 0.68, dampZ: 0.68, limX: 1.5, limZ: 0.3 },
+  ];
+
+  // Slow independent drift per arm joint
+  this.armDrift = [
+    { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.009+Math.random()*0.006, speedZ: 0.007+Math.random()*0.005, ampX: 0.16, ampZ: 0.20 },
+    { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.009+Math.random()*0.006, speedZ: 0.007+Math.random()*0.005, ampX: 0.16, ampZ: 0.20 },
+    { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.011+Math.random()*0.007, speedZ: 0.009+Math.random()*0.006, ampX: 0.10, ampZ: 0.12 },
+    { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.011+Math.random()*0.007, speedZ: 0.009+Math.random()*0.006, ampX: 0.10, ampZ: 0.12 },
+  ];
+
+
+}
+
+RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
+  dx = dx || 0; dy = dy || 0;
+  this.animTime += 0.08;
+
+  // ── 1. Body orientation: pitched forward-down toward planet horizon ──────
+  //    Fixed pose — facing forward and down, slight side lean from accel.
+  //    This is the default soaring orientation regardless of altitude.
+  var leanZ = -accelX * 0.8;
+  var targetBodyX = -0.72;
+  this.baseRotZ += (leanZ - this.baseRotZ) * 0.12;
+  this.baseRotX += (targetBodyX - this.baseRotX) * 0.08;
+
+  this.mesh.rotation.z = this.baseRotZ + this.flipZ;
+  this.mesh.rotation.x = this.baseRotX + this.flipX;
+
+  // 3/4 view — visor faces forward toward horizon
+  var BIAS_Y = Math.PI / 5;
+  var cursorNudge = Math.max(-0.3, Math.min(0.3, -dx * 0.003));
+  this.mesh.rotation.y += (BIAS_Y + cursorNudge - this.mesh.rotation.y) * 0.07;
+
+  // ── 2. Thruster flames ──────────────────────────────────────────────────
+  var baseScale   = 0.6 + Math.random() * 0.4;
+  var thrustBoost = Math.max(0, accelY * 2.5);
+  this.lFlame.scale.set(1, baseScale + thrustBoost, 0.5);
+  this.rFlame.scale.set(1, baseScale + thrustBoost, 0.5);
+
+  // ── 3. Advance drift phases ─────────────────────────────────────────────
+  for (var ad = 0; ad < this.armDrift.length; ad++) {
+    this.armDrift[ad].phaseX += this.armDrift[ad].speedX;
+    this.armDrift[ad].phaseZ += this.armDrift[ad].speedZ;
   }
-  
-  function Sky() {
-    this.mesh = new THREE.Object3D();
-    var nStars = 150;
-    for (var i = 0; i < nStars; i++) {
-      var s = new Star();
-      var a = Math.random() * Math.PI * 2;
-      var h = 650 + Math.random() * 300;
-      s.mesh.position.set(Math.cos(a) * h, Math.sin(a) * h, -200 - Math.random() * 600);
-      this.mesh.add(s.mesh);
-    }
-  }
-  
-  function makeBox(w, h, d, mat) {
-    return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-  }
-  
-  function RagdollHuman() {
-    this.mesh = new THREE.Object3D();
-    this.mesh.rotation.y = Math.PI / 5; 
-  
-    this.baseRotX = 0;
-    this.baseRotZ = 0;
-    this.flipX = 0;
-    this.flipZ = 0;
-  
-    var suitMat = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true });
-    var jointMat = new THREE.MeshPhongMaterial({ color: 0x666666, flatShading: true });
-    var visorMat = new THREE.MeshPhongMaterial({ color: 0x111115, flatShading: true, shininess: 100, specular: 0xffffff });
-    var packMat = new THREE.MeshPhongMaterial({ color: 0xdddddd, flatShading: true });
-    var thrusterMat = new THREE.MeshPhongMaterial({ color: 0x444444, flatShading: true });
-    var flameMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
-  
-    var head = makeBox(18, 18, 18, suitMat);
-    head.position.set(0, 34, 0);
-    head.castShadow = true;
-    this.mesh.add(head);
-    this.head = head;
-  
-    var visor = makeBox(14, 10, 4, visorMat);
-    visor.position.set(0, 2, 8);
-    head.add(visor);
-  
-    var neck = makeBox(12, 4, 12, jointMat);
-    neck.position.set(0, 24, 0);
-    this.mesh.add(neck);
-  
-    var torsoU = makeBox(24, 16, 16, suitMat);
-    torsoU.position.set(0, 15, 0);
-    torsoU.castShadow = true;
-    this.mesh.add(torsoU);
-  
-    var pack = makeBox(18, 22, 10, packMat);
-    pack.position.set(0, 0, -12);
-    pack.castShadow = true;
-    torsoU.add(pack);
-  
-    var lThruster = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 3.5, 8, 8), thrusterMat);
-    lThruster.position.set(-6, -11, 0);
-    pack.add(lThruster);
-  
-    var rThruster = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 3.5, 8, 8), thrusterMat);
-    rThruster.position.set(6, -11, 0);
-    pack.add(rThruster);
-  
-    this.lFlame = new THREE.Mesh(new THREE.ConeGeometry(2.5, 12, 8), flameMat);
-    this.lFlame.position.set(0, -9, 0);
-    this.lFlame.rotation.x = Math.PI;
-    lThruster.add(this.lFlame);
-  
-    this.rFlame = new THREE.Mesh(new THREE.ConeGeometry(2.5, 12, 8), flameMat);
-    this.rFlame.position.set(0, -9, 0);
-    this.rFlame.rotation.x = Math.PI;
-    rThruster.add(this.rFlame);
-  
-    var torsoL = makeBox(22, 12, 14, suitMat);
-    torsoL.position.set(0, 3, 0);
-    torsoL.castShadow = true;
-    this.mesh.add(torsoL);
-  
-    var pelvis = makeBox(20, 8, 12, jointMat);
-    pelvis.position.set(0, -5, 0);
-    this.mesh.add(pelvis);
-  
-    // ARMS & LEGS
-    this.rShoulderPivot = new THREE.Object3D();
-    this.rShoulderPivot.position.set(-15, 16, 0);
-    this.rShoulderPivot.userData = { velX: 0, velZ: 0 };
-    var rUpperArm = makeBox(8, 18, 8, suitMat);
-    rUpperArm.position.set(0, -9, 0);
-    this.rShoulderPivot.add(rUpperArm);
-    
-    this.rElbowPivot = new THREE.Object3D();
-    this.rElbowPivot.position.set(0, -18, 0);
-    this.rElbowPivot.userData = { velX: 0, velZ: 0 };
-    var rForearm = makeBox(7, 14, 7, suitMat);
-    rForearm.position.set(0, -7, 0);
-    this.rElbowPivot.add(rForearm);
-    this.rShoulderPivot.add(this.rElbowPivot);
-    this.mesh.add(this.rShoulderPivot);
-  
-    this.lShoulderPivot = new THREE.Object3D();
-    this.lShoulderPivot.position.set(15, 16, 0);
-    this.lShoulderPivot.userData = { velX: 0, velZ: 0 };
-    var lUpperArm = makeBox(8, 18, 8, suitMat);
-    lUpperArm.position.set(0, -9, 0);
-    this.lShoulderPivot.add(lUpperArm);
-    
-    this.lElbowPivot = new THREE.Object3D();
-    this.lElbowPivot.position.set(0, -18, 0);
-    this.lElbowPivot.userData = { velX: 0, velZ: 0 };
-    var lForearm = makeBox(7, 14, 7, suitMat);
-    lForearm.position.set(0, -7, 0);
-    this.lElbowPivot.add(lForearm);
-    this.lShoulderPivot.add(this.lElbowPivot);
-    this.mesh.add(this.lShoulderPivot);
-  
-    this.rHipPivot = new THREE.Object3D();
-    this.rHipPivot.position.set(-8, -9, 0);
-    this.rHipPivot.userData = { velX: 0, velZ: 0 };
-    var rThigh = makeBox(10, 18, 10, suitMat);
-    rThigh.position.set(0, -9, 0);
-    this.rHipPivot.add(rThigh);
-    
-    this.rKneePivot = new THREE.Object3D();
-    this.rKneePivot.position.set(0, -18, 0);
-    this.rKneePivot.userData = { velX: 0, velZ: 0 };
-    var rShin = makeBox(9, 16, 9, suitMat);
-    rShin.position.set(0, -8, 0);
-    this.rKneePivot.add(rShin);
-    this.rHipPivot.add(this.rKneePivot);
-    this.mesh.add(this.rHipPivot);
-  
-    this.lHipPivot = new THREE.Object3D();
-    this.lHipPivot.position.set(8, -9, 0);
-    this.lHipPivot.userData = { velX: 0, velZ: 0 };
-    var lThigh = makeBox(10, 18, 10, suitMat);
-    lThigh.position.set(0, -9, 0);
-    this.lHipPivot.add(lThigh);
-    
-    this.lKneePivot = new THREE.Object3D();
-    this.lKneePivot.position.set(0, -18, 0);
-    this.lKneePivot.userData = { velX: 0, velZ: 0 };
-    var lShin = makeBox(9, 16, 9, suitMat);
-    lShin.position.set(0, -8, 0);
-    this.lKneePivot.add(lShin);
-    this.lHipPivot.add(this.lKneePivot);
-    this.mesh.add(this.lHipPivot);
-  
-    this.animTime = 0;
+  var dRS = this.armDrift[0], dLS = this.armDrift[1],
+      dRE = this.armDrift[2], dLE = this.armDrift[3];
 
-// Floaty ragdoll physics — arms drift like seaweed, legs swing with weight
-this.joints = [
-  // SHOULDERS: Very low stiffness + high damping = slow, dreamy float
-  { pivot: this.rShoulderPivot, restX: 0.1, restZ: -0.05, stiffX: 0.06, stiffZ: 0.06, dampX: 0.92, dampZ: 0.92, limX: 3.2, limZ: 2.8 },
-  { pivot: this.lShoulderPivot, restX: 0.1, restZ:  0.05, stiffX: 0.06, stiffZ: 0.06, dampX: 0.92, dampZ: 0.92, limX: 3.2, limZ: 2.8 },
+  // ── 4. Arm rest positions: T-pose out to sides + slow drift wiggle ───────
+  //    No gravity, no physics forces. Just a fixed open pose with lazy sine
+  //    drift per joint so limbs float and wiggle naturally in zero-g.
+  //
+  //    rShoulderPivot is at local -X (right side), arm hangs at Y=-9.
+  //    restZ drives side-spread: positive = arm swings out to the right in local space.
+  //    restX drives forward/back pitch of the arm.
 
-  // ELBOWS: Even lazier — trail well behind the shoulder
-  { pivot: this.rElbowPivot,    restX: 0.0, restZ: 0, stiffX: 0.05, stiffZ: 0.04, dampX: 0.94, dampZ: 0.94, limX: 1.6, limZ: 1.0 },
-  { pivot: this.lElbowPivot,    restX: 0.0, restZ: 0, stiffX: 0.05, stiffZ: 0.04, dampX: 0.94, dampZ: 0.94, limX: 1.6, limZ: 1.0 },
+  // Right shoulder — out to side, slight forward angle
+  this.joints[0].restX =  0.28 + Math.sin(dRS.phaseX) * dRS.ampX;
+  this.joints[0].restZ = -1.05 + Math.sin(dRS.phaseZ) * dRS.ampZ;   // splay out right
 
-  // LEGS: Slightly snappier for running weight
-  { pivot: this.rHipPivot,      restX: 0,   restZ: 0, stiffX: 0.18, stiffZ: 0.14, dampX: 0.68, dampZ: 0.68, limX: 1.4, limZ: 0.6 },
-  { pivot: this.rKneePivot,     restX: 0.1, restZ: 0, stiffX: 0.15, stiffZ: 0.11, dampX: 0.68, dampZ: 0.68, limX: 1.5, limZ: 0.3 },
-  { pivot: this.lHipPivot,      restX: 0,   restZ: 0, stiffX: 0.18, stiffZ: 0.14, dampX: 0.68, dampZ: 0.68, limX: 1.4, limZ: 0.6 },
-  { pivot: this.lKneePivot,     restX: 0.1, restZ: 0, stiffX: 0.15, stiffZ: 0.11, dampX: 0.68, dampZ: 0.68, limX: 1.5, limZ: 0.3 },
-];
-// Arm drift offsets — slow independent sine waves per joint for weightless float feel
-this.armDrift = [
-  { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.009 + Math.random()*0.006, speedZ: 0.007 + Math.random()*0.005, ampX: 0.18, ampZ: 0.22 }, // rShoulder
-  { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.009 + Math.random()*0.006, speedZ: 0.007 + Math.random()*0.005, ampX: 0.18, ampZ: 0.22 }, // lShoulder
-  { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.011 + Math.random()*0.007, speedZ: 0.009 + Math.random()*0.006, ampX: 0.12, ampZ: 0.14 }, // rElbow
-  { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.011 + Math.random()*0.007, speedZ: 0.009 + Math.random()*0.006, ampX: 0.12, ampZ: 0.14 }, // lElbow
-];
-// Inertia tracking for butterfly-catching feel
-this.cursorVelX = 0;
-this.cursorVelY = 0;
-this.prevCursorX = 0;
-this.prevCursorY = 0;
-  }
-  
-  RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
-    dx = dx || 0; dy = dy || 0;
-    this.animTime += 0.08;
-  
-    // Track cursor velocity for inertia-based movement (butterfly-catching feel)
-    var cursorDX = dx - this.prevCursorX;
-    var cursorDY = dy - this.prevCursorY;
-    this.prevCursorX = dx;
-    this.prevCursorY = dy;
-    
-    // Smooth velocity with inertia - creates the "chasing" feel
-    this.cursorVelX = this.cursorVelX * 0.85 + cursorDX * 0.15;
-    this.cursorVelY = this.cursorVelY * 0.85 + cursorDY * 0.15;
-  
-    // Smooth lean with inertia - butterfly-catching feel
-    var leanZ = -accelX * 0.8;  
-    var leanX = -accelY * 0.6;  
-    var forwardPitch = -0.5 - speed * 0.004;
+  // Left shoulder — mirror
+  this.joints[1].restX =  0.28 + Math.sin(dLS.phaseX) * dLS.ampX;
+  this.joints[1].restZ =  1.05 + Math.sin(dLS.phaseZ) * dLS.ampZ;   // splay out left
 
-    // Add cursor vertical offset into body pitch — body tilts up/down with the arm reach
-    // dy is positive when cursor is above the character
-    var BODY_PITCH_STRENGTH = 0.0028;
-    var BODY_PITCH_MAX = 0.55;
-    var cursorPitch = Math.max(-BODY_PITCH_MAX, Math.min(BODY_PITCH_MAX, dy * BODY_PITCH_STRENGTH));
+  // Right elbow — slight droop, lazy follow
+  this.joints[2].restX =  0.10 + Math.sin(dRE.phaseX) * dRE.ampX;
+  this.joints[2].restZ = -0.20 + Math.sin(dRE.phaseZ) * dRE.ampZ;
 
-    // Slower interpolation for inertia feel
-    this.baseRotZ += (leanZ - this.baseRotZ) * 0.12;
-    this.baseRotX += (leanX + forwardPitch + cursorPitch - this.baseRotX) * 0.1;
-  
-    this.mesh.rotation.z = this.baseRotZ + this.flipZ;
-    this.mesh.rotation.x = this.baseRotX + this.flipX;
-    
-    // 3/4 forward bias — natural orientation, gentle lean toward cursor side
-    var BIAS_Y = Math.PI / 5;  // ~36° = classic 3/4 view
-    var cursorNudge = Math.max(-0.35, Math.min(0.35, -dx * 0.003));
-    var targetY = BIAS_Y + cursorNudge;
-    this.mesh.rotation.y += (targetY - this.mesh.rotation.y) * 0.07;
-  
-    var baseScale = 0.6 + Math.random() * 0.4;
-    var thrustBoost = Math.max(0, accelY * 2.5); 
-    this.lFlame.scale.set(1, baseScale + thrustBoost, .5);
-    this.rFlame.scale.set(1, baseScale + thrustBoost, .5);
-  
-    var legCycle = Math.sin(this.animTime * 2.5) * 0.4;
-    var legDrag = accelY * 0.5;
-    
-    // ── ARM PHYSICS ──────────────────────────────────────────────────────────
-    // Joint layout: 0=rShoulder 1=lShoulder 2=rElbow 3=lElbow 4=rHip 5=rKnee 6=lHip 7=lKnee
+  // Left elbow — mirror
+  this.joints[3].restX =  0.10 + Math.sin(dLE.phaseX) * dLE.ampX;
+  this.joints[3].restZ =  0.20 + Math.sin(dLE.phaseZ) * dLE.ampZ;
 
-    // Advance independent drift phases for floaty feel
-    for (var ad = 0; ad < this.armDrift.length; ad++) {
-      this.armDrift[ad].phaseX += this.armDrift[ad].speedX;
-      this.armDrift[ad].phaseZ += this.armDrift[ad].speedZ;
+  // ── 5. Solve all joints ─────────────────────────────────────────────────
+  for (var i = 0; i < this.joints.length; i++) {
+    var j = this.joints[i], p = j.pivot, ud = p.userData;
+
+    if (i >= 4) {
+      // Legs: loose drift behind the body — no strong cycle, just float
+      j.restX =  0.08 + Math.sin(this.animTime * 0.9 + i) * 0.12;
+      j.restZ =  (i === 4 || i === 5 ? 0.06 : -0.06) + Math.sin(this.animTime * 0.7 + i) * 0.08;
     }
 
-    // Cursor offset in world units — dx positive = cursor right, dy positive = cursor up
-    // Scale to [-1,1] reach angles
-    var reachPitchX = Math.max(-1.4, Math.min(1.4, dy / 120));   // up/down tilt
-    var reachSideZ  = Math.max(-1.2, Math.min(1.2, -dx / 140));  // left/right reach
+    var errX = j.restX - p.rotation.x;
+    var errZ = j.restZ - p.rotation.z;
 
-    // Drift per joint
-    var dRS = this.armDrift[0], dLS = this.armDrift[1], dRE = this.armDrift[2], dLE = this.armDrift[3];
+    ud.velX = ud.velX * j.dampX + errX * j.stiffX;
+    ud.velZ = ud.velZ * j.dampZ + errZ * j.stiffZ;
 
-    // ── Right shoulder (joint 0) ─ reaches toward cursor with drift
-    this.joints[0].restX = reachPitchX + Math.sin(dRS.phaseX) * dRS.ampX;
-    this.joints[0].restZ = reachSideZ  + Math.sin(dRS.phaseZ) * dRS.ampZ - 0.1;
+    p.rotation.x = Math.max(-j.limX, Math.min(j.limX, p.rotation.x + ud.velX));
+    p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
+  }
 
-    // ── Left shoulder (joint 1) ─ mirror side reach, same pitch
-    this.joints[1].restX = reachPitchX + Math.sin(dLS.phaseX) * dLS.ampX;
-    this.joints[1].restZ = -reachSideZ + Math.sin(dLS.phaseZ) * dLS.ampZ + 0.1;
+  // Head wobble — slight counter-lean for life
+  this.head.rotation.z += ((-leanZ * 0.5 + Math.sin(this.animTime * 0.8) * 0.05) - this.head.rotation.z) * 0.12;
+};
 
-    // ── Right elbow (joint 2) ─ lazy follow-through of shoulder
-    this.joints[2].restX = reachPitchX * 0.5 + Math.sin(dRE.phaseX) * dRE.ampX;
-    this.joints[2].restZ = reachSideZ  * 0.4 + Math.sin(dRE.phaseZ) * dRE.ampZ;
+RagdollHuman.prototype.hitReaction = function() {
+  for (var i = 0; i < this.joints.length; i++) {
+    this.joints[i].pivot.userData.velX += (Math.random() - 0.5) * 3.5;
+    this.joints[i].pivot.userData.velZ += (Math.random() - 0.5) * 3.5;
+  }
+  gsap.to(this, { flipX: this.flipX + (Math.random()-0.5)*Math.PI*2, duration: 0.8, ease: "power2.out" });
+  gsap.to(this.mesh.rotation, { y: this.mesh.rotation.y + (Math.random()-0.5)*Math.PI*3, duration: 0.8, ease: "power2.out" });
+  gsap.to(this, { flipZ: this.flipZ + (Math.random()-0.5)*Math.PI*2, duration: 0.8, ease: "power2.out" });
+  this.baseRotZ += (Math.random() - 0.5) * 0.8;
+  this.baseRotX += (Math.random() - 0.5) * 0.6;
+};
 
-    // ── Left elbow (joint 3) ─ mirror
-    this.joints[3].restX = reachPitchX * 0.5 + Math.sin(dLE.phaseX) * dLE.ampX;
-    this.joints[3].restZ = -reachSideZ * 0.4 + Math.sin(dLE.phaseZ) * dLE.ampZ;
+// ─── Enemy / Coin / holders ────────────────────────────────────────────────
+function Enemy() {
+  this.mesh = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(8, 1),
+    new THREE.MeshPhongMaterial({ color: C.red, shininess: 0, flatShading: true })
+  );
+  this.mesh.castShadow = true;
+}
+function Coin() {
+  this.mesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(5, 5, 1, 12),
+    new THREE.MeshPhongMaterial({ color: C.blue, shininess: 0, flatShading: true })
+  );
+  this.mesh.castShadow = true;
+}
+function EnemiesHolder() {
+  this.mesh = new THREE.Object3D(); this.inUse = []; this.pool = []; this.speed = 2.0;
+}
+EnemiesHolder.prototype.spawn = function() {
+  var e = this.pool.length ? this.pool.pop() : new Enemy();
+  e.mesh.position.set(380 + Math.random()*100, 25 + Math.random()*150, 0);
+  e.mesh.scale.setScalar(1 + Math.random()*0.5);
+  this.mesh.add(e.mesh); this.inUse.push(e);
+};
+EnemiesHolder.prototype.update = function() {
+  for (var i = this.inUse.length-1; i >= 0; i--) {
+    var e = this.inUse[i];
+    e.mesh.position.x -= this.speed;
+    e.mesh.rotation.x += 0.07; e.mesh.rotation.z += 0.05;
+    if (e.mesh.position.x < -300) { this.pool.push(e); this.mesh.remove(e.mesh); this.inUse.splice(i,1); }
+  }
+};
+function CoinsHolder() {
+  this.mesh = new THREE.Object3D(); this.inUse = []; this.pool = []; this.speed = 2.0;
+}
+CoinsHolder.prototype.spawn = function() {
+  var c = this.pool.length ? this.pool.pop() : new Coin();
+  c.mesh.position.set(380 + Math.random()*100, 30 + Math.random()*140, 0);
+  this.mesh.add(c.mesh); this.inUse.push(c);
+};
+CoinsHolder.prototype.update = function() {
+  for (var i = this.inUse.length-1; i >= 0; i--) {
+    var c = this.inUse[i];
+    c.mesh.position.x -= this.speed;
+    c.mesh.rotation.x += 0.08; c.mesh.rotation.y += 0.12;
+    if (c.mesh.position.x < -300) { this.pool.push(c); this.mesh.remove(c.mesh); this.inUse.splice(i,1); }
+  }
+};
 
-    // ── Gravity bias for legs (heavier near surface)
-    var gravityBias = norm(this.mesh.position.y, 25, 175, 1.5, 0);
+// ─── Red Astronaut ─────────────────────────────────────────────────────────
+function RedAstronaut() {
+  this.mesh = new THREE.Object3D();
+  this.tagged = false; this.tagTimer = 0;
+  this.bobOffset = Math.random()*Math.PI*2;
+  this.bobSpeed  = 0.025 + Math.random()*0.015;
 
-    for (var i = 0; i < this.joints.length; i++) {
-      var j = this.joints[i], p = j.pivot, ud = p.userData;
-      var forceX = 0, forceZ = 0;
+  var suitMat  = new THREE.MeshPhongMaterial({ color: 0xdd2211, flatShading: true });
+  var visorMat = new THREE.MeshPhongMaterial({ color: 0xff6655, flatShading: true, shininess: 80 });
+  var jointMat = new THREE.MeshPhongMaterial({ color: 0x881100, flatShading: true });
+  this.suitMat = suitMat;
 
-      if (i >= 4) {
-        // Legs: swing with movement
-        forceX = -accelY * 1.5 + legDrag + gravityBias;
-        forceZ = -accelX * 1.0;
-      }
-      // Arms: rest position already set above, force is 0
+  var head = makeBox(9,9,9,suitMat); head.position.set(0,17,0); this.mesh.add(head);
+  var visor = makeBox(6,5,3,visorMat); visor.position.set(0,1,4); head.add(visor);
+  var torso = makeBox(11,10,8,suitMat); torso.position.set(0,7,0); this.mesh.add(torso);
+  var pelvis = makeBox(9,5,7,jointMat); pelvis.position.set(0,1,0); this.mesh.add(pelvis);
 
-      var errX = (j.restX + forceX) - p.rotation.x;
-      var errZ = (j.restZ + forceZ) - p.rotation.z;
+  var rArm = makeBox(4,14,4,suitMat); rArm.position.set(-8,5,0); this.mesh.add(rArm); this.rArm = rArm;
+  var lArm = makeBox(4,14,4,suitMat); lArm.position.set(8,5,0);  this.mesh.add(lArm); this.lArm = lArm;
+  var rLeg = makeBox(4,12,4,suitMat); rLeg.position.set(-4,-6,0); this.mesh.add(rLeg); this.rLeg = rLeg;
+  var lLeg = makeBox(4,12,4,suitMat); lLeg.position.set(4,-6,0);  this.mesh.add(lLeg); this.lLeg = lLeg;
 
-      ud.velX = ud.velX * j.dampX + errX * j.stiffX;
-      ud.velZ = ud.velZ * j.dampZ + errZ * j.stiffZ;
+  var ringMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc });
+  this.tagRing = new THREE.Mesh(new THREE.TorusGeometry(10,1.5,6,16), ringMat);
+  this.tagRing.visible = false; this.mesh.add(this.tagRing);
 
-      p.rotation.x = Math.max(-j.limX, Math.min(j.limX, p.rotation.x + ud.velX));
-      p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
+  this.animTime = Math.random()*Math.PI*2;
+}
+RedAstronaut.prototype.update = function(speed) {
+  this.animTime += 0.06;
+  this.mesh.position.x -= speed;
+  this.mesh.position.y += Math.sin(this.animTime * this.bobSpeed * 60) * 0.15;
+  this.rArm.rotation.z =  Math.sin(this.animTime*0.8)*0.5 + 0.3;
+  this.lArm.rotation.z = -Math.sin(this.animTime*0.8+1)*0.5 - 0.3;
+  this.rLeg.rotation.x =  Math.sin(this.animTime*1.2)*0.3;
+  this.lLeg.rotation.x = -Math.sin(this.animTime*1.2)*0.3;
+  if (this.tagged) {
+    this.tagTimer--;
+    this.tagRing.visible = (Math.floor(this.tagTimer/3)%2 === 0);
+    this.tagRing.rotation.z += 0.12;
+    this.tagRing.scale.setScalar(1 + (1-this.tagTimer/40)*0.5);
+    this.suitMat.color.setHex(this.tagTimer%4 < 2 ? 0xffffff : 0x00ffcc);
+    if (this.tagTimer <= 0) {
+      this.tagged = false;
+      this.suitMat.color.setHex(0xdd2211);
+      this.tagRing.visible = false;
     }
-  
-    this.rHipPivot.rotation.x += ((-0.2 + legCycle) - this.rHipPivot.rotation.x) * 0.35;
-    this.lHipPivot.rotation.x += ((-0.2 - legCycle) - this.lHipPivot.rotation.x) * 0.35;
-    this.rKneePivot.rotation.x += ((0.3 + Math.max(0, -legCycle) * 0.8) - this.rKneePivot.rotation.x) * 0.3;
-    this.lKneePivot.rotation.x += ((0.3 + Math.max(0, legCycle) * 0.8) - this.lKneePivot.rotation.x) * 0.3;
-    // More responsive head movement for cartoonish effect
-    this.head.rotation.z += ((-leanZ * 0.6 + Math.sin(this.animTime) * 0.06) - this.head.rotation.z) * 0.15;
-  };
-  
-  RagdollHuman.prototype.hitReaction = function() {
-    // Random rotation and spin on collision - dramatic cartoon hit
-    for (var i = 0; i < this.joints.length; i++) {
-      this.joints[i].pivot.userData.velX += (Math.random() - 0.5) * 3.5;
-      this.joints[i].pivot.userData.velZ += (Math.random() - 0.5) * 3.5;
+  }
+  this.mesh.rotation.y = Math.sin(this.animTime*0.3)*0.3 - 0.4;
+};
+function RedAstronautsHolder() {
+  this.mesh = new THREE.Object3D(); this.inUse = []; this.pool = []; this.speed = 2.0;
+}
+RedAstronautsHolder.prototype.spawn = function() {
+  var a = this.pool.length ? this.pool.pop() : new RedAstronaut();
+  a.mesh.position.set(400+Math.random()*120, 40+Math.random()*130, 0);
+  a.mesh.scale.setScalar(0.22+Math.random()*0.1);
+  a.tagged = false; a.tagTimer = 0;
+  a.suitMat.color.setHex(0xdd2211);
+  a.tagRing.visible = false;
+  this.mesh.add(a.mesh); this.inUse.push(a);
+};
+RedAstronautsHolder.prototype.update = function() {
+  for (var i = this.inUse.length-1; i >= 0; i--) {
+    var a = this.inUse[i];
+    a.update(this.speed);
+    if (a.mesh.position.x < -320) { this.pool.push(a); this.mesh.remove(a.mesh); this.inUse.splice(i,1); }
+  }
+};
+
+// ─── Bursts ────────────────────────────────────────────────────────────────
+var activeBursts = [];
+function Burst(color, n) {
+  this.mesh = new THREE.Object3D(); this.parts = [];
+  var g = new THREE.TetrahedronGeometry(3, 0);
+  var m = new THREE.MeshPhongMaterial({ color: color, flatShading: true });
+  for (var i = 0; i < (n||8); i++) {
+    var p = new THREE.Mesh(g, m);
+    var angle = (Math.PI*2*i)/n;
+    p.userData = {
+      vx: Math.cos(angle)*(1.5+Math.random()),
+      vy: Math.sin(angle)*(1.5+Math.random()),
+      vr: Math.random()*0.3
+    };
+    this.mesh.add(p); this.parts.push(p);
+  }
+  scene.add(this.mesh); this.life = 30; activeBursts.push(this);
+}
+function updateBursts() {
+  for (var i = activeBursts.length-1; i >= 0; i--) {
+    var b = activeBursts[i]; b.life--;
+    for (var j = 0; j < b.parts.length; j++) {
+      b.parts[j].position.x += b.parts[j].userData.vx;
+      b.parts[j].position.y += b.parts[j].userData.vy;
+      b.parts[j].rotation.x += b.parts[j].userData.vr;
     }
-    
-    // Random full-body rotation and spin
-    var randomSpinX = (Math.random() - 0.5) * Math.PI * 2;  // Random X flip
-    var randomSpinY = (Math.random() - 0.5) * Math.PI * 3;  // Random Y spin
-    var randomSpinZ = (Math.random() - 0.5) * Math.PI * 2;  // Random Z roll
-    
-    // Apply spin using GSAP for smooth animation
-    gsap.to(this, { 
-      flipX: this.flipX + randomSpinX, 
-      duration: 0.8, 
-      ease: "power2.out" 
+    b.mesh.scale.setScalar(b.life/30);
+    if (b.life <= 0) { scene.remove(b.mesh); activeBursts.splice(i,1); }
+  }
+}
+
+// ─── Game state ────────────────────────────────────────────────────────────
+var STATUS = 'waiting';
+var score = 0, level = 1, energy = 10, MAX_E = 10;
+var distance = 0, coinsGot = 0, frame = 0;
+var spawnInt = 72, BASE_SPD = 2.0, COINS_PER_LEVEL = 20;
+var mouse = { x: 0, y: 0 };
+var sea, sky, humanoid, eHolder, cHolder, raHolder;
+
+function buildWorld() {
+  sea = new Sea(); sea.mesh.position.y = -600; scene.add(sea.mesh);
+  sky = new Sky(); sky.mesh.position.y = -600; scene.add(sky.mesh);
+  humanoid = new RagdollHuman();
+  humanoid.mesh.scale.setScalar(0.25);
+  humanoid.mesh.position.set(0, 100, 0);
+  scene.add(humanoid.mesh);
+  eHolder = new EnemiesHolder(); scene.add(eHolder.mesh);
+  cHolder = new CoinsHolder(); scene.add(cHolder.mesh);
+  raHolder = new RedAstronautsHolder(); scene.add(raHolder.mesh);
+  for (var i = 0; i < 8; i++) {
+    eHolder.pool.push(new Enemy());
+    cHolder.pool.push(new Coin());
+    raHolder.pool.push(new RedAstronaut());
+  }
+}
+
+function buildHearts() {
+  var el = document.getElementById('hearts'); el.innerHTML = '';
+  for (var i = 0; i < MAX_E; i++) {
+    var div = document.createElement('div');
+    div.className = 'heart'; div.id = 'heart-'+i;
+    div.innerHTML = '<svg viewBox="0 0 32 29.6"><path fill="#f25346" d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.9,16,21.2,16,21.2s16-11.3,16-21.2C32,3.8,28.2,0,23.6,0z"/></svg>';
+    el.appendChild(div);
+  }
+}
+function refreshUI() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('dist').textContent  = Math.round(distance);
+  for (var i = 0; i < MAX_E; i++) {
+    var h = document.getElementById('heart-'+i);
+    if (h) h.classList.toggle('lost', i >= energy);
+  }
+}
+function setLevelRing(pct) {
+  var circ = 2 * Math.PI * 82;
+  document.getElementById('lvlRing').setAttribute('stroke-dashoffset', circ*(1-pct));
+}
+
+function norm(v, vmin, vmax, tmin, tmax) {
+  var nv = Math.max(Math.min(v, vmax), vmin);
+  return tmin + ((nv-vmin)/(vmax-vmin))*(tmax-tmin);
+}
+
+document.addEventListener('mousemove', function(e) {
+  mouse.x = -1 + (e.clientX / WIDTH) * 2;
+  mouse.y =  1 - (e.clientY / HEIGHT) * 2;
+  var cursorEl = document.getElementById('cursor');
+  if (cursorEl) { cursorEl.style.left = e.clientX+'px'; cursorEl.style.top = e.clientY+'px'; }
+});
+
+var reverseLerp = 0.0;
+var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -2.2;
+
+window.addEventListener('wheel', function(e) {
+  reverseLerp -= e.deltaY * 0.0012;
+  reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.2, reverseLerp));
+}, { passive: true });
+
+window.addEventListener('pointerdown', function(e) {
+  if (STATUS === 'tumbling') {
+    if (tumble.bounces >= 1) {
+      tumble.liftProgress = 1.0;
+      gsap.fromTo('#coin-flash', { opacity: 0.25 }, { opacity: 0, duration: 0.4 });
+    }
+    return;
+  }
+  if (STATUS !== 'playing') return;
+  if (e.pointerType === 'touch') return;
+
+  if (e.button === 0) {
+    // Random spin/tumble on left click
+    gsap.to(humanoid, {
+      flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 3.5,
+      flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 3.5,
+      duration: 0.65, ease: "power2.inOut"
     });
-    gsap.to(this.mesh.rotation, { 
-      y: this.mesh.rotation.y + randomSpinY, 
-      duration: 0.8, 
-      ease: "power2.out" 
-    });
-    gsap.to(this, { 
-      flipZ: this.flipZ + randomSpinZ, 
-      duration: 0.8, 
-      ease: "power2.out" 
-    });
-    
-    this.baseRotZ += (Math.random() - 0.5) * 0.8;
-    this.baseRotX += (Math.random() - 0.5) * 0.6;
-  };
+    for (var si = 0; si < humanoid.joints.length; si++) {
+      humanoid.joints[si].pivot.userData.velX += (Math.random() - 0.5) * 4;
+      humanoid.joints[si].pivot.userData.velZ += (Math.random() - 0.5) * 4;
+    }
+    // Also tag any nearby astronaut if in range
+    var clickX = norm(mouse.x, -1, 1, -100, 100);
+    var clickY = norm(mouse.y, -1, 1, 25, 175);
+    var TAG_RADIUS = 38, bestDist = TAG_RADIUS, bestRa = null;
+    for (var ri = 0; ri < raHolder.inUse.length; ri++) {
+      var ra = raHolder.inUse[ri];
+      if (ra.tagged) continue;
+      var raPos = new THREE.Vector3();
+      ra.mesh.getWorldPosition(raPos);
+      var d = Math.sqrt(Math.pow(clickX-raPos.x,2) + Math.pow(clickY-raPos.y,2));
+      if (d < bestDist) { bestDist = d; bestRa = ra; }
+    }
+    if (bestRa) {
+      bestRa.tagged = true; bestRa.tagTimer = 50;
+      score += 3; refreshUI();
+      var rp = new THREE.Vector3(); bestRa.mesh.getWorldPosition(rp);
+      new Burst(0x00ffcc, 12).mesh.position.copy(rp);
+      gsap.fromTo('#coin-flash', { opacity: 0.4 }, { opacity: 0, duration: 0.3 });
+      (function(target) {
+        setTimeout(function() {
+          var idx = raHolder.inUse.indexOf(target);
+          if (idx >= 0) { raHolder.pool.push(target); raHolder.mesh.remove(target.mesh); raHolder.inUse.splice(idx,1); }
+        }, 700);
+      })(bestRa);
+    }
+  } else if (e.button === 2) {
+    // Right click: reset to default soaring pose
+    gsap.to(humanoid, { flipX: 0, flipZ: 0, duration: 0.5, ease: "power3.out" });
+    gsap.to(humanoid.mesh.rotation, { y: Math.PI / 5, duration: 0.5, ease: "power3.out" });
+    humanoid.baseRotX = -0.72; humanoid.baseRotZ = 0;
+  }
+});
+window.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
-  
-  
-  function Enemy() {
-    var geom = new THREE.IcosahedronGeometry(8, 1);
-    var mat = new THREE.MeshPhongMaterial({ color: C.red, shininess: 0, flatShading: true });
-    this.mesh = new THREE.Mesh(geom, mat);
-    this.mesh.castShadow = true;
+window.addEventListener('keydown', function(e) {
+  if (STATUS !== 'playing') return;
+  if (e.code === 'Space') {
+    e.preventDefault();
+    gsap.to(humanoid, { flipZ: "-="+(Math.PI*2), duration: 0.65, ease: "power2.inOut" });
   }
-  function Coin() {
-    var geom = new THREE.CylinderGeometry(5, 5, 1, 12);
-    var mat = new THREE.MeshPhongMaterial({ color: C.blue, shininess: 0, flatShading: true });
-    this.mesh = new THREE.Mesh(geom, mat);
-    this.mesh.castShadow = true;
+});
+
+function startGame() {
+  STATUS = 'playing';
+  score = 0; energy = MAX_E; distance = 0; coinsGot = 0;
+  level = 1; frame = 0; spawnInt = 55;
+  eHolder.speed = cHolder.speed = BASE_SPD;
+  eHolder.inUse.forEach(function(e) { eHolder.mesh.remove(e.mesh); }); eHolder.inUse = [];
+  cHolder.inUse.forEach(function(c) { cHolder.mesh.remove(c.mesh); }); cHolder.inUse = [];
+  raHolder.inUse.forEach(function(a) { raHolder.mesh.remove(a.mesh); }); raHolder.inUse = [];
+  humanoid.flipX = 0; humanoid.flipZ = 0;
+  humanoid.baseRotX = 0; humanoid.baseRotZ = 0;
+  var lhEl = document.getElementById('lift-hint');
+  if (lhEl) lhEl.classList.remove('visible');
+  setLevelRing(0);
+  document.getElementById('level-num').textContent = 1;
+  refreshUI();
+  document.getElementById('screen-welcome').classList.remove('visible');
+  document.getElementById('screen-gameover').classList.remove('visible');
+}
+
+var tumble = { surfaceY: 22, velX: 0, velY: 0, bounces: 0, spinX: 0, spinY: 0, spinZ: 0, liftProgress: 0 };
+
+function doTumble() {
+  STATUS = 'tumbling';
+  tumble.velX = -(eHolder.speed*0.6 + Math.random()*3);
+  tumble.velY = 4 + Math.random()*3;
+  tumble.bounces = 0; tumble.liftProgress = 0;
+  tumble.spinX = (Math.random()-0.5)*0.28;
+  tumble.spinY = (Math.random()-0.5)*0.22;
+  tumble.spinZ = (Math.random()<0.5 ? 1 : -1) * (0.12 + Math.random()*0.2);
+  for (var i = 0; i < humanoid.joints.length; i++) {
+    humanoid.joints[i].pivot.userData.velX += (Math.random()-0.5)*6;
+    humanoid.joints[i].pivot.userData.velZ += (Math.random()-0.5)*6;
   }
-  function EnemiesHolder() {
-    this.mesh = new THREE.Object3D();
-    this.inUse = []; this.pool = [];
-    this.speed = 2.0;
+  gsap.fromTo('#hit-flash', { opacity: 0.8 }, { opacity: 0, duration: 0.6 });
+}
+
+function doGameOver() {
+  STATUS = 'gameover';
+  document.getElementById('go-score').textContent = 'You scored ' + score + ' points';
+  document.getElementById('screen-gameover').classList.add('visible');
+}
+
+function levelUp() {
+  level++;
+  document.getElementById('level-num').textContent = level;
+  setLevelRing(0);
+  var spd = BASE_SPD * (1 + level*0.22);
+  eHolder.speed = cHolder.speed = raHolder.speed = spd;
+  spawnInt = Math.max(18, 55 - level*4);
+}
+
+var _pWorld = new THREE.Vector3(), _eWorld = new THREE.Vector3();
+
+function checkCollisions() {
+  humanoid.mesh.getWorldPosition(_pWorld);
+  for (var i = eHolder.inUse.length-1; i >= 0; i--) {
+    var en = eHolder.inUse[i]; en.mesh.getWorldPosition(_eWorld);
+    if (_pWorld.distanceTo(_eWorld) < 8) {
+      new Burst(C.red, 10).mesh.position.copy(_eWorld);
+      eHolder.pool.push(en); eHolder.mesh.remove(en.mesh); eHolder.inUse.splice(i,1);
+      energy--; refreshUI();
+      gsap.fromTo('#hit-flash', { opacity: 0.55 }, { opacity: 0, duration: 0.35 });
+      humanoid.hitReaction();
+      if (energy <= 0) { doTumble(); return; }
+    }
   }
-  EnemiesHolder.prototype.spawn = function() {
-    var e = this.pool.length ? this.pool.pop() : new Enemy();
-    e.mesh.position.set(380 + Math.random() * 100, 25 + Math.random() * 150, 0);
-    e.mesh.scale.setScalar(1 + Math.random() * 0.5);
-    this.mesh.add(e.mesh);
-    this.inUse.push(e);
-  };
-  EnemiesHolder.prototype.update = function() {
-    for (var i = this.inUse.length - 1; i >= 0; i--) {
-      var e = this.inUse[i];
-      e.mesh.position.x -= this.speed;
-      e.mesh.rotation.x += 0.07; e.mesh.rotation.z += 0.05;
-      if (e.mesh.position.x < -300) {
-        this.pool.push(e); this.mesh.remove(e.mesh); this.inUse.splice(i, 1);
+  for (var j = cHolder.inUse.length-1; j >= 0; j--) {
+    var cn = cHolder.inUse[j]; cn.mesh.getWorldPosition(_eWorld);
+    if (_pWorld.distanceTo(_eWorld) < 8) {
+      new Burst(C.blue, 8).mesh.position.copy(_eWorld);
+      cHolder.pool.push(cn); cHolder.mesh.remove(cn.mesh); cHolder.inUse.splice(j,1);
+      score++; coinsGot++;
+      gsap.fromTo('#coin-flash', { opacity: 0.3 }, { opacity: 0, duration: 0.25 });
+      var lvlPct = (coinsGot % COINS_PER_LEVEL) / COINS_PER_LEVEL;
+      setLevelRing(lvlPct);
+      if (coinsGot > 0 && coinsGot % COINS_PER_LEVEL === 0) levelUp();
+      refreshUI();
+    }
+  }
+}
+
+function loop() {
+  requestAnimationFrame(loop);
+  frame++;
+
+  reverseLerp += (0 - reverseLerp) * MAGNETIC_STRENGTH;
+  targetRotSpeed = MAGNETIC_FORWARD + reverseLerp;
+  currentRotSpeed += (targetRotSpeed - currentRotSpeed) * 0.05;
+
+  sea.mesh.rotation.z += 0.005 * currentRotSpeed;
+  sky.mesh.rotation.z += 0.002 * currentRotSpeed;
+  sea.moveWaves();
+
+  var cycle = (sea.mesh.rotation.z / Math.PI) % planetColors.length;
+  var idx1 = Math.floor(Math.abs(cycle)), idx2 = (idx1+1) % planetColors.length;
+  var c1 = new THREE.Color(planetColors[idx1]), c2 = new THREE.Color(planetColors[idx2]);
+  sea.mesh.material.color.copy(c1).lerp(c2, Math.abs(cycle) - idx1);
+
+  if (STATUS === 'playing') {
+    distance += 0.2 * Math.max(0.1, currentRotSpeed);
+    var tx = norm(mouse.x, -1, 1, -100, 100), ty = norm(mouse.y, -1, 1, 25, 175);
+    var dx = tx - humanoid.mesh.position.x, dy = ty - humanoid.mesh.position.y;
+    humanoid.mesh.position.x += dx * 0.1;
+    humanoid.mesh.position.y += dy * 0.1;
+    humanoid.update(dx*0.003, dy*0.003, eHolder.speed, dx, dy);
+
+    if (frame % Math.round(spawnInt) === 0) {
+      var r = Math.random();
+      if (r < 0.40) eHolder.spawn();
+      else if (r < 0.80) cHolder.spawn();
+      else raHolder.spawn();
+    }
+    eHolder.update(); cHolder.update(); raHolder.update();
+    updateBursts(); checkCollisions();
+
+  } else if (STATUS === 'tumbling') {
+    var GRAVITY = -0.45, FRICTION = 0.91, BOUNCE_DAMP = 0.48, SURFACE_Y = tumble.surfaceY;
+    tumble.velY += GRAVITY;
+    humanoid.mesh.position.y += tumble.velY;
+    humanoid.mesh.position.x += tumble.velX;
+    if (humanoid.mesh.position.x < -130) { humanoid.mesh.position.x = -130; tumble.velX *= -0.4; }
+    if (humanoid.mesh.position.x >  130) { humanoid.mesh.position.x =  130; tumble.velX *= -0.4; }
+    if (humanoid.mesh.position.y <= SURFACE_Y) {
+      humanoid.mesh.position.y = SURFACE_Y;
+      var impactSpeed = Math.abs(tumble.velY);
+      tumble.velY = impactSpeed * BOUNCE_DAMP;
+      tumble.velX *= FRICTION;
+      tumble.bounces++;
+      var spinScale = Math.max(0.5, 1.2 - tumble.bounces*0.08);
+      tumble.spinX = (Math.random()-0.5)*0.32*spinScale;
+      tumble.spinY = (Math.random()-0.5)*0.25*spinScale;
+      tumble.spinZ = (Math.random()<0.5?1:-1)*(0.15+Math.random()*0.22)*spinScale;
+      var splatStr = Math.min(6, impactSpeed*0.5);
+      for (var bi = 0; bi < humanoid.joints.length; bi++) {
+        humanoid.joints[bi].pivot.userData.velX += (Math.random()-0.5)*splatStr;
+        humanoid.joints[bi].pivot.userData.velZ += (Math.random()-0.5)*splatStr;
       }
+      if (tumble.velY < 1.2) tumble.velY = 1.2 + Math.random()*1.5;
     }
-  };
-  function CoinsHolder() {
-    this.mesh = new THREE.Object3D();
-    this.inUse = []; this.pool = [];
-    this.speed = 2.0;
+    humanoid.flipX += tumble.spinX;
+    humanoid.flipZ += tumble.spinZ;
+    humanoid.mesh.rotation.y += tumble.spinY;
+    humanoid.update(tumble.velX*0.004, tumble.velY*0.003, 0, 0, 0);
+    var liftHint = document.getElementById('lift-hint');
+    if (liftHint) liftHint.classList.toggle('visible', tumble.bounces >= 1);
+    if (tumble.liftProgress >= 1.0) {
+      STATUS = 'playing';
+      energy = Math.max(1, Math.floor(MAX_E*0.3));
+      refreshUI(); setLevelRing(0);
+      tumble.liftProgress = 0; tumble.velX = 0; tumble.velY = 0;
+      humanoid.flipX = 0; humanoid.flipZ = 0;
+      humanoid.baseRotX = 0; humanoid.baseRotZ = 0;
+      gsap.to(humanoid.mesh.rotation, { y: 0, duration: 0.6, ease: "power3.out" });
+      if (liftHint) liftHint.classList.remove('visible');
+    }
+    updateBursts();
+
+  } else {
+    humanoid.mesh.position.y = 100 + Math.sin(Date.now()*0.001)*6;
+    humanoid.update(0, 0, 0, 0, 0);
   }
-  CoinsHolder.prototype.spawn = function() {
-    var c = this.pool.length ? this.pool.pop() : new Coin();
-    c.mesh.position.set(380 + Math.random() * 100, 30 + Math.random() * 140, 0);
-    this.mesh.add(c.mesh); this.inUse.push(c);
-  };
-  CoinsHolder.prototype.update = function() {
-    for (var i = this.inUse.length - 1; i >= 0; i--) {
-      var c = this.inUse[i];
-      c.mesh.position.x -= this.speed;
-      c.mesh.rotation.x += 0.08; c.mesh.rotation.y += 0.12;
-      if (c.mesh.position.x < -300) {
-        this.pool.push(c); this.mesh.remove(c.mesh); this.inUse.splice(i, 1);
-      }
-    }
-  };
-  
-  // ---- RED ASTRONAUT ENEMY ----
-  function RedAstronaut() {
-    this.mesh = new THREE.Object3D();
-    this.tagged = false;
-    this.tagTimer = 0;
-    this.bobOffset = Math.random() * Math.PI * 2;
-    this.bobSpeed = 0.025 + Math.random() * 0.015;
+  renderer.render(scene, camera);
+}
 
-    var suitMat = new THREE.MeshPhongMaterial({ color: 0xdd2211, flatShading: true });
-    var visorMat = new THREE.MeshPhongMaterial({ color: 0xff6655, flatShading: true, shininess: 80 });
-    var jointMat = new THREE.MeshPhongMaterial({ color: 0x881100, flatShading: true });
-    this.suitMat = suitMat;
+document.getElementById('btn-start').addEventListener('click', startGame);
+document.getElementById('btn-replay').addEventListener('click', startGame);
 
-    // Head
-    var head = makeBox(9, 9, 9, suitMat);
-    head.position.set(0, 17, 0);
-    this.mesh.add(head);
-    var visor = makeBox(6, 5, 3, visorMat);
-    visor.position.set(0, 1, 4);
-    head.add(visor);
-
-    // Torso
-    var torso = makeBox(11, 10, 8, suitMat);
-    torso.position.set(0, 7, 0);
-    this.mesh.add(torso);
-
-    // Pelvis
-    var pelvis = makeBox(9, 5, 7, jointMat);
-    pelvis.position.set(0, 1, 0);
-    this.mesh.add(pelvis);
-
-    // Arms
-    var rArm = makeBox(4, 14, 4, suitMat);
-    rArm.position.set(-8, 5, 0);
-    this.mesh.add(rArm);
-    var lArm = makeBox(4, 14, 4, suitMat);
-    lArm.position.set(8, 5, 0);
-    this.mesh.add(lArm);
-    this.rArm = rArm; this.lArm = lArm;
-
-    // Legs
-    var rLeg = makeBox(4, 12, 4, suitMat);
-    rLeg.position.set(-4, -6, 0);
-    this.mesh.add(rLeg);
-    var lLeg = makeBox(4, 12, 4, suitMat);
-    lLeg.position.set(4, -6, 0);
-    this.mesh.add(lLeg);
-    this.rLeg = rLeg; this.lLeg = lLeg;
-
-    // Tag flash ring (shows when hit by laser)
-    var ringGeom = new THREE.TorusGeometry(10, 1.5, 6, 16);
-    var ringMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc });
-    this.tagRing = new THREE.Mesh(ringGeom, ringMat);
-    this.tagRing.visible = false;
-    this.mesh.add(this.tagRing);
-
-    this.animTime = Math.random() * Math.PI * 2;
-  }
-
-  RedAstronaut.prototype.update = function(speed) {
-    this.animTime += 0.06;
-    this.mesh.position.x -= speed;
-    // Bob up and down
-    this.mesh.position.y += Math.sin(this.animTime * this.bobSpeed * 60) * 0.15;
-    // Slow waving arms
-    this.rArm.rotation.z = Math.sin(this.animTime * 0.8) * 0.5 + 0.3;
-    this.lArm.rotation.z = -Math.sin(this.animTime * 0.8 + 1) * 0.5 - 0.3;
-    // Slow walking legs
-    this.rLeg.rotation.x = Math.sin(this.animTime * 1.2) * 0.3;
-    this.lLeg.rotation.x = -Math.sin(this.animTime * 1.2) * 0.3;
-    // Tag ring pulse
-    if (this.tagged) {
-      this.tagTimer--;
-      this.tagRing.visible = (Math.floor(this.tagTimer / 3) % 2 === 0);
-      this.tagRing.rotation.z += 0.12;
-      this.tagRing.scale.setScalar(1 + (1 - this.tagTimer / 40) * 0.5);
-      // Flash suit white
-      this.suitMat.color.setHex(this.tagTimer % 4 < 2 ? 0xffffff : 0x00ffcc);
-      if (this.tagTimer <= 0) {
-        this.tagged = false;
-        this.suitMat.color.setHex(0xdd2211);
-        this.tagRing.visible = false;
-      }
-    }
-    // Rotate to face camera slightly
-    this.mesh.rotation.y = Math.sin(this.animTime * 0.3) * 0.3 - 0.4;
-  };
-
-  function RedAstronautsHolder() {
-    this.mesh = new THREE.Object3D();
-    this.inUse = []; this.pool = [];
-    this.speed = 2.0;
-  }
-  RedAstronautsHolder.prototype.spawn = function() {
-    var a = this.pool.length ? this.pool.pop() : new RedAstronaut();
-    a.mesh.position.set(400 + Math.random() * 120, 40 + Math.random() * 130, 0);
-    a.mesh.scale.setScalar(0.22 + Math.random() * 0.1);  // much smaller
-    a.tagged = false; a.tagTimer = 0;
-    a.suitMat.color.setHex(0xdd2211);
-    a.tagRing.visible = false;
-    this.mesh.add(a.mesh);
-    this.inUse.push(a);
-  };
-  RedAstronautsHolder.prototype.update = function() {
-    for (var i = this.inUse.length - 1; i >= 0; i--) {
-      var a = this.inUse[i];
-      a.update(this.speed);
-      if (a.mesh.position.x < -320) {
-        this.pool.push(a); this.mesh.remove(a.mesh); this.inUse.splice(i, 1);
-      }
-    }
-  };
-
-  function Burst(color, n) {
-    this.mesh = new THREE.Object3D();
-    this.parts = [];
-    var g = new THREE.TetrahedronGeometry(3, 0);
-    var m = new THREE.MeshPhongMaterial({ color: color, flatShading: true });
-    for (var i = 0; i < (n || 8); i++) {
-      var p = new THREE.Mesh(g, m);
-      var angle = (Math.PI * 2 * i) / n;
-      p.userData = {
-        vx: Math.cos(angle) * (1.5 + Math.random()),
-        vy: Math.sin(angle) * (1.5 + Math.random()),
-        vr: Math.random() * 0.3
-      };
-      this.mesh.add(p); this.parts.push(p);
-    }
-    scene.add(this.mesh);
-    this.life = 30;
-    activeBursts.push(this);
-  }
-  var activeBursts = [];
-  function updateBursts() {
-    for (var i = activeBursts.length - 1; i >= 0; i--) {
-      var b = activeBursts[i]; b.life--;
-      for (var j = 0; j < b.parts.length; j++) {
-        b.parts[j].position.x += b.parts[j].userData.vx;
-        b.parts[j].position.y += b.parts[j].userData.vy;
-        b.parts[j].rotation.x += b.parts[j].userData.vr;
-      }
-      b.mesh.scale.setScalar(b.life / 30);
-      if (b.life <= 0) { scene.remove(b.mesh); activeBursts.splice(i, 1); }
-    }
-  }
-  
-  var STATUS = 'waiting';
-  var score = 0, level = 1, energy = 10, MAX_E = 10;
-  var distance = 0, coinsGot = 0, frame = 0;
-  var spawnInt = 72, BASE_SPD = 2.0, COINS_PER_LEVEL = 20;
-  var mouse = { x: 0, y: 0 };
-
-  var sea, sky, humanoid, eHolder, cHolder, raHolder;
-  
-  function buildWorld() {
-    sea = new Sea(); sea.mesh.position.y = -600; scene.add(sea.mesh);
-    sky = new Sky(); sky.mesh.position.y = -600; scene.add(sky.mesh);
-    humanoid = new RagdollHuman();
-    humanoid.mesh.scale.setScalar(0.25);
-    humanoid.mesh.position.set(0, 100, 0);
-    scene.add(humanoid.mesh);
-    eHolder = new EnemiesHolder(); scene.add(eHolder.mesh);
-    cHolder = new CoinsHolder(); scene.add(cHolder.mesh);
-    raHolder = new RedAstronautsHolder(); scene.add(raHolder.mesh);
-    for (var i = 0; i < 8; i++) {
-      eHolder.pool.push(new Enemy());
-      cHolder.pool.push(new Coin());
-      raHolder.pool.push(new RedAstronaut());
-    }
-  }
-  
-  function buildHearts() {
-    var el = document.getElementById('hearts');
-    el.innerHTML = '';
-    for (var i = 0; i < MAX_E; i++) {
-      var div = document.createElement('div');
-      div.className = 'heart'; div.id = 'heart-' + i;
-      div.innerHTML = '<svg viewBox="0 0 32 29.6"><path fill="#f25346" d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.9,16,21.2,16,21.2s16-11.3,16-21.2C32,3.8,28.2,0,23.6,0z"/></svg>';
-      el.appendChild(div);
-    }
-  }
-  function refreshUI() {
-    document.getElementById('score').textContent = score;
-    document.getElementById('dist').textContent = Math.round(distance);
-    for (var i = 0; i < MAX_E; i++) {
-      var h = document.getElementById('heart-' + i);
-      if (h) h.classList.toggle('lost', i >= energy);
-    }
-  }
-  function setLevelRing(pct) {
-    var circ = 2 * Math.PI * 82;
-    document.getElementById('lvlRing').setAttribute('stroke-dashoffset', circ * (1 - pct));
-  }
-  
-  function norm(v, vmin, vmax, tmin, tmax) {
-    var nv = Math.max(Math.min(v, vmax), vmin);
-    return tmin + ((nv - vmin) / (vmax - vmin)) * (tmax - tmin);
-  }
-  
-  document.addEventListener('mousemove', function(e) {
-    mouse.x = -1 + (e.clientX / WIDTH) * 2;
-    mouse.y = 1 - (e.clientY / HEIGHT) * 2;
-    
-    var cursorEl = document.getElementById('cursor');
-    if (cursorEl) {
-      cursorEl.style.left = e.clientX + 'px';
-      cursorEl.style.top = e.clientY + 'px';
-    }
-  });
-
-  // Scroll listener: user can push into reverse, but magnetic bias always pulls forward
-  // reverseLerp tracks the "player intent" offset from the magnetic center
-  var reverseLerp = 0.0;         // user-controlled deviation: negative = reverse push
-  var MAGNETIC_FORWARD = 1.0;    // natural resting forward speed
-  var MAGNETIC_STRENGTH = 0.018; // how hard the magnet pulls back to forward per frame
-  var REVERSE_LIMIT = -2.2;      // how far back the user can push
-
-  window.addEventListener('wheel', function(e) {
-    // Scrolling down adds negative offset (pulls toward reverse), up adds positive
-    reverseLerp -= e.deltaY * 0.0012;
-    reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.2, reverseLerp));
-  }, { passive: true });
-  
-  window.addEventListener('pointerdown', function(e) {
-    // Tumbling: tap anywhere to get up
-    if (STATUS === 'tumbling') {
-      if (tumble.bounces >= 1) {
-        tumble.liftProgress = 1.0;
-        gsap.fromTo('#coin-flash', { opacity: 0.25 }, { opacity: 0, duration: 0.4 });
-      }
-      return;
-    }
-    if (STATUS !== 'playing') return;
-    if (e.pointerType === 'touch') return;
-
-    if (e.button === 0) {
-      // Left click: tag the nearest red astronaut within radius — ragdoll it
-      var clickX = norm(mouse.x, -1, 1, -100, 100);
-      var clickY = norm(mouse.y, -1, 1, 25, 175);
-      var TAG_RADIUS = 38;
-      var bestDist = TAG_RADIUS, bestRa = null;
-      for (var ri = 0; ri < raHolder.inUse.length; ri++) {
-        var ra = raHolder.inUse[ri];
-        if (ra.tagged) continue;
-        var raPos = new THREE.Vector3();
-        ra.mesh.getWorldPosition(raPos);
-        var d = Math.sqrt(Math.pow(clickX - raPos.x, 2) + Math.pow(clickY - raPos.y, 2));
-        if (d < bestDist) { bestDist = d; bestRa = ra; }
-      }
-      if (bestRa) {
-        bestRa.tagged = true;
-        bestRa.tagTimer = 50;
-        score += 3; refreshUI();
-        var rp = new THREE.Vector3();
-        bestRa.mesh.getWorldPosition(rp);
-        new Burst(0x00ffcc, 12).mesh.position.copy(rp);
-        gsap.fromTo('#coin-flash', { opacity: 0.4 }, { opacity: 0, duration: 0.3 });
-        (function(target) {
-          setTimeout(function() {
-            var idx = raHolder.inUse.indexOf(target);
-            if (idx >= 0) { raHolder.pool.push(target); raHolder.mesh.remove(target.mesh); raHolder.inUse.splice(idx, 1); }
-          }, 700);
-        })(bestRa);
-      }
-    } else if (e.button === 2) {
-      // Right click: reset orientation
-      gsap.to(humanoid, { flipX: 0, flipZ: 0, duration: 0.5, ease: "power3.out" });
-      gsap.to(humanoid.mesh.rotation, { y: Math.PI / 5, duration: 0.5, ease: "power3.out" });
-      humanoid.baseRotX = 0;
-      humanoid.baseRotZ = 0;
-    }
-  });
-  window.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-  
-  window.addEventListener('keydown', function(e) {
-    if (STATUS !== 'playing') return;
-    if (e.code === 'Space') {
-      e.preventDefault();
-      gsap.to(humanoid, { flipZ: "-=" + (Math.PI * 2), duration: 0.65, ease: "power2.inOut" });
-    }
-  });
-  
-  function startGame() {
-    STATUS = 'playing';
-    score = 0; energy = MAX_E; distance = 0;
-    coinsGot = 0; level = 1; frame = 0;
-    spawnInt = 55;
-    eHolder.speed = cHolder.speed = BASE_SPD;
-    eHolder.inUse.forEach(function(e) { eHolder.mesh.remove(e.mesh); });
-    cHolder.inUse.forEach(function(c) { cHolder.mesh.remove(c.mesh); });
-    raHolder.inUse.forEach(function(a) { raHolder.mesh.remove(a.mesh); });
-    eHolder.inUse = []; cHolder.inUse = []; raHolder.inUse = [];
-    
-    humanoid.flipX = 0; humanoid.flipZ = 0;
-    humanoid.baseRotX = 0; humanoid.baseRotZ = 0;
-    var lhEl = document.getElementById('lift-hint');
-    if (lhEl) lhEl.classList.remove('visible');
-  
-    setLevelRing(0);
-    document.getElementById('level-num').textContent = 1;
-    refreshUI();
-    document.getElementById('screen-welcome').classList.remove('visible');
-    document.getElementById('screen-gameover').classList.remove('visible');
-  }
-  
-  // Tumble state: character falls to planet surface and ragdolls along it
-  var tumble = {
-    surfaceY: 22,
-    velX: 0,
-    velY: 0,
-    bounces: 0,
-    spinX: 0,
-    spinY: 0,
-    spinZ: 0,
-    liftProgress: 0,
-  };
-
-  function doTumble() {
-    STATUS = 'tumbling';
-    tumble.velX = -(eHolder.speed * 0.6 + Math.random() * 3);
-    tumble.velY = 4 + Math.random() * 3;
-    tumble.bounces = 0;
-    tumble.liftProgress = 0;
-    tumble.spinX = (Math.random() - 0.5) * 0.28;
-    tumble.spinY = (Math.random() - 0.5) * 0.22;
-    tumble.spinZ = (Math.random() < 0.5 ? 1 : -1) * (0.12 + Math.random() * 0.2);
-    for (var i = 0; i < humanoid.joints.length; i++) {
-      humanoid.joints[i].pivot.userData.velX += (Math.random() - 0.5) * 6;
-      humanoid.joints[i].pivot.userData.velZ += (Math.random() - 0.5) * 6;
-    }
-    gsap.fromTo('#hit-flash', { opacity: 0.8 }, { opacity: 0, duration: 0.6 });
-  }
-
-  function doGameOver() {
-    STATUS = 'gameover';
-    document.getElementById('go-score').textContent = 'You scored ' + score + ' points';
-    document.getElementById('screen-gameover').classList.add('visible');
-  }
-  
-  function levelUp() {
-    level++;
-    document.getElementById('level-num').textContent = level;
-    setLevelRing(0);
-    var spd = BASE_SPD * (1 + level * 0.22);
-    eHolder.speed = cHolder.speed = raHolder.speed = spd;
-    spawnInt = Math.max(18, 55 - level * 4);
-  }
-  
-  var _pWorld = new THREE.Vector3(), _eWorld = new THREE.Vector3();
-  
-  function checkCollisions() {
-    humanoid.mesh.getWorldPosition(_pWorld);
-    for (var i = eHolder.inUse.length - 1; i >= 0; i--) {
-      var en = eHolder.inUse[i];
-      en.mesh.getWorldPosition(_eWorld);
-      if (_pWorld.distanceTo(_eWorld) < 8) {
-        new Burst(C.red, 10).mesh.position.copy(_eWorld);
-        eHolder.pool.push(en); eHolder.mesh.remove(en.mesh); eHolder.inUse.splice(i, 1);
-        energy--; refreshUI();
-        gsap.fromTo('#hit-flash', { opacity: 0.55 }, { opacity: 0, duration: 0.35 });
-        humanoid.hitReaction();
-        if (energy <= 0) { doTumble(); return; }
-      }
-    }
-    for (var j = cHolder.inUse.length - 1; j >= 0; j--) {
-      var cn = cHolder.inUse[j];
-      cn.mesh.getWorldPosition(_eWorld);
-      if (_pWorld.distanceTo(_eWorld) < 8) {
-        new Burst(C.blue, 8).mesh.position.copy(_eWorld);
-        cHolder.pool.push(cn); cHolder.mesh.remove(cn.mesh); cHolder.inUse.splice(j, 1);
-        score++; coinsGot++;
-        gsap.fromTo('#coin-flash', { opacity: 0.3 }, { opacity: 0, duration: 0.25 });
-        var lvlPct = (coinsGot % COINS_PER_LEVEL) / COINS_PER_LEVEL;
-        setLevelRing(lvlPct);
-        if (coinsGot > 0 && coinsGot % COINS_PER_LEVEL === 0) levelUp();
-        refreshUI();
-      }
-    }
-  }
-  
-  function loop() {
-    requestAnimationFrame(loop);
-    frame++;
-
-    // Magnetic forward bias: reverseLerp drifts back toward 0 each frame (magnet to forward)
-    // The further into reverse the user pushed, the harder it pulls back
-    reverseLerp += (0 - reverseLerp) * MAGNETIC_STRENGTH;
-
-    // targetRotSpeed = magnetic forward speed + user's reverse offset
-    targetRotSpeed = MAGNETIC_FORWARD + reverseLerp;
-
-    // Interpolate visual rotation toward the combined target
-    currentRotSpeed += (targetRotSpeed - currentRotSpeed) * 0.05;
-
-    // Apply the speed multiplier to the sky and planet
-    sea.mesh.rotation.z += 0.005 * currentRotSpeed;
-    sky.mesh.rotation.z += 0.002 * currentRotSpeed;
-    sea.moveWaves();
-  
-    var cycle = (sea.mesh.rotation.z / Math.PI) % planetColors.length; 
-    var idx1 = Math.floor(Math.abs(cycle)), idx2 = (idx1 + 1) % planetColors.length;
-    var c1 = new THREE.Color(planetColors[idx1]), c2 = new THREE.Color(planetColors[idx2]);
-    sea.mesh.material.color.copy(c1).lerp(c2, Math.abs(cycle) - idx1);
-  
-    if (STATUS === 'playing') {
-      // Tie distance tracking to our dynamic scroll speed as well
-      distance += 0.2 * Math.max(0.1, currentRotSpeed);
-
-      var tx = norm(mouse.x, -1, 1, -100, 100), ty = norm(mouse.y, -1, 1, 25, 175);
-      var dx = tx - humanoid.mesh.position.x, dy = ty - humanoid.mesh.position.y;
-      humanoid.mesh.position.x += dx * 0.1; humanoid.mesh.position.y += dy * 0.1;
-
-      humanoid.update(dx * 0.003, dy * 0.003, eHolder.speed, dx, dy);
-  
-      if (frame % Math.round(spawnInt) === 0) {
-        var r = Math.random();
-        if (r < 0.40) eHolder.spawn();
-        else if (r < 0.80) cHolder.spawn();
-        else raHolder.spawn();  // ~20% chance
-      }
-      eHolder.update(); cHolder.update(); raHolder.update();
-      updateBursts(); checkCollisions();
-
-
-
-    } else if (STATUS === 'tumbling') {
-      // --- RAGDOLL TUMBLE PHYSICS ---
-      var GRAVITY = -0.45;
-      var FRICTION = 0.91;
-      var BOUNCE_DAMP = 0.48;
-      var SURFACE_Y = tumble.surfaceY;
-
-      // Apply gravity
-      tumble.velY += GRAVITY;
-      humanoid.mesh.position.y += tumble.velY;
-      humanoid.mesh.position.x += tumble.velX;
-
-      // Keep character horizontally in view — wrap/clamp
-      if (humanoid.mesh.position.x < -130) { humanoid.mesh.position.x = -130; tumble.velX *= -0.4; }
-      if (humanoid.mesh.position.x >  130) { humanoid.mesh.position.x =  130; tumble.velX *= -0.4; }
-
-      // Bounce off planet surface
-      if (humanoid.mesh.position.y <= SURFACE_Y) {
-        humanoid.mesh.position.y = SURFACE_Y;
-        var impactSpeed = Math.abs(tumble.velY);
-        tumble.velY = impactSpeed * BOUNCE_DAMP;
-        tumble.velX *= FRICTION;
-        tumble.bounces++;
-
-        // On each bounce, inject NEW random spin — stays chaotic, doesn't decay to stillness
-        var spinScale = Math.max(0.5, 1.2 - tumble.bounces * 0.08);
-        tumble.spinX = (Math.random() - 0.5) * 0.32 * spinScale;
-        tumble.spinY = (Math.random() - 0.5) * 0.25 * spinScale;
-        tumble.spinZ = (Math.random() < 0.5 ? 1 : -1) * (0.15 + Math.random() * 0.22) * spinScale;
-
-        // Limb splat on impact — harder hits = wilder splat
-        var splatStr = Math.min(6, impactSpeed * 0.5);
-        for (var bi = 0; bi < humanoid.joints.length; bi++) {
-          humanoid.joints[bi].pivot.userData.velX += (Math.random() - 0.5) * splatStr;
-          humanoid.joints[bi].pivot.userData.velZ += (Math.random() - 0.5) * splatStr;
-        }
-
-        // Micro-bounces: keep a minimum bounce so it never just flat-slides
-        if (tumble.velY < 1.2) tumble.velY = 1.2 + Math.random() * 1.5;
-      }
-
-      // Apply continuous spin every frame — no decay, stays tumbling
-      humanoid.flipX += tumble.spinX;
-      humanoid.flipZ += tumble.spinZ;
-      humanoid.mesh.rotation.y += tumble.spinY;
-
-      // Drive joints with tumble velocity so limbs flail with the motion
-      humanoid.update(tumble.velX * 0.004, tumble.velY * 0.003, 0, 0, 0);
-
-      // Show lift hint after first bounce
-      var liftHint = document.getElementById('lift-hint');
-      if (liftHint) liftHint.classList.toggle('visible', tumble.bounces >= 1);
-
-      // Lift triggered by tap (tumble.liftProgress set to 1 on tap via pointerdown)
-      if (tumble.liftProgress >= 1.0) {
-        STATUS = 'playing';
-        energy = Math.max(1, Math.floor(MAX_E * 0.3));
-        refreshUI();
-        setLevelRing(0);
-        tumble.liftProgress = 0;
-        tumble.velX = 0; tumble.velY = 0;
-        humanoid.flipX = 0; humanoid.flipZ = 0;
-        humanoid.baseRotX = 0; humanoid.baseRotZ = 0;
-        gsap.to(humanoid.mesh.rotation, { y: 0, duration: 0.6, ease: "power3.out" });
-        if (liftHint) liftHint.classList.remove('visible');
-      }
-
-      updateBursts();
-
-    } else {
-      humanoid.mesh.position.y = 100 + Math.sin(Date.now() * 0.001) * 6;
-      humanoid.update(0, 0, 0, 0, 0);
-    }
-    renderer.render(scene, camera);
-  }
-  
-  document.getElementById('btn-start').addEventListener('click', startGame);
-  document.getElementById('btn-replay').addEventListener('click', startGame);
-  
-  window.addEventListener('load', function() {
-    createScene(); createLights(); buildWorld(); buildHearts();
-    refreshUI(); loop();
-    startGame(); 
-  });
+window.addEventListener('load', function() {
+  createScene(); createLights(); buildWorld(); buildHearts();
+  refreshUI(); loop(); startGame();
+});
 </script>
 </body>
 </html>
