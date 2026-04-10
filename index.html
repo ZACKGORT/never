@@ -259,8 +259,9 @@
 
 <div class="screen" id="screen-welcome">
   <h1>neverever.land</h1>
-  <p class="sub">a floating astronaut tamagotchi<br>that you need to feed</p>
-  <button class="btn-play" id="btn-start">begin</button>
+  <p class="sub">Bad news comes, don't you worry even when it lands<br>
+    Good news will work its way to all them plans<br></p>
+  <button class="btn-play" id="btn-start">Float on</button>
 </div>
 
 <div class="screen" id="screen-gameover"></div>
@@ -1041,6 +1042,15 @@ function handleHeartbeatTap() {
 }
 
 document.addEventListener('touchstart', function(e) {
+  // Allow taps on buttons (e.g. the "begin" button on the intro screen)
+  var target = e.target;
+  if (target && (target.tagName === 'BUTTON' || target.tagName === 'A' || target.closest('button') || target.closest('a'))) {
+    // Manually trigger startGame if it's the start button, since preventDefault below would swallow the click
+    if (target.id === 'btn-start' || (target.closest && target.closest('#btn-start'))) {
+      startGame();
+    }
+    return;
+  }
   e.preventDefault();
   if (STATUS === 'void') { handleHeartbeatTap(); return; }
   if (STATUS === 'tumbling') {
