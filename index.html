@@ -22,18 +22,33 @@
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; tap-highlight-color: transparent; }
   html, body { overscroll-behavior: none; touch-action: none; }
 
-  /* Black hole FAB */
-  #fab-bh {
+  /* Top header bar */
+  #top-bar {
     position: fixed;
-    top: 12px; left: 14px;
+    top: 0; left: 0; right: 0;
+    height: 48px;
+    background: rgba(2, 1, 17, 0.85);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 55;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 0 4px;
+  }
+
+  /* Black hole FAB — lives inside header */
+  #fab-bh {
     width: 62px; height: 62px;
     cursor: pointer;
-    z-index: 55;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.4s, transform 0.2s;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    flex-shrink: 0;
+    display: block;
   }
   #fab-bh.visible { opacity: 1; pointer-events: all; }
   #fab-bh:hover { transform: scale(1.10); }
@@ -48,13 +63,13 @@
   }
   #world {
     position: fixed;
-    width: 100%; height: 100%;
+    top: 48px; left: 0; right: 0; bottom: 0;
     background: linear-gradient(180deg, #020111 0%, #0d0820 100%);
     overflow: hidden;
     touch-action: none;
     transition: background 1.2s ease;
   }
-  #ui { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+  #ui { position: fixed; top: 48px; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 10; }
 
   /* Oxygen rail — thin bar, color shifts with depletion */
   #oxy-rail-bg {
@@ -71,19 +86,18 @@
     transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), background 1.5s ease;
   }
 
-  /* Survival timer — top right, whisper quiet */
+  /* Survival timer — right side of header */
   #timer {
-    position: absolute;
-    top: 20px; right: 22px;
-    font-size: clamp(0.7em, 2vw, 0.95em);
+    font-size: clamp(0.65em, 1.8vw, 0.85em);
     font-weight: 400;
     color: rgba(255,255,255,0.25);
     letter-spacing: 2px;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   #lift-hint {
-    position: fixed; left: 50%; top: 50%;
+    position: fixed; left: 50%; top: calc(48px + (100vh - 48px)/2);
     transform: translate(-50%, -50%);
     text-align: center; pointer-events: none; z-index: 15;
     opacity: 0; transition: opacity 0.4s;
@@ -93,7 +107,7 @@
 
   /* Void overlay — invisible tap-catcher, darkness comes from the scene itself */
   #void-overlay {
-    position: fixed; inset: 0;
+    position: fixed; top: 48px; left: 0; right: 0; bottom: 0;
     background: transparent;
     opacity: 0; pointer-events: none;
     z-index: 25;
@@ -102,7 +116,7 @@
 
   /* Heartbeat prompt */
   #heartbeat-prompt {
-    position: fixed; left: 50%; top: 50%;
+    position: fixed; left: 50%; top: calc(48px + (100vh - 48px)/2);
     transform: translate(-50%, -50%);
     text-align: center; pointer-events: none; z-index: 35;
     opacity: 0; transition: opacity 0.6s;
@@ -130,13 +144,13 @@
 
   /* Comet tail flash */
   #comet-flash {
-    position: fixed; inset: 0;
+    position: fixed; top: 48px; left: 0; right: 0; bottom: 0;
     background: radial-gradient(circle at 50% 50%, rgba(255,220,80,0.15), transparent 70%);
     opacity: 0; pointer-events: none; z-index: 30;
   }
 
   .screen {
-    position: fixed; inset: 0;
+    position: fixed; top: 48px; left: 0; right: 0; bottom: 0;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     z-index: 40; pointer-events: none;
@@ -238,7 +252,7 @@
 
   /* Foreground canvas — astronaut above pause overlay */
   #world-fg {
-    position: fixed; inset: 0;
+    position: fixed; top: 48px; left: 0; right: 0; bottom: 0;
     pointer-events: none;
     z-index: 70;
     display: none;
@@ -246,7 +260,7 @@
 
   /* Pause bento overlay */
   #pause-overlay {
-    position: fixed; inset: 0;
+    position: fixed; top: 48px; left: 0; right: 0; bottom: 0;
     background: rgba(2, 1, 17, 0.72);
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
@@ -342,13 +356,14 @@
     display: none;
   }
 
-  /* Toast notifications — top of screen */
+  /* Toast notifications — centered in header bar */
   #toast-container {
     position: fixed;
-    left: 50%; top: 14px;
+    left: 50%; top: 0;
+    height: 48px;
     transform: translateX(-50%);
-    z-index: 50; pointer-events: none;
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    z-index: 60; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
   }
   .toast {
     display: inline-block;
@@ -407,7 +422,7 @@
   .sol-rocket-notice { font-size: clamp(0.7em, 1.8vw, 0.82em); color: rgba(255,200,60,0.7); letter-spacing: 2px; margin-bottom: 1.6em; }
   .sol-buttons { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
-  #hit-flash { position: fixed; inset: 0; background: #f25346; opacity: 0; pointer-events: none; z-index: 30; mix-blend-mode: multiply; }
+  #hit-flash { position: fixed; top: 48px; left: 0; right: 0; bottom: 0; background: #f25346; opacity: 0; pointer-events: none; z-index: 30; mix-blend-mode: multiply; }
 
   /* Structural integrity bar — thin white line just above oxy rail */
   #stress-bar-bg {
@@ -463,8 +478,9 @@
 <div id="toast-container"></div>
 <div id="hint-label"></div>
 
-<!-- Black hole FAB — logomark / pause trigger -->
-<svg id="fab-bh" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-label="pause" style="touch-action:manipulation">
+<!-- Header bar: logo + timer -->
+<div id="top-bar">
+  <svg id="fab-bh" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-label="pause" style="touch-action:manipulation">
   <defs>
     <radialGradient id="fab-glow" cx="50%" cy="50%" r="50%">
       <stop offset="0%"   stop-color="#ff8020" stop-opacity="0.35"/>
@@ -491,6 +507,8 @@
   <ellipse cx="18" cy="18" rx="10.5" ry="2.7" fill="none" stroke="#ff9030" stroke-width="2.4" opacity="0.88" clip-path="url(#fab-cf)"/>
   <ellipse cx="18" cy="18" rx="10.5" ry="2.7" fill="none" stroke="#ffffd0" stroke-width="0.9" opacity="0.80" clip-path="url(#fab-cf)"/>
 </svg>
+  <div id="timer">0:00</div>
+</div><!-- /#top-bar -->
 
 <div id="pause-overlay">
   <div class="bento-grid">
@@ -535,7 +553,6 @@
 </div>
 
 <div id="ui">
-  <div id="timer">0:00</div>
   <div id="rocket-bar-bg"><div id="rocket-bar"></div></div>
   <div id="stress-bar-bg"><div id="stress-bar"></div></div>
   <div id="oxy-rail-bg"><div id="oxy-rail"></div></div>
@@ -589,7 +606,8 @@ var C = {
 var planetColors = [0x68c3c0, 0x4a3b69, 0x2b596b, 0x5c3a41];
 var scene, camera, renderer, fgRenderer;
 var pauseActive = false;
-var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
+var BAR_H = 48;
+var WIDTH = window.innerWidth, HEIGHT = window.innerHeight - BAR_H;
 var targetRotSpeed = 1.0, currentRotSpeed = 1.0;
 
 // ─── Scene ─────────────────────────────────────────────────────────────────
@@ -613,7 +631,7 @@ function createScene() {
   document.getElementById('world-fg').appendChild(fgRenderer.domElement);
 
   window.addEventListener('resize', function() {
-    WIDTH = window.innerWidth; HEIGHT = window.innerHeight;
+    WIDTH = window.innerWidth; HEIGHT = window.innerHeight - BAR_H;
     camera.aspect = WIDTH / HEIGHT;
     camera.updateProjectionMatrix();
     renderer.setSize(WIDTH, HEIGHT);
