@@ -868,9 +868,21 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
     var j = this.joints[i], p = j.pivot, ud = p.userData;
 
     if (i >= 4) {
-      var legTrail = forwardForce * 0.55 - reverseForce * 0.55;
-      j.restX = 0.08 - legBack + Math.sin(this.animTime * 0.9 + i) * 0.12 + legTrail;
-      j.restZ = (i === 4 || i === 6 ? legZ : -legZ) + Math.sin(this.animTime * 0.7 + i) * 0.08 + sideDrift * 0.50;
+      var legTrail  = forwardForce * 0.55 - reverseForce * 0.55;
+      var isHip     = (i === 4 || i === 6);
+      // Reverse pull: hips fold forward, knees lock straight
+      var hipFold   = reverseForce * 1.05;  // thighs rotate toward chest
+      var kneeLock  = Math.min(1, reverseForce * 1.2); // 0 = free, 1 = locked straight
+      var idleAnim  = Math.sin(this.animTime * 0.9 + i) * 0.12 * (1 - kneeLock);
+
+      if (isHip) {
+        // Fold: drive hip restX negative (thigh forward), suppress idle wiggle
+        j.restX = (0.08 - legBack - hipFold) + idleAnim + legTrail;
+      } else {
+        // Lock: blend toward 0 (straight), fully suppress oscillation
+        j.restX = (0.08 - legBack + idleAnim + legTrail) * (1 - kneeLock);
+      }
+      j.restZ = (i === 4 || i === 6 ? legZ : -legZ) + Math.sin(this.animTime * 0.7 + i) * 0.08 * (1 - kneeLock * 0.6) + sideDrift * 0.50;
     }
 
     var errX = j.restX - p.rotation.x;
