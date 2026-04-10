@@ -373,37 +373,70 @@
   
     this.animTime = 0;
   
-// Inside the RagdollHuman constructor, update the joints array:
+// Super responsive ragdoll physics - cartoonishly realistic, over-exaggerated
 this.joints = [
-  // SHOULDERS: Increased limits and reduced stiffness for more reach
-  { pivot: this.rShoulderPivot, restX: 0.2, restZ: -0.1, stiffX: 0.18, stiffZ: 0.18, dampX: 0.7, dampZ: 0.7, limX: 2.4, limZ: 1.2 },
-  { pivot: this.lShoulderPivot, restX: 0.2, restZ:  0.1, stiffX: 0.18, stiffZ: 0.18, dampX: 0.7, dampZ: 0.7, limX: 2.4, limZ: 1.2 },
+  // SHOULDERS: Full range of motion including forward reach (negative Z = forward)
+  { pivot: this.rShoulderPivot, restX: 0.2, restZ: -0.1, stiffX: 0.25, stiffZ: 0.25, dampX: 0.7, dampZ: 0.7, limX: 3.2, limZ: 2.5 },
+  { pivot: this.lShoulderPivot, restX: 0.2, restZ:  0.1, stiffX: 0.25, stiffZ: 0.25, dampX: 0.7, dampZ: 0.7, limX: 3.2, limZ: 2.5 },
   
-  // ELBOWS: Lower restX and tighter limX to keep arms straighter
-  { pivot: this.rElbowPivot,    restX: 0.15, restZ: 0,    stiffX: 0.1,  stiffZ: 0.1,  dampX: 0.8, dampZ: 0.8, limX: 0.5, limZ: 0.2 },
-  { pivot: this.lElbowPivot,    restX: 0.15, restZ: 0,    stiffX: 0.1,  stiffZ: 0.1,  dampX: 0.8, dampZ: 0.8, limX: 0.5, limZ: 0.2 },
+  // ELBOWS: Follow through on cursor reach with more range
+  { pivot: this.rElbowPivot,    restX: 0.05, restZ: 0,    stiffX: 0.3,  stiffZ: 0.25,  dampX: 0.72, dampZ: 0.72, limX: 1.2, limZ: 0.6 },
+  { pivot: this.lElbowPivot,    restX: 0.05, restZ: 0,    stiffX: 0.3,  stiffZ: 0.25,  dampX: 0.72, dampZ: 0.72, limX: 1.2, limZ: 0.6 },
   
-  // LEGS: Unchanged
-  { pivot: this.rHipPivot,      restX: 0,    restZ: 0,    stiffX: 0.12, stiffZ: 0.1,  dampX: 0.75, dampZ: 0.75, limX: 1.0, limZ: 0.4 },
-  { pivot: this.rKneePivot,     restX: 0.1,  restZ: 0,    stiffX: 0.1,  stiffZ: 0.08, dampX: 0.75, dampZ: 0.75, limX: 1.2, limZ: 0.2 },
-  { pivot: this.lHipPivot,      restX: 0,    restZ: 0,    stiffX: 0.12, stiffZ: 0.1,  dampX: 0.75, dampZ: 0.75, limX: 1.0, limZ: 0.4 },
-  { pivot: this.lKneePivot,     restX: 0.1,  restZ: 0,    stiffX: 0.1,  stiffZ: 0.08, dampX: 0.75, dampZ: 0.75, limX: 1.2, limZ: 0.2 },
+  // LEGS: Opposing swing for balance
+  { pivot: this.rHipPivot,      restX: 0,    restZ: 0,    stiffX: 0.18, stiffZ: 0.15,  dampX: 0.65, dampZ: 0.65, limX: 1.4, limZ: 0.6 },
+  { pivot: this.rKneePivot,     restX: 0.1,  restZ: 0,    stiffX: 0.15,  stiffZ: 0.12,  dampX: 0.65, dampZ: 0.65, limX: 1.5, limZ: 0.3 },
+  { pivot: this.lHipPivot,      restX: 0,    restZ: 0,    stiffX: 0.18, stiffZ: 0.15,  dampX: 0.65, dampZ: 0.65, limX: 1.4, limZ: 0.6 },
+  { pivot: this.lKneePivot,     restX: 0.1,  restZ: 0,    stiffX: 0.15,  stiffZ: 0.12,  dampX: 0.65, dampZ: 0.65, limX: 1.5, limZ: 0.3 },
 ];
+// Inertia tracking for butterfly-catching feel
+this.cursorVelX = 0;
+this.cursorVelY = 0;
+this.prevCursorX = 0;
+this.prevCursorY = 0;
   }
   
   RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
     dx = dx || 0; dy = dy || 0;
     this.animTime += 0.08;
   
-    var leanZ = -accelX * 0.6;
-    var leanX = -accelY * 0.4;
-    var forwardPitch = -0.5 - speed * 0.004;
+    // Track cursor velocity for inertia-based movement (butterfly-catching feel)
+    var cursorDX = dx - this.prevCursorX;
+    var cursorDY = dy - this.prevCursorY;
+    this.prevCursorX = dx;
+    this.prevCursorY = dy;
+    
+    // Smooth velocity with inertia - creates the "chasing" feel
+    this.cursorVelX = this.cursorVelX * 0.85 + cursorDX * 0.15;
+    this.cursorVelY = this.cursorVelY * 0.85 + cursorDY * 0.15;
   
+    // Smooth lean with inertia - butterfly-catching feel
+    var leanZ = -accelX * 0.8;  
+    var leanX = -accelY * 0.6;  
+    var forwardPitch = -0.5 - speed * 0.004;
+
+    // Add cursor vertical offset into body pitch — body tilts up/down with the arm reach
+    // dy is positive when cursor is above the character
+    var BODY_PITCH_STRENGTH = 0.0028;
+    var BODY_PITCH_MAX = 0.55;
+    var cursorPitch = Math.max(-BODY_PITCH_MAX, Math.min(BODY_PITCH_MAX, dy * BODY_PITCH_STRENGTH));
+
+    // Slower interpolation for inertia feel
     this.baseRotZ += (leanZ - this.baseRotZ) * 0.12;
-    this.baseRotX += (leanX + forwardPitch - this.baseRotX) * 0.1;
+    this.baseRotX += (leanX + forwardPitch + cursorPitch - this.baseRotX) * 0.1;
   
     this.mesh.rotation.z = this.baseRotZ + this.flipZ;
     this.mesh.rotation.x = this.baseRotX + this.flipX;
+    
+    // Body turns to face the cursor in tandem with the arms
+    // dx: world-units offset from char to cursor (positive = cursor right of char)
+    // Map horizontal offset to Y-axis yaw: cursor right → rotate right
+    // Base forward angle is PI/5; cursor pulls it left/right from there
+    var BODY_TURN_STRENGTH = 0.0045;
+    var BODY_TURN_MAX = 1.1;
+    var cursorYaw = Math.max(-BODY_TURN_MAX, Math.min(BODY_TURN_MAX, -dx * BODY_TURN_STRENGTH));
+    var targetRotY = Math.PI / 5 + cursorYaw;
+    this.mesh.rotation.y += (targetRotY - this.mesh.rotation.y) * 0.09;
   
     var baseScale = 0.6 + Math.random() * 0.4;
     var thrustBoost = Math.max(0, accelY * 2.5); 
@@ -413,13 +446,49 @@ this.joints = [
     var legCycle = Math.sin(this.animTime * 2.5) * 0.4;
     var legDrag = accelY * 0.5;
     
-    var reachX = Math.max(-1.5, Math.min(1.5, -dy * 0.03));
-    var reachZ = Math.max(-1.5, Math.min(1.5, -dx * 0.03));
-
-    this.joints[0].restX = reachX;
-    this.joints[0].restZ = reachZ - 0.02; 
-    this.joints[2].restX = reachX; 
-    this.joints[2].restZ = reachZ + 0.02;
+    // --- CURSOR-AIMED ARMS ---
+    // Map mouse world-space position relative to character to get a reach vector
+    // mouse.x / mouse.y are in [-1,1] normalized screen space
+    // We project that into a shoulder-relative angle for strong cursor pointing
+    
+    // Character screen position approximation (center of viewport = 0,0 for mouse)
+    // dx/dy is the pixel offset from char to target — use that for strong aiming
+    var charToMouseX = dx;  // world units: positive = cursor is to the right
+    var charToMouseY = dy;  // world units: positive = cursor is above
+    
+    // Convert to angles: atan2 gives us the angle from character to cursor
+    // Scale into joint rotation ranges with strong magnetic pull
+    var HAND_BIAS = 0.82;  // how strongly hands reach (0=none, 1=full lock-on)
+    
+    // Horizontal reach: left arm reaches left, right arm reaches right, both reach toward cursor
+    // Z-axis rotation = side reach, X-axis rotation = forward/back pitch
+    var cursorDistNorm = Math.sqrt(charToMouseX * charToMouseX + charToMouseY * charToMouseY);
+    var normX = cursorDistNorm > 0.01 ? charToMouseX / Math.max(cursorDistNorm, 80) : 0;
+    var normY = cursorDistNorm > 0.01 ? charToMouseY / Math.max(cursorDistNorm, 80) : 0;
+    
+    // Clamp to comfortable reach angles
+    var reachPitchX = Math.max(-1.8, Math.min(1.8, normY * 2.2));   // pitch up/down toward cursor
+    var reachSideZ  = Math.max(-1.6, Math.min(1.6, normX * 1.8));   // side reach toward cursor
+    
+    // Strong cursor pull blended with velocity response
+    var velContribX = this.cursorVelY * 0.08;
+    var velContribZ = this.cursorVelX * 0.06;
+    
+    // Right shoulder: shoulder is at -15x, cursor to the left means reach left (negative Z)
+    var rArmTargetX = reachPitchX * HAND_BIAS + velContribX * (1 - HAND_BIAS);
+    var rArmTargetZ = -reachSideZ * HAND_BIAS + velContribZ * (1 - HAND_BIAS) - 0.15;
+    
+    // Left shoulder: shoulder is at +15x, mirror of right
+    var lArmTargetX = reachPitchX * HAND_BIAS + velContribX * (1 - HAND_BIAS);
+    var lArmTargetZ =  reachSideZ * HAND_BIAS - velContribZ * (1 - HAND_BIAS) + 0.15;
+    
+    // Arms react OPPOSITE to body movement direction
+    // Right arm
+    this.joints[0].restX = rArmTargetX;
+    this.joints[0].restZ = rArmTargetZ;
+    // Left arm  
+    this.joints[2].restX = lArmTargetX;
+    this.joints[2].restZ = lArmTargetZ;
   
     // Calculate simulated gravity based on vertical position 
     // Y mapped between roughly 25 (bottom) to 175 (top).
@@ -429,10 +498,31 @@ this.joints = [
     for (var i = 0; i < this.joints.length; i++) {
       var j = this.joints[i], p = j.pivot, ud = p.userData;
       
-      // By adding gravityBias to forceX, we force the limbs back/down locally, 
-      // overpowering the mouse reach the lower on the screen they are.
-      var forceX = -accelY * 1.8 + (i < 4 ? 0 : legDrag) + gravityBias;
-      var forceZ = -accelX * (i < 4 ? 1.2 : 0.5);
+      // OPPOSING FORCES for butterfly-catching physics
+      // Arms (indices 0-3) reach forward when body moves back, and vice versa
+      // Legs (indices 4-7) swing opposite to direction of travel for balance
+      
+      var isArm = (i < 4);
+      var isShoulder = (i === 0 || i === 2);
+      var isLeg = (i >= 4);
+      
+      // Arms get opposing force - reach forward when pulled back
+      // Legs get drag force - swing back when moving forward
+      var forceX, forceZ;
+      
+      if (isShoulder) {
+        // Shoulders: strong cursor aim (already set via restX/restZ above)
+        forceX = 0;
+        forceZ = 0;
+      } else if (isArm) {
+        // Elbows: follow through toward cursor direction — extend the arm reach
+        forceX = reachPitchX * 0.55;
+        forceZ = (i === 1 ? -reachSideZ : reachSideZ) * 0.45;
+      } else {
+        // Legs: natural swing opposite to movement direction
+        forceX = -accelY * 1.5 + legDrag + gravityBias;
+        forceZ = -accelX * 1.0;
+      }
       
       var errX = (j.restX + forceX) - p.rotation.x;
       var errZ = (j.restZ + forceZ) - p.rotation.z;
@@ -444,38 +534,45 @@ this.joints = [
       p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
     }
   
-    this.rHipPivot.rotation.x += ((-0.2 + legCycle) - this.rHipPivot.rotation.x) * 0.3;
-    this.lHipPivot.rotation.x += ((-0.2 - legCycle) - this.lHipPivot.rotation.x) * 0.3;
-    this.rKneePivot.rotation.x += ((0.3 + Math.max(0, -legCycle) * 0.8) - this.rKneePivot.rotation.x) * 0.25;
-    this.lKneePivot.rotation.x += ((0.3 + Math.max(0, legCycle) * 0.8) - this.lKneePivot.rotation.x) * 0.25;
-    this.head.rotation.z += ((-leanZ * 0.4 + Math.sin(this.animTime) * 0.04) - this.head.rotation.z) * 0.1;
+    this.rHipPivot.rotation.x += ((-0.2 + legCycle) - this.rHipPivot.rotation.x) * 0.35;
+    this.lHipPivot.rotation.x += ((-0.2 - legCycle) - this.lHipPivot.rotation.x) * 0.35;
+    this.rKneePivot.rotation.x += ((0.3 + Math.max(0, -legCycle) * 0.8) - this.rKneePivot.rotation.x) * 0.3;
+    this.lKneePivot.rotation.x += ((0.3 + Math.max(0, legCycle) * 0.8) - this.lKneePivot.rotation.x) * 0.3;
+    // More responsive head movement for cartoonish effect
+    this.head.rotation.z += ((-leanZ * 0.6 + Math.sin(this.animTime) * 0.06) - this.head.rotation.z) * 0.15;
   };
   
   RagdollHuman.prototype.hitReaction = function() {
+    // Random rotation and spin on collision - dramatic cartoon hit
     for (var i = 0; i < this.joints.length; i++) {
-      this.joints[i].pivot.userData.velX += (Math.random() - 0.5) * 1.5;
-      this.joints[i].pivot.userData.velZ += (Math.random() - 0.5) * 1.5;
+      this.joints[i].pivot.userData.velX += (Math.random() - 0.5) * 3.5;
+      this.joints[i].pivot.userData.velZ += (Math.random() - 0.5) * 3.5;
     }
-    this.baseRotZ += (Math.random() - 0.5) * 0.6;
-    this.baseRotX += (Math.random() - 0.5) * 0.4;
-
-    for (var i = 0; i < this.joints.length; i++) {
-    var j = this.joints[i], p = j.pivot, ud = p.userData;
-
-    // Direct reach bias: Shoulders (indices 0 and 2) get 2x sensitivity to cursor position
-    var bias = (i === 0 || i === 2) ? 2.5 : 1.0;
-    var forceX = -accelY * 2.2 * bias;
-    var forceZ = -accelX * 1.5 * bias;
-
-    var errX = (j.restX + forceX) - p.rotation.x;
-    var errZ = (j.restZ + forceZ) - p.rotation.z;
-
-    ud.velX = ud.velX * j.dampX + errX * j.stiffX;
-    ud.velZ = ud.velZ * j.dampZ + errZ * j.stiffZ;
-
-    p.rotation.x = Math.max(-j.limX, Math.min(j.limX, p.rotation.x + ud.velX));
-    p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
-  }
+    
+    // Random full-body rotation and spin
+    var randomSpinX = (Math.random() - 0.5) * Math.PI * 2;  // Random X flip
+    var randomSpinY = (Math.random() - 0.5) * Math.PI * 3;  // Random Y spin
+    var randomSpinZ = (Math.random() - 0.5) * Math.PI * 2;  // Random Z roll
+    
+    // Apply spin using GSAP for smooth animation
+    gsap.to(this, { 
+      flipX: this.flipX + randomSpinX, 
+      duration: 0.8, 
+      ease: "power2.out" 
+    });
+    gsap.to(this.mesh.rotation, { 
+      y: this.mesh.rotation.y + randomSpinY, 
+      duration: 0.8, 
+      ease: "power2.out" 
+    });
+    gsap.to(this, { 
+      flipZ: this.flipZ + randomSpinZ, 
+      duration: 0.8, 
+      ease: "power2.out" 
+    });
+    
+    this.baseRotZ += (Math.random() - 0.5) * 0.8;
+    this.baseRotX += (Math.random() - 0.5) * 0.6;
   };
 
   
@@ -629,11 +726,17 @@ this.joints = [
     }
   });
 
-  // Adding the Scroll Listener to track desired world rotation speed
+  // Scroll listener: user can push into reverse, but magnetic bias always pulls forward
+  // reverseLerp tracks the "player intent" offset from the magnetic center
+  var reverseLerp = 0.0;         // user-controlled deviation: negative = reverse push
+  var MAGNETIC_FORWARD = 1.0;    // natural resting forward speed
+  var MAGNETIC_STRENGTH = 0.018; // how hard the magnet pulls back to forward per frame
+  var REVERSE_LIMIT = -2.2;      // how far back the user can push
+
   window.addEventListener('wheel', function(e) {
-    targetRotSpeed += e.deltaY * 0.002;
-    // Bound the rotational speed between forwards, slow backwards, and ultra-fast
-    targetRotSpeed = Math.max(-5, Math.min(5, targetRotSpeed));
+    // Scrolling down adds negative offset (pulls toward reverse), up adds positive
+    reverseLerp -= e.deltaY * 0.0012;
+    reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.2, reverseLerp));
   }, { passive: true });
   
   window.addEventListener('pointerdown', function(e) {
@@ -641,9 +744,27 @@ this.joints = [
     if (e.pointerType === 'touch') return; 
   
     if (e.button === 0) { 
-      gsap.to(humanoid, { flipX: "-=" + (Math.PI * 2), duration: 0.65, ease: "power2.inOut" });
+      // Left click: randomize all three rotation axes with dramatic spins
+      var randX = (Math.random() - 0.5) * Math.PI * 4;
+      var randY = (Math.random() - 0.5) * Math.PI * 4;
+      var randZ = (Math.random() - 0.5) * Math.PI * 4;
+      gsap.to(humanoid, {
+        flipX: humanoid.flipX + randX,
+        flipZ: humanoid.flipZ + randZ,
+        duration: 0.6,
+        ease: "power2.inOut"
+      });
+      gsap.to(humanoid.mesh.rotation, {
+        y: humanoid.mesh.rotation.y + randY,
+        duration: 0.6,
+        ease: "power2.inOut"
+      });
     } else if (e.button === 2) { 
-      gsap.to(humanoid, { flipX: "+=" + (Math.PI * 2), duration: 0.65, ease: "power2.inOut" });
+      // Right click: reset character orientation back to neutral
+      gsap.to(humanoid, { flipX: 0, flipZ: 0, duration: 0.5, ease: "power3.out" });
+      gsap.to(humanoid.mesh.rotation, { y: Math.PI / 5, duration: 0.5, ease: "power3.out" });
+      humanoid.baseRotX = 0;
+      humanoid.baseRotZ = 0;
     }
   });
   
@@ -728,7 +849,14 @@ this.joints = [
     requestAnimationFrame(loop);
     frame++;
 
-    // Interpolate the visual rotation speed towards the mouse wheel input
+    // Magnetic forward bias: reverseLerp drifts back toward 0 each frame (magnet to forward)
+    // The further into reverse the user pushed, the harder it pulls back
+    reverseLerp += (0 - reverseLerp) * MAGNETIC_STRENGTH;
+
+    // targetRotSpeed = magnetic forward speed + user's reverse offset
+    targetRotSpeed = MAGNETIC_FORWARD + reverseLerp;
+
+    // Interpolate visual rotation toward the combined target
     currentRotSpeed += (targetRotSpeed - currentRotSpeed) * 0.05;
 
     // Apply the speed multiplier to the sky and planet
