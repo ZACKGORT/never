@@ -19,7 +19,7 @@
     width: 100%; height: 100%;
     background: linear-gradient(180deg, #e4e0ba 0%, #f7d9aa 100%);
     overflow: hidden;
-    cursor: none;
+    cursor: crosshair;
   }
   #ui {
     position: fixed;
@@ -63,7 +63,7 @@
   #coin-flash { position: fixed; inset: 0; background: #68c3c0; opacity: 0; pointer-events: none; z-index: 30; mix-blend-mode: screen; }
 </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
 <div id="world"></div>
 <div id="hit-flash"></div>
@@ -96,6 +96,8 @@
 <div id="instructions" style="display:none">
   <p>Grab the <strong style="color:#68c3c0">blue pills</strong></p>
   <p><span>avoid the red ones</span></p>
+  <p style="font-size:0.8em; margin-top:8px; color:#d1b790; letter-spacing: 1px;">L-Click: Spin 180&deg; / R-Click: Front Flip 360&deg;</p>
+  <p style="font-size:0.7em; color:#d1b790; letter-spacing: 1px;">Mobile: Tap (180&deg;) / Double Tap (360&deg;)</p>
 </div>
 
 <div class="screen visible" id="screen-welcome">
@@ -127,6 +129,7 @@ var C = {
   cloud:     0xffffff,
   charRed:   0xdd3322,
   charDark:  0xaa2211,
+  boardBase: 0x334455,
 };
 
 var scene, camera, renderer;
@@ -227,7 +230,7 @@ function Sky() {
   }
 }
 
-// ── RAGDOLL HUMANOID ──────────────────────────────────────────
+// ── RAGDOLL HUMANOID WITH HOVERBOARD ──────────────────────────
 
 function makeBox(w, h, d, mat) {
   return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
@@ -238,6 +241,28 @@ function RagdollHuman() {
 
   var bodyMat = new THREE.MeshPhongMaterial({ color: C.charRed, flatShading: true });
   var darkMat = new THREE.MeshPhongMaterial({ color: C.charDark, flatShading: true });
+
+  // HOVERBOARD
+  var boardMat = new THREE.MeshPhongMaterial({ color: C.boardBase, flatShading: true });
+  this.board = makeBox(46, 4, 16, boardMat);
+  this.board.position.set(0, -41, 0);
+  this.board.castShadow = true;
+  
+  var stripeMat = new THREE.MeshPhongMaterial({ color: C.blue, flatShading: true });
+  var stripe = makeBox(46, 4.2, 4, stripeMat);
+  this.board.add(stripe);
+  this.mesh.add(this.board);
+
+  // PARTICLES SYSTEM FOR HOVERBOARD
+  this.particles = [];
+  this.particleMat = new THREE.MeshPhongMaterial({ color: C.cloud, flatShading: true, transparent: true });
+  this.particleGeo = new THREE.BoxGeometry(1, 1, 1);
+
+  // ROTATION CONTROLS
+  this.targetRotY = 0;
+  this.currentRotY = 0;
+  this.targetRotX = 0; // NEW: X-Axis Flip target
+  this.currentRotX = 0; // NEW: X-Axis Flip current
 
   // HEAD
   var head = makeBox(14, 14, 14, bodyMat);
@@ -354,31 +379,77 @@ function RagdollHuman() {
 
   this.animTime = 0;
 
+  // Stance adjusted for boarding
   this.joints = [
-    { pivot: this.rShoulderPivot, restX: 0.3, restZ: -0.2, stiffX: 0.15, stiffZ: 0.15, dampX: 0.7, dampZ: 0.7, limX: 1.2, limZ: 0.8 },
+    { pivot: this.rShoulderPivot, restX: 0.3, restZ: -0.5, stiffX: 0.15, stiffZ: 0.15, dampX: 0.7, dampZ: 0.7, limX: 1.2, limZ: 0.8 },
     { pivot: this.rElbowPivot,    restX: 0.4, restZ: 0,    stiffX: 0.12, stiffZ: 0.1,  dampX: 0.7, dampZ: 0.7, limX: 1.5, limZ: 0.3 },
-    { pivot: this.lShoulderPivot, restX: 0.3, restZ:  0.2, stiffX: 0.15, stiffZ: 0.15, dampX: 0.7, dampZ: 0.7, limX: 1.2, limZ: 0.8 },
+    { pivot: this.lShoulderPivot, restX: 0.3, restZ:  0.5, stiffX: 0.15, stiffZ: 0.15, dampX: 0.7, dampZ: 0.7, limX: 1.2, limZ: 0.8 },
     { pivot: this.lElbowPivot,    restX: 0.4, restZ: 0,    stiffX: 0.12, stiffZ: 0.1,  dampX: 0.7, dampZ: 0.7, limX: 1.5, limZ: 0.3 },
-    { pivot: this.rHipPivot,      restX: 0,   restZ: 0,    stiffX: 0.12, stiffZ: 0.1,  dampX: 0.75, dampZ: 0.75, limX: 1.0, limZ: 0.4 },
-    { pivot: this.rKneePivot,     restX: 0.1, restZ: 0,    stiffX: 0.1,  stiffZ: 0.08, dampX: 0.75, dampZ: 0.75, limX: 1.2, limZ: 0.2 },
-    { pivot: this.lHipPivot,      restX: 0,   restZ: 0,    stiffX: 0.12, stiffZ: 0.1,  dampX: 0.75, dampZ: 0.75, limX: 1.0, limZ: 0.4 },
-    { pivot: this.lKneePivot,     restX: 0.1, restZ: 0,    stiffX: 0.1,  stiffZ: 0.08, dampX: 0.75, dampZ: 0.75, limX: 1.2, limZ: 0.2 },
+    { pivot: this.rHipPivot,      restX: 0,   restZ: -0.5, stiffX: 0.12, stiffZ: 0.1,  dampX: 0.75, dampZ: 0.75, limX: 1.0, limZ: 0.4 },
+    { pivot: this.rKneePivot,     restX: 0.2, restZ: 0,    stiffX: 0.1,  stiffZ: 0.08, dampX: 0.75, dampZ: 0.75, limX: 1.2, limZ: 0.2 },
+    { pivot: this.lHipPivot,      restX: 0,   restZ: 0.5,  stiffX: 0.12, stiffZ: 0.1,  dampX: 0.75, dampZ: 0.75, limX: 1.0, limZ: 0.4 },
+    { pivot: this.lKneePivot,     restX: 0.2, restZ: 0,    stiffX: 0.1,  stiffZ: 0.08, dampX: 0.75, dampZ: 0.75, limX: 1.2, limZ: 0.2 },
   ];
 }
 
 RagdollHuman.prototype.update = function(accelX, accelY, speed) {
   this.animTime += 0.08;
 
+  // Spin rotation logic (Y axis)
+  this.currentRotY += (this.targetRotY - this.currentRotY) * 0.15;
+  this.mesh.rotation.y = this.currentRotY;
+
+  // Flip rotation logic (X axis)
+  this.currentRotX += (this.targetRotX - this.currentRotX) * 0.10; // Slightly slower lerp for a flip
+
+  // Hoverboard Particles
+  if (Math.random() > 0.4 && speed > 0) {
+    var p = new THREE.Mesh(this.particleGeo, this.particleMat);
+    var size = 2 + Math.random() * 3.5;
+    p.scale.setScalar(size);
+    p.position.set(
+      this.board.position.x + (Math.random() - 0.5) * 44,
+      this.board.position.y - 1,
+      this.board.position.z + (Math.random() - 0.5) * 14
+    );
+    p.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+    p.userData = {
+      life: 1.0,
+      vx: -speed - Math.random() * 2,
+      vy: -0.5 - Math.random() * 1.5,
+      vz: (Math.random() - 0.5) * 2
+    };
+    this.mesh.add(p);
+    this.particles.push(p);
+  }
+
+  for (var k = this.particles.length - 1; k >= 0; k--) {
+    var pt = this.particles[k];
+    pt.userData.life -= 0.05;
+    pt.position.x += pt.userData.vx;
+    pt.position.y += pt.userData.vy;
+    pt.position.z += pt.userData.vz;
+    pt.rotation.x += 0.1;
+    pt.rotation.y += 0.1;
+    pt.scale.setScalar(Math.max(0, pt.userData.life * 4));
+    pt.material.opacity = pt.userData.life;
+    if (pt.userData.life <= 0) {
+      this.mesh.remove(pt);
+      this.particles.splice(k, 1);
+    }
+  }
+
   var leanZ = -accelX * 0.6;
   var leanX = -accelY * 0.4;
   this.mesh.rotation.z += (leanZ - this.mesh.rotation.z) * 0.12;
-  this.mesh.rotation.x += (leanX - this.mesh.rotation.x) * 0.12;
 
-  var forwardPitch = -0.5 - speed * 0.004;
-  this.mesh.rotation.x += (forwardPitch - this.mesh.rotation.x) * 0.05;
+  var forwardPitch = -0.1 - speed * 0.004; 
 
-  var legCycle = Math.sin(this.animTime * 2.5) * 0.4;
-  var legDrag = accelY * 0.5;
+  // Combine Flip (X-axis target) + Mouse Lean (X-axis) + Speed Pitch
+  var targetMeshX = this.currentRotX + leanX + forwardPitch;
+  this.mesh.rotation.x += (targetMeshX - this.mesh.rotation.x) * 0.15;
+
+  var boardBump = Math.sin(this.animTime * 1.5) * 0.05;
   var armFlutter = Math.sin(this.animTime * 3) * 0.05;
 
   for (var i = 0; i < this.joints.length; i++) {
@@ -386,7 +457,7 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed) {
     var p = j.pivot;
     var ud = p.userData;
 
-    var forceX = -accelY * 1.8 + (i < 4 ? 0 : legDrag);
+    var forceX = -accelY * 1.8;
     var forceZ = -accelX * (i < 4 ? 1.2 : 0.5);
 
     var errX = (j.restX + forceX) - p.rotation.x;
@@ -399,15 +470,21 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed) {
     p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
   }
 
-  var rHipBase = -0.2 + legCycle;
-  var lHipBase = -0.2 - legCycle;
+  // Boarding stance adjustments
+  var rHipBase = -0.1 + boardBump;
+  var lHipBase = -0.1 - boardBump;
   this.rHipPivot.rotation.x += (rHipBase - this.rHipPivot.rotation.x) * 0.3;
   this.lHipPivot.rotation.x += (lHipBase - this.lHipPivot.rotation.x) * 0.3;
 
-  var rKneeBase = 0.3 + Math.max(0, -legCycle) * 0.8;
-  var lKneeBase = 0.3 + Math.max(0, legCycle) * 0.8;
+  var rKneeBase = 0.3;
+  var lKneeBase = 0.3;
   this.rKneePivot.rotation.x += (rKneeBase - this.rKneePivot.rotation.x) * 0.25;
   this.lKneePivot.rotation.x += (lKneeBase - this.lKneePivot.rotation.x) * 0.25;
+
+  var rSpread = -0.2;
+  var lSpread = 0.2;
+  this.rHipPivot.rotation.z += (rSpread - this.rHipPivot.rotation.z) * 0.1;
+  this.lHipPivot.rotation.z += (lSpread - this.lHipPivot.rotation.z) * 0.1;
 
   var rArmSpread = -0.2 + armFlutter + accelX * 0.4;
   var lArmSpread = -0.2 - armFlutter - accelX * 0.4;
@@ -524,7 +601,7 @@ function updateBursts() {
 }
 
 // ─────────────────────────────────────────
-// GAME STATE
+// GAME STATE & INPUT
 // ─────────────────────────────────────────
 var STATUS = 'waiting';
 var score = 0, level = 1, energy = 10, MAX_E = 10;
@@ -592,6 +669,27 @@ document.addEventListener('touchmove', function(e) {
   mouse.y = 1 - (t.clientY / HEIGHT) * 2;
 }, { passive: false });
 
+// ROTATION EVENT LISTENERS
+document.addEventListener('mousedown', function(e) {
+  if (e.target.tagName === 'BUTTON') return;
+  if (e.button === 0) humanoid.targetRotY += Math.PI; // Left Click (Spin)
+  else if (e.button === 2) humanoid.targetRotX += Math.PI * 2; // Right Click (Front Flip)
+});
+
+var lastTapTime = 0;
+document.addEventListener('touchstart', function(e) {
+  if (e.target.tagName === 'BUTTON') return;
+  var now = Date.now();
+  if (now - lastTapTime < 300) {
+    humanoid.targetRotY += Math.PI * 2; // Double tap
+    lastTapTime = 0;
+  } else {
+    humanoid.targetRotY += Math.PI; // Single tap
+    lastTapTime = now;
+  }
+}, { passive: false });
+
+
 function startGame() {
   STATUS = 'playing';
   score = 0; energy = MAX_E; distance = 0;
@@ -609,8 +707,8 @@ function startGame() {
   var instr = document.getElementById('instructions');
   instr.style.display = 'block';
   instr.classList.remove('fade');
-  setTimeout(function() { instr.classList.add('fade'); }, 3000);
-  setTimeout(function() { instr.style.display = 'none'; }, 4200);
+  setTimeout(function() { instr.classList.add('fade'); }, 4000);
+  setTimeout(function() { instr.style.display = 'none'; }, 5200);
 }
 
 function doGameOver() {
@@ -636,7 +734,8 @@ function checkCollisions() {
   for (var i = eHolder.inUse.length - 1; i >= 0; i--) {
     var en = eHolder.inUse[i];
     en.mesh.getWorldPosition(_eWorld);
-    if (_pWorld.distanceTo(_eWorld) < 8) {
+    // Adjusted hit radius slightly to accommodate hoverboard shape
+    if (_pWorld.distanceTo(_eWorld) < 12) {
       new Burst(C.red, 10).mesh.position.copy(_eWorld);
       eHolder.pool.push(en);
       eHolder.mesh.remove(en.mesh);
@@ -651,7 +750,7 @@ function checkCollisions() {
   for (var j = cHolder.inUse.length - 1; j >= 0; j--) {
     var cn = cHolder.inUse[j];
     cn.mesh.getWorldPosition(_eWorld);
-    if (_pWorld.distanceTo(_eWorld) < 8) {
+    if (_pWorld.distanceTo(_eWorld) < 12) {
       new Burst(C.blue, 8).mesh.position.copy(_eWorld);
       cHolder.pool.push(cn);
       cHolder.mesh.remove(cn.mesh);
@@ -710,6 +809,13 @@ function loop() {
     humanoid.mesh.position.y = 100 + Math.sin(Date.now() * 0.001) * 6;
     humanoid.update(0, 0, 0);
   }
+
+  // PULL FOCUS: Center camera dynamically on the hoverboard
+  var boardWorldPos = new THREE.Vector3();
+  humanoid.board.getWorldPosition(boardWorldPos);
+  if (!camera.userData.lookTarget) camera.userData.lookTarget = new THREE.Vector3(0, 100, 0);
+  camera.userData.lookTarget.lerp(boardWorldPos, 0.1);
+  camera.lookAt(camera.userData.lookTarget);
 
   renderer.render(scene, camera);
 }
