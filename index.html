@@ -4,6 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>neverever.land</title>
+<meta name="description" content="A capable person floating in an indifferent environment.">
+<meta property="og:title" content="neverever.land">
+<meta property="og:description" content="A capable person floating in an indifferent environment.">
+<meta property="og:url" content="https://neverever.land">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://neverever.land/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="neverever.land">
+<meta name="twitter:description" content="A capable person floating in an indifferent environment.">
+<meta name="twitter:image" content="https://neverever.land/og.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23020111' rx='6'/%3E%3Ccircle cx='16' cy='10' r='7' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Cellipse cx='16' cy='10' rx='4.5' ry='3.5' fill='%231a2a4a'/%3E%3Cellipse cx='14' cy='8.5' rx='1.5' ry='1' fill='%234466aa' opacity='0.7'/%3E%3Crect x='9' y='16' width='14' height='10' rx='3' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Crect x='9.5' y='17' width='4' height='6' rx='1' fill='%23ccc' stroke='%23aaa' stroke-width='0.3'/%3E%3Crect x='4' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='22.5' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Ccircle cx='4.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Ccircle cx='27.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Crect x='10' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='18' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='9.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Crect x='17.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Ccircle cx='4' cy='4' r='0.6' fill='%23fff' opacity='0.8'/%3E%3Ccircle cx='28' cy='6' r='0.8' fill='%23fff' opacity='0.9'/%3E%3Ccircle cx='26' cy='28' r='0.5' fill='%23fff' opacity='0.7'/%3E%3C/svg%3E">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
@@ -1701,8 +1713,33 @@ function doGameOver() {
   STATUS = 'gameover';
   rocketmanPending = true;
 
-  var secs = Math.floor(survivalFrames / 60);
-  var mins = Math.floor(secs / 60); secs = secs % 60;
+  var totalSecs = Math.floor(survivalFrames / 60);
+
+  // Short session grace — first impression shouldn't be an empty debrief
+  if (totalSecs < 30) {
+    var screen = document.getElementById('screen-gameover');
+    screen.innerHTML =
+      '<h1>still here</h1>' +
+      '<p class="sol-label">sol ' + solNumber + '</p>' +
+      '<p class="sub" style="max-width:320px;text-align:center;color:rgba(255,255,255,0.45);font-size:0.9em;line-height:1.7;margin-bottom:2em;">' +
+        'You\'re just getting oriented.<br>The environment takes a moment to read.' +
+      '</p>' +
+      '<div class="sol-buttons">' +
+        '<button class="btn-play" id="btn-replay">again</button>' +
+        '<a href="https://zack.cx" target="_blank" class="btn-link" style="margin-top:14px;">zack.cx</a>' +
+      '</div>';
+    document.getElementById('btn-replay').addEventListener('click', startGame);
+    screen.classList.add('visible');
+    document.getElementById('void-overlay').classList.remove('active');
+    document.getElementById('heartbeat-prompt').classList.remove('visible');
+    if (sea) { sea.mesh.visible = true; sky.mesh.visible = true; }
+    if (orbHolder) { orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true; }
+    if (voidLight) voidLight.intensity = 0;
+    return;
+  }
+
+  var secs = totalSecs % 60;
+  var mins = Math.floor(totalSecs / 60);
   var timeStr = mins > 0 ? mins + 'm ' + secs + 's' : secs + 's';
 
   var avgAlt = stats.altitudeFrames ? stats.altitudeSum / stats.altitudeFrames : 100;
@@ -1946,10 +1983,16 @@ function loop() {
 
   if (STATUS === 'playing') {
     if (pauseActive) {
-      // Frozen — scene animates, astronaut bobs, game doesn't advance
-      humanoid.mesh.position.y += (100 - humanoid.mesh.position.y) * 0.04;
-      humanoid.update(0, 0, 0, 0, 0);
+      // Full astronaut agency — mouse tracking, all interactions live
+      humanoid.flipX += (0 - humanoid.flipX) * 0.004;
+      humanoid.flipZ += (0 - humanoid.flipZ) * 0.004;
+      var tx = norm(mouse.x, -1, 1, -100, 100), ty = norm(mouse.y, -1, 1, 25, 175);
+      var dx = tx - humanoid.mesh.position.x, dy = ty - humanoid.mesh.position.y;
+      humanoid.mesh.position.x += dx * 0.1;
+      humanoid.mesh.position.y += dy * 0.1;
+      humanoid.update(dx*0.003, dy*0.003, orbHolder.speed, dx, dy);
       updateBursts();
+      if (cometSparkles.length) updateCometSparkles();
       renderer.render(scene, camera);
       // Foreground: astronaut above overlay
       sea.mesh.visible = false; sky.mesh.visible = false;
