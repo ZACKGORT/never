@@ -281,8 +281,8 @@ function RagdollHuman() {
   // Arms
   this.rShoulderPivot = new THREE.Object3D();
   this.rShoulderPivot.position.set(-15, 16, 0);
-  this.rShoulderPivot.rotation.x =  0.65;  // reach forward
-  this.rShoulderPivot.rotation.z = -0.55;  // arms in, not outstretched
+  this.rShoulderPivot.rotation.x =  0.28;
+  this.rShoulderPivot.rotation.z = -1.05;   // lower arms, less horizontal
   this.rShoulderPivot.userData = { velX: 0, velZ: 0 };
   var rUpperArm = makeBox(8, 18, 8, suitMat);
   rUpperArm.position.set(0, -9, 0);
@@ -300,8 +300,8 @@ function RagdollHuman() {
 
   this.lShoulderPivot = new THREE.Object3D();
   this.lShoulderPivot.position.set(15, 16, 0);
-  this.lShoulderPivot.rotation.x =  0.65;  // reach forward
-  this.lShoulderPivot.rotation.z =  0.55;  // arms in, not outstretched
+  this.lShoulderPivot.rotation.x =  0.28;
+  this.lShoulderPivot.rotation.z =  1.05;   // lower arms
   this.lShoulderPivot.userData = { velX: 0, velZ: 0 };
   var lUpperArm = makeBox(8, 18, 8, suitMat);
   lUpperArm.position.set(0, -9, 0);
