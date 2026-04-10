@@ -10,14 +10,15 @@
   body {
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Arial, sans-serif;
     overflow: hidden;
-    background: #68c3c0;
+    background: #020111;
     user-select: none;
     -webkit-user-select: none;
   }
   #world {
     position: fixed;
     width: 100%; height: 100%;
-    background: linear-gradient(180deg, #e4e0ba 0%, #f7d9aa 100%);
+    /* Deep space gradient */
+    background: linear-gradient(180deg, #020111 0%, #1a1025 100%);
     overflow: hidden;
     cursor: none;
   }
@@ -96,6 +97,7 @@
 <div id="instructions" style="display:none">
   <p>Grab the <strong style="color:#68c3c0">blue pills</strong></p>
   <p><span>avoid the red ones</span></p>
+  <p style="font-size:0.7em; margin-top:12px; color:rgba(255,255,255,.6); letter-spacing:1px; text-transform:uppercase;">Desktop: L/R Click = Flip &nbsp;|&nbsp; Space = Cartwheel</p>
 </div>
 
 <div class="screen visible" id="screen-welcome">
@@ -129,12 +131,14 @@ var C = {
   charDark:  0xaa2211,
 };
 
+var planetColors = [0x68c3c0, 0x4a3b69, 0x2b596b, 0x5c3a41];
+
 var scene, camera, renderer;
 var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
 
 function createScene() {
   scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xf7d9aa, 100, 950);
+  scene.fog = new THREE.Fog(0x1a1025, 100, 950);
   camera = new THREE.PerspectiveCamera(60, WIDTH / HEIGHT, 1, 10000);
   camera.position.set(0, 100, 200);
   renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -152,9 +156,9 @@ function createScene() {
 }
 
 function createLights() {
-  var hemi = new THREE.HemisphereLight(0xaaaaaa, 0x000000, 0.9);
+  var hemi = new THREE.HemisphereLight(0xffffff, 0x000000, 0.5);
   scene.add(hemi);
-  var ambient = new THREE.AmbientLight(0xdc8874, 0.3);
+  var ambient = new THREE.AmbientLight(0x404040, 0.7);
   scene.add(ambient);
   var sun = new THREE.DirectionalLight(0xffffff, 0.9);
   sun.position.set(150, 350, 350);
@@ -179,7 +183,7 @@ function Sea() {
       speed: 0.016 + Math.random() * 0.032,
     });
   }
-  var mat = new THREE.MeshPhongMaterial({ color: C.blue, transparent: true, opacity: 0.6, flatShading: true });
+  var mat = new THREE.MeshPhongMaterial({ color: planetColors[0], transparent: true, opacity: 0.8, flatShading: true });
   this.mesh = new THREE.Mesh(geom, mat);
   this.mesh.receiveShadow = true;
 }
@@ -195,35 +199,23 @@ Sea.prototype.moveWaves = function() {
   this.mesh.geometry.computeVertexNormals();
 };
 
-function Cloud() {
+function Star() {
   this.mesh = new THREE.Object3D();
-  var geom = new THREE.BoxGeometry(20, 20, 20);
-  var mat = new THREE.MeshPhongMaterial({ color: C.cloud, flatShading: true });
-  var n = 3 + Math.floor(Math.random() * 3);
-  for (var i = 0; i < n; i++) {
-    var m = new THREE.Mesh(geom, mat);
-    m.position.set(i * 15, Math.random() * 10, Math.random() * 10);
-    m.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, 0);
-    var s = 0.1 + Math.random() * 0.9;
-    m.scale.set(s, s, s);
-    m.castShadow = m.receiveShadow = true;
-    this.mesh.add(m);
-  }
+  var geom = new THREE.BoxGeometry(2, 2, 2);
+  var mat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  var m = new THREE.Mesh(geom, mat);
+  this.mesh.add(m);
 }
 
 function Sky() {
   this.mesh = new THREE.Object3D();
-  var nClouds = 20;
-  var step = (Math.PI * 2) / nClouds;
-  for (var i = 0; i < nClouds; i++) {
-    var c = new Cloud();
-    var a = step * i;
-    var h = 750 + Math.random() * 200;
-    c.mesh.position.set(Math.cos(a) * h, Math.sin(a) * h, -400 - Math.random() * 400);
-    c.mesh.rotation.z = a + Math.PI / 2;
-    var s = 1 + Math.random() * 2;
-    c.mesh.scale.set(s, s, s);
-    this.mesh.add(c.mesh);
+  var nStars = 150;
+  for (var i = 0; i < nStars; i++) {
+    var s = new Star();
+    var a = Math.random() * Math.PI * 2;
+    var h = 650 + Math.random() * 300;
+    s.mesh.position.set(Math.cos(a) * h, Math.sin(a) * h, -200 - Math.random() * 600);
+    this.mesh.add(s.mesh);
   }
 }
 
@@ -235,51 +227,70 @@ function makeBox(w, h, d, mat) {
 
 function RagdollHuman() {
   this.mesh = new THREE.Object3D();
-  
-  // Set to 3/4 view angle
   this.mesh.rotation.y = Math.PI / 5; 
+
+  // Add explicit physics rotations and independent flip rotations
+  this.baseRotX = 0;
+  this.baseRotZ = 0;
+  this.flipX = 0;
+  this.flipZ = 0;
 
   var suitMat = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true });
   var jointMat = new THREE.MeshPhongMaterial({ color: 0x666666, flatShading: true });
   var visorMat = new THREE.MeshPhongMaterial({ color: 0x111115, flatShading: true, shininess: 100, specular: 0xffffff });
   var packMat = new THREE.MeshPhongMaterial({ color: 0xdddddd, flatShading: true });
+  var thrusterMat = new THREE.MeshPhongMaterial({ color: 0x444444, flatShading: true });
+  var flameMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
 
-  // HEAD / HELMET
+  // HEAD
   var head = makeBox(18, 18, 18, suitMat);
   head.position.set(0, 34, 0);
   head.castShadow = true;
   this.mesh.add(head);
   this.head = head;
 
-  // HELMET VISOR
+  // VISOR
   var visor = makeBox(14, 10, 4, visorMat);
   visor.position.set(0, 2, 8);
   head.add(visor);
 
-  // NECK RING
   var neck = makeBox(12, 4, 12, jointMat);
   neck.position.set(0, 24, 0);
   this.mesh.add(neck);
 
-  // TORSO upper
   var torsoU = makeBox(24, 16, 16, suitMat);
   torsoU.position.set(0, 15, 0);
   torsoU.castShadow = true;
   this.mesh.add(torsoU);
 
-  // BACKPACK (PLSS)
   var pack = makeBox(18, 22, 10, packMat);
   pack.position.set(0, 0, -12);
   pack.castShadow = true;
   torsoU.add(pack);
 
-  // TORSO lower
+  var lThruster = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 3.5, 8, 8), thrusterMat);
+  lThruster.position.set(-6, -11, 0);
+  pack.add(lThruster);
+
+  var rThruster = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 3.5, 8, 8), thrusterMat);
+  rThruster.position.set(6, -11, 0);
+  pack.add(rThruster);
+
+  this.lFlame = new THREE.Mesh(new THREE.ConeGeometry(2.5, 12, 8), flameMat);
+  this.lFlame.position.set(0, -9, 0);
+  this.lFlame.rotation.x = Math.PI;
+  lThruster.add(this.lFlame);
+
+  this.rFlame = new THREE.Mesh(new THREE.ConeGeometry(2.5, 12, 8), flameMat);
+  this.rFlame.position.set(0, -9, 0);
+  this.rFlame.rotation.x = Math.PI;
+  rThruster.add(this.rFlame);
+
   var torsoL = makeBox(22, 12, 14, suitMat);
   torsoL.position.set(0, 3, 0);
   torsoL.castShadow = true;
   this.mesh.add(torsoL);
 
-  // PELVIS
   var pelvis = makeBox(20, 8, 12, jointMat);
   pelvis.position.set(0, -5, 0);
   this.mesh.add(pelvis);
@@ -301,7 +312,7 @@ function RagdollHuman() {
   rForearm.castShadow = true;
   this.rElbowPivot.add(rForearm);
   
-  var rHand = makeBox(8, 8, 8, jointMat); // Glove
+  var rHand = makeBox(8, 8, 8, jointMat); 
   rHand.position.set(0, -15, 0);
   this.rElbowPivot.add(rHand);
   this.rShoulderPivot.add(this.rElbowPivot);
@@ -324,7 +335,7 @@ function RagdollHuman() {
   lForearm.castShadow = true;
   this.lElbowPivot.add(lForearm);
   
-  var lHand = makeBox(8, 8, 8, jointMat); // Glove
+  var lHand = makeBox(8, 8, 8, jointMat);
   lHand.position.set(0, -15, 0);
   this.lElbowPivot.add(lHand);
   this.lShoulderPivot.add(this.lElbowPivot);
@@ -347,7 +358,7 @@ function RagdollHuman() {
   rShin.castShadow = true;
   this.rKneePivot.add(rShin);
   
-  var rFoot = makeBox(11, 8, 14, jointMat); // Moon Boot
+  var rFoot = makeBox(11, 8, 14, jointMat);
   rFoot.position.set(0, -18, 3);
   this.rKneePivot.add(rFoot);
   this.rHipPivot.add(this.rKneePivot);
@@ -370,7 +381,7 @@ function RagdollHuman() {
   lShin.castShadow = true;
   this.lKneePivot.add(lShin);
   
-  var lFoot = makeBox(11, 8, 14, jointMat); // Moon Boot
+  var lFoot = makeBox(11, 8, 14, jointMat);
   lFoot.position.set(0, -18, 3);
   this.lKneePivot.add(lFoot);
   this.lHipPivot.add(this.lKneePivot);
@@ -378,7 +389,6 @@ function RagdollHuman() {
 
   this.animTime = 0;
 
-  // Stiffened joints slightly to reflect a pressurized space suit
   this.joints = [
     { pivot: this.rShoulderPivot, restX: 0.3, restZ: -0.2, stiffX: 0.15, stiffZ: 0.15, dampX: 0.7, dampZ: 0.7, limX: 1.2, limZ: 0.8 },
     { pivot: this.rElbowPivot,    restX: 0.4, restZ: 0,    stiffX: 0.12, stiffZ: 0.1,  dampX: 0.7, dampZ: 0.7, limX: 1.5, limZ: 0.3 },
@@ -396,11 +406,20 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed) {
 
   var leanZ = -accelX * 0.6;
   var leanX = -accelY * 0.4;
-  this.mesh.rotation.z += (leanZ - this.mesh.rotation.z) * 0.12;
-  this.mesh.rotation.x += (leanX - this.mesh.rotation.x) * 0.12;
-
   var forwardPitch = -0.5 - speed * 0.004;
-  this.mesh.rotation.x += (forwardPitch - this.mesh.rotation.x) * 0.05;
+
+  // Use procedural smoothing for the core physical drag/lean
+  this.baseRotZ += (leanZ - this.baseRotZ) * 0.12;
+  this.baseRotX += (leanX + forwardPitch - this.baseRotX) * 0.1;
+
+  // Append user-triggered flips (animated via GSAP)
+  this.mesh.rotation.z = this.baseRotZ + this.flipZ;
+  this.mesh.rotation.x = this.baseRotX + this.flipX;
+
+  var baseScale = 0.6 + Math.random() * 0.4;
+  var thrustBoost = Math.max(0, accelY * 2.5); 
+  this.lFlame.scale.set(1, baseScale + thrustBoost, 1);
+  this.rFlame.scale.set(1, baseScale + thrustBoost, 1);
 
   var legCycle = Math.sin(this.animTime * 2.5) * 0.4;
   var legDrag = accelY * 0.5;
@@ -449,13 +468,10 @@ RagdollHuman.prototype.hitReaction = function() {
     j.pivot.userData.velX += (Math.random() - 0.5) * 1.5;
     j.pivot.userData.velZ += (Math.random() - 0.5) * 1.5;
   }
-  this.mesh.rotation.z += (Math.random() - 0.5) * 0.6;
-  this.mesh.rotation.x += (Math.random() - 0.5) * 0.4;
+  this.baseRotZ += (Math.random() - 0.5) * 0.6;
+  this.baseRotX += (Math.random() - 0.5) * 0.4;
 };
 
-// ─────────────────────────────────────────
-// ENEMY, COIN, HOLDERS
-// ─────────────────────────────────────────
 function Enemy() {
   var geom = new THREE.IcosahedronGeometry(8, 1);
   var mat = new THREE.MeshPhongMaterial({ color: C.red, shininess: 0, flatShading: true });
@@ -548,9 +564,6 @@ function updateBursts() {
   }
 }
 
-// ─────────────────────────────────────────
-// GAME STATE
-// ─────────────────────────────────────────
 var STATUS = 'waiting';
 var score = 0, level = 1, energy = 10, MAX_E = 10;
 var distance = 0, coinsGot = 0, frame = 0;
@@ -617,6 +630,36 @@ document.addEventListener('touchmove', function(e) {
   mouse.y = 1 - (t.clientY / HEIGHT) * 2;
 }, { passive: false });
 
+
+// ── CONTROLS & TRICKS ──────────────────────────────────────────
+
+window.addEventListener('pointerdown', function(e) {
+  if (STATUS !== 'playing') return;
+  // Ignore mobile inputs to keep standard drag controls purely intact
+  if (e.pointerType === 'touch') return; 
+
+  if (e.button === 0) { // Left Click - Front Flip
+    gsap.to(humanoid, { flipX: "-=" + (Math.PI * 2), duration: 0.65, ease: "power2.inOut" });
+  } else if (e.button === 2) { // Right Click - Backflip
+    gsap.to(humanoid, { flipX: "+=" + (Math.PI * 2), duration: 0.65, ease: "power2.inOut" });
+  }
+});
+
+// Prevent Context Menu on Right Click
+window.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+});
+
+window.addEventListener('keydown', function(e) {
+  if (STATUS !== 'playing') return;
+  if (e.code === 'Space') {
+    e.preventDefault(); // Prevent accidental page scrolling
+    // Spacebar - Clockwise Cartwheel
+    gsap.to(humanoid, { flipZ: "-=" + (Math.PI * 2), duration: 0.65, ease: "power2.inOut" });
+  }
+});
+
+
 function startGame() {
   STATUS = 'playing';
   score = 0; energy = MAX_E; distance = 0;
@@ -626,6 +669,13 @@ function startGame() {
   eHolder.inUse.forEach(function(e) { eHolder.mesh.remove(e.mesh); });
   cHolder.inUse.forEach(function(c) { cHolder.mesh.remove(c.mesh); });
   eHolder.inUse = []; cHolder.inUse = [];
+  
+  // Reset trick rotations
+  humanoid.flipX = 0;
+  humanoid.flipZ = 0;
+  humanoid.baseRotX = 0;
+  humanoid.baseRotZ = 0;
+
   setLevelRing(0);
   document.getElementById('level-num').textContent = 1;
   refreshUI();
@@ -634,8 +684,8 @@ function startGame() {
   var instr = document.getElementById('instructions');
   instr.style.display = 'block';
   instr.classList.remove('fade');
-  setTimeout(function() { instr.classList.add('fade'); }, 3000);
-  setTimeout(function() { instr.style.display = 'none'; }, 4200);
+  setTimeout(function() { instr.classList.add('fade'); }, 4000);
+  setTimeout(function() { instr.style.display = 'none'; }, 5200);
 }
 
 function doGameOver() {
@@ -697,8 +747,18 @@ function loop() {
   frame++;
 
   sea.mesh.rotation.z += 0.005;
-  sky.mesh.rotation.z += 0.01;
+  sky.mesh.rotation.z += 0.002;
   sea.moveWaves();
+
+  var rot = sea.mesh.rotation.z;
+  var cycle = (rot / Math.PI) % planetColors.length; 
+  var idx1 = Math.floor(cycle);
+  var idx2 = (idx1 + 1) % planetColors.length;
+  var lerpAmt = cycle - idx1;
+  
+  var c1 = new THREE.Color(planetColors[idx1]);
+  var c2 = new THREE.Color(planetColors[idx2]);
+  sea.mesh.material.color.copy(c1).lerp(c2, lerpAmt);
 
   mouseVel.x = mouse.x - prevMouse.x;
   mouseVel.y = mouse.y - prevMouse.y;
