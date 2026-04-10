@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>neverever.land</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23020111' rx='6'/%3E%3Ccircle cx='16' cy='10' r='7' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Cellipse cx='16' cy='10' rx='4.5' ry='3.5' fill='%231a2a4a'/%3E%3Cellipse cx='14' cy='8.5' rx='1.5' ry='1' fill='%234466aa' opacity='0.7'/%3E%3Crect x='9' y='16' width='14' height='10' rx='3' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Crect x='9.5' y='17' width='4' height='6' rx='1' fill='%23ccc' stroke='%23aaa' stroke-width='0.3'/%3E%3Crect x='4' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='22.5' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Ccircle cx='4.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Ccircle cx='27.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Crect x='10' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='18' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='9.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Crect x='17.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Ccircle cx='4' cy='4' r='0.6' fill='%23fff' opacity='0.8'/%3E%3Ccircle cx='28' cy='6' r='0.8' fill='%23fff' opacity='0.9'/%3E%3Ccircle cx='26' cy='28' r='0.5' fill='%23fff' opacity='0.7'/%3E%3C/svg%3E">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; tap-highlight-color: transparent; }
@@ -622,6 +623,71 @@ function updateBursts() {
   }
 }
 
+// ─── Smoke Trail ───────────────────────────────────────────────────────────
+var smokeParticles = [];
+var smokePool = [];
+var SMOKE_COLORS = [0x8899aa, 0x99aabb, 0x6677aa, 0xaabbcc, 0x778899];
+
+function SmokeParticle() {
+  var sides = 5 + Math.floor(Math.random() * 4); // 5–8 sided polygon feel
+  var g = new THREE.IcosahedronGeometry(1, 0);
+  // squash it flat-ish for a more 2d polygonal look
+  g.applyMatrix4(new THREE.Matrix4().makeScale(1, 0.55 + Math.random()*0.3, 0.4 + Math.random()*0.3));
+  var col = SMOKE_COLORS[Math.floor(Math.random()*SMOKE_COLORS.length)];
+  var m = new THREE.MeshPhongMaterial({ color: col, flatShading: true, transparent: true, opacity: 0.0 });
+  this.mesh = new THREE.Mesh(g, m);
+  this.mesh.castShadow = false;
+  scene.add(this.mesh);
+}
+
+function spawnSmoke(x, y, z, velX, velY) {
+  var p = smokePool.length ? smokePool.pop() : new SmokeParticle();
+  var spread = 3;
+  p.mesh.position.set(
+    x + (Math.random()-0.5)*spread,
+    y + (Math.random()-0.5)*spread,
+    z + (Math.random()-0.5)*4
+  );
+  var baseSize = 1.8 + Math.random()*2.0;
+  p.mesh.scale.setScalar(baseSize);
+  p.mesh.rotation.set(Math.random()*Math.PI*2, Math.random()*Math.PI*2, Math.random()*Math.PI*2);
+  p.mesh.material.opacity = 0.55 + Math.random()*0.25;
+  p.mesh.material.color.setHex(SMOKE_COLORS[Math.floor(Math.random()*SMOKE_COLORS.length)]);
+  p.mesh.visible = true;
+  p.vx = velX * 0.18 + (Math.random()-0.5)*0.6;
+  p.vy = velY * 0.10 + (Math.random()-0.5)*0.4 + 0.15;
+  p.vz = (Math.random()-0.5)*0.5;
+  p.vr = (Math.random()-0.5)*0.08;
+  p.life = 1.0;
+  p.decay = 0.022 + Math.random()*0.016;
+  p.growRate = 0.055 + Math.random()*0.04;
+  p.baseSize = baseSize;
+  smokeParticles.push(p);
+}
+
+function updateSmoke() {
+  for (var i = smokeParticles.length-1; i >= 0; i--) {
+    var p = smokeParticles[i];
+    p.life -= p.decay;
+    if (p.life <= 0) {
+      p.mesh.visible = false;
+      smokePool.push(p);
+      smokeParticles.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.x += p.vx;
+    p.mesh.position.y += p.vy;
+    p.mesh.position.z += p.vz;
+    p.vx *= 0.97; p.vy *= 0.97;
+    p.mesh.rotation.x += p.vr;
+    p.mesh.rotation.z += p.vr * 0.7;
+    // grow and fade
+    var s = p.baseSize * (1 + (1 - p.life) * p.growRate * 30);
+    p.mesh.scale.setScalar(s);
+    p.mesh.material.opacity = p.life * 0.7;
+  }
+}
+
 // ─── Game state ────────────────────────────────────────────────────────────
 var STATUS = 'waiting';
 var score = 0, level = 1, energy = 10, MAX_E = 10;
@@ -1008,6 +1074,11 @@ function loop() {
     humanoid.flipZ += tumble.spinZ;
     humanoid.mesh.rotation.y += tumble.spinY;
     humanoid.update(tumble.velX*0.004, tumble.velY*0.003, 0, 0, 0);
+    // Smoke trail — spawn 2–3 particles per frame trailing the astronaut
+    var sx = humanoid.mesh.position.x, sy = humanoid.mesh.position.y;
+    var numSmoke = 2 + (frame % 3 === 0 ? 1 : 0);
+    for (var si = 0; si < numSmoke; si++) spawnSmoke(sx, sy, 0, tumble.velX, tumble.velY);
+    updateSmoke();
     var liftHint = document.getElementById('lift-hint');
     if (liftHint) liftHint.classList.toggle('visible', tumble.bounces >= 1);
     if (tumble.liftProgress >= 1.0) {
@@ -1021,6 +1092,7 @@ function loop() {
       if (liftHint) liftHint.classList.remove('visible');
     }
     updateBursts();
+    if (smokeParticles.length) updateSmoke();
 
   } else {
     humanoid.mesh.position.y = 100 + Math.sin(Date.now()*0.001)*6;
