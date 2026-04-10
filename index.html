@@ -25,18 +25,19 @@
   /* Black hole FAB */
   #fab-bh {
     position: fixed;
-    bottom: 20px; right: 18px;
-    width: 42px; height: 42px;
+    top: 12px; right: 14px;
+    width: 62px; height: 62px;
     cursor: pointer;
     z-index: 55;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.4s, transform 0.2s;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   #fab-bh.visible { opacity: 1; pointer-events: all; }
-  #fab-bh:hover { transform: scale(1.12); }
-  #fab-bh:active { transform: scale(0.94); }
+  #fab-bh:hover { transform: scale(1.10); }
+  #fab-bh:active { transform: scale(0.92); }
   body {
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Arial, sans-serif;
     overflow: hidden;
@@ -73,7 +74,7 @@
   /* Survival timer — top right, whisper quiet */
   #timer {
     position: absolute;
-    top: 20px; right: 22px;
+    top: 20px; right: 90px;
     font-size: clamp(0.7em, 2vw, 0.95em);
     font-weight: 400;
     color: rgba(255,255,255,0.25);
@@ -2314,6 +2315,24 @@ document.getElementById('btn-start').addEventListener('click', startGame);
 document.getElementById('fab-bh').addEventListener('click', function() {
   if (STATUS === 'playing' || STATUS === 'tumbling') pauseGame();
 });
+
+// Direct touch handler on FAB so mobile tap works reliably
+(function() {
+  var fab = document.getElementById('fab-bh');
+  var fabTouchStarted = false;
+  fab.addEventListener('touchstart', function(e) {
+    fabTouchStarted = true;
+    e.stopPropagation(); // don't trigger long-press on document
+  }, { passive: true });
+  fab.addEventListener('touchend', function(e) {
+    if (fabTouchStarted) {
+      fabTouchStarted = false;
+      e.stopPropagation();
+      if (STATUS === 'playing' || STATUS === 'tumbling') pauseGame();
+    }
+  }, { passive: true });
+  fab.addEventListener('touchmove', function() { fabTouchStarted = false; }, { passive: true });
+})();
 
 // ─── Hint label ────────────────────────────────────────────────────────────
 var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
