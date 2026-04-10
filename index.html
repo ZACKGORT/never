@@ -1417,7 +1417,7 @@ document.addEventListener('touchstart', function(e) {
   // Let buttons, links, inputs and the FAB handle their own events
   var tag = e.target.tagName;
   if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
-  if (e.target.closest('#fab-bh')) return;
+  if (e.target.closest && e.target.closest('#fab-bh')) return;
   // Don't interfere with screen overlays while waiting or showing gameover
   if (STATUS === 'waiting' || STATUS === 'gameover') return;
 
@@ -1470,7 +1470,10 @@ document.addEventListener('touchmove', function(e) {
 document.addEventListener('touchend', function(e) {
   var tag = e.target.tagName;
   if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
-  if (e.target.closest('#fab-bh')) return;
+  if (e.target.closest && e.target.closest('#fab-bh')) {
+    if (STATUS === 'playing' || STATUS === 'tumbling') pauseGame();
+    return;
+  }
   if (STATUS === 'waiting' || STATUS === 'gameover') return;
   e.preventDefault();
   touchState.twoFinger = false;
@@ -2318,25 +2321,7 @@ document.getElementById('fab-bh').addEventListener('click', function() {
   if (STATUS === 'playing' || STATUS === 'tumbling') pauseGame();
 });
 
-// Direct touch handler on FAB so mobile tap works reliably
-(function() {
-  var fab = document.getElementById('fab-bh');
-  var fabTouchStarted = false;
-  fab.addEventListener('touchstart', function(e) {
-    fabTouchStarted = true;
-    e.stopPropagation();
-    e.preventDefault();
-  }, { passive: false });
-  fab.addEventListener('touchend', function(e) {
-    if (fabTouchStarted) {
-      fabTouchStarted = false;
-      e.stopPropagation();
-      e.preventDefault();
-      if (STATUS === 'playing' || STATUS === 'tumbling') pauseGame();
-    }
-  }, { passive: false });
-  fab.addEventListener('touchmove', function() { fabTouchStarted = false; }, { passive: true });
-})();
+// FAB touch handled inline in document touchend
 
 // ─── Hint label ────────────────────────────────────────────────────────────
 var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
