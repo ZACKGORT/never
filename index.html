@@ -1414,10 +1414,16 @@ function handleHeartbeatTap() {
 }
 
 document.addEventListener('touchstart', function(e) {
-  // Let buttons, links, inputs and the FAB handle their own events
+  // Let buttons, links, inputs handle their own events
   var tag = e.target.tagName;
   if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
-  if (e.target.closest && e.target.closest('#fab-bh')) return;
+  // Hit-test FAB by coordinates — works on all SVG/mobile targets
+  var fab = document.getElementById('fab-bh');
+  if (fab && fab.classList.contains('visible')) {
+    var r = fab.getBoundingClientRect();
+    var tx = e.touches[0].clientX, ty = e.touches[0].clientY;
+    if (tx >= r.left && tx <= r.right && ty >= r.top && ty <= r.bottom) return;
+  }
   // Don't interfere with screen overlays while waiting or showing gameover
   if (STATUS === 'waiting' || STATUS === 'gameover') return;
 
@@ -1470,9 +1476,15 @@ document.addEventListener('touchmove', function(e) {
 document.addEventListener('touchend', function(e) {
   var tag = e.target.tagName;
   if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
-  if (e.target.closest && e.target.closest('#fab-bh')) {
-    if (STATUS === 'playing' || STATUS === 'tumbling') pauseGame();
-    return;
+  // Hit-test FAB by the touch that just ended (changedTouches)
+  var fab = document.getElementById('fab-bh');
+  if (fab && fab.classList.contains('visible') && e.changedTouches.length) {
+    var r = fab.getBoundingClientRect();
+    var tx = e.changedTouches[0].clientX, ty = e.changedTouches[0].clientY;
+    if (tx >= r.left && tx <= r.right && ty >= r.top && ty <= r.bottom) {
+      if (STATUS === 'playing' || STATUS === 'tumbling') pauseGame();
+      return;
+    }
   }
   if (STATUS === 'waiting' || STATUS === 'gameover') return;
   e.preventDefault();
