@@ -1536,7 +1536,7 @@ function buildDispatchTable() {
 }
 
 function pauseGame() {
-  if (STATUS === 'waiting' || STATUS === 'gameover') return;
+  if (STATUS === 'waiting' || STATUS === 'gameover' || STATUS === 'void' || STATUS === 'tumbling') return;
   pauseActive = true;
   document.getElementById('pause-dispatch-content').innerHTML = buildDispatchTable();
   document.getElementById('pause-overlay').classList.add('visible');
@@ -1703,6 +1703,9 @@ function doVoid() {
 }
 
 function exitVoid() {
+  pauseActive = false;
+  document.getElementById('pause-overlay').classList.remove('visible');
+  document.getElementById('world-fg').style.display = 'none';
   stats.voidRevives++;
   showToast('heartbeat restored', 'void');
   STATUS = 'playing';
@@ -1994,6 +1997,12 @@ function loop() {
   sea.mesh.material.color.copy(c1).lerp(c2, Math.abs(cycle) - idx1);
 
   if (STATUS === 'playing') {
+    // Safety net — ensure scene is always visible during play
+    if (!sea.mesh.visible) sea.mesh.visible = true;
+    if (!sky.mesh.visible) sky.mesh.visible = true;
+    if (!orbHolder.mesh.visible) orbHolder.mesh.visible = true;
+    if (!canHolder.mesh.visible) canHolder.mesh.visible = true;
+    if (!boxHolder.mesh.visible) boxHolder.mesh.visible = true;
     if (pauseActive) {
       // Full astronaut agency — mouse tracking, all interactions live
       humanoid.flipX += (0 - humanoid.flipX) * 0.004;
@@ -2277,7 +2286,7 @@ var longPressTimer = null;
 var LONG_PRESS_MS  = 500;
 
 document.addEventListener('touchstart', function(e) {
-  if (STATUS === 'gameover' || STATUS === 'waiting') return;
+  if (STATUS === 'gameover' || STATUS === 'waiting' || STATUS === 'void' || STATUS === 'tumbling') return;
   if (pauseActive) return;
   if (e.touches.length !== 1) { clearTimeout(longPressTimer); return; }
   longPressTimer = setTimeout(pauseGame, LONG_PRESS_MS);
