@@ -259,9 +259,8 @@
 
 <div class="screen" id="screen-welcome">
   <h1>neverever.land</h1>
-  <p class="sub">Bad news comes, don't you worry even when it lands<br>
-    Good news will work its way to all them plans<br></p>
-  <button class="btn-play" id="btn-start">Float on</button>
+  <p class="sub">a floating astronaut tamagotchi<br>that you need to feed</p>
+  <button class="btn-play" id="btn-start">begin</button>
 </div>
 
 <div class="screen" id="screen-gameover"></div>
@@ -1492,6 +1491,9 @@ function checkCollisions() {
       stats.canistersCollected++;
       showToast('oxygen + ' + restore.toFixed(1), 'oxy');
       gsap.fromTo('#comet-flash', { opacity: cometActive ? 0.4 : 0.2 }, { opacity: 0, duration: 0.3 });
+      // Gentle celebratory spin on canister pickup
+      gsap.to(humanoid, { flipZ: humanoid.flipZ + (Math.random()-0.5)*Math.PI*0.8, duration: 0.6, ease: "power2.out" });
+      gsap.to(humanoid.mesh.rotation, { y: humanoid.mesh.rotation.y + (Math.random()-0.5)*Math.PI*0.6, duration: 0.6, ease: "power2.out" });
       refreshUI();
     }
   }
@@ -1513,6 +1515,7 @@ function checkCollisions() {
         stats.boxSlings++;
         showToast('pulled from orbit', 'box');
         doOrbitalSling();
+        gsap.to(humanoid, { flipX: humanoid.flipX + (Math.random()-0.5)*Math.PI*2.5, flipZ: humanoid.flipZ + (Math.random()-0.5)*Math.PI*2.5, duration: 0.55, ease: "power2.in" });
       } else {
         stats.boxComets++;
         showToast('rare windfall — active', 'rocket');
@@ -1520,6 +1523,8 @@ function checkCollisions() {
         cometTimer = COMET_DURATION;
         humanoid.flameMat.color.setHex(0xffdd00);
         gsap.fromTo('#comet-flash', { opacity: 0.6 }, { opacity: 0, duration: 0.8 });
+        gsap.to(humanoid.mesh.rotation, { y: humanoid.mesh.rotation.y + Math.PI * (Math.random()<0.5?1:-1), duration: 0.5, ease: "power3.out" });
+        gsap.to(humanoid, { flipX: humanoid.flipX + (Math.random()-0.5)*Math.PI, duration: 0.5, ease: "power3.out" });
       }
       return;
     }
