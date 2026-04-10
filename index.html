@@ -671,6 +671,107 @@ document.addEventListener('mousemove', function(e) {
   if (cursorEl) { cursorEl.style.left = e.clientX+'px'; cursorEl.style.top = e.clientY+'px'; }
 });
 
+// ── Touch tracking ─────────────────────────────────────────────────────────
+var touchState = {
+  active: false, id: null,
+  startX: 0, startY: 0,
+  lastX: 0, lastY: 0,
+  hasMoved: false,
+  twoFinger: false, twoStartY: 0
+};
+
+document.addEventListener('touchstart', function(e) {
+  e.preventDefault();
+  if (STATUS === 'tumbling') {
+    if (tumble.bounces >= 1) {
+      tumble.liftProgress = 1.0;
+      gsap.fromTo('#coin-flash', { opacity: 0.25 }, { opacity: 0, duration: 0.4 });
+    }
+    return;
+  }
+  if (e.touches.length === 2) {
+    touchState.twoFinger = true;
+    touchState.twoStartY = (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
+    return;
+  }
+  var t = e.touches[0];
+  touchState.active = true; touchState.id = t.identifier;
+  touchState.startX = t.clientX; touchState.startY = t.clientY;
+  touchState.lastX = t.clientX; touchState.lastY = t.clientY;
+  touchState.hasMoved = false; touchState.twoFinger = false;
+  mouse.x = -1 + (t.clientX / WIDTH) * 2;
+  mouse.y =  1 - (t.clientY / HEIGHT) * 2;
+}, { passive: false });
+
+document.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+  if (e.touches.length === 2 && touchState.twoFinger) {
+    var midY = (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
+    var delta = touchState.twoStartY - midY;
+    touchState.twoStartY = midY;
+    reverseLerp -= delta * 0.004;
+    reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.2, reverseLerp));
+    return;
+  }
+  if (!touchState.active) return;
+  var t = null;
+  for (var i = 0; i < e.touches.length; i++) {
+    if (e.touches[i].identifier === touchState.id) { t = e.touches[i]; break; }
+  }
+  if (!t) return;
+  var dx = t.clientX - touchState.startX, dy = t.clientY - touchState.startY;
+  if (Math.sqrt(dx*dx + dy*dy) > 6) touchState.hasMoved = true;
+  touchState.lastX = t.clientX; touchState.lastY = t.clientY;
+  mouse.x = -1 + (t.clientX / WIDTH) * 2;
+  mouse.y =  1 - (t.clientY / HEIGHT) * 2;
+}, { passive: false });
+
+document.addEventListener('touchend', function(e) {
+  e.preventDefault();
+  touchState.twoFinger = false;
+  if (!touchState.active) return;
+  if (!touchState.hasMoved && STATUS === 'playing') {
+    if (manualScrollMode) {
+      gsap.killTweensOf(humanoid);
+      var targetFlipX = Math.round(humanoid.flipX / (Math.PI * 2)) * Math.PI * 2 + Math.PI * 2;
+      gsap.to(humanoid, { flipX: targetFlipX, flipZ: 0, duration: 0.6, ease: "power2.inOut" });
+    } else {
+      gsap.to(humanoid, {
+        flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 3.5,
+        flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 3.5,
+        duration: 0.65, ease: "power2.inOut"
+      });
+      for (var si = 0; si < humanoid.joints.length; si++) {
+        humanoid.joints[si].pivot.userData.velX += (Math.random() - 0.5) * 4;
+        humanoid.joints[si].pivot.userData.velZ += (Math.random() - 0.5) * 4;
+      }
+    }
+    var worldX = norm(mouse.x, -1, 1, -100, 100), worldY = norm(mouse.y, -1, 1, 25, 175);
+    var TAG_RADIUS = 48, bestDist = TAG_RADIUS, bestRa = null;
+    for (var ri = 0; ri < raHolder.inUse.length; ri++) {
+      var ra = raHolder.inUse[ri];
+      if (ra.tagged) continue;
+      var raPos = new THREE.Vector3(); ra.mesh.getWorldPosition(raPos);
+      var d = Math.sqrt(Math.pow(worldX-raPos.x,2) + Math.pow(worldY-raPos.y,2));
+      if (d < bestDist) { bestDist = d; bestRa = ra; }
+    }
+    if (bestRa) {
+      bestRa.tagged = true; bestRa.tagTimer = 50;
+      score += 3; refreshUI();
+      var rp = new THREE.Vector3(); bestRa.mesh.getWorldPosition(rp);
+      new Burst(0x00ffcc, 12).mesh.position.copy(rp);
+      gsap.fromTo('#coin-flash', { opacity: 0.4 }, { opacity: 0, duration: 0.3 });
+      (function(target) {
+        setTimeout(function() {
+          var idx = raHolder.inUse.indexOf(target);
+          if (idx >= 0) { raHolder.pool.push(target); raHolder.mesh.remove(target.mesh); raHolder.inUse.splice(idx,1); }
+        }, 700);
+      })(bestRa);
+    }
+  }
+  touchState.active = false; touchState.id = null;
+}, { passive: false });
+
 var reverseLerp = 0.0;
 var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -2.2;
 
@@ -691,15 +792,26 @@ window.addEventListener('pointerdown', function(e) {
   if (e.pointerType === 'touch') return;
 
   if (e.button === 0) {
-    // Random spin/tumble on left click
-    gsap.to(humanoid, {
-      flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 3.5,
-      flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 3.5,
-      duration: 0.65, ease: "power2.inOut"
-    });
-    for (var si = 0; si < humanoid.joints.length; si++) {
-      humanoid.joints[si].pivot.userData.velX += (Math.random() - 0.5) * 4;
-      humanoid.joints[si].pivot.userData.velZ += (Math.random() - 0.5) * 4;
+    if (manualScrollMode) {
+      // Space toggled: rotate along X axis only (clean forward somersault)
+      gsap.killTweensOf(humanoid);
+      var targetFlipX = Math.round(humanoid.flipX / (Math.PI * 2)) * Math.PI * 2 + Math.PI * 2;
+      gsap.to(humanoid, {
+        flipX: targetFlipX,
+        flipZ: 0,
+        duration: 0.6, ease: "power2.inOut"
+      });
+    } else {
+      // Normal: random spin
+      gsap.to(humanoid, {
+        flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 3.5,
+        flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 3.5,
+        duration: 0.65, ease: "power2.inOut"
+      });
+      for (var si = 0; si < humanoid.joints.length; si++) {
+        humanoid.joints[si].pivot.userData.velX += (Math.random() - 0.5) * 4;
+        humanoid.joints[si].pivot.userData.velZ += (Math.random() - 0.5) * 4;
+      }
     }
     // Also tag any nearby astronaut if in range
     var clickX = norm(mouse.x, -1, 1, -100, 100);
