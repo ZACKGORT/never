@@ -385,17 +385,34 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   dx = dx || 0; dy = dy || 0;
   this.animTime += 0.08;
 
-  // ── 1. Body orientation: pitch follows vertical movement direction ──────────
-  //    Base: gentle forward-down soar. Nose rises when climbing, dips when diving.
-  var leanZ = -accelX * 0.8;
-  var targetBodyX = -0.52 + Math.max(-0.22, Math.min(0.26, dy * 0.006));
-  this.baseRotZ += (leanZ   - this.baseRotZ) * 0.10;
+  // ── Scroll forces ────────────────────────────────────────────────────────
+  var reverseForce = Math.max(0, -reverseLerp) / 2.2;
+  var forwardForce = Math.max(0,  reverseLerp) / 1.2;
+  var scrollMag    = Math.min(1, reverseForce + forwardForce);
+
+  // sideDrift: which way ALL limbs stream
+  //   braking  → +  → limbs trail to screen right
+  //   forward  → -  → limbs trail to screen left
+  var sideDrift = reverseForce * 0.60 - forwardForce * 0.60;
+
+  // ── 1. Body ───────────────────────────────────────────────────────────────
+  // Z lean: torso tips IN THE DIRECTION OF PULL (same sign as sideDrift).
+  //   Cursor banking fades to zero as scroll takes over, so they never fight.
+  var cursorLean = -accelX * 0.5 * (1 - scrollMag);
+  var scrollLean =  -sideDrift * 1.2;
+  var leanZ      = cursorLean + scrollLean;
+
+  // X pitch: braking = string pulls back, nose tips toward planet (-)
+  //          accel   = string pulls forward, nose lifts (+)
+  var inertiaPitch = -reverseForce * 0.40 + forwardForce * 0.30;
+  var targetBodyX  = -0.52 + Math.max(-0.22, Math.min(0.26, dy * 0.006)) + inertiaPitch;
+
+  this.baseRotZ += (leanZ       - this.baseRotZ) * 0.10;
   this.baseRotX += (targetBodyX - this.baseRotX) * 0.06;
 
   this.mesh.rotation.z = this.baseRotZ + this.flipZ;
   this.mesh.rotation.x = this.baseRotX + this.flipX;
 
-  // 3/4 view — visor faces forward toward horizon
   var BIAS_Y = Math.PI / 5;
   var cursorNudge = Math.max(-0.3, Math.min(0.3, -dx * 0.003));
   this.mesh.rotation.y += (BIAS_Y + cursorNudge - this.mesh.rotation.y) * 0.07;
@@ -414,38 +431,30 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var dRS = this.armDrift[0], dLS = this.armDrift[1],
       dRE = this.armDrift[2], dLE = this.armDrift[3];
 
-  // ── 4. Arm rest positions: T-pose out to sides + slow drift wiggle ───────
-  //    No gravity, no physics forces. Just a fixed open pose with lazy sine
-  //    drift per joint so limbs float and wiggle naturally in zero-g.
-  //
-  //    rShoulderPivot is at local -X (right side), arm hangs at Y=-9.
-  //    restZ drives side-spread: positive = arm swings out to the right in local space.
-  //    restX drives forward/back pitch of the arm.
+  // ── 4. Limbs: armTrail (fwd/back) + sideDrift (left/right) ──────────────
+  // armTrail: braking → arms sweep forward, accel → arms sweep back
+  var armTrail = reverseForce * 0.90 - forwardForce * 0.70;
 
-  // Right shoulder — out to side, slight forward angle
-  this.joints[0].restX =  0.28 + Math.sin(dRS.phaseX) * dRS.ampX;
-  this.joints[0].restZ = -1.05 + Math.sin(dRS.phaseZ) * dRS.ampZ;   // splay out right
+  this.joints[0].restX =  0.28 + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
+  this.joints[0].restZ = -1.05 + Math.sin(dRS.phaseZ) * dRS.ampZ + sideDrift;
 
-  // Left shoulder — mirror
-  this.joints[1].restX =  0.28 + Math.sin(dLS.phaseX) * dLS.ampX;
-  this.joints[1].restZ =  1.05 + Math.sin(dLS.phaseZ) * dLS.ampZ;   // splay out left
+  this.joints[1].restX =  0.28 + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
+  this.joints[1].restZ =  1.05 + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
 
-  // Right elbow — slight droop, lazy follow
-  this.joints[2].restX =  0.10 + Math.sin(dRE.phaseX) * dRE.ampX;
-  this.joints[2].restZ = -0.20 + Math.sin(dRE.phaseZ) * dRE.ampZ;
+  this.joints[2].restX =  0.10 + Math.sin(dRE.phaseX) * dRE.ampX + reverseForce * 0.50 - forwardForce * 0.35;
+  this.joints[2].restZ = -0.20 + Math.sin(dRE.phaseZ) * dRE.ampZ + sideDrift * 0.75;
 
-  // Left elbow — mirror
-  this.joints[3].restX =  0.10 + Math.sin(dLE.phaseX) * dLE.ampX;
-  this.joints[3].restZ =  0.20 + Math.sin(dLE.phaseZ) * dLE.ampZ;
+  this.joints[3].restX =  0.10 + Math.sin(dLE.phaseX) * dLE.ampX + reverseForce * 0.50 - forwardForce * 0.35;
+  this.joints[3].restZ =  0.20 + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
 
   // ── 5. Solve all joints ─────────────────────────────────────────────────
   for (var i = 0; i < this.joints.length; i++) {
     var j = this.joints[i], p = j.pivot, ud = p.userData;
 
     if (i >= 4) {
-      // Legs: loose drift behind the body — no strong cycle, just float
-      j.restX =  0.08 + Math.sin(this.animTime * 0.9 + i) * 0.12;
-      j.restZ =  (i === 4 || i === 5 ? 0.06 : -0.06) + Math.sin(this.animTime * 0.7 + i) * 0.08;
+      var legTrail = reverseForce * 0.70 - forwardForce * 0.55;
+      j.restX =  0.08 + Math.sin(this.animTime * 0.9 + i) * 0.12 + legTrail;
+      j.restZ =  (i === 4 || i === 5 ? 0.06 : -0.06) + Math.sin(this.animTime * 0.7 + i) * 0.08 + sideDrift * 0.50;
     }
 
     var errX = j.restX - p.rotation.x;
@@ -458,8 +467,11 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
     p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
   }
 
-  // Head wobble — slight counter-lean for life
+  // ── 6. Head ─────────────────────────────────────────────────────────────
+  // Z: counter-lean to body, gentle idle wobble
   this.head.rotation.z += ((-leanZ * 0.5 + Math.sin(this.animTime * 0.8) * 0.05) - this.head.rotation.z) * 0.12;
+  // X: chin down when braking, chin up when accelerating
+  this.head.rotation.x += ((reverseForce * 0.35 - forwardForce * 0.30) - this.head.rotation.x) * 0.10;
 };
 
 RagdollHuman.prototype.hitReaction = function() {
