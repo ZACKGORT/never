@@ -25,7 +25,7 @@
   /* Black hole FAB */
   #fab-bh {
     position: fixed;
-    top: 12px; right: 14px;
+    top: 12px; left: 14px;
     width: 62px; height: 62px;
     cursor: pointer;
     z-index: 55;
@@ -74,7 +74,7 @@
   /* Survival timer — top right, whisper quiet */
   #timer {
     position: absolute;
-    top: 20px; right: 90px;
+    top: 20px; right: 22px;
     font-size: clamp(0.7em, 2vw, 0.95em);
     font-weight: 400;
     color: rgba(255,255,255,0.25);
@@ -464,7 +464,7 @@
 <div id="hint-label"></div>
 
 <!-- Black hole FAB — logomark / pause trigger -->
-<svg id="fab-bh" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-label="pause">
+<svg id="fab-bh" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-label="pause" style="touch-action:manipulation">
   <defs>
     <radialGradient id="fab-glow" cx="50%" cy="50%" r="50%">
       <stop offset="0%"   stop-color="#ff8020" stop-opacity="0.35"/>
@@ -2322,15 +2322,17 @@ document.getElementById('fab-bh').addEventListener('click', function() {
   var fabTouchStarted = false;
   fab.addEventListener('touchstart', function(e) {
     fabTouchStarted = true;
-    e.stopPropagation(); // don't trigger long-press on document
-  }, { passive: true });
+    e.stopPropagation();
+    e.preventDefault();
+  }, { passive: false });
   fab.addEventListener('touchend', function(e) {
     if (fabTouchStarted) {
       fabTouchStarted = false;
       e.stopPropagation();
+      e.preventDefault();
       if (STATUS === 'playing' || STATUS === 'tumbling') pauseGame();
     }
-  }, { passive: true });
+  }, { passive: false });
   fab.addEventListener('touchmove', function() { fabTouchStarted = false; }, { passive: true });
 })();
 
