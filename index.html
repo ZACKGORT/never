@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>neverever.land</title>
+<title>neverever.land • by zack.cx</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23020111' rx='6'/%3E%3Ccircle cx='16' cy='10' r='7' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Cellipse cx='16' cy='10' rx='4.5' ry='3.5' fill='%231a2a4a'/%3E%3Cellipse cx='14' cy='8.5' rx='1.5' ry='1' fill='%234466aa' opacity='0.7'/%3E%3Crect x='9' y='16' width='14' height='10' rx='3' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Crect x='9.5' y='17' width='4' height='6' rx='1' fill='%23ccc' stroke='%23aaa' stroke-width='0.3'/%3E%3Crect x='4' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='22.5' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Ccircle cx='4.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Ccircle cx='27.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Crect x='10' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='18' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='9.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Crect x='17.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Ccircle cx='4' cy='4' r='0.6' fill='%23fff' opacity='0.8'/%3E%3Ccircle cx='28' cy='6' r='0.8' fill='%23fff' opacity='0.9'/%3E%3Ccircle cx='26' cy='28' r='0.5' fill='%23fff' opacity='0.7'/%3E%3C/svg%3E">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
@@ -220,6 +220,27 @@
     border-color: rgba(242, 83, 70, 0.7);
   }
 
+  /* Narrated caption */
+  #caption {
+    position: fixed;
+    left: 50%; bottom: clamp(48px, 8vh, 80px);
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+    z-index: 20;
+    opacity: 0;
+    max-width: min(560px, 88vw);
+  }
+  #caption p {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(0.82em, 2.2vw, 1.02em);
+    color: rgba(255,255,255,0.42);
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
   /* Shooting star DOM element (pure CSS streak) */
   #shooting-star {
     position: fixed;
@@ -249,7 +270,7 @@
 
 <div id="void-overlay"></div>
 <div id="heartbeat-prompt">
-  <p class="hb-text">tap to restore heartbeat</p>
+  <p class="hb-text">double tap to revive</p>
   <div id="hb-bar-bg"><div id="hb-bar"></div></div>
 </div>
 
@@ -257,10 +278,13 @@
   <p>tap anywhere to get up</p>
 </div>
 
+<div id="caption"><p></p></div>
+
 <div class="screen" id="screen-welcome">
   <h1>neverever.land</h1>
-  <p class="sub">a floating astronaut tamagotchi<br>that you need to feed</p>
-  <button class="btn-play" id="btn-start">begin</button>
+  <p class="sub">Bad news comes, don't you worry even when it lands.<br>
+    Good news will work its way to all them plans.</p>
+  <button class="btn-play" id="btn-start">Float on.</button>
 </div>
 
 <div class="screen" id="screen-gameover"></div>
@@ -616,9 +640,9 @@ RagdollHuman.prototype.hitReaction = function() {
 
 // ─── Orbs (tiered enemy system) ────────────────────────────────────────────
 var ORB_DEFS = {
-  blue:  { color: 0x4499ff, emissive: 0x001133, oxygenCost: 1.0,  size: 8,  hitStr: 'light'       },
-  red:   { color: 0xf23030, emissive: 0x220000, oxygenCost: 2.5,  size: 9,  hitStr: 'heavy'       },
-  black: { color: 0x111118, emissive: 0x000000, oxygenCost: 99,   size: 10, hitStr: 'singularity' }
+  blue:  { color: 0x4499ff, emissive: 0x001133, oxygenCost: 1.2,  size: 8,  hitStr: 'light',       ghostChance: 0.45 },
+  red:   { color: 0xf23030, emissive: 0x220000, oxygenCost: 7.5,  size: 9,  hitStr: 'heavy',       ghostChance: 0    },
+  black: { color: 0x111118, emissive: 0x000000, oxygenCost: 99,   size: 10, hitStr: 'singularity', ghostChance: 0    }
 };
 
 function Orb(type) {
@@ -648,9 +672,11 @@ OrbsHolder.prototype.spawn = function(type) {
 OrbsHolder.prototype.update = function() {
   for (var i = this.inUse.length-1; i >= 0; i--) {
     var e = this.inUse[i];
-    e.mesh.position.x -= this.speed;
+    var spd = e._showerBoost || this.speed;
+    e.mesh.position.x -= spd;
     e.mesh.rotation.x += 0.07; e.mesh.rotation.z += 0.05;
     if (e.mesh.position.x < -300) {
+      e._showerBoost = 0;
       this.pools[e.orbType].push(e);
       this.mesh.remove(e.mesh);
       this.inUse.splice(i, 1);
@@ -942,6 +968,58 @@ function showToast(msg, type) {
   );
 }
 
+// ─── Narrated Captions ─────────────────────────────────────────────────────
+var CAPTIONS = [
+  { frame:  300, text: "you are still here." },
+  { frame:  720, text: "not floating. moving through." },
+  { frame: 1440, text: "there is no station. no signal waiting. only what you do next." },
+  { frame: 2280, text: "the oxygen doesn't care. it goes regardless." },
+  { frame: 3240, text: "you learn to read the patterns. what comes and what passes." },
+  { frame: 4320, text: "resourcefulness isn't a gift. it's something you practice, alone, until it holds." },
+  { frame: 5520, text: "the moon doesn't offer. you have to go and find." },
+  { frame: 6840, text: "this is what a sol looks like from the inside." },
+  { frame: 8280, text: "keep your rhythm. it's the one thing that belongs to you." },
+  { frame: 9840, text: "some days the debris is heavier. you absorb it and continue." },
+  { frame:11520, text: "attentive. that's the word. not alert — attentive." },
+  { frame:13320, text: "the surface holds nothing for you. you were always going to have to do this yourself." },
+  { frame:15240, text: "you don't survive by waiting. you survive by seeking." },
+  { frame:17280, text: "physics is not your enemy. it's the only honest thing out here." },
+  { frame:19440, text: "there is a cadence to it. you feel it before you understand it." },
+  { frame:21720, text: "still here. still moving. that's enough for now." },
+  { frame:24120, text: "maybe what you're looking for is further. keep going." },
+];
+
+var captionIndex = 0;
+var captionTween = null;
+
+function showCaption(text) {
+  var el = document.getElementById('caption');
+  var p  = el.querySelector('p');
+  if (!el || !p) return;
+  if (captionTween) { captionTween.kill(); gsap.set(el, { opacity: 0 }); }
+  p.textContent = text;
+  captionTween = gsap.timeline()
+    .to(el, { opacity: 1, duration: 1.8, ease: "power1.inOut" })
+    .to(el, { opacity: 0, duration: 2.2, ease: "power1.inOut", delay: 4.5 });
+}
+
+function tickCaptions() {
+  if (STATUS !== 'playing') return;
+  if (captionIndex >= CAPTIONS.length) return;
+  if (survivalFrames >= CAPTIONS[captionIndex].frame) {
+    showCaption(CAPTIONS[captionIndex].text);
+    captionIndex++;
+  }
+}
+
+function resetCaptions() {
+  captionIndex = 0;
+  if (captionTween) { captionTween.kill(); captionTween = null; }
+  var el = document.getElementById('caption');
+  if (el) gsap.set(el, { opacity: 0 });
+}
+
+
 function buildWorld() {
   sea = new Sea(); sea.mesh.position.y = -600; scene.add(sea.mesh);
   sky = new Sky(); sky.mesh.position.y = -600; scene.add(sky.mesh);
@@ -1023,20 +1101,21 @@ var touchState = {
   hasMoved: false, twoFinger: false, twoStartY: 0
 };
 
-function handleHeartbeatTap() {
+var lastTapTime = 0;
+var DOUBLE_TAP_WINDOW = 350; // ms
+
+function handleVoidTap() {
   if (STATUS !== 'void') return;
-  heartbeatTaps++;
-  voidIdleFrames = 0;
-  var pct = heartbeatTaps / HEARTBEAT_REQUIRED;
-  document.getElementById('hb-bar').style.width = Math.min(100, pct * 100) + '%';
-  // Color lerps from crimson to blue
-  var r = Math.floor(204 * (1 - pct));
-  var b = Math.floor(255 * pct);
-  document.getElementById('hb-bar').style.background = 'rgb(' + r + ',0,' + b + ')';
-  // Suit pulses
-  humanoid.suitMat.color.setRGB(0.8 + r/255*0.2, 0.8 - (1-pct)*0.4, 0.8 + b/255*0.2);
-  if (heartbeatTaps >= HEARTBEAT_REQUIRED) {
+  var now = Date.now();
+  var gap = now - lastTapTime;
+  lastTapTime = now;
+  if (gap < DOUBLE_TAP_WINDOW && gap > 60) {
+    // Double tap — revive
     exitVoid();
+  } else {
+    // Single tap — pulse the bar as feedback
+    var pct = Math.min(1, (DOUBLE_TAP_WINDOW - gap) / DOUBLE_TAP_WINDOW);
+    document.getElementById('hb-bar').style.width = Math.min(100, pct * 120) + '%';
   }
 }
 
@@ -1051,7 +1130,7 @@ document.addEventListener('touchstart', function(e) {
     return;
   }
   e.preventDefault();
-  if (STATUS === 'void') { handleHeartbeatTap(); return; }
+  if (STATUS === 'void') { handleVoidTap(); return; }
   if (STATUS === 'tumbling') {
     if (tumble.bounces >= 1) {
       tumble.liftProgress = 1.0;
@@ -1124,7 +1203,7 @@ window.addEventListener('wheel', function(e) {
 }, { passive: true });
 
 window.addEventListener('pointerdown', function(e) {
-  if (STATUS === 'void') { handleHeartbeatTap(); return; }
+  if (STATUS === 'void') { handleVoidTap(); return; }
   if (STATUS === 'tumbling') {
     if (tumble.bounces >= 1) {
       tumble.liftProgress = 1.0;
@@ -1163,7 +1242,7 @@ window.addEventListener('pointerdown', function(e) {
 window.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
 window.addEventListener('keydown', function(e) {
-  if (STATUS === 'void') { handleHeartbeatTap(); return; }
+  if (STATUS === 'void') { handleVoidTap(); return; }
   if (STATUS !== 'playing') return;
   if (e.code === 'Space') {
     e.preventDefault();
@@ -1225,6 +1304,7 @@ function startGame() {
   }
 
   refreshUI();
+  resetCaptions();
   document.getElementById('screen-welcome').classList.remove('visible');
   document.getElementById('screen-gameover').classList.remove('visible');
 }
@@ -1290,6 +1370,42 @@ function doOrbitalSling() {
   gsap.fromTo('#hit-flash', { opacity: 0.5 }, { opacity: 0, duration: 0.4 });
 }
 
+function doMeteorShower() {
+  // Rapid volley of blue and red orbs — chaos wave
+  if (STATUS !== 'playing') return;
+  var showerCount = 10 + Math.floor(Math.random() * 8);
+  for (var i = 0; i < showerCount; i++) {
+    (function(delay) {
+      setTimeout(function() {
+        if (STATUS !== 'playing') return;
+        var type = Math.random() < 0.45 ? 'red' : 'blue';
+        var e = orbHolder.pools[type].length ? orbHolder.pools[type].pop() : new Orb(type);
+        // Spawn them tighter and faster
+        e.mesh.position.set(
+          320 + Math.random() * 80,
+          15 + Math.random() * 165,
+          0
+        );
+        e.mesh.scale.setScalar(0.8 + Math.random() * 0.6);
+        orbHolder.mesh.add(e.mesh);
+        orbHolder.inUse.push(e);
+        // Temporarily boost speed for shower orbs
+        e._showerBoost = orbHolder.speed * 1.8;
+      }, delay);
+    })(i * 90 + Math.random() * 60);
+  }
+}
+
+function activateRocketman() {
+  if (rocketmanActive) return; // already boosted
+  rocketmanActive = true;
+  rocketmanTimer = ROCKETMAN_DURATION;
+  invincibleFrames = ROCKETMAN_DURATION;
+  document.getElementById('rocket-bar').style.display = 'block';
+  document.getElementById('rocket-bar').style.transform = 'scaleX(1)';
+  gsap.fromTo('#comet-flash', { opacity: 0.7 }, { opacity: 0, duration: 1.0 });
+}
+
 function doVoid() {
   STATUS = 'void';
   heartbeatTaps = 0; voidIdleFrames = 0;
@@ -1315,7 +1431,7 @@ function doVoid() {
 
 function exitVoid() {
   stats.voidRevives++;
-  showToast('heartbeat restored', 'void');
+  showToast('aura, fam', 'void');
   STATUS = 'playing';
   // Restore scene
   sea.mesh.visible = true;
@@ -1333,6 +1449,7 @@ function exitVoid() {
 
 function doGameOver() {
   STATUS = 'gameover';
+  showToast('cooked', 'red');
   rocketmanPending = true; // always award boost for next sol
 
   var secs = Math.floor(survivalFrames / 60);
@@ -1359,9 +1476,8 @@ function doGameOver() {
       (stats.redOrbHits    ? row('&nbsp;&nbsp;collision',   stats.redOrbHits    + ' ×', 'significant') : '') +
       (stats.blackOrbHits  ? row('&nbsp;&nbsp;singularity', stats.blackOrbHits  + ' ×', 'total disruption') : '') +
       (stats.shootingStarHits ? row('&nbsp;&nbsp;external', stats.shootingStarHits + ' ×', 'uncontrolled') : '') +
-      (stats.boxTumbles    ? row('&nbsp;&nbsp;surprise',    stats.boxTumbles    + ' ×', 'unforeseen') : '') +
-      (stats.boxSlings     ? row('&nbsp;&nbsp;ejection',    stats.boxSlings     + ' ×', 'orbital') : '') +
-      (stats.boxComets     ? row('&nbsp;&nbsp;windfall',    stats.boxComets     + ' ×', 'lucky') : '') +
+      (stats.boxTumbles    ? row('&nbsp;&nbsp;yolo',    stats.boxTumbles    + ' ×', 'meteor shower') : '') +
+      (stats.boxComets     ? row('&nbsp;&nbsp;fafo',    stats.boxComets     + ' ×', 'rocketman') : '') +
       '<tr><td colspan="3"><hr class="sol-divider"/></td></tr>' +
       row('recovered', stats.tumbleRecoveries + ' ×', 'got back up') +
       row('revived',   stats.voidRevives      + ' ×', 'heartbeat restored') +
@@ -1442,7 +1558,6 @@ function checkCollisions() {
       orbHolder.inUse.splice(i, 1);
 
       if (invincibleFrames > 0) {
-        // Rocketman: obstacles still burst visually but cause no harm
         new Burst(0xffdd00, 12).mesh.position.copy(_eWorld);
         continue;
       }
@@ -1454,18 +1569,35 @@ function checkCollisions() {
         return;
       }
 
+      // Blue orb — random ghost
+      if (en.orbType === 'blue' && Math.random() < def.ghostChance) {
+        stats.blueOrbHits++;
+        showToast('skrtt', 'blue');
+        // Ghost: just a flicker and a nudge, no oxygen cost
+        gsap.fromTo('#hit-flash', { opacity: 0.15 }, { opacity: 0, duration: 0.2 });
+        humanoid.hitReaction();
+        invincibleFrames = 18;
+        continue;
+      }
+
+      // Normal hit
       oxygen -= def.oxygenCost;
-      if (def.hitStr === 'heavy') {
+
+      if (en.orbType === 'red') {
         stats.redOrbHits++;
-        showToast('not moving forward', 'red');
-        gsap.fromTo('#hit-flash', { opacity: 0.7 }, { opacity: 0, duration: 0.5 });
+        // Red hits hard — clamp to a sliver so you're alive but barely
+        oxygen = Math.max(0.4, oxygen);
+        showToast('that hurt', 'red');
+        gsap.fromTo('#hit-flash', { opacity: 0.85 }, { opacity: 0, duration: 0.7 });
         humanoid.hitReaction();
         humanoid.hitReaction();
+        invincibleFrames = 60;
       } else {
         stats.blueOrbHits++;
-        showToast('processed by filter', 'blue');
+        showToast('processed', 'blue');
         gsap.fromTo('#hit-flash', { opacity: 0.35 }, { opacity: 0, duration: 0.3 });
         humanoid.hitReaction();
+        invincibleFrames = 20;
       }
 
       if (oxygen <= 0) {
@@ -1486,11 +1618,11 @@ function checkCollisions() {
       new Burst(0x00e5ff, 8).mesh.position.copy(_eWorld);
       canHolder.pool.push(cn); canHolder.mesh.remove(cn.mesh); canHolder.inUse.splice(j,1);
 
-      var restore = (cometActive || rocketmanActive) ? 2.0 : 1.5;
+      var restore = rocketmanActive ? 2.0 : 1.5;
       oxygen = Math.min(MAX_O, oxygen + restore);
       stats.canistersCollected++;
-      showToast('oxygen + ' + restore.toFixed(1), 'oxy');
-      gsap.fromTo('#comet-flash', { opacity: cometActive ? 0.4 : 0.2 }, { opacity: 0, duration: 0.3 });
+      showToast('oxygen +' + restore.toFixed(1), 'oxy');
+      gsap.fromTo('#comet-flash', { opacity: 0.2 }, { opacity: 0, duration: 0.3 });
       // Gentle celebratory spin on canister pickup
       gsap.to(humanoid, { flipZ: humanoid.flipZ + (Math.random()-0.5)*Math.PI*0.8, duration: 0.6, ease: "power2.out" });
       gsap.to(humanoid.mesh.rotation, { y: humanoid.mesh.rotation.y + (Math.random()-0.5)*Math.PI*0.6, duration: 0.6, ease: "power2.out" });
@@ -1505,26 +1637,16 @@ function checkCollisions() {
     if (_pWorld.distanceTo(_eWorld) < 14) {
       boxHolder.pool.push(bx); boxHolder.mesh.remove(bx.mesh); boxHolder.inUse.splice(k,1);
 
-      // Roll the dice: 60% bad tumble, 25% orbital sling, 15% comet tail
-      var roll = Math.random();
-      if (roll < 0.60) {
+      if (Math.random() < 0.5) {
+        // YOLO — meteor shower
         stats.boxTumbles++;
-        showToast('unforeseen complication', 'box');
-        doTumble();
-      } else if (roll < 0.85) {
-        stats.boxSlings++;
-        showToast('pulled from orbit', 'box');
-        doOrbitalSling();
-        gsap.to(humanoid, { flipX: humanoid.flipX + (Math.random()-0.5)*Math.PI*2.5, flipZ: humanoid.flipZ + (Math.random()-0.5)*Math.PI*2.5, duration: 0.55, ease: "power2.in" });
+        showToast('yolo', 'box');
+        doMeteorShower();
       } else {
+        // FAFO — rocketman
         stats.boxComets++;
-        showToast('rare windfall — active', 'rocket');
-        cometActive = true;
-        cometTimer = COMET_DURATION;
-        humanoid.flameMat.color.setHex(0xffdd00);
-        gsap.fromTo('#comet-flash', { opacity: 0.6 }, { opacity: 0, duration: 0.8 });
-        gsap.to(humanoid.mesh.rotation, { y: humanoid.mesh.rotation.y + Math.PI * (Math.random()<0.5?1:-1), duration: 0.5, ease: "power3.out" });
-        gsap.to(humanoid, { flipX: humanoid.flipX + (Math.random()-0.5)*Math.PI, duration: 0.5, ease: "power3.out" });
+        showToast('fafo', 'rocket');
+        activateRocketman();
       }
       return;
     }
@@ -1563,7 +1685,7 @@ function loop() {
     }
 
     // Passive oxygen drain — very slow tamagotchi hunger
-    if (frame % 2400 === 0 && oxygen > 0 && !cometActive) {
+    if (frame % 2400 === 0 && oxygen > 0) {
       oxygen -= 0.5;
       if (oxygen <= 0) { oxygen = 0; doVoid(); } else { refreshUI(); }
     }
@@ -1577,20 +1699,10 @@ function loop() {
       spawnInt = Math.max(22, spawnInt - 3);
     }
 
-    // Comet tail
-    if (cometActive) {
-      cometTimer--;
-      if (frame % 3 === 0) spawnCometSparkle(humanoid.mesh.position.x, humanoid.mesh.position.y);
-      if (cometTimer <= 0) {
-        cometActive = false;
-        if (!rocketmanActive) humanoid.flameMat.color.setHex(0x00ffff);
-      }
-    }
-
     // Rocketman — supernova boost
     if (rocketmanActive) {
       rocketmanTimer--;
-      invincibleFrames = 10; // perpetually invincible while active
+      invincibleFrames = 10;
 
       // Rainbow suit cycling
       var rt = Date.now() * 0.004;
@@ -1601,7 +1713,7 @@ function loop() {
       );
       // Gold flame
       humanoid.flameMat.color.setRGB(1, 0.85 + Math.random()*0.15, 0);
-      // Dense sparkle trail — more than comet
+      // Dense sparkle trail
       if (frame % 2 === 0) {
         spawnCometSparkle(humanoid.mesh.position.x, humanoid.mesh.position.y);
         spawnCometSparkle(humanoid.mesh.position.x, humanoid.mesh.position.y);
@@ -1614,8 +1726,7 @@ function loop() {
       var rocketPct = rocketmanTimer / ROCKETMAN_DURATION;
       document.getElementById('rocket-bar').style.transform = 'scaleX(' + rocketPct + ')';
 
-      // Warn when nearly done
-      if (rocketmanTimer === 180) showToast('rocketman — 3s remaining', 'rocket');
+      if (rocketmanTimer === 180) showToast('rocketman fading — 3s', 'rocket');
 
       if (rocketmanTimer <= 0) {
         rocketmanActive = false;
@@ -1661,27 +1772,25 @@ function loop() {
     if (smokeParticles.length) updateSmoke();
 
     if (frame % 10 === 0) refreshUI();
+    tickCaptions();
 
   } else if (STATUS === 'void') {
-    // Void — astronaut locked to center, suit pulses
+    // Void — astronaut locked to center, suit pulses red with urgency
     humanoid.mesh.position.set(0, 100, 0);
     humanoid.update(0, 0, 0, 0, 0);
 
-    // Idle timer — if they stop tapping, game over
+    // Idle timer — if they stop, game over
     voidIdleFrames++;
     if (voidIdleFrames >= VOID_IDLE_MAX) {
       doGameOver();
       return;
     }
 
-    // Pulse suit red as they approach timeout
+    // Pulse suit red — urgency increases as idle timer runs
     var urgency = voidIdleFrames / VOID_IDLE_MAX;
     var pulseSpeed = 2 + urgency * 6;
     var pulse = 0.5 + Math.sin(Date.now() * 0.001 * pulseSpeed) * 0.5;
-    var tapPct = heartbeatTaps / HEARTBEAT_REQUIRED;
-    var rr = 0.8 + (1 - tapPct) * 0.2;
-    var bb = tapPct * 0.8;
-    humanoid.suitMat.color.setRGB(rr * (0.5 + pulse * 0.5), 0, bb * (0.5 + pulse * 0.5));
+    humanoid.suitMat.color.setRGB(0.8 * (0.5 + pulse * 0.5), 0, 0);
 
     updateBursts();
 
