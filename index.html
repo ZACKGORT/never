@@ -234,11 +234,11 @@ function makeBox(w, h, d, mat) {
 function RagdollHuman() {
   this.mesh = new THREE.Object3D();
   this.mesh.rotation.y = Math.PI / 5;  // face forward toward horizon
-  this.baseRotX = -0.52;   // neutral soar pitch — adjusts with movement
+  this.baseRotX = -0.55;   // mid-altitude neutral, will adjust each frame
   this.baseRotZ = 0;
   this.flipX = 0;
   this.flipZ = 0;
-  this.mesh.rotation.x = -0.52;
+  this.mesh.rotation.x = -0.55;
 
   var suitMat  = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true });
   var jointMat = new THREE.MeshPhongMaterial({ color: 0x666666, flatShading: true });
@@ -388,24 +388,17 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   // ── Scroll forces ────────────────────────────────────────────────────────
   var reverseForce = Math.max(0, -reverseLerp) / 2.2;
   var forwardForce = Math.max(0,  reverseLerp) / 1.2;
-  var scrollMag    = Math.min(1, reverseForce + forwardForce);
 
-  // sideDrift: which way ALL limbs stream
-  //   braking  → +  → limbs trail to screen right
-  //   forward  → -  → limbs trail to screen left
-  var sideDrift = reverseForce * 0.60 - forwardForce * 0.60;
+  // forward = pulled by CHEST: nose pitches DOWN, arms trail BACK,  limbs stream LEFT
+  // reverse = pulled by BACK:  nose arches UP,   arms fly FORWARD, limbs stream RIGHT
+  var inertiaPitch = forwardForce * 0.40 - reverseForce * 0.35;
+  var armTrail     = forwardForce * 0.75 - reverseForce * 0.65;
+  var sideDrift    = forwardForce * 0.50 - reverseForce * 0.50;
 
   // ── 1. Body ───────────────────────────────────────────────────────────────
-  // Z lean: torso tips IN THE DIRECTION OF PULL (same sign as sideDrift).
-  //   Cursor banking fades to zero as scroll takes over, so they never fight.
-  var cursorLean = -accelX * 0.5 * (1 - scrollMag);
-  var scrollLean =  -sideDrift * 1.2;
-  var leanZ      = cursorLean + scrollLean;
-
-  // X pitch: braking = string pulls back, nose tips toward planet (-)
-  //          accel   = string pulls forward, nose lifts (+)
-  var inertiaPitch = -reverseForce * 0.40 + forwardForce * 0.30;
-  var targetBodyX  = -0.52 + Math.max(-0.22, Math.min(0.26, dy * 0.006)) + inertiaPitch;
+  var altFactor   = Math.max(0, Math.min(1, (this.mesh.position.y - 25) / 150));
+  var targetBodyX = (-0.85 + altFactor * 0.60) + inertiaPitch;
+  var leanZ       = -accelX * 0.8;
 
   this.baseRotZ += (leanZ       - this.baseRotZ) * 0.10;
   this.baseRotX += (targetBodyX - this.baseRotX) * 0.06;
@@ -431,20 +424,17 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var dRS = this.armDrift[0], dLS = this.armDrift[1],
       dRE = this.armDrift[2], dLE = this.armDrift[3];
 
-  // ── 4. Limbs: armTrail (fwd/back) + sideDrift (left/right) ──────────────
-  // armTrail: braking → arms sweep forward, accel → arms sweep back
-  var armTrail = reverseForce * 0.90 - forwardForce * 0.70;
-
+  // ── 4. Limbs ─────────────────────────────────────────────────────────────
   this.joints[0].restX =  0.28 + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
   this.joints[0].restZ = -1.05 + Math.sin(dRS.phaseZ) * dRS.ampZ + sideDrift;
 
   this.joints[1].restX =  0.28 + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
   this.joints[1].restZ =  1.05 + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
 
-  this.joints[2].restX =  0.10 + Math.sin(dRE.phaseX) * dRE.ampX + reverseForce * 0.50 - forwardForce * 0.35;
+  this.joints[2].restX =  0.10 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
   this.joints[2].restZ = -0.20 + Math.sin(dRE.phaseZ) * dRE.ampZ + sideDrift * 0.75;
 
-  this.joints[3].restX =  0.10 + Math.sin(dLE.phaseX) * dLE.ampX + reverseForce * 0.50 - forwardForce * 0.35;
+  this.joints[3].restX =  0.10 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
   this.joints[3].restZ =  0.20 + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
 
   // ── 5. Solve all joints ─────────────────────────────────────────────────
@@ -452,7 +442,7 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
     var j = this.joints[i], p = j.pivot, ud = p.userData;
 
     if (i >= 4) {
-      var legTrail = reverseForce * 0.70 - forwardForce * 0.55;
+      var legTrail = forwardForce * 0.55 - reverseForce * 0.55;
       j.restX =  0.08 + Math.sin(this.animTime * 0.9 + i) * 0.12 + legTrail;
       j.restZ =  (i === 4 || i === 5 ? 0.06 : -0.06) + Math.sin(this.animTime * 0.7 + i) * 0.08 + sideDrift * 0.50;
     }
@@ -471,7 +461,7 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   // Z: counter-lean to body, gentle idle wobble
   this.head.rotation.z += ((-leanZ * 0.5 + Math.sin(this.animTime * 0.8) * 0.05) - this.head.rotation.z) * 0.12;
   // X: chin down when braking, chin up when accelerating
-  this.head.rotation.x += ((reverseForce * 0.35 - forwardForce * 0.30) - this.head.rotation.x) * 0.10;
+  this.head.rotation.x += ((-forwardForce * 0.30 + reverseForce * 0.35) - this.head.rotation.x) * 0.10;
 };
 
 RagdollHuman.prototype.hitReaction = function() {
@@ -754,16 +744,19 @@ window.addEventListener('pointerdown', function(e) {
     // Right click: reset to default soaring pose
     gsap.to(humanoid, { flipX: 0, flipZ: 0, duration: 0.5, ease: "power3.out" });
     gsap.to(humanoid.mesh.rotation, { y: Math.PI / 5, duration: 0.5, ease: "power3.out" });
-    humanoid.baseRotX = -0.52; humanoid.baseRotZ = 0;
+    humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
   }
 });
 window.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+var manualScrollMode = false;
 
 window.addEventListener('keydown', function(e) {
   if (STATUS !== 'playing') return;
   if (e.code === 'Space') {
     e.preventDefault();
-    gsap.to(humanoid, { flipZ: "-="+(Math.PI*2), duration: 0.65, ease: "power2.inOut" });
+    manualScrollMode = !manualScrollMode;
+    MAGNETIC_FORWARD = manualScrollMode ? 0.0 : 1.0;
   }
 });
 
@@ -777,6 +770,7 @@ function startGame() {
   raHolder.inUse.forEach(function(a) { raHolder.mesh.remove(a.mesh); }); raHolder.inUse = [];
   humanoid.flipX = 0; humanoid.flipZ = 0;
   humanoid.baseRotX = 0; humanoid.baseRotZ = 0;
+  manualScrollMode = false; MAGNETIC_FORWARD = 1.0;
   var lhEl = document.getElementById('lift-hint');
   if (lhEl) lhEl.classList.remove('visible');
   setLevelRing(0);
@@ -866,6 +860,10 @@ function loop() {
   sea.mesh.material.color.copy(c1).lerp(c2, Math.abs(cycle) - idx1);
 
   if (STATUS === 'playing') {
+    // Gradually return to default orientation when not manually spun
+    humanoid.flipX += (0 - humanoid.flipX) * 0.015;
+    humanoid.flipZ += (0 - humanoid.flipZ) * 0.015;
+
     distance += 0.2 * Math.max(0.1, currentRotSpeed);
     var tx = norm(mouse.x, -1, 1, -100, 100), ty = norm(mouse.y, -1, 1, 25, 175);
     var dx = tx - humanoid.mesh.position.x, dy = ty - humanoid.mesh.position.y;
