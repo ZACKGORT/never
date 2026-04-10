@@ -281,8 +281,8 @@ function RagdollHuman() {
   // Arms
   this.rShoulderPivot = new THREE.Object3D();
   this.rShoulderPivot.position.set(-15, 16, 0);
-  this.rShoulderPivot.rotation.x =  0.28;
-  this.rShoulderPivot.rotation.z = -1.05;   // lower arms, less horizontal
+  this.rShoulderPivot.rotation.x =  0.65;  // reach forward
+  this.rShoulderPivot.rotation.z = -0.55;  // arms in, not outstretched
   this.rShoulderPivot.userData = { velX: 0, velZ: 0 };
   var rUpperArm = makeBox(8, 18, 8, suitMat);
   rUpperArm.position.set(0, -9, 0);
@@ -300,8 +300,8 @@ function RagdollHuman() {
 
   this.lShoulderPivot = new THREE.Object3D();
   this.lShoulderPivot.position.set(15, 16, 0);
-  this.lShoulderPivot.rotation.x =  0.28;
-  this.lShoulderPivot.rotation.z =  1.05;   // lower arms
+  this.lShoulderPivot.rotation.x =  0.65;  // reach forward
+  this.lShoulderPivot.rotation.z =  0.55;  // arms in, not outstretched
   this.lShoulderPivot.userData = { velX: 0, velZ: 0 };
   var lUpperArm = makeBox(8, 18, 8, suitMat);
   lUpperArm.position.set(0, -9, 0);
@@ -416,16 +416,21 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
       dRE = this.armDrift[2], dLE = this.armDrift[3];
 
   // ── 4. Limbs ─────────────────────────────────────────────────────────────
-  this.joints[0].restX =  0.65 + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
+  // centerProximity: 1 = dead center, 0 = at screen edge — arms reach forward at center, trail back at edges
+  var distFromCenter = Math.sqrt(mouse.x * mouse.x + mouse.y * mouse.y);
+  var centerProximity = Math.max(0, 1 - distFromCenter / Math.SQRT2);
+  var armReach = 0.65 - centerProximity * 2.2; // +0.65 (back) at edge → -1.55 (forward) at center
+
+  this.joints[0].restX =  armReach + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
   this.joints[0].restZ = -0.55 + Math.sin(dRS.phaseZ) * dRS.ampZ + sideDrift;
 
-  this.joints[1].restX =  0.65 + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
+  this.joints[1].restX =  armReach + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
   this.joints[1].restZ =  0.55 + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
 
-  this.joints[2].restX =  0.10 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
+  this.joints[2].restX =  0.10 + centerProximity * -0.8 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
   this.joints[2].restZ = -0.20 + Math.sin(dRE.phaseZ) * dRE.ampZ + sideDrift * 0.75;
 
-  this.joints[3].restX =  0.10 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
+  this.joints[3].restX =  0.10 + centerProximity * -0.8 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
   this.joints[3].restZ =  0.20 + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
 
   // ── 5. Solve all joints ─────────────────────────────────────────────────
@@ -789,12 +794,11 @@ window.addEventListener('pointerdown', function(e) {
 
   if (e.button === 0) {
     if (manualScrollMode) {
-      // Space toggled: rotate along X axis only (clean forward somersault)
-      gsap.killTweensOf(humanoid);
-      var targetFlipX = Math.round(humanoid.flipX / (Math.PI * 2)) * Math.PI * 2 + Math.PI * 2;
-      gsap.to(humanoid, {
-        flipX: targetFlipX,
-        flipZ: 0,
+      // Space toggled: rotate along Y axis only (clean spin)
+      gsap.killTweensOf(humanoid.mesh.rotation);
+      var targetRotY = humanoid.mesh.rotation.y + Math.PI * 2;
+      gsap.to(humanoid.mesh.rotation, {
+        y: targetRotY,
         duration: 0.6, ease: "power2.inOut"
       });
     } else {
