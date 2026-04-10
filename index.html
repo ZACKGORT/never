@@ -623,17 +623,17 @@ function updateBursts() {
   }
 }
 
-// ─── Smoke Trail ───────────────────────────────────────────────────────────
+// ─── Moondust Trail ────────────────────────────────────────────────────────
 var smokeParticles = [];
 var smokePool = [];
-var SMOKE_COLORS = [0x8899aa, 0x99aabb, 0x6677aa, 0xaabbcc, 0x778899];
+// Pulling tones that blend with the planet atmosphere
+var DUST_COLORS = [0x68c3c0, 0x4a3b69, 0x2b596b, 0x444455, 0x556677];
 
 function SmokeParticle() {
-  var sides = 5 + Math.floor(Math.random() * 4); // 5–8 sided polygon feel
+  var sides = 5 + Math.floor(Math.random() * 4);
   var g = new THREE.IcosahedronGeometry(1, 0);
-  // squash it flat-ish for a more 2d polygonal look
   g.applyMatrix4(new THREE.Matrix4().makeScale(1, 0.55 + Math.random()*0.3, 0.4 + Math.random()*0.3));
-  var col = SMOKE_COLORS[Math.floor(Math.random()*SMOKE_COLORS.length)];
+  var col = DUST_COLORS[Math.floor(Math.random()*DUST_COLORS.length)];
   var m = new THREE.MeshPhongMaterial({ color: col, flatShading: true, transparent: true, opacity: 0.0 });
   this.mesh = new THREE.Mesh(g, m);
   this.mesh.castShadow = false;
@@ -642,25 +642,27 @@ function SmokeParticle() {
 
 function spawnSmoke(x, y, z, velX, velY) {
   var p = smokePool.length ? smokePool.pop() : new SmokeParticle();
-  var spread = 3;
+  var spread = 4; // Wider scatter for dust
   p.mesh.position.set(
     x + (Math.random()-0.5)*spread,
     y + (Math.random()-0.5)*spread,
     z + (Math.random()-0.5)*4
   );
-  var baseSize = 1.8 + Math.random()*2.0;
+  var baseSize = 0.8 + Math.random()*1.5; // Smaller particulate
   p.mesh.scale.setScalar(baseSize);
   p.mesh.rotation.set(Math.random()*Math.PI*2, Math.random()*Math.PI*2, Math.random()*Math.PI*2);
-  p.mesh.material.opacity = 0.55 + Math.random()*0.25;
-  p.mesh.material.color.setHex(SMOKE_COLORS[Math.floor(Math.random()*SMOKE_COLORS.length)]);
+  
+  // Fainter initial opacity
+  p.mesh.material.opacity = 0.15 + Math.random()*0.15; 
+  p.mesh.material.color.setHex(DUST_COLORS[Math.floor(Math.random()*DUST_COLORS.length)]);
   p.mesh.visible = true;
-  p.vx = velX * 0.18 + (Math.random()-0.5)*0.6;
-  p.vy = velY * 0.10 + (Math.random()-0.5)*0.4 + 0.15;
-  p.vz = (Math.random()-0.5)*0.5;
+  p.vx = velX * 0.18 + (Math.random()-0.5)*0.8;
+  p.vy = velY * 0.10 + (Math.random()-0.5)*0.6 + 0.15;
+  p.vz = (Math.random()-0.5)*0.6;
   p.vr = (Math.random()-0.5)*0.08;
   p.life = 1.0;
-  p.decay = 0.022 + Math.random()*0.016;
-  p.growRate = 0.055 + Math.random()*0.04;
+  p.decay = 0.03 + Math.random()*0.02; // Decays slightly faster
+  p.growRate = 0.02 + Math.random()*0.03; // Less explosive growth
   p.baseSize = baseSize;
   smokeParticles.push(p);
 }
@@ -678,13 +680,15 @@ function updateSmoke() {
     p.mesh.position.x += p.vx;
     p.mesh.position.y += p.vy;
     p.mesh.position.z += p.vz;
-    p.vx *= 0.97; p.vy *= 0.97;
+    // Slightly more friction for that zero-g floating feel
+    p.vx *= 0.95; p.vy *= 0.95; 
     p.mesh.rotation.x += p.vr;
     p.mesh.rotation.z += p.vr * 0.7;
-    // grow and fade
-    var s = p.baseSize * (1 + (1 - p.life) * p.growRate * 30);
+    
+    var s = p.baseSize * (1 + (1 - p.life) * p.growRate * 20);
     p.mesh.scale.setScalar(s);
-    p.mesh.material.opacity = p.life * 0.7;
+    // Cap the maximum opacity much lower so it stays ethereal 
+    p.mesh.material.opacity = p.life * 0.25; 
   }
 }
 
@@ -1045,6 +1049,9 @@ function loop() {
     }
     eHolder.update(); cHolder.update(); raHolder.update();
     updateBursts(); checkCollisions();
+    
+    // Let the dust settle when we resume flying
+    if (smokeParticles.length > 0) updateSmoke();
 
   } else if (STATUS === 'tumbling') {
     var GRAVITY = -0.45, FRICTION = 0.91, BOUNCE_DAMP = 0.48, SURFACE_Y = tumble.surfaceY;
