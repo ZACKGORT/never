@@ -234,11 +234,11 @@ function makeBox(w, h, d, mat) {
 function RagdollHuman() {
   this.mesh = new THREE.Object3D();
   this.mesh.rotation.y = Math.PI / 5;  // face forward toward horizon
-  this.baseRotX = -0.72;   // start at correct forward-down pitch immediately
+  this.baseRotX = -0.52;   // neutral soar pitch — adjusts with movement
   this.baseRotZ = 0;
   this.flipX = 0;
   this.flipZ = 0;
-  this.mesh.rotation.x = -0.72;
+  this.mesh.rotation.x = -0.52;
 
   var suitMat  = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true });
   var jointMat = new THREE.MeshPhongMaterial({ color: 0x666666, flatShading: true });
@@ -385,13 +385,12 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   dx = dx || 0; dy = dy || 0;
   this.animTime += 0.08;
 
-  // ── 1. Body orientation: pitched forward-down toward planet horizon ──────
-  //    Fixed pose — facing forward and down, slight side lean from accel.
-  //    This is the default soaring orientation regardless of altitude.
+  // ── 1. Body orientation: pitch follows vertical movement direction ──────────
+  //    Base: gentle forward-down soar. Nose rises when climbing, dips when diving.
   var leanZ = -accelX * 0.8;
-  var targetBodyX = -0.72;
-  this.baseRotZ += (leanZ - this.baseRotZ) * 0.12;
-  this.baseRotX += (targetBodyX - this.baseRotX) * 0.08;
+  var targetBodyX = -0.52 + Math.max(-0.22, Math.min(0.26, dy * 0.006));
+  this.baseRotZ += (leanZ   - this.baseRotZ) * 0.10;
+  this.baseRotX += (targetBodyX - this.baseRotX) * 0.06;
 
   this.mesh.rotation.z = this.baseRotZ + this.flipZ;
   this.mesh.rotation.x = this.baseRotX + this.flipX;
@@ -743,7 +742,7 @@ window.addEventListener('pointerdown', function(e) {
     // Right click: reset to default soaring pose
     gsap.to(humanoid, { flipX: 0, flipZ: 0, duration: 0.5, ease: "power3.out" });
     gsap.to(humanoid.mesh.rotation, { y: Math.PI / 5, duration: 0.5, ease: "power3.out" });
-    humanoid.baseRotX = -0.72; humanoid.baseRotZ = 0;
+    humanoid.baseRotX = -0.52; humanoid.baseRotZ = 0;
   }
 });
 window.addEventListener('contextmenu', function(e) { e.preventDefault(); });
