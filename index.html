@@ -90,32 +90,26 @@
 
 <div id="ui">
   <div id="level-wrap">
-    <svg width="90" height="90" viewBox="0 0 200 200">
+    <svg width="0" height="90" viewBox="0 0 0 0">
       <circle r="82" cx="100" cy="100" fill="none" stroke="#d1b790" stroke-width="20" opacity=".4"/>
       <circle id="lvlRing" r="82" cx="100" cy="100" fill="none" stroke="#68c3c0"
               stroke-width="14" stroke-dasharray="515" stroke-dashoffset="515"
               transform="rotate(-90 100 100)" stroke-linecap="round"/>
     </svg>
     <div id="level-inner">
-      <span id="level-num">1</span>
-      <span id="level-lbl">lvl</span>
+      <span id="level-num"></span>
+      <span id="level-lbl"></span>
     </div>
   </div>
   <div id="score-wrap">
-    <div id="score-label">Score</div>
-    <div id="score">0</div>
+    <div id="score-label"></div>
+    <div id="score"></div>
   </div>
-  <div id="dist-wrap"><span id="dist">0</span> m</div>
+  <div id="dist-wrap"><span id="dist"></span></div>
   <div id="hearts-wrap">
-    <span id="hearts-label">Energy</span>
+    <span id="hearts-label"></span>
     <div id="hearts"></div>
   </div>
-</div>
-
-<div id="instructions" style="display:none">
-  <p>Grab the <strong style="color:#68c3c0">blue pills</strong></p>
-  <p><span>avoid the red ones</span></p>
-  <p style="font-size:0.7em; margin-top:12px; color:rgba(255,255,255,.6); letter-spacing:1px; text-transform:uppercase;">Desktop: L/R Click = Flip &nbsp;|&nbsp; Space = Cartwheel &nbsp;|&nbsp; Scroll = Planet Speed</p>
 </div>
 
 <div class="screen" id="screen-welcome">
