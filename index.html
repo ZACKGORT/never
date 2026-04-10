@@ -1391,7 +1391,7 @@ document.addEventListener('touchmove', function(e) {
     var midY = (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
     var delta = touchState.twoStartY - midY;
     touchState.twoStartY = midY;
-    reverseLerp -= delta * 0.004;
+    reverseLerp += delta * 0.004;
     reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.2, reverseLerp));
     return;
   }
@@ -1434,7 +1434,7 @@ var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -2.2;
 var manualScrollMode = false;
 
 window.addEventListener('wheel', function(e) {
-  reverseLerp -= e.deltaY * 0.0012;
+  reverseLerp += e.deltaY * 0.0012;
   reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.2, reverseLerp));
 }, { passive: true });
 
