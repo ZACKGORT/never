@@ -16,11 +16,27 @@
 <meta name="twitter:title" content="neverever.land">
 <meta name="twitter:description" content="A capable person floating in an indifferent environment.">
 <meta name="twitter:image" content="https://neverever.land/og.png">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23020111' rx='6'/%3E%3Ccircle cx='16' cy='10' r='7' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Cellipse cx='16' cy='10' rx='4.5' ry='3.5' fill='%231a2a4a'/%3E%3Cellipse cx='14' cy='8.5' rx='1.5' ry='1' fill='%234466aa' opacity='0.7'/%3E%3Crect x='9' y='16' width='14' height='10' rx='3' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Crect x='9.5' y='17' width='4' height='6' rx='1' fill='%23ccc' stroke='%23aaa' stroke-width='0.3'/%3E%3Crect x='4' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='22.5' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Ccircle cx='4.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Ccircle cx='27.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Crect x='10' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='18' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='9.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Crect x='17.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Ccircle cx='4' cy='4' r='0.6' fill='%23fff' opacity='0.8'/%3E%3Ccircle cx='28' cy='6' r='0.8' fill='%23fff' opacity='0.9'/%3E%3Ccircle cx='26' cy='28' r='0.5' fill='%23fff' opacity='0.7'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23ff8020' stop-opacity='0.35'/%3E%3Cstop offset='55%25' stop-color='%239040ff' stop-opacity='0.10'/%3E%3Cstop offset='100%25' stop-color='%23000010' stop-opacity='0'/%3E%3C/radialGradient%3E%3CclipPath id='cb'%3E%3Crect x='0' y='18' width='36' height='18'/%3E%3C/clipPath%3E%3CclipPath id='cf'%3E%3Crect x='0' y='0' width='36' height='18'/%3E%3C/clipPath%3E%3C/defs%3E%3Ccircle cx='18' cy='18' r='17' fill='url(%23g)'/%3E%3Cellipse cx='18' cy='18' rx='15.5' ry='3.8' fill='none' stroke='%238888ff' stroke-width='0.4' opacity='0.10'/%3E%3Cellipse cx='18' cy='18' rx='12.5' ry='3.2' fill='none' stroke='%23aaaaff' stroke-width='0.45' opacity='0.16'/%3E%3Cellipse cx='18' cy='18' rx='10.5' ry='2.7' fill='none' stroke='%23ff9030' stroke-width='2.4' opacity='0.65' clip-path='url(%23cb)'/%3E%3Cellipse cx='18' cy='18' rx='10.5' ry='2.7' fill='none' stroke='%23ffe090' stroke-width='0.9' opacity='0.55' clip-path='url(%23cb)'/%3E%3Cellipse cx='18' cy='18' rx='7.8' ry='2.0' fill='none' stroke='%23ffdd88' stroke-width='0.7' opacity='0.45'/%3E%3Ccircle cx='18' cy='18' r='6.0' fill='%23000005'/%3E%3Ccircle cx='18' cy='18' r='6.0' fill='none' stroke='%23440088' stroke-width='1.4' opacity='0.45'/%3E%3Cellipse cx='18' cy='18' rx='10.5' ry='2.7' fill='none' stroke='%23ff9030' stroke-width='2.4' opacity='0.88' clip-path='url(%23cf)'/%3E%3Cellipse cx='18' cy='18' rx='10.5' ry='2.7' fill='none' stroke='%23ffffd0' stroke-width='0.9' opacity='0.80' clip-path='url(%23cf)'/%3E%3C/svg%3E">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; tap-highlight-color: transparent; }
   html, body { overscroll-behavior: none; touch-action: none; }
+
+  /* Black hole FAB */
+  #fab-bh {
+    position: fixed;
+    bottom: 20px; right: 18px;
+    width: 42px; height: 42px;
+    cursor: pointer;
+    z-index: 55;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s, transform 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #fab-bh.visible { opacity: 1; pointer-events: all; }
+  #fab-bh:hover { transform: scale(1.12); }
+  #fab-bh:active { transform: scale(0.94); }
   body {
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Arial, sans-serif;
     overflow: hidden;
@@ -445,6 +461,35 @@
 <div id="shooting-star"></div>
 <div id="toast-container"></div>
 <div id="hint-label"></div>
+
+<!-- Black hole FAB — logomark / pause trigger -->
+<svg id="fab-bh" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-label="pause">
+  <defs>
+    <radialGradient id="fab-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#ff8020" stop-opacity="0.35"/>
+      <stop offset="55%"  stop-color="#9040ff" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#000010" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="fab-cb"><rect x="0" y="18" width="36" height="18"/></clipPath>
+    <clipPath id="fab-cf"><rect x="0" y="0"  width="36" height="18"/></clipPath>
+  </defs>
+  <!-- Ambient glow -->
+  <circle cx="18" cy="18" r="17" fill="url(#fab-glow)"/>
+  <!-- Outer lensing rings (cool) -->
+  <ellipse cx="18" cy="18" rx="15.5" ry="3.8" fill="none" stroke="#8888ff" stroke-width="0.4" opacity="0.10"/>
+  <ellipse cx="18" cy="18" rx="12.5" ry="3.2" fill="none" stroke="#aaaaff" stroke-width="0.45" opacity="0.16"/>
+  <!-- Accretion disk — back half (behind sphere) -->
+  <ellipse cx="18" cy="18" rx="10.5" ry="2.7" fill="none" stroke="#ff9030" stroke-width="2.4" opacity="0.65" clip-path="url(#fab-cb)"/>
+  <ellipse cx="18" cy="18" rx="10.5" ry="2.7" fill="none" stroke="#ffe090" stroke-width="0.9" opacity="0.55" clip-path="url(#fab-cb)"/>
+  <!-- Inner photon ring -->
+  <ellipse cx="18" cy="18" rx="7.8" ry="2.0" fill="none" stroke="#ffdd88" stroke-width="0.7" opacity="0.45"/>
+  <!-- Event horizon -->
+  <circle cx="18" cy="18" r="6.0" fill="#000005"/>
+  <circle cx="18" cy="18" r="6.0" fill="none" stroke="#440088" stroke-width="1.4" opacity="0.45"/>
+  <!-- Accretion disk — front half (over sphere) -->
+  <ellipse cx="18" cy="18" rx="10.5" ry="2.7" fill="none" stroke="#ff9030" stroke-width="2.4" opacity="0.88" clip-path="url(#fab-cf)"/>
+  <ellipse cx="18" cy="18" rx="10.5" ry="2.7" fill="none" stroke="#ffffd0" stroke-width="0.9" opacity="0.80" clip-path="url(#fab-cf)"/>
+</svg>
 
 <div id="pause-overlay">
   <div class="bento-grid">
@@ -2266,14 +2311,20 @@ function loop() {
 }
 
 document.getElementById('btn-start').addEventListener('click', startGame);
+document.getElementById('fab-bh').addEventListener('click', function() {
+  if (STATUS === 'playing' || STATUS === 'tumbling') pauseGame();
+});
 
 // ─── Hint label ────────────────────────────────────────────────────────────
 var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 var hintEl = null;
 function updateHintLabel() {
   if (!hintEl) return;
+  var fabEl = document.getElementById('fab-bh');
+  var active = !pauseActive && (STATUS === 'playing' || STATUS === 'tumbling');
+  if (fabEl) fabEl.classList.toggle('visible', active);
   if (pauseActive) { hintEl.style.opacity = '0'; return; }
-  if (STATUS === 'playing' || STATUS === 'tumbling') {
+  if (active) {
     hintEl.style.opacity = '1';
     hintEl.textContent = isMobile ? 'hold to pause' : 'space to pause';
   } else {
