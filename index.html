@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>neverever.land • by zack.cx</title>
+<title>neverever.land</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23020111' rx='6'/%3E%3Ccircle cx='16' cy='10' r='7' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Cellipse cx='16' cy='10' rx='4.5' ry='3.5' fill='%231a2a4a'/%3E%3Cellipse cx='14' cy='8.5' rx='1.5' ry='1' fill='%234466aa' opacity='0.7'/%3E%3Crect x='9' y='16' width='14' height='10' rx='3' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Crect x='9.5' y='17' width='4' height='6' rx='1' fill='%23ccc' stroke='%23aaa' stroke-width='0.3'/%3E%3Crect x='4' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='22.5' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Ccircle cx='4.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Ccircle cx='27.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Crect x='10' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='18' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='9.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Crect x='17.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Ccircle cx='4' cy='4' r='0.6' fill='%23fff' opacity='0.8'/%3E%3Ccircle cx='28' cy='6' r='0.8' fill='%23fff' opacity='0.9'/%3E%3Ccircle cx='26' cy='28' r='0.5' fill='%23fff' opacity='0.7'/%3E%3C/svg%3E">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
@@ -1098,7 +1098,9 @@ document.addEventListener('mousemove', function(e) {
 var touchState = {
   active: false, id: null,
   startX: 0, startY: 0, lastX: 0, lastY: 0,
-  hasMoved: false, twoFinger: false, twoStartY: 0
+  hasMoved: false, twoFinger: false, twoStartY: 0,
+  pinchDist: 0,
+  startTime: 0
 };
 
 var lastTapTime = 0;
@@ -1120,13 +1122,13 @@ function handleVoidTap() {
 }
 
 document.addEventListener('touchstart', function(e) {
-  // Allow taps on buttons (e.g. the "begin" button on the intro screen)
   var target = e.target;
-  if (target && (target.tagName === 'BUTTON' || target.tagName === 'A' || target.closest('button') || target.closest('a'))) {
-    // Manually trigger startGame if it's the start button, since preventDefault below would swallow the click
-    if (target.id === 'btn-start' || (target.closest && target.closest('#btn-start'))) {
+  // Only intercept actual button/link elements — don't walk up to distant ancestors
+  if (target && (target.tagName === 'BUTTON' || target.tagName === 'A')) {
+    if (target.id === 'btn-start' && STATUS === 'waiting') {
       startGame();
     }
+    // btn-replay is wired via addEventListener in doGameOver — let it fire naturally
     return;
   }
   e.preventDefault();
@@ -1138,9 +1140,13 @@ document.addEventListener('touchstart', function(e) {
     }
     return;
   }
+  if (STATUS !== 'playing') return;
   if (e.touches.length === 2) {
     touchState.twoFinger = true;
-    touchState.twoStartY = (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
+    var p0 = e.touches[0], p1 = e.touches[1];
+    var pdx = p0.clientX - p1.clientX, pdy = p0.clientY - p1.clientY;
+    touchState.pinchDist = Math.sqrt(pdx*pdx + pdy*pdy);
+    touchState.twoStartY = (p0.clientY + p1.clientY) * 0.5; // keep for fallback
     return;
   }
   var t = e.touches[0];
@@ -1148,6 +1154,7 @@ document.addEventListener('touchstart', function(e) {
   touchState.startX = t.clientX; touchState.startY = t.clientY;
   touchState.lastX = t.clientX; touchState.lastY = t.clientY;
   touchState.hasMoved = false; touchState.twoFinger = false;
+  touchState.startTime = Date.now();
   mouse.x = -1 + (t.clientX / WIDTH) * 2;
   mouse.y =  1 - (t.clientY / HEIGHT) * 2;
 }, { passive: false });
@@ -1155,11 +1162,16 @@ document.addEventListener('touchstart', function(e) {
 document.addEventListener('touchmove', function(e) {
   e.preventDefault();
   if (e.touches.length === 2 && touchState.twoFinger) {
-    var midY = (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
-    var delta = touchState.twoStartY - midY;
-    touchState.twoStartY = midY;
-    reverseLerp -= delta * 0.004;
+    var t0 = e.touches[0], t1 = e.touches[1];
+    var dx = t0.clientX - t1.clientX, dy = t0.clientY - t1.clientY;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    var delta = dist - touchState.pinchDist; // positive = spreading (fast-forward), negative = closing (reverse)
+    var speed = Math.abs(delta);
+    // Amplify rapid gestures — faster pinch = more effect
+    var amplifier = speed > 18 ? 2.8 : speed > 8 ? 1.6 : 1.0;
+    reverseLerp += (delta * 0.012) * amplifier;
     reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.2, reverseLerp));
+    touchState.pinchDist = dist;
     return;
   }
   if (!touchState.active) return;
@@ -1168,8 +1180,8 @@ document.addEventListener('touchmove', function(e) {
     if (e.touches[i].identifier === touchState.id) { t = e.touches[i]; break; }
   }
   if (!t) return;
-  var dx = t.clientX - touchState.startX, dy = t.clientY - touchState.startY;
-  if (Math.sqrt(dx*dx + dy*dy) > 6) touchState.hasMoved = true;
+  var dx2 = t.clientX - touchState.startX, dy2 = t.clientY - touchState.startY;
+  if (Math.sqrt(dx2*dx2 + dy2*dy2) > 6) touchState.hasMoved = true;
   touchState.lastX = t.clientX; touchState.lastY = t.clientY;
   mouse.x = -1 + (t.clientX / WIDTH) * 2;
   mouse.y =  1 - (t.clientY / HEIGHT) * 2;
@@ -1179,7 +1191,9 @@ document.addEventListener('touchend', function(e) {
   e.preventDefault();
   touchState.twoFinger = false;
   if (!touchState.active) return;
-  if (!touchState.hasMoved && STATUS === 'playing') {
+  var elapsed = Date.now() - touchState.startTime;
+  // Only register as intentional tap if touch lasted at least 30ms and didn't move
+  if (!touchState.hasMoved && elapsed >= 30 && STATUS === 'playing') {
     gsap.to(humanoid, {
       flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 3.5,
       flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 3.5,
