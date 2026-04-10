@@ -206,7 +206,98 @@
     transition: color 0.2s; pointer-events: all;
   }
   .btn-link:hover { color: rgba(255,255,255,0.65); }
-  /* Rocketman boost bar — thin gold strip at top */
+
+  /* Foreground canvas — astronaut above pause overlay */
+  #world-fg {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 70;
+    display: none;
+  }
+
+  /* Pause bento overlay */
+  #pause-overlay {
+    position: fixed; inset: 0;
+    background: rgba(2, 1, 17, 0.72);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 60;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-y: auto;
+  }
+  #pause-overlay.visible { opacity: 1; pointer-events: all; }
+  .bento-grid {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
+    width: 100%;
+    max-width: 580px;
+  }
+  @media (max-width: 520px) {
+    .bento-grid { grid-template-columns: 1fr; }
+  }
+  .bento-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .bento-manifesto { grid-column: 1; grid-row: 1 / 3; display: flex; flex-direction: column; justify-content: space-between; }
+  .bento-dispatch  { grid-column: 2; grid-row: 1; }
+  .bento-link      { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; justify-content: flex-end; }
+  @media (max-width: 520px) {
+    .bento-manifesto, .bento-dispatch, .bento-link { grid-column: 1; grid-row: auto; }
+  }
+  .bento-label {
+    font-size: 0.58em; letter-spacing: 2.5px;
+    color: rgba(255,255,255,0.2); text-transform: lowercase; margin-bottom: 14px;
+  }
+  .bento-manifesto-text {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(0.78em, 2vw, 0.90em);
+    font-weight: 300; color: rgba(255,255,255,0.62);
+    line-height: 1.75; letter-spacing: 0.1px;
+  }
+  .bento-manifesto-text strong { color: rgba(255,255,255,0.88); font-weight: 500; }
+  .bento-manifesto-text .manifesto-sign {
+    display: block; margin-top: 18px;
+    font-size: 0.85em; color: rgba(104,195,192,0.55); letter-spacing: 1px;
+  }
+  .bento-resume {
+    margin-top: 20px; font-size: 0.65em; letter-spacing: 2px;
+    color: rgba(255,255,255,0.22); text-transform: lowercase;
+    cursor: pointer; transition: color 0.2s;
+    background: none; border: none; padding: 0; font-family: inherit;
+  }
+  .bento-resume:hover { color: rgba(255,255,255,0.6); }
+  .dispatch-table {
+    font-size: clamp(0.58em, 1.4vw, 0.68em);
+    letter-spacing: 0.8px; color: rgba(255,255,255,0.5);
+    border-collapse: collapse; width: 100%;
+  }
+  .dispatch-table td { padding: 2px 0; vertical-align: top; }
+  .dispatch-table td:first-child { color: rgba(255,255,255,0.25); padding-right: 10px; white-space: nowrap; }
+  .dispatch-val { color: rgba(255,255,255,0.75); }
+  .dispatch-divider { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 5px 0; }
+  .bento-zack {
+    display: inline-block;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(1em, 2.5vw, 1.2em); font-weight: 500;
+    color: rgba(255,255,255,0.5); text-decoration: none;
+    letter-spacing: -0.02em; transition: color 0.2s;
+  }
+  .bento-zack:hover { color: rgba(255,255,255,0.9); }
+  .bento-zack-sub {
+    display: block; font-size: 0.58em; letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.2); text-transform: lowercase;
+    margin-top: 4px; font-weight: 300;
+  }
   #rocket-bar-bg {
     position: absolute;
     top: 0; left: 0;
@@ -267,51 +358,6 @@
   }
 
   /* Long-press menu */
-  #menu-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.82);
-    z-index: 60; opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 0;
-    overflow-y: auto;
-    padding: 40px 20px;
-  }
-  #menu-overlay.visible { opacity: 1; pointer-events: all; }
-  #menu-overlay h2 {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(1.4em, 4vw, 2em);
-    color: rgba(255,255,255,0.85);
-    letter-spacing: -0.5px;
-    margin-bottom: 6px;
-  }
-  #menu-sol-label { color: rgba(255,255,255,0.3); font-size: 0.72em; letter-spacing: 2px; margin-bottom: 20px; }
-  #menu-report { width: 100%; max-width: 340px; margin-bottom: 24px; }
-  .menu-report-table {
-    font-size: clamp(0.65em, 1.6vw, 0.78em);
-    letter-spacing: 1px; color: rgba(255,255,255,0.6);
-    border-collapse: collapse; width: 100%;
-  }
-  .menu-report-table td { padding: 2px 6px 2px 0; vertical-align: top; }
-  .menu-report-table td:first-child { color: rgba(255,255,255,0.3); white-space: nowrap; padding-right: 14px; }
-  .menu-report-table td:last-child { color: rgba(255,255,255,0.35); font-size: 0.9em; }
-  .menu-divider { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 0; }
-  .menu-count { color: rgba(255,255,255,0.8); font-weight: 500; }
-  .menu-actions { display: flex; flex-direction: column; gap: 8px; align-items: center; }
-  .btn-menu {
-    background: rgba(255,255,255,0.05);
-    color: rgba(255,255,255,0.6);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 50px; padding: 9px 28px;
-    font-size: 0.78em; letter-spacing: 2px; text-transform: lowercase;
-    cursor: pointer; transition: background 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .btn-menu:hover { background: rgba(255,255,255,0.1); }
-  .btn-menu.btn-menu-end { border-color: rgba(242,83,70,0.3); color: rgba(242,83,70,0.6); }
-
   /* Sol summary screen overrides */
   #screen-gameover {
     background: rgba(0,0,0,0.75);
@@ -381,13 +427,46 @@
 
 <div id="cursor"></div>
 <div id="world"></div>
+<div id="world-fg"></div>
 <div id="hit-flash"></div>
 <div id="comet-flash"></div>
 <div id="shooting-star"></div>
 <div id="toast-container"></div>
 <div id="hint-label"></div>
 
-<div id="menu-overlay">
+<div id="pause-overlay">
+  <div class="bento-grid">
+
+    <div class="bento-card bento-manifesto">
+      <p class="bento-label">doctrine</p>
+      <div class="bento-manifesto-text">
+        <p><strong>You are not lost.</strong><br>You are between destinations.</p>
+        <br>
+        <p>neverever.land is a tamagotchi for the capable and unmoored. <strong>Keep it alive.</strong> Navigate the friction. Collect what sustains you. Let the disruptions pass without explanation.</p>
+        <br>
+        <p>The void is not failure.<br>It is a prompt.</p>
+        <br>
+        <p>Every sol is a data point.<br>The pattern is yours to read.</p>
+        <span class="manifesto-sign">float on. ·</span>
+      </div>
+      <button class="bento-resume" id="btn-pause-resume">space to resume</button>
+    </div>
+
+    <div class="bento-card bento-dispatch">
+      <p class="bento-label">dispatch</p>
+      <div id="pause-dispatch-content"></div>
+    </div>
+
+    <div class="bento-card bento-link">
+      <p class="bento-label">origin</p>
+      <a href="https://zack.cx" target="_blank" class="bento-zack">
+        zack.cx
+        <span class="bento-zack-sub">the human behind the astronaut</span>
+      </a>
+    </div>
+
+  </div>
+</div>
   <h2>neverever.land</h2>
   <p id="menu-sol-label">sol 0</p>
   <div id="menu-report"></div>
@@ -450,7 +529,8 @@ var C = {
 };
 
 var planetColors = [0x68c3c0, 0x4a3b69, 0x2b596b, 0x5c3a41];
-var scene, camera, renderer;
+var scene, camera, renderer, fgRenderer;
+var pauseActive = false;
 var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
 var targetRotSpeed = 1.0, currentRotSpeed = 1.0;
 
@@ -466,11 +546,20 @@ function createScene() {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   document.getElementById('world').appendChild(renderer.domElement);
+
+  // Foreground renderer — renders only the astronaut, above the pause overlay
+  fgRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  fgRenderer.setSize(WIDTH, HEIGHT);
+  fgRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  fgRenderer.shadowMap.enabled = false;
+  document.getElementById('world-fg').appendChild(fgRenderer.domElement);
+
   window.addEventListener('resize', function() {
     WIDTH = window.innerWidth; HEIGHT = window.innerHeight;
     camera.aspect = WIDTH / HEIGHT;
     camera.updateProjectionMatrix();
     renderer.setSize(WIDTH, HEIGHT);
+    fgRenderer.setSize(WIDTH, HEIGHT);
   });
 }
 
@@ -1378,13 +1467,67 @@ window.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
 window.addEventListener('keydown', function(e) {
   if (STATUS === 'void') { handleHeartbeatTap(); return; }
-  if (STATUS !== 'playing') return;
   if (e.code === 'Space') {
     e.preventDefault();
-    manualScrollMode = !manualScrollMode;
-    MAGNETIC_FORWARD = manualScrollMode ? 0.0 : 1.0;
+    if (STATUS === 'playing' || STATUS === 'tumbling' || STATUS === 'paused') {
+      pauseActive ? resumeGame() : pauseGame();
+    }
+    return;
   }
+  if (e.code === 'Escape' && pauseActive) { resumeGame(); return; }
 });
+
+// ─── Pause ─────────────────────────────────────────────────────────────────
+function buildDispatchTable() {
+  var secs   = Math.floor(survivalFrames / 60);
+  var mins   = Math.floor(secs / 60); secs = secs % 60;
+  var timeStr = mins > 0 ? mins + 'm ' + secs + 's' : secs + 's';
+  var avgAlt = stats.altitudeFrames ? stats.altitudeSum / stats.altitudeFrames : 100;
+  var altLabel = avgAlt > HIGH_ORBIT_Y ? 'high orbit' : avgAlt < LOW_ORBIT_Y ? 'low orbit' : 'operational';
+  var totalOpp = stats.canistersCollected + stats.canistersMissed;
+  var capture  = totalOpp > 0 ? Math.round(stats.canistersCollected / totalOpp * 100) : 0;
+  var peakPct  = Math.round(stats.peakStructuralStress * 100);
+  var total    = stats.blueOrbHits + stats.redOrbHits + stats.blackOrbHits +
+                 stats.shootingStarHits + stats.boxTumbles + stats.boxSlings;
+
+  function row(l, v) {
+    return '<tr><td>' + l + '</td><td class="dispatch-val">' + v + '</td></tr>';
+  }
+  function div() { return '<tr><td colspan="2"><hr class="dispatch-divider"/></td></tr>'; }
+
+  return '<table class="dispatch-table">' +
+    row('sol',       solNumber) +
+    row('elapsed',   timeStr) +
+    row('altitude',  altLabel) +
+    div() +
+    row('o₂ captured', stats.canistersCollected + ' / ' + totalOpp) +
+    row('capture',   capture + '%') +
+    div() +
+    row('setbacks',  total + ' ×') +
+    row('structural', peakPct + '%') +
+    div() +
+    row('recoveries', stats.tumbleRecoveries + ' ×') +
+    row('revivals',   stats.voidRevives + ' ×') +
+  '</table>';
+}
+
+function pauseGame() {
+  if (STATUS === 'waiting' || STATUS === 'gameover') return;
+  pauseActive = true;
+  document.getElementById('pause-dispatch-content').innerHTML = buildDispatchTable();
+  document.getElementById('pause-overlay').classList.add('visible');
+  document.getElementById('world-fg').style.display = 'block';
+  updateHintLabel();
+}
+
+function resumeGame() {
+  pauseActive = false;
+  document.getElementById('pause-overlay').classList.remove('visible');
+  document.getElementById('world-fg').style.display = 'none';
+  updateHintLabel();
+}
+
+document.getElementById('btn-pause-resume').addEventListener('click', resumeGame);
 
 // ─── Game Events ───────────────────────────────────────────────────────────
 function startGame() {
@@ -1407,6 +1550,9 @@ function startGame() {
   humanoid.flameMat.color.setHex(0x00ffff);
   humanoid.mesh.scale.setScalar(0.25);
   manualScrollMode = false; MAGNETIC_FORWARD = 1.0;
+  pauseActive = false;
+  document.getElementById('pause-overlay').classList.remove('visible');
+  document.getElementById('world-fg').style.display = 'none';
   cometActive = false; cometTimer = 0;
   structuralStress = 0.0; wasInRiskZone = false;
   spinPresetIdx = 0;
@@ -1799,6 +1945,20 @@ function loop() {
   sea.mesh.material.color.copy(c1).lerp(c2, Math.abs(cycle) - idx1);
 
   if (STATUS === 'playing') {
+    if (pauseActive) {
+      // Frozen — scene animates, astronaut bobs, game doesn't advance
+      humanoid.mesh.position.y += (100 - humanoid.mesh.position.y) * 0.04;
+      humanoid.update(0, 0, 0, 0, 0);
+      updateBursts();
+      renderer.render(scene, camera);
+      // Foreground: astronaut above overlay
+      sea.mesh.visible = false; sky.mesh.visible = false;
+      orbHolder.mesh.visible = false; canHolder.mesh.visible = false; boxHolder.mesh.visible = false;
+      fgRenderer.render(scene, camera);
+      sea.mesh.visible = true; sky.mesh.visible = true;
+      orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true;
+      return;
+    }
     survivalFrames++;
     if (invincibleFrames > 0) invincibleFrames--;
 
@@ -2048,98 +2208,31 @@ var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 var hintEl = null;
 function updateHintLabel() {
   if (!hintEl) return;
+  if (pauseActive) { hintEl.style.opacity = '0'; return; }
   if (STATUS === 'playing' || STATUS === 'tumbling') {
     hintEl.style.opacity = '1';
-    hintEl.textContent = isMobile ? 'hold for menu' : 'space — pause orbit  ·  hold for menu';
+    hintEl.textContent = isMobile ? 'hold to pause' : 'space to pause';
   } else {
     hintEl.style.opacity = '0';
   }
 }
 
-// ─── Live progress report (shared by menu and end-of-sol) ──────────────────
-function buildReportRows() {
-  var secs    = Math.floor(survivalFrames / 60);
-  var mins    = Math.floor(secs / 60); secs = secs % 60;
-  var timeStr = mins > 0 ? mins + 'm ' + secs + 's' : secs + 's';
-
-  var avgAlt  = stats.altitudeFrames ? stats.altitudeSum / stats.altitudeFrames : 100;
-  var altLabel= avgAlt > HIGH_ORBIT_Y ? 'high orbit' : avgAlt < LOW_ORBIT_Y ? 'low orbit' : 'operational';
-  var totalOpp      = stats.canistersCollected + stats.canistersMissed;
-  var captureRate   = totalOpp > 0 ? Math.round(stats.canistersCollected / totalOpp * 100) : 0;
-  var safeTimeSecs  = Math.round(stats.safeZoneFrames / 60);
-  var peakPct       = Math.round(stats.peakStructuralStress * 100);
-  var stressLabel   = peakPct >= 100 ? 'forced tumble' : peakPct >= 75 ? 'critical' : peakPct >= 40 ? 'elevated' : 'stable';
-  var totalSetbacks = stats.blueOrbHits + stats.redOrbHits + stats.blackOrbHits +
-                      stats.shootingStarHits + stats.boxTumbles + stats.boxSlings;
-
-  function r(label, val, note) {
-    return '<tr><td>' + label + '</td><td><span class="menu-count">' + val +
-           '</span></td><td>' + (note||'') + '</td></tr>';
-  }
-  function d() { return '<tr><td colspan="3"><hr class="menu-divider"/></td></tr>'; }
-
-  return '<table class="menu-report-table">' +
-    r('elapsed',       timeStr,      '') +
-    r('altitude',      altLabel,     '') +
-    d() +
-    r('oxygen',        stats.canistersCollected + ' / ' + totalOpp, captureRate + '%') +
-    (stats.canistersMissed ? r('&nbsp;missed', stats.canistersMissed + ' ×', '') : '') +
-    d() +
-    r('setbacks',      totalSetbacks + ' ×', '') +
-    (stats.blueOrbHits    ? r('&nbsp;friction',    stats.blueOrbHits    + ' ×', 'safe bet') : '') +
-    (stats.redOrbHits     ? r('&nbsp;collision',   stats.redOrbHits     + ' ×', 'risk')     : '') +
-    (stats.blackOrbHits   ? r('&nbsp;singularity', stats.blackOrbHits   + ' ×', 'removed')  : '') +
-    (stats.shootingStarHits ? r('&nbsp;external',  stats.shootingStarHits + ' ×', '')        : '') +
-    (stats.boxTumbles     ? r('&nbsp;grounded',    stats.boxTumbles     + ' ×', '')          : '') +
-    d() +
-    r('risk entries',  stats.riskZoneEntries + ' ×',  '< 30% o₂') +
-    r('safe bet',      safeTimeSecs + 's',             '> 60% o₂') +
-    r('structural',    peakPct + '%',                  stressLabel) +
-    d() +
-    r('recoveries',    stats.tumbleRecoveries + ' ×', '') +
-    r('revivals',      stats.voidRevives      + ' ×', '') +
-  '</table>';
-}
-
-// ─── Menu ──────────────────────────────────────────────────────────────────
-var menuOpen = false;
-function openMenu() {
-  if (STATUS === 'gameover' || STATUS === 'waiting') return;
-  menuOpen = true;
-  document.getElementById('menu-sol-label').textContent = 'sol ' + solNumber;
-  document.getElementById('menu-report').innerHTML = buildReportRows();
-  document.getElementById('menu-overlay').classList.add('visible');
-  updateHintLabel();
-}
-function closeMenu() {
-  menuOpen = false;
-  document.getElementById('menu-overlay').classList.remove('visible');
-  updateHintLabel();
-}
-document.getElementById('btn-menu-resume').addEventListener('click', closeMenu);
-document.getElementById('btn-menu-end').addEventListener('click', function() {
-  closeMenu();
-  doGameOver();
-});
-
-// Long-press detection (500ms)
+// Long-press on mobile → pause
 var longPressTimer = null;
 var LONG_PRESS_MS  = 500;
 
 document.addEventListener('touchstart', function(e) {
   if (STATUS === 'gameover' || STATUS === 'waiting') return;
-  if (menuOpen) return;
+  if (pauseActive) return;
   if (e.touches.length !== 1) { clearTimeout(longPressTimer); return; }
-  longPressTimer = setTimeout(openMenu, LONG_PRESS_MS);
+  longPressTimer = setTimeout(pauseGame, LONG_PRESS_MS);
 }, { passive: true });
-document.addEventListener('touchend',   function() { clearTimeout(longPressTimer); }, { passive: true });
-document.addEventListener('touchmove',  function() { clearTimeout(longPressTimer); }, { passive: true });
+document.addEventListener('touchend',  function() { clearTimeout(longPressTimer); }, { passive: true });
+document.addEventListener('touchmove', function() { clearTimeout(longPressTimer); }, { passive: true });
 
-window.addEventListener('keydown', function(e) {
-  if (e.code === 'KeyM' || e.code === 'Escape') {
-    if (menuOpen) { closeMenu(); return; }
-    if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
-  }
+// Tap pause overlay background to resume
+document.getElementById('pause-overlay').addEventListener('click', function(e) {
+  if (e.target === this) resumeGame();
 });
 
 // ─── Welcome quotes ────────────────────────────────────────────────────────
