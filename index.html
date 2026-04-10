@@ -141,8 +141,37 @@
     transition: background .2s, border-color .2s;
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-link {
-    color: rgba(255,255,255,0.28); font-size: 0.75em; letter-spacing: 2px;
+  /* Wordmark */
+  #wordmark {
+    display: block;
+    width: clamp(260px, 55vw, 520px);
+    margin-bottom: 1.6em;
+    opacity: 0.92;
+  }
+
+  /* Quote rotator */
+  #welcome-quote {
+    font-size: clamp(0.78em, 2vw, 0.95em);
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 0.5em;
+    min-height: 2.8em;
+    letter-spacing: 0.5px;
+    font-weight: 300;
+    font-style: italic;
+    text-align: center;
+    padding: 0 24px;
+    max-width: 480px;
+    line-height: 1.55;
+    transition: opacity 0.6s ease;
+  }
+  #welcome-attribution {
+    font-size: clamp(0.62em, 1.5vw, 0.72em);
+    color: rgba(255,255,255,0.22);
+    letter-spacing: 2px;
+    text-transform: lowercase;
+    margin-bottom: 2.2em;
+    transition: opacity 0.6s ease;
+  }
     text-decoration: none; text-transform: lowercase;
     transition: color 0.2s; pointer-events: all;
   }
@@ -349,9 +378,51 @@
 </div>
 
 <div class="screen" id="screen-welcome">
-  <h1>neverever.land</h1>
-  <p class="sub">a floating astronaut tamagotchi<br>that you need to feed</p>
-  <button class="btn-play" id="btn-start">begin</button>
+
+  <!-- Bespoke wordmark -->
+  <svg id="wordmark" viewBox="0 0 520 72" xmlns="http://www.w3.org/2000/svg" aria-label="neverever.land">
+    <defs>
+      <linearGradient id="wm-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.95"/>
+        <stop offset="48%"  stop-color="#a0c8e0" stop-opacity="0.90"/>
+        <stop offset="100%" stop-color="#68c3c0" stop-opacity="0.85"/>
+      </linearGradient>
+    </defs>
+    <!-- n -->
+    <path d="M8 54 L8 18 L14 18 L14 26 Q18 16 28 16 Q40 16 40 30 L40 54 L34 54 L34 32 Q34 22 26 22 Q18 22 14 30 L14 54 Z" fill="url(#wm-grad)"/>
+    <!-- e -->
+    <path d="M46 36 Q46 16 60 16 Q74 16 74 32 Q74 35 73 37 L52 37 Q53 44 60 44 Q66 44 69 40 L73 43 Q69 50 60 50 Q46 50 46 36 Z M52 32 L68 32 Q67 22 60 22 Q53 22 52 32 Z" fill="url(#wm-grad)"/>
+    <!-- v -->
+    <path d="M76 18 L83 18 L92 44 L101 18 L108 18 L96 54 L88 54 Z" fill="url(#wm-grad)"/>
+    <!-- e -->
+    <path d="M110 36 Q110 16 124 16 Q138 16 138 32 Q138 35 137 37 L116 37 Q117 44 124 44 Q130 44 133 40 L137 43 Q133 50 124 50 Q110 50 110 36 Z M116 32 L132 32 Q131 22 124 22 Q117 22 116 32 Z" fill="url(#wm-grad)"/>
+    <!-- r -->
+    <path d="M142 54 L142 18 L148 18 L148 26 Q152 16 163 16 L163 22 Q151 22 148 32 L148 54 Z" fill="url(#wm-grad)"/>
+    <!-- e -->
+    <path d="M166 36 Q166 16 180 16 Q194 16 194 32 Q194 35 193 37 L172 37 Q173 44 180 44 Q186 44 189 40 L193 43 Q189 50 180 50 Q166 50 166 36 Z M172 32 L188 32 Q187 22 180 22 Q173 22 172 32 Z" fill="url(#wm-grad)"/>
+    <!-- v -->
+    <path d="M197 18 L204 18 L213 44 L222 18 L229 18 L217 54 L209 54 Z" fill="url(#wm-grad)"/>
+    <!-- e -->
+    <path d="M232 36 Q232 16 246 16 Q260 16 260 32 Q260 35 259 37 L238 37 Q239 44 246 44 Q252 44 255 40 L259 43 Q255 50 246 50 Q232 50 232 36 Z M238 32 L254 32 Q253 22 246 22 Q239 22 238 32 Z" fill="url(#wm-grad)"/>
+    <!-- r -->
+    <path d="M264 54 L264 18 L270 18 L270 26 Q274 16 285 16 L285 22 Q273 22 270 32 L270 54 Z" fill="url(#wm-grad)"/>
+    <!-- dot separator -->
+    <circle cx="294" cy="54" r="4" fill="#68c3c0" opacity="0.7"/>
+    <!-- l -->
+    <path d="M306 54 L306 8 L312 8 L312 54 Z" fill="url(#wm-grad)"/>
+    <!-- a -->
+    <path d="M318 42 Q318 30 334 30 Q339 30 342 32 L342 30 Q342 22 335 22 Q330 22 327 26 L323 23 Q327 16 335 16 Q348 16 348 28 L348 54 L342 54 L342 50 Q339 54 334 54 Q318 54 318 42 Z M324 42 Q324 48 334 48 Q342 48 342 40 L342 36 Q339 34 334 34 Q324 34 324 42 Z" fill="url(#wm-grad)"/>
+    <!-- n -->
+    <path d="M354 54 L354 18 L360 18 L360 26 Q364 16 374 16 Q386 16 386 30 L386 54 L380 54 L380 32 Q380 22 372 22 Q364 22 360 30 L360 54 Z" fill="url(#wm-grad)"/>
+    <!-- d -->
+    <path d="M406 54 L406 8 L412 8 L412 26 Q416 16 426 16 Q440 16 440 33 Q440 50 426 50 Q416 50 412 44 L412 54 Z M412 33 Q412 44 422 44 Q434 44 434 33 Q434 22 422 22 Q412 22 412 33 Z" fill="url(#wm-grad)"/>
+    <!-- subtle orbit ring around the dot -->
+    <ellipse cx="294" cy="48" rx="10" ry="5" fill="none" stroke="#68c3c0" stroke-width="0.8" opacity="0.3"/>
+  </svg>
+
+  <p id="welcome-quote"></p>
+  <p id="welcome-attribution"></p>
+  <button class="btn-play" id="btn-start">float on.</button>
 </div>
 
 <div class="screen" id="screen-gameover"></div>
@@ -615,20 +686,26 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   dx = dx || 0; dy = dy || 0;
   this.animTime += 0.08;
 
-  // ── Scroll forces — read directly from reverseLerp ───────────────────────
+  // ── Scroll forces ────────────────────────────────────────────────────────
   var reverseForce = Math.max(0, -reverseLerp) / 2.2;
   var forwardForce = Math.max(0,  reverseLerp) / 1.2;
-
-  // forward: nose pitches DOWN, arms trail BACK, limbs stream LEFT
-  // reverse: nose arches UP,   arms fly FORWARD, limbs stream RIGHT
   var inertiaPitch = forwardForce * 0.40 - reverseForce * 0.35;
   var armTrail     = forwardForce * 0.75 - reverseForce * 0.65;
   var sideDrift    = forwardForce * 0.50 - reverseForce * 0.50;
 
   // ── 1. Body ───────────────────────────────────────────────────────────────
-  var altFactor   = Math.max(0, Math.min(1, (this.mesh.position.y - 25) / 150));
-  var targetBodyX = (-0.85 + altFactor * 0.60) + inertiaPitch;
-  var leanZ       = -accelX * 0.8;
+  var altFactor = Math.max(0, Math.min(1, (this.mesh.position.y - 25) / 150));
+
+  // Altitude pose zones (smooth, no hard edges)
+  // poseLow:  1 at ground, fades to 0 at altFactor=0.38 (≈y=82)
+  // poseHigh: 0 below altFactor=0.62 (≈y=118), rises to 1 at top
+  var poseLow  = Math.max(0, 1 - altFactor / 0.38);
+  var poseHigh = Math.max(0, (altFactor - 0.62) / 0.38);
+
+  // Superman (low): flat, nose-down, body horizontal
+  // Baumgartner (high): upright, spread-eagle
+  var targetBodyX = (-1.05 + altFactor * 0.80) + inertiaPitch;
+  var leanZ = -accelX * 0.8;
 
   this.baseRotZ += (leanZ       - this.baseRotZ) * 0.10;
   this.baseRotX += (targetBodyX - this.baseRotX) * 0.06;
@@ -636,9 +713,9 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   this.mesh.rotation.z = this.baseRotZ + this.flipZ;
   this.mesh.rotation.x = this.baseRotX + this.flipX;
 
-  var BIAS_Y = Math.PI * 0.75;
-  var cursorNudge = Math.max(-0.3, Math.min(0.3, -dx * 0.003));
-  this.mesh.rotation.y += (BIAS_Y + cursorNudge - this.mesh.rotation.y) * 0.07;
+  // Facing: track direction of travel — dx > 0 means moving right (face right)
+  var directionBias = Math.PI * 0.75 - Math.max(-0.50, Math.min(0.50, dx / 50));
+  this.mesh.rotation.y += (directionBias - this.mesh.rotation.y) * 0.055;
 
   // ── 2. Thruster flames ──────────────────────────────────────────────────
   var baseScale   = 0.6 + Math.random() * 0.4;
@@ -646,7 +723,7 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   this.lFlame.scale.set(1, baseScale + thrustBoost, 0.5);
   this.rFlame.scale.set(1, baseScale + thrustBoost, 0.5);
 
-  // ── 3. Advance drift phases ─────────────────────────────────────────────
+  // ── 3. Drift phases ─────────────────────────────────────────────────────
   for (var ad = 0; ad < this.armDrift.length; ad++) {
     this.armDrift[ad].phaseX += this.armDrift[ad].speedX;
     this.armDrift[ad].phaseZ += this.armDrift[ad].speedZ;
@@ -654,19 +731,32 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var dRS = this.armDrift[0], dLS = this.armDrift[1],
       dRE = this.armDrift[2], dLE = this.armDrift[3];
 
-  // ── 4. Limbs ─────────────────────────────────────────────────────────────
-  var distFromCenter = Math.sqrt(mouse.x * mouse.x + mouse.y * mouse.y);
+  // ── 4. Altitude-blended limb poses ──────────────────────────────────────
+  // Superman (low): arms thrust forward, narrow Z, legs stream back together
+  // Baumgartner (high): arms spread wide, legs spread, body upright
+  var distFromCenter  = Math.sqrt(mouse.x * mouse.x + mouse.y * mouse.y);
   var centerProximity = Math.max(0, 1 - distFromCenter / Math.SQRT2);
-  var armReach = 0.65 - centerProximity * 2.2;
+  var armReach        = 0.65 - centerProximity * 2.2;
+  var supermanPull    = poseLow * 0.75; // extra arm reach forward in low orbit
 
-  this.joints[0].restX =  armReach + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
-  this.joints[0].restZ = -0.55 + Math.sin(dRS.phaseZ) * dRS.ampZ + sideDrift;
-  this.joints[1].restX =  armReach + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
-  this.joints[1].restZ =  0.55 + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
-  this.joints[2].restX =  0.10 + centerProximity * -0.8 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
-  this.joints[2].restZ = -0.20 + Math.sin(dRE.phaseZ) * dRE.ampZ + sideDrift * 0.75;
-  this.joints[3].restX =  0.10 + centerProximity * -0.8 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
-  this.joints[3].restZ =  0.20 + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
+  // Shoulder Z: narrow (±0.12) → default (±0.55) → wide (±1.18)
+  var shoulderZ = 0.55 + poseLow * (-0.43) + poseHigh * 0.63;
+  // Elbow Z: narrow → default (±0.20) → wide (±0.70)
+  var elbowZ    = 0.20 + poseLow * (-0.10) + poseHigh * 0.50;
+
+  this.joints[0].restX = armReach - supermanPull + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
+  this.joints[0].restZ = -shoulderZ + Math.sin(dRS.phaseZ) * dRS.ampZ + sideDrift;
+  this.joints[1].restX = armReach - supermanPull + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
+  this.joints[1].restZ =  shoulderZ + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
+  this.joints[2].restX = 0.10 + centerProximity * -0.8 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
+  this.joints[2].restZ = -elbowZ + Math.sin(dRE.phaseZ) * dRE.ampZ + sideDrift * 0.75;
+  this.joints[3].restX = 0.10 + centerProximity * -0.8 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
+  this.joints[3].restZ =  elbowZ + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
+
+  // Leg Z spread: together (±0.03) → default (±0.06) → wide (±0.42)
+  var legZ      = 0.06 + poseLow * (-0.03) + poseHigh * 0.36;
+  // Leg X: pull back in superman, spread slightly in baumgartner
+  var legBack   = poseLow * 0.28;
 
   // ── 5. Solve all joints ─────────────────────────────────────────────────
   for (var i = 0; i < this.joints.length; i++) {
@@ -674,16 +764,14 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
 
     if (i >= 4) {
       var legTrail = forwardForce * 0.55 - reverseForce * 0.55;
-      j.restX =  0.08 + Math.sin(this.animTime * 0.9 + i) * 0.12 + legTrail;
-      j.restZ =  (i === 4 || i === 5 ? 0.06 : -0.06) + Math.sin(this.animTime * 0.7 + i) * 0.08 + sideDrift * 0.50;
+      j.restX = 0.08 - legBack + Math.sin(this.animTime * 0.9 + i) * 0.12 + legTrail;
+      j.restZ = (i === 4 || i === 6 ? legZ : -legZ) + Math.sin(this.animTime * 0.7 + i) * 0.08 + sideDrift * 0.50;
     }
 
     var errX = j.restX - p.rotation.x;
     var errZ = j.restZ - p.rotation.z;
-
     ud.velX = ud.velX * j.dampX + errX * j.stiffX;
     ud.velZ = ud.velZ * j.dampZ + errZ * j.stiffZ;
-
     p.rotation.x = Math.max(-j.limX, Math.min(j.limX, p.rotation.x + ud.velX));
     p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
   }
@@ -1236,26 +1324,25 @@ window.addEventListener('pointerdown', function(e) {
 
   if (e.button === 0) {
     if (manualScrollMode) {
-      // manualScrollMode: clean Y spin
+      // Space mode: clean Y spin
       gsap.killTweensOf(humanoid.mesh.rotation);
-      var targetRotY = humanoid.mesh.rotation.y + Math.PI * 2;
-      gsap.to(humanoid.mesh.rotation, { y: targetRotY, duration: 0.6, ease: "power2.inOut" });
+      gsap.to(humanoid.mesh.rotation, { y: humanoid.mesh.rotation.y + Math.PI * 2, duration: 0.6, ease: "power2.inOut" });
     } else {
-      // Normal: random spin
+      // Directional flip based on cursor side of viewport
+      var flipDir = mouse.x >= 0 ? 1 : -1; // right half = frontflip (+), left half = backflip (-)
       gsap.to(humanoid, {
-        flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 3.5,
-        flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 3.5,
-        duration: 0.65, ease: "power2.inOut"
+        flipX: humanoid.flipX + flipDir * Math.PI * 2,
+        duration: 0.75, ease: "power2.inOut"
       });
+      // Limb jitter — heavier on direction of rotation
       for (var si = 0; si < humanoid.joints.length; si++) {
-        humanoid.joints[si].pivot.userData.velX += (Math.random() - 0.5) * 4;
-        humanoid.joints[si].pivot.userData.velZ += (Math.random() - 0.5) * 4;
+        humanoid.joints[si].pivot.userData.velX += flipDir * (1.5 + Math.random() * 2.5);
+        humanoid.joints[si].pivot.userData.velZ += (Math.random() - 0.5) * 2.5;
       }
     }
   } else if (e.button === 2) {
     // Right click: reset to default soaring pose
     gsap.to(humanoid, { flipX: 0, flipZ: 0, duration: 0.5, ease: "power3.out" });
-    gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.75, duration: 0.5, ease: "power3.out" });
     humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
   }
 });
@@ -1325,6 +1412,7 @@ function startGame() {
   }
 
   refreshUI();
+  stopQuoteRotation();
   updateHintLabel();
   document.getElementById('screen-welcome').classList.remove('visible');
   document.getElementById('screen-gameover').classList.remove('visible');
@@ -2025,12 +2113,81 @@ window.addEventListener('keydown', function(e) {
   }
 });
 
+// ─── Welcome quotes ────────────────────────────────────────────────────────
+var QUOTES = [
+  { text: "Bad news comes, don't you worry even when it lands.\nGood news will work its way to all them plans.",
+    attr: "Modest Mouse — Float On" },
+  { text: "You are not lost. You are here.",
+    attr: "anonymous" },
+  { text: "We shall not cease from exploration, and the end of all our exploring will be to arrive where we started.",
+    attr: "T.S. Eliot" },
+  { text: "Not all those who wander are lost.",
+    attr: "J.R.R. Tolkien" },
+  { text: "The most important thing is this: to be able at any moment to sacrifice what we are for what we could become.",
+    attr: "Charles Du Bos" },
+  { text: "You can't go back and change the beginning, but you can start where you are and change the ending.",
+    attr: "C.S. Lewis" },
+  { text: "Stars are not small or gentle. They are writhing and dying and burning. They are not hopeful. And yet.",
+    attr: "Ellie Wiesel" },
+  { text: "Somewhere, something incredible is waiting to be known.",
+    attr: "Sharon Begley" },
+  { text: "Keep your face always toward the sunshine, and shadows will fall behind you.",
+    attr: "Walt Whitman" },
+  { text: "To navigate is to live twice: once in the planning, once in the going.",
+    attr: "anonymous" },
+  { text: "The cure for anything is salt water — sweat, tears, or the sea.",
+    attr: "Isak Dinesen" },
+  { text: "It is not the destination, it is the motion.",
+    attr: "Bob Dylan" },
+  { text: "We are all just walking each other home.",
+    attr: "Ram Dass" },
+  { text: "The real voyage of discovery consists not in seeking new landscapes, but in having new eyes.",
+    attr: "Marcel Proust" },
+  { text: "Even the darkest night will end and the sun will rise.",
+    attr: "Victor Hugo" },
+  { text: "In the void, learn to float.",
+    attr: "neverever.land" },
+  { text: "You don't have to see the whole staircase. Just take the first step.",
+    attr: "Martin Luther King Jr." },
+  { text: "I am not afraid of storms, for I am learning how to sail my ship.",
+    attr: "Louisa May Alcott" },
+];
+
+var _quoteIdx = Math.floor(Math.random() * QUOTES.length);
+function rotateQuote() {
+  var qEl = document.getElementById('welcome-quote');
+  var aEl = document.getElementById('welcome-attribution');
+  if (!qEl || !aEl) return;
+  qEl.style.opacity = '0'; aEl.style.opacity = '0';
+  setTimeout(function() {
+    _quoteIdx = (_quoteIdx + 1) % QUOTES.length;
+    var q = QUOTES[_quoteIdx];
+    qEl.textContent = '\u201c' + q.text + '\u201d';
+    aEl.textContent = '— ' + q.attr;
+    qEl.style.opacity = '1'; aEl.style.opacity = '1';
+  }, 650);
+}
+var _quoteInterval = null;
+function startQuoteRotation() {
+  var q = QUOTES[_quoteIdx];
+  var qEl = document.getElementById('welcome-quote');
+  var aEl = document.getElementById('welcome-attribution');
+  if (qEl) qEl.textContent = '\u201c' + q.text + '\u201d';
+  if (aEl) aEl.textContent = '— ' + q.attr;
+  if (qEl) qEl.style.opacity = '1';
+  if (aEl) aEl.style.opacity = '1';
+  clearInterval(_quoteInterval);
+  _quoteInterval = setInterval(rotateQuote, 5000);
+}
+function stopQuoteRotation() { clearInterval(_quoteInterval); }
+
 window.addEventListener('load', function() {
   hintEl = document.getElementById('hint-label');
   isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
   createScene(); createLights(); buildWorld();
   refreshUI(); loop();
   document.getElementById('screen-welcome').classList.add('visible');
+  startQuoteRotation();
   STATUS = 'waiting';
 });
 </script>
