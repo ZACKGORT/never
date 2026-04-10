@@ -6,7 +6,7 @@
 <title>neverever.land</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23020111' rx='6'/%3E%3Ccircle cx='16' cy='10' r='7' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Cellipse cx='16' cy='10' rx='4.5' ry='3.5' fill='%231a2a4a'/%3E%3Cellipse cx='14' cy='8.5' rx='1.5' ry='1' fill='%234466aa' opacity='0.7'/%3E%3Crect x='9' y='16' width='14' height='10' rx='3' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Crect x='9.5' y='17' width='4' height='6' rx='1' fill='%23ccc' stroke='%23aaa' stroke-width='0.3'/%3E%3Crect x='4' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='22.5' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Ccircle cx='4.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Ccircle cx='27.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Crect x='10' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='18' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='9.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Crect x='17.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Ccircle cx='4' cy='4' r='0.6' fill='%23fff' opacity='0.8'/%3E%3Ccircle cx='28' cy='6' r='0.8' fill='%23fff' opacity='0.9'/%3E%3Ccircle cx='26' cy='28' r='0.5' fill='%23fff' opacity='0.7'/%3E%3C/svg%3E">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; tap-highlight-color: transparent; }
   html, body { overscroll-behavior: none; touch-action: none; }
   body {
@@ -144,9 +144,39 @@
   /* Wordmark */
   #wordmark {
     display: block;
-    width: clamp(260px, 55vw, 520px);
-    margin-bottom: 1.6em;
-    opacity: 0.92;
+    margin-bottom: 1.4em;
+    text-align: center;
+    line-height: 1;
+    user-select: none;
+  }
+  #wordmark .wm-main {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(2.8em, 8vw, 5.2em);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    background: linear-gradient(100deg, #ffffff 0%, #b8d8ea 45%, #68c3c0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  #wordmark .wm-dot {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(2.8em, 8vw, 5.2em);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    -webkit-text-fill-color: rgba(104, 195, 192, 0.55);
+    color: rgba(104, 195, 192, 0.55);
+  }
+  #wordmark .wm-tld {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(2.8em, 8vw, 5.2em);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    background: linear-gradient(100deg, #68c3c0 0%, #4a9ea0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0.7;
   }
 
   /* Quote rotator */
@@ -283,7 +313,14 @@
   .btn-menu.btn-menu-end { border-color: rgba(242,83,70,0.3); color: rgba(242,83,70,0.6); }
 
   /* Sol summary screen overrides */
-  #screen-gameover { background: rgba(0,0,0,0.75); }
+  #screen-gameover {
+    background: rgba(0,0,0,0.75);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+    padding-top: max(40px, 8vh);
+    padding-bottom: 40px;
+  }
   #screen-gameover h1 { margin-bottom: 0.05em; }
   .sol-label { color: rgba(255,255,255,0.35); font-size: 0.72em; letter-spacing: 2px; margin-bottom: 1.5em; }
   .sol-table { font-size: clamp(0.72em, 1.8vw, 0.85em); letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 1.8em; width: 100%; max-width: 340px; border-collapse: collapse; }
@@ -379,46 +416,10 @@
 
 <div class="screen" id="screen-welcome">
 
-  <!-- Bespoke wordmark -->
-  <svg id="wordmark" viewBox="0 0 520 72" xmlns="http://www.w3.org/2000/svg" aria-label="neverever.land">
-    <defs>
-      <linearGradient id="wm-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.95"/>
-        <stop offset="48%"  stop-color="#a0c8e0" stop-opacity="0.90"/>
-        <stop offset="100%" stop-color="#68c3c0" stop-opacity="0.85"/>
-      </linearGradient>
-    </defs>
-    <!-- n -->
-    <path d="M8 54 L8 18 L14 18 L14 26 Q18 16 28 16 Q40 16 40 30 L40 54 L34 54 L34 32 Q34 22 26 22 Q18 22 14 30 L14 54 Z" fill="url(#wm-grad)"/>
-    <!-- e -->
-    <path d="M46 36 Q46 16 60 16 Q74 16 74 32 Q74 35 73 37 L52 37 Q53 44 60 44 Q66 44 69 40 L73 43 Q69 50 60 50 Q46 50 46 36 Z M52 32 L68 32 Q67 22 60 22 Q53 22 52 32 Z" fill="url(#wm-grad)"/>
-    <!-- v -->
-    <path d="M76 18 L83 18 L92 44 L101 18 L108 18 L96 54 L88 54 Z" fill="url(#wm-grad)"/>
-    <!-- e -->
-    <path d="M110 36 Q110 16 124 16 Q138 16 138 32 Q138 35 137 37 L116 37 Q117 44 124 44 Q130 44 133 40 L137 43 Q133 50 124 50 Q110 50 110 36 Z M116 32 L132 32 Q131 22 124 22 Q117 22 116 32 Z" fill="url(#wm-grad)"/>
-    <!-- r -->
-    <path d="M142 54 L142 18 L148 18 L148 26 Q152 16 163 16 L163 22 Q151 22 148 32 L148 54 Z" fill="url(#wm-grad)"/>
-    <!-- e -->
-    <path d="M166 36 Q166 16 180 16 Q194 16 194 32 Q194 35 193 37 L172 37 Q173 44 180 44 Q186 44 189 40 L193 43 Q189 50 180 50 Q166 50 166 36 Z M172 32 L188 32 Q187 22 180 22 Q173 22 172 32 Z" fill="url(#wm-grad)"/>
-    <!-- v -->
-    <path d="M197 18 L204 18 L213 44 L222 18 L229 18 L217 54 L209 54 Z" fill="url(#wm-grad)"/>
-    <!-- e -->
-    <path d="M232 36 Q232 16 246 16 Q260 16 260 32 Q260 35 259 37 L238 37 Q239 44 246 44 Q252 44 255 40 L259 43 Q255 50 246 50 Q232 50 232 36 Z M238 32 L254 32 Q253 22 246 22 Q239 22 238 32 Z" fill="url(#wm-grad)"/>
-    <!-- r -->
-    <path d="M264 54 L264 18 L270 18 L270 26 Q274 16 285 16 L285 22 Q273 22 270 32 L270 54 Z" fill="url(#wm-grad)"/>
-    <!-- dot separator -->
-    <circle cx="294" cy="54" r="4" fill="#68c3c0" opacity="0.7"/>
-    <!-- l -->
-    <path d="M306 54 L306 8 L312 8 L312 54 Z" fill="url(#wm-grad)"/>
-    <!-- a -->
-    <path d="M318 42 Q318 30 334 30 Q339 30 342 32 L342 30 Q342 22 335 22 Q330 22 327 26 L323 23 Q327 16 335 16 Q348 16 348 28 L348 54 L342 54 L342 50 Q339 54 334 54 Q318 54 318 42 Z M324 42 Q324 48 334 48 Q342 48 342 40 L342 36 Q339 34 334 34 Q324 34 324 42 Z" fill="url(#wm-grad)"/>
-    <!-- n -->
-    <path d="M354 54 L354 18 L360 18 L360 26 Q364 16 374 16 Q386 16 386 30 L386 54 L380 54 L380 32 Q380 22 372 22 Q364 22 360 30 L360 54 Z" fill="url(#wm-grad)"/>
-    <!-- d -->
-    <path d="M406 54 L406 8 L412 8 L412 26 Q416 16 426 16 Q440 16 440 33 Q440 50 426 50 Q416 50 412 44 L412 54 Z M412 33 Q412 44 422 44 Q434 44 434 33 Q434 22 422 22 Q412 22 412 33 Z" fill="url(#wm-grad)"/>
-    <!-- subtle orbit ring around the dot -->
-    <ellipse cx="294" cy="48" rx="10" ry="5" fill="none" stroke="#68c3c0" stroke-width="0.8" opacity="0.3"/>
-  </svg>
+  <!-- Wordmark -->
+  <div id="wordmark" aria-label="neverever.land">
+    <span class="wm-main">neverever</span><span class="wm-dot">.</span><span class="wm-tld">land</span>
+  </div>
 
   <p id="welcome-quote"></p>
   <p id="welcome-attribution"></p>
@@ -433,7 +434,10 @@
 <script>
 "use strict";
 
-document.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+document.addEventListener('touchmove', function(e) {
+  if (STATUS === 'waiting' || STATUS === 'gameover') return;
+  e.preventDefault();
+}, { passive: false });
 history.pushState(null, '', location.href);
 window.addEventListener('popstate', function() { history.pushState(null, '', location.href); });
 
@@ -1112,6 +1116,20 @@ var mouse = { x: 0, y: 0 };
 var sea, sky, humanoid, orbHolder, canHolder, boxHolder;
 var voidLight;
 
+// ─── Sequential spin presets ───────────────────────────────────────────────
+var spinPresetIdx = 0;
+var PI = Math.PI;
+var SPIN_PRESETS = [
+  { x:  PI*2,    z:  0,        dur: 0.70, ease: "power2.inOut", jx:  3.5, jz:  0.5 }, // clean frontflip
+  { x: -PI*2,    z:  0,        dur: 0.70, ease: "power2.inOut", jx: -3.5, jz:  0.5 }, // clean backflip
+  { x:  0,       z:  PI*2,     dur: 0.75, ease: "power2.inOut", jx:  0.5, jz:  3.5 }, // barrel roll right
+  { x:  0,       z: -PI*2,     dur: 0.75, ease: "power2.inOut", jx:  0.5, jz: -3.5 }, // barrel roll left
+  { x:  PI*1.5,  z:  PI*1.0,   dur: 0.90, ease: "power1.inOut", jx:  2.5, jz:  2.0 }, // diagonal tumble
+  { x: -PI*1.5,  z: -PI*1.0,   dur: 0.90, ease: "power1.inOut", jx: -2.5, jz: -2.0 }, // reverse diagonal
+  { x:  PI*3,    z:  0,        dur: 1.10, ease: "power2.inOut", jx:  4.0, jz:  0.5 }, // 1.5 frontflip
+  { x:  PI*2.5,  z:  PI*1.5,   dur: 1.00, ease: "power1.inOut", jx:  3.0, jz:  2.5 }, // corkscrew
+];
+
 // ─── Toast ─────────────────────────────────────────────────────────────────
 var MAX_TOASTS = 5;
 function showToast(msg, type) {
@@ -1237,6 +1255,12 @@ function handleHeartbeatTap() {
 }
 
 document.addEventListener('touchstart', function(e) {
+  // Let buttons, links and inputs handle their own events
+  var tag = e.target.tagName;
+  if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
+  // Don't interfere with screen overlays while waiting or showing gameover
+  if (STATUS === 'waiting' || STATUS === 'gameover') return;
+
   e.preventDefault();
   if (STATUS === 'void') { handleHeartbeatTap(); return; }
   if (STATUS === 'tumbling') {
@@ -1284,6 +1308,9 @@ document.addEventListener('touchmove', function(e) {
 }, { passive: false });
 
 document.addEventListener('touchend', function(e) {
+  var tag = e.target.tagName;
+  if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
+  if (STATUS === 'waiting' || STATUS === 'gameover') return;
   e.preventDefault();
   touchState.twoFinger = false;
   if (!touchState.active) return;
@@ -1328,16 +1355,17 @@ window.addEventListener('pointerdown', function(e) {
       gsap.killTweensOf(humanoid.mesh.rotation);
       gsap.to(humanoid.mesh.rotation, { y: humanoid.mesh.rotation.y + Math.PI * 2, duration: 0.6, ease: "power2.inOut" });
     } else {
-      // Directional flip based on cursor side of viewport
-      var flipDir = mouse.x >= 0 ? 1 : -1; // right half = frontflip (+), left half = backflip (-)
+      // Sequential preset spins — cycles through distinct axes each click
+      var preset = SPIN_PRESETS[spinPresetIdx % SPIN_PRESETS.length];
+      spinPresetIdx++;
       gsap.to(humanoid, {
-        flipX: humanoid.flipX + flipDir * Math.PI * 2,
-        duration: 0.75, ease: "power2.inOut"
+        flipX: humanoid.flipX + preset.x,
+        flipZ: humanoid.flipZ + preset.z,
+        duration: preset.dur, ease: preset.ease
       });
-      // Limb jitter — heavier on direction of rotation
       for (var si = 0; si < humanoid.joints.length; si++) {
-        humanoid.joints[si].pivot.userData.velX += flipDir * (1.5 + Math.random() * 2.5);
-        humanoid.joints[si].pivot.userData.velZ += (Math.random() - 0.5) * 2.5;
+        humanoid.joints[si].pivot.userData.velX += preset.jx * (0.8 + Math.random() * 0.4);
+        humanoid.joints[si].pivot.userData.velZ += preset.jz * (0.8 + Math.random() * 0.4);
       }
     }
   } else if (e.button === 2) {
@@ -1381,6 +1409,7 @@ function startGame() {
   manualScrollMode = false; MAGNETIC_FORWARD = 1.0;
   cometActive = false; cometTimer = 0;
   structuralStress = 0.0; wasInRiskZone = false;
+  spinPresetIdx = 0;
   heartbeatTaps = 0; voidIdleFrames = 0;
   starActive = false;
   nextStarFrame = frame + 900 + Math.floor(Math.random() * 1800);
