@@ -2,11 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>neverever.land</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; tap-highlight-color: transparent; }
+  html, body {
+    overscroll-behavior: none;
+    touch-action: none;
+  }
   body {
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Arial, sans-serif;
     overflow: hidden;
@@ -20,6 +24,7 @@
     width: 100%; height: 100%;
     background: linear-gradient(180deg, #020111 0%, #1a1025 100%);
     overflow: hidden;
+    touch-action: none;
   }
   #ui {
     position: fixed;
@@ -27,27 +32,31 @@
     pointer-events: none;
     z-index: 10;
   }
-  #score-wrap { position: absolute; top: 24px; right: 30px; text-align: right; }
+  /* Score — top centre, minimal */
   #score {
-    font-size: clamp(2em, 5vw, 3.5em);
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(1.1em, 3.5vw, 1.6em);
     font-weight: 900;
-    color: #fff;
-    text-shadow: 0 2px 12px rgba(0,0,0,.18);
-    letter-spacing: -1px;
-    line-height: 1;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 2px;
   }
-  #score-label { font-size: .65em; color: rgba(255,255,255,.7); letter-spacing: 2px; text-transform: uppercase; }
-  #dist-wrap { position: absolute; bottom: 28px; right: 28px; text-align: right; color: rgba(255,255,255,.75); font-size: .9em; letter-spacing: 1px; }
-
-  #hearts-wrap { position: absolute; bottom: 24px; left: 24px; display: flex; align-items: center; gap: 6px; }
-  #hearts-label { font-size: .7em; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.6); margin-right: 4px; }
-  .heart { width: 18px; height: 16px; position: relative; transition: transform .3s, opacity .3s; }
-  .heart svg { width: 100%; height: 100%; }
-  .heart.lost { opacity: .2; transform: scale(.75); }
-  #instructions { position: fixed; left: 50%; bottom: 80px; transform: translateX(-50%); text-align: center; pointer-events: none; z-index: 12; opacity: 1; transition: opacity 1s; }
-  #instructions.fade { opacity: 0; }
-  #instructions p { color: #fff; font-size: 1.05em; text-shadow: 0 1px 4px rgba(0,0,0,.2); }
-  #instructions span { color: #f25346; }
+  /* Health rail — thin red bar along the bottom */
+  #health-rail-bg {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 3px;
+    background: rgba(255,255,255,0.08);
+  }
+  #health-rail {
+    height: 100%;
+    background: #f25346;
+    width: 100%;
+    transform-origin: left center;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
   #lift-hint { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; z-index: 15; opacity: 0; transition: opacity 0.4s; }
   #lift-hint.visible { opacity: 1; }
   #lift-hint p { color: #fff; font-size: 1.3em; font-weight: 700; text-shadow: 0 2px 12px rgba(0,0,0,.5); letter-spacing: 1px; }
@@ -55,7 +64,7 @@
   .screen.visible { opacity: 1; pointer-events: all; }
   .screen h1 { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(3em, 8vw, 5.5em); font-weight: 700; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,.2); margin-bottom: .15em; letter-spacing: -1px; }
   .screen .sub { font-size: clamp(1em, 2.5vw, 1.3em); color: rgba(255,255,255,.8); margin-bottom: 2em; min-height: 1.5em; }
-  .btn-play { pointer-events: all; background: #fff; color: #f25346; border: none; border-radius: 50px; padding: 14px 40px; font-size: 1.05em; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 24px rgba(0,0,0,.12); transition: transform .2s, box-shadow .2s; }
+  .btn-play { pointer-events: all; background: #fff; color: #f25346; border: none; border-radius: 50px; padding: 14px 40px; font-size: 1.05em; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 24px rgba(0,0,0,.12); transition: transform .2s, box-shadow .2s; -webkit-tap-highlight-color: transparent; }
   .btn-play:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 30px rgba(0,0,0,.18); }
   .btn-play:active { transform: translateY(0) scale(.98); }
   #hit-flash { position: fixed; inset: 0; background: #f25346; opacity: 0; pointer-events: none; z-index: 30; mix-blend-mode: multiply; }
@@ -86,15 +95,8 @@
 <div id="coin-flash"></div>
 
 <div id="ui">
-  <div id="score-wrap">
-    <div id="score-label">score</div>
-    <div id="score">0</div>
-  </div>
-  <div id="dist-wrap"><span id="dist">0</span></div>
-  <div id="hearts-wrap">
-    <span id="hearts-label">lives</span>
-    <div id="hearts"></div>
-  </div>
+  <div id="score">0</div>
+  <div id="health-rail-bg"><div id="health-rail"></div></div>
 </div>
 
 <div id="lift-hint">
@@ -118,6 +120,11 @@
 
 <script>
 "use strict";
+
+// Prevent Chrome back-browse swipe and overscroll bounce
+document.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', function() { history.pushState(null, '', location.href); });
 
 var C = {
   red: 0xf25346, white: 0xd8d0d1, brown: 0x59332e, pink: 0xF5986E,
@@ -635,22 +642,11 @@ function buildWorld() {
   }
 }
 
-function buildHearts() {
-  var el = document.getElementById('hearts'); el.innerHTML = '';
-  for (var i = 0; i < MAX_E; i++) {
-    var div = document.createElement('div');
-    div.className = 'heart'; div.id = 'heart-'+i;
-    div.innerHTML = '<svg viewBox="0 0 32 29.6"><path fill="#f25346" d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.9,16,21.2,16,21.2s16-11.3,16-21.2C32,3.8,28.2,0,23.6,0z"/></svg>';
-    el.appendChild(div);
-  }
-}
+function buildHearts() { /* replaced by health rail */ }
 function refreshUI() {
   document.getElementById('score').textContent = score;
-  document.getElementById('dist').textContent  = Math.round(distance);
-  for (var i = 0; i < MAX_E; i++) {
-    var h = document.getElementById('heart-'+i);
-    if (h) h.classList.toggle('lost', i >= energy);
-  }
+  var pct = energy / MAX_E;
+  document.getElementById('health-rail').style.transform = 'scaleX(' + pct + ')';
 }
 function setLevelRing(pct) {
   var el = document.getElementById('lvlRing');
