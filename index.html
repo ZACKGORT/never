@@ -141,17 +141,68 @@
     transition: background .2s, border-color .2s;
     -webkit-tap-highlight-color: transparent;
   }
-  .btn-play:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
-  .btn-play:active { background: rgba(255,255,255,0.08); }
   .btn-link {
-    display: block; margin-top: 18px;
-    color: rgba(255,255,255,0.28);
-    font-size: 0.75em; letter-spacing: 2px;
+    color: rgba(255,255,255,0.28); font-size: 0.75em; letter-spacing: 2px;
     text-decoration: none; text-transform: lowercase;
-    transition: color 0.2s;
-    pointer-events: all;
+    transition: color 0.2s; pointer-events: all;
   }
   .btn-link:hover { color: rgba(255,255,255,0.65); }
+  /* Rocketman boost bar — thin gold strip at top */
+  #rocket-bar-bg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: transparent;
+  }
+  #rocket-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ffcc00, #fff);
+    width: 100%;
+    transform-origin: left center;
+    transition: transform 0.1s linear;
+    display: none;
+  }
+
+  /* Toast notifications */
+  #toast-container {
+    position: fixed;
+    left: 18px; top: 55px;
+    z-index: 50; pointer-events: none;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .toast {
+    display: inline-block;
+    background: rgba(0,0,0,0.55);
+    color: rgba(255,255,255,0.75);
+    padding: 4px 10px;
+    font-size: clamp(0.62em, 1.6vw, 0.72em);
+    letter-spacing: 1.5px;
+    text-transform: lowercase;
+    border-left: 2px solid rgba(255,255,255,0.2);
+    opacity: 0;
+    white-space: nowrap;
+  }
+  .toast-blue  { border-left-color: #4499ff; }
+  .toast-red   { border-left-color: #f23030; }
+  .toast-black { border-left-color: #888; color: rgba(255,255,255,0.5); }
+  .toast-oxy   { border-left-color: #00e5ff; }
+  .toast-box   { border-left-color: #ffcc00; }
+  .toast-star  { border-left-color: rgba(255,255,255,0.6); }
+  .toast-void  { border-left-color: #cc1133; }
+  .toast-rocket{ border-left-color: #ffcc00; color: rgba(255,220,80,0.9); }
+
+  /* Sol summary screen overrides */
+  #screen-gameover { background: rgba(0,0,0,0.75); }
+  #screen-gameover h1 { margin-bottom: 0.05em; }
+  .sol-label { color: rgba(255,255,255,0.35); font-size: 0.72em; letter-spacing: 2px; margin-bottom: 1.5em; }
+  .sol-table { font-size: clamp(0.72em, 1.8vw, 0.85em); letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 1.8em; width: 100%; max-width: 340px; border-collapse: collapse; }
+  .sol-table td { padding: 3px 8px 3px 0; vertical-align: top; }
+  .sol-table td:first-child { color: rgba(255,255,255,0.35); white-space: nowrap; padding-right: 16px; }
+  .sol-table td:last-child { color: rgba(255,255,255,0.4); font-size: 0.9em; padding-left: 8px; }
+  .sol-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 6px 0; }
+  .sol-count { color: rgba(255,255,255,0.85); font-weight: 600; }
+  .sol-rocket-notice { font-size: clamp(0.7em, 1.8vw, 0.82em); color: rgba(255,200,60,0.7); letter-spacing: 2px; margin-bottom: 1.6em; }
+  .sol-buttons { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   #hit-flash { position: fixed; inset: 0; background: #f25346; opacity: 0; pointer-events: none; z-index: 30; mix-blend-mode: multiply; }
 
@@ -188,9 +239,11 @@
 <div id="hit-flash"></div>
 <div id="comet-flash"></div>
 <div id="shooting-star"></div>
+<div id="toast-container"></div>
 
 <div id="ui">
   <div id="timer">0:00</div>
+  <div id="rocket-bar-bg"><div id="rocket-bar"></div></div>
   <div id="oxy-rail-bg"><div id="oxy-rail"></div></div>
 </div>
 
@@ -210,12 +263,7 @@
   <button class="btn-play" id="btn-start">begin</button>
 </div>
 
-<div class="screen" id="screen-gameover">
-  <h1>still here</h1>
-  <p class="sub" id="go-score"></p>
-  <button class="btn-play" id="btn-replay">again</button>
-  <a href="https://zack.cx" target="_blank" class="btn-link">zack.cx</a>
-</div>
+<div class="screen" id="screen-gameover"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
@@ -826,27 +874,73 @@ var oxygen = 10, MAX_O = 10;
 var survivalFrames = 0;
 var distance = 0, frame = 0;
 var spawnInt = 72, BASE_SPD = 2.0;
-var speedTick = 0; // frames until next speed increase
-var SPEED_TICK_INTERVAL = 1800; // increase speed every 30s
+var speedTick = 0;
+var SPEED_TICK_INTERVAL = 1800;
 
 // Void / heartbeat state
 var heartbeatTaps = 0, HEARTBEAT_REQUIRED = 20;
-var voidIdleFrames = 0, VOID_IDLE_MAX = 360; // 6 seconds of no tapping → game over
+var voidIdleFrames = 0, VOID_IDLE_MAX = 360;
 
 // Comet state
 var cometActive = false, cometTimer = 0, COMET_DURATION = 480;
 
-// Invincibility after singularity
+// Invincibility
 var invincibleFrames = 0;
 
 // Shooting star
 var starActive = false, starEl;
 var starX = 0, starY = 0, starAngle = 0, starProgress = 0;
-var nextStarFrame = 900 + Math.floor(Math.random() * 1800); // first star in 15-45s
+var nextStarFrame = 900 + Math.floor(Math.random() * 1800);
+
+// Sol + stats
+var solNumber = 0;
+var stats = {};
+function resetStats() {
+  stats = {
+    canistersCollected: 0,
+    blueOrbHits: 0, redOrbHits: 0, blackOrbHits: 0,
+    shootingStarHits: 0,
+    boxTumbles: 0, boxSlings: 0, boxComets: 0,
+    tumbleRecoveries: 0, voidRevives: 0
+  };
+}
+resetStats();
+
+// Rocketman boost
+var rocketmanPending = false;
+var rocketmanActive  = false;
+var rocketmanTimer   = 0;
+var ROCKETMAN_DURATION = 1800; // 30 seconds
 
 var mouse = { x: 0, y: 0 };
 var sea, sky, humanoid, orbHolder, canHolder, boxHolder;
 var voidLight;
+
+// ─── Toast ─────────────────────────────────────────────────────────────────
+var MAX_TOASTS = 5;
+function showToast(msg, type) {
+  if (STATUS !== 'playing' && STATUS !== 'tumbling') return;
+  var container = document.getElementById('toast-container');
+  while (container.children.length >= MAX_TOASTS) {
+    var last = container.lastChild;
+    gsap.killTweensOf(last);
+    container.removeChild(last);
+  }
+  var el = document.createElement('div');
+  el.className = 'toast toast-' + (type || 'blue');
+  el.textContent = msg;
+  container.insertBefore(el, container.firstChild);
+  gsap.fromTo(el,
+    { opacity: 0, x: -10 },
+    { opacity: 1, x: 0, duration: 0.18, ease: "power2.out",
+      onComplete: function() {
+        gsap.to(el, { opacity: 0, x: -6, duration: 0.25, delay: 1.3,
+          onComplete: function() { if (el.parentNode) el.parentNode.removeChild(el); }
+        });
+      }
+    }
+  );
+}
 
 function buildWorld() {
   sea = new Sea(); sea.mesh.position.y = -600; scene.add(sea.mesh);
@@ -1071,6 +1165,8 @@ window.addEventListener('keydown', function(e) {
 
 // ─── Game Events ───────────────────────────────────────────────────────────
 function startGame() {
+  solNumber++;
+  resetStats();
   STATUS = 'playing';
   oxygen = MAX_O; survivalFrames = 0;
   distance = 0; frame = 0;
@@ -1085,9 +1181,9 @@ function startGame() {
   humanoid.singularity = false;
   humanoid.slingVx = 0; humanoid.slingVy = 0; humanoid.slingFrames = 0;
   humanoid.suitMat.color.setHex(0xffffff);
+  humanoid.flameMat.color.setHex(0x00ffff);
   humanoid.mesh.scale.setScalar(0.25);
   manualScrollMode = false; MAGNETIC_FORWARD = 1.0;
-  invincibleFrames = 120; // brief grace period on start
   cometActive = false; cometTimer = 0;
   heartbeatTaps = 0; voidIdleFrames = 0;
   starActive = false;
@@ -1097,10 +1193,28 @@ function startGame() {
   document.getElementById('hb-bar').style.width = '0%';
   document.getElementById('lift-hint').classList.remove('visible');
   document.getElementById('world').style.background = 'linear-gradient(180deg,#020111 0%,#0d0820 100%)';
-  // Always restore scene visibility
+  // Clear toasts
+  document.getElementById('toast-container').innerHTML = '';
+  // Restore scene
   if (sea) { sea.mesh.visible = true; sky.mesh.visible = true; }
   if (orbHolder) { orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true; }
   if (voidLight) voidLight.intensity = 0;
+
+  // Rocketman boost from previous sol
+  if (rocketmanPending && solNumber > 1) {
+    rocketmanActive = true;
+    rocketmanTimer  = ROCKETMAN_DURATION;
+    rocketmanPending = false;
+    invincibleFrames = ROCKETMAN_DURATION;
+    document.getElementById('rocket-bar').style.display = 'block';
+    document.getElementById('rocket-bar').style.transform = 'scaleX(1)';
+    showToast('rocketman — ' + Math.round(ROCKETMAN_DURATION/60) + 's', 'rocket');
+  } else {
+    rocketmanActive = false; rocketmanTimer = 0;
+    document.getElementById('rocket-bar').style.display = 'none';
+    invincibleFrames = 120;
+  }
+
   refreshUI();
   document.getElementById('screen-welcome').classList.remove('visible');
   document.getElementById('screen-gameover').classList.remove('visible');
@@ -1191,10 +1305,9 @@ function doVoid() {
 }
 
 function exitVoid() {
+  stats.voidRevives++;
+  showToast('heartbeat restored', 'void');
   STATUS = 'playing';
-  oxygen = Math.floor(MAX_O * 0.4);
-  invincibleFrames = 120;
-  heartbeatTaps = 0;
   // Restore scene
   sea.mesh.visible = true;
   sky.mesh.visible = true;
@@ -1211,16 +1324,54 @@ function exitVoid() {
 
 function doGameOver() {
   STATUS = 'gameover';
+  rocketmanPending = true; // always award boost for next sol
+
   var secs = Math.floor(survivalFrames / 60);
-  var mins = Math.floor(secs / 60);
-  secs = secs % 60;
-  document.getElementById('go-score').textContent =
-    mins > 0
-      ? mins + 'm ' + secs + 's'
-      : secs + ' seconds';
+  var mins = Math.floor(secs / 60); secs = secs % 60;
+  var timeStr = mins > 0 ? mins + 'm ' + secs + 's' : secs + 's';
+
+  var totalSetbacks = stats.blueOrbHits + stats.redOrbHits + stats.blackOrbHits + stats.shootingStarHits + stats.boxTumbles + stats.boxSlings;
+
+  function row(label, count, note) {
+    return '<tr><td>' + label + '</td><td><span class="sol-count">' + count + '</span></td><td>' + (note||'') + '</td></tr>';
+  }
+
+  var screen = document.getElementById('screen-gameover');
+  screen.innerHTML =
+    '<h1>still here</h1>' +
+    '<p class="sol-label">sol ' + solNumber + '</p>' +
+    '<table class="sol-table">' +
+      row('survived', timeStr, '') +
+      '<tr><td colspan="3"><hr class="sol-divider"/></td></tr>' +
+      row('oxygen restored', stats.canistersCollected + ' ×', 'brief reprieves') +
+      '<tr><td colspan="3"><hr class="sol-divider"/></td></tr>' +
+      row('setbacks', totalSetbacks + ' ×', 'total') +
+      (stats.blueOrbHits   ? row('&nbsp;&nbsp;friction',    stats.blueOrbHits   + ' ×', 'minor — processed') : '') +
+      (stats.redOrbHits    ? row('&nbsp;&nbsp;collision',   stats.redOrbHits    + ' ×', 'significant') : '') +
+      (stats.blackOrbHits  ? row('&nbsp;&nbsp;singularity', stats.blackOrbHits  + ' ×', 'total disruption') : '') +
+      (stats.shootingStarHits ? row('&nbsp;&nbsp;external', stats.shootingStarHits + ' ×', 'uncontrolled') : '') +
+      (stats.boxTumbles    ? row('&nbsp;&nbsp;surprise',    stats.boxTumbles    + ' ×', 'unforeseen') : '') +
+      (stats.boxSlings     ? row('&nbsp;&nbsp;ejection',    stats.boxSlings     + ' ×', 'orbital') : '') +
+      (stats.boxComets     ? row('&nbsp;&nbsp;windfall',    stats.boxComets     + ' ×', 'lucky') : '') +
+      '<tr><td colspan="3"><hr class="sol-divider"/></td></tr>' +
+      row('recovered', stats.tumbleRecoveries + ' ×', 'got back up') +
+      row('revived',   stats.voidRevives      + ' ×', 'heartbeat restored') +
+    '</table>' +
+    '<p class="sol-rocket-notice">rocketman boost armed for sol ' + (solNumber + 1) + '</p>' +
+    '<div class="sol-buttons">' +
+      '<button class="btn-play" id="btn-replay">next sol</button>' +
+      '<a href="https://zack.cx" target="_blank" class="btn-link">zack.cx</a>' +
+    '</div>';
+
+  document.getElementById('btn-replay').addEventListener('click', startGame);
+
   document.getElementById('screen-gameover').classList.add('visible');
   document.getElementById('void-overlay').classList.remove('active');
   document.getElementById('heartbeat-prompt').classList.remove('visible');
+  // Restore scene visibility
+  if (sea) { sea.mesh.visible = true; sky.mesh.visible = true; }
+  if (orbHolder) { orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true; }
+  if (voidLight) voidLight.intensity = 0;
 }
 
 // ─── Shooting Star ─────────────────────────────────────────────────────────
@@ -1253,6 +1404,8 @@ function launchShootingStar() {
         var dist2 = Math.sqrt((worldX-hx)*(worldX-hx)+(worldY-hy)*(worldY-hy));
         if (dist2 < 25 && STATUS === 'playing' && invincibleFrames <= 0) {
           invincibleFrames = 60;
+          stats.shootingStarHits++;
+          showToast('external event — uncontrolled', 'star');
           doTumble();
           gsap.fromTo('#hit-flash', { opacity: 0.9 }, { opacity: 0, duration: 0.8 });
         }
@@ -1279,19 +1432,29 @@ function checkCollisions() {
       orbHolder.mesh.remove(en.mesh);
       orbHolder.inUse.splice(i, 1);
 
-      if (invincibleFrames > 0) continue;
+      if (invincibleFrames > 0) {
+        // Rocketman: obstacles still burst visually but cause no harm
+        new Burst(0xffdd00, 12).mesh.position.copy(_eWorld);
+        continue;
+      }
 
       if (en.orbType === 'black') {
+        stats.blackOrbHits++;
+        showToast('removed from pipeline', 'black');
         doSingularity();
         return;
       }
 
       oxygen -= def.oxygenCost;
       if (def.hitStr === 'heavy') {
+        stats.redOrbHits++;
+        showToast('not moving forward', 'red');
         gsap.fromTo('#hit-flash', { opacity: 0.7 }, { opacity: 0, duration: 0.5 });
         humanoid.hitReaction();
-        humanoid.hitReaction(); // double for heavy
+        humanoid.hitReaction();
       } else {
+        stats.blueOrbHits++;
+        showToast('processed by filter', 'blue');
         gsap.fromTo('#hit-flash', { opacity: 0.35 }, { opacity: 0, duration: 0.3 });
         humanoid.hitReaction();
       }
@@ -1314,8 +1477,10 @@ function checkCollisions() {
       new Burst(0x00e5ff, 8).mesh.position.copy(_eWorld);
       canHolder.pool.push(cn); canHolder.mesh.remove(cn.mesh); canHolder.inUse.splice(j,1);
 
-      var restore = cometActive ? 2.0 : 1.5;
+      var restore = (cometActive || rocketmanActive) ? 2.0 : 1.5;
       oxygen = Math.min(MAX_O, oxygen + restore);
+      stats.canistersCollected++;
+      showToast('oxygen + ' + restore.toFixed(1), 'oxy');
       gsap.fromTo('#comet-flash', { opacity: cometActive ? 0.4 : 0.2 }, { opacity: 0, duration: 0.3 });
       refreshUI();
     }
@@ -1331,11 +1496,16 @@ function checkCollisions() {
       // Roll the dice: 60% bad tumble, 25% orbital sling, 15% comet tail
       var roll = Math.random();
       if (roll < 0.60) {
+        stats.boxTumbles++;
+        showToast('unforeseen complication', 'box');
         doTumble();
       } else if (roll < 0.85) {
+        stats.boxSlings++;
+        showToast('pulled from orbit', 'box');
         doOrbitalSling();
       } else {
-        // Comet tail — the lucky 15%
+        stats.boxComets++;
+        showToast('rare windfall — active', 'rocket');
         cometActive = true;
         cometTimer = COMET_DURATION;
         humanoid.flameMat.color.setHex(0xffdd00);
@@ -1398,9 +1568,50 @@ function loop() {
       if (frame % 3 === 0) spawnCometSparkle(humanoid.mesh.position.x, humanoid.mesh.position.y);
       if (cometTimer <= 0) {
         cometActive = false;
-        humanoid.flameMat.color.setHex(0x00ffff);
+        if (!rocketmanActive) humanoid.flameMat.color.setHex(0x00ffff);
       }
     }
+
+    // Rocketman — supernova boost
+    if (rocketmanActive) {
+      rocketmanTimer--;
+      invincibleFrames = 10; // perpetually invincible while active
+
+      // Rainbow suit cycling
+      var rt = Date.now() * 0.004;
+      humanoid.suitMat.color.setRGB(
+        Math.sin(rt)         * 0.5 + 0.5,
+        Math.sin(rt + 2.094) * 0.5 + 0.5,
+        Math.sin(rt + 4.189) * 0.5 + 0.5
+      );
+      // Gold flame
+      humanoid.flameMat.color.setRGB(1, 0.85 + Math.random()*0.15, 0);
+      // Dense sparkle trail — more than comet
+      if (frame % 2 === 0) {
+        spawnCometSparkle(humanoid.mesh.position.x, humanoid.mesh.position.y);
+        spawnCometSparkle(humanoid.mesh.position.x, humanoid.mesh.position.y);
+      }
+      // Subtle scale pulse
+      var scalePulse = 0.25 + Math.sin(Date.now() * 0.008) * 0.012;
+      humanoid.mesh.scale.setScalar(scalePulse);
+
+      // Rocket bar countdown
+      var rocketPct = rocketmanTimer / ROCKETMAN_DURATION;
+      document.getElementById('rocket-bar').style.transform = 'scaleX(' + rocketPct + ')';
+
+      // Warn when nearly done
+      if (rocketmanTimer === 180) showToast('rocketman — 3s remaining', 'rocket');
+
+      if (rocketmanTimer <= 0) {
+        rocketmanActive = false;
+        humanoid.suitMat.color.setHex(0xffffff);
+        humanoid.flameMat.color.setHex(0x00ffff);
+        humanoid.mesh.scale.setScalar(0.25);
+        document.getElementById('rocket-bar').style.display = 'none';
+        showToast('boost expired', 'blue');
+      }
+    }
+
     if (cometSparkles.length) updateCometSparkles();
 
     // Shooting star
@@ -1495,7 +1706,8 @@ function loop() {
     if (liftHint) liftHint.classList.toggle('visible', tumble.bounces >= 1);
     if (tumble.liftProgress >= 1.0) {
       STATUS = 'playing';
-      oxygen = Math.max(1, oxygen); // survive tumble with whatever oxygen remains
+      stats.tumbleRecoveries++;
+      oxygen = Math.max(1, oxygen);
       invincibleFrames = 90;
       refreshUI();
       tumble.liftProgress = 0; tumble.velX = 0; tumble.velY = 0;
@@ -1518,7 +1730,6 @@ function loop() {
 }
 
 document.getElementById('btn-start').addEventListener('click', startGame);
-document.getElementById('btn-replay').addEventListener('click', startGame);
 
 window.addEventListener('load', function() {
   createScene(); createLights(); buildWorld();
