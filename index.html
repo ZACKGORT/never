@@ -2969,12 +2969,17 @@ function goHome() {
 }
 
 var _goHomeCooldown = false;
-document.getElementById('hud-wordmark').addEventListener('click', function() { location.reload(); });
+document.getElementById('hud-wordmark').addEventListener('click', function(e) {
+  if (e.pointerType === 'touch') return;
+  if (STATUS === 'playing' || STATUS === 'tumbling') { openMenu(); return; }
+  location.reload();
+});
 document.getElementById('hud-wordmark').addEventListener('touchend', function(e) {
   e.stopPropagation(); e.preventDefault();
   if (_goHomeCooldown) return;
   _goHomeCooldown = true;
   setTimeout(function() { _goHomeCooldown = false; }, 600);
+  if (STATUS === 'playing' || STATUS === 'tumbling') { openMenu(); return; }
   location.reload();
 }, { passive: false });
 
