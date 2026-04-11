@@ -528,6 +528,21 @@
   }
 
   /* Shooting star DOM element (pure CSS streak) */
+  @keyframes pill-luminous {
+    0%   { box-shadow: 0 0 0 0 rgba(104,195,192,0); border-color: rgba(255,255,255,0.08); }
+    25%  { box-shadow: 0 0 22px 6px rgba(104,195,192,0.4); border-color: rgba(104,195,192,0.7); }
+    100% { box-shadow: 0 0 0 0 rgba(104,195,192,0); border-color: rgba(255,255,255,0.08); }
+  }
+  #top-hud.luminous {
+    opacity: 1 !important;
+    pointer-events: none !important;
+    animation: pill-luminous 1.4s ease-out forwards;
+  }
+  #wind-layer {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 18;
+    overflow: hidden;
+  }
   #shooting-star {
     position: fixed;
     width: 120px; height: 2px;
@@ -547,6 +562,7 @@
 <div id="hit-flash"></div>
 <div id="comet-flash"></div>
 <div id="shooting-star"></div>
+<div id="wind-layer"></div>
 <div id="toast-container"></div><!-- legacy, kept for JS compat -->
 
 <!-- Top HUD: wordmark pill (resets to start screen) -->
@@ -559,11 +575,9 @@
 <!-- Toast banner area: top center, stacked -->
 <div id="toast-banner-area"></div>
 
-<!-- Bottom HUD: reverse | menu | forward (mobile only) -->
+<!-- Bottom HUD: reverse | forward (mobile only) -->
 <div id="bottom-hud">
   <button id="btn-hud-back" class="hud-btn">&#8592;</button>
-  <div class="hud-sep"></div>
-  <button id="btn-hud-menu" class="hud-btn">menu</button>
   <div class="hud-sep"></div>
   <button id="btn-hud-fwd" class="hud-btn">&#8594;</button>
 </div>
@@ -760,7 +774,7 @@ function makeBox(w, h, d, mat) {
 // ─── RAGDOLL ───────────────────────────────────────────────────────────────
 function RagdollHuman() {
   this.mesh = new THREE.Object3D();
-  this.mesh.rotation.y = Math.PI * 0.75;
+  this.mesh.rotation.y = Math.PI * 0.25;
   this.baseRotX = -0.55;
   this.baseRotZ = 0;
   this.flipX = 0;
@@ -768,6 +782,7 @@ function RagdollHuman() {
   this.mesh.rotation.x = -0.55;
   this.singularity = false;
   this.slingVx = 0; this.slingVy = 0; this.slingFrames = 0;
+  this.reachFade = 1.0; // 1 = full cursor reach, 0 = disabled (during spins/hits)
 
   this.suitMat  = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true });
   var jointMat  = new THREE.MeshPhongMaterial({ color: 0x666666, flatShading: true });
@@ -914,10 +929,10 @@ function RagdollHuman() {
     { pivot: this.lShoulderPivot, stiffX: 0.06, stiffZ: 0.06, dampX: 0.90, dampZ: 0.90, limX: 3.2, limZ: 2.8 },
     { pivot: this.rElbowPivot,    stiffX: 0.05, stiffZ: 0.04, dampX: 0.93, dampZ: 0.93, limX: 1.6, limZ: 1.0 },
     { pivot: this.lElbowPivot,    stiffX: 0.05, stiffZ: 0.04, dampX: 0.93, dampZ: 0.93, limX: 1.6, limZ: 1.0 },
-    { pivot: this.rHipPivot,      stiffX: 0.18, stiffZ: 0.14, dampX: 0.68, dampZ: 0.68, limX: 1.4, limZ: 0.6 },
-    { pivot: this.rKneePivot,     stiffX: 0.15, stiffZ: 0.11, dampX: 0.68, dampZ: 0.68, limX: 1.5, limZ: 0.3 },
-    { pivot: this.lHipPivot,      stiffX: 0.18, stiffZ: 0.14, dampX: 0.68, dampZ: 0.68, limX: 1.4, limZ: 0.6 },
-    { pivot: this.lKneePivot,     stiffX: 0.15, stiffZ: 0.11, dampX: 0.68, dampZ: 0.68, limX: 1.5, limZ: 0.3 },
+    { pivot: this.rHipPivot,      stiffX: 0.18, stiffZ: 0.14, dampX: 0.68, dampZ: 0.68, limX: 1.4, limZ: 0.28 },
+    { pivot: this.rKneePivot,     stiffX: 0.15, stiffZ: 0.11, dampX: 0.68, dampZ: 0.68, limX: 1.5, limZ: 0.14 },
+    { pivot: this.lHipPivot,      stiffX: 0.18, stiffZ: 0.14, dampX: 0.68, dampZ: 0.68, limX: 1.4, limZ: 0.28 },
+    { pivot: this.lKneePivot,     stiffX: 0.15, stiffZ: 0.11, dampX: 0.68, dampZ: 0.68, limX: 1.5, limZ: 0.14 },
   ];
 
   this.armDrift = [
@@ -939,10 +954,10 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var inertiaPitch = forwardForce * 0.40 - reverseForce * 0.35;
   var armTrail     = forwardForce * 0.75 - reverseForce * 0.65;
   var sideDrift    = forwardForce * 0.50 - reverseForce * 0.50;
+  var scrollIntensity = Math.min(1, Math.max(forwardForce, reverseForce) * 1.6);
 
   // ── 1. Body ───────────────────────────────────────────────────────────────
   var altFactor = Math.max(0, Math.min(1, (this.mesh.position.y - 25) / 150));
-
   var poseLow  = Math.max(0, 1 - altFactor / 0.38);
   var poseHigh = Math.max(0, (altFactor - 0.62) / 0.38);
 
@@ -955,7 +970,7 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   this.mesh.rotation.z = this.baseRotZ + this.flipZ;
   this.mesh.rotation.x = this.baseRotX + this.flipX;
 
-  // Facing: always try to face the butterfly (cursor).
+  // Facing: always try to face the butterfly (cursor)
   var bfAngle;
   if (typeof dx !== 'undefined' && dx !== null) {
     var facingBias = Math.max(-1, Math.min(1, dx / 120));
@@ -979,89 +994,96 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var dRS = this.armDrift[0], dLS = this.armDrift[1],
       dRE = this.armDrift[2], dLE = this.armDrift[3];
 
-  // ── 4. Altitude-blended limb poses ──────────────────────────────────────
+  // ── 4. Limb poses ────────────────────────────────────────────────────────
   var distFromCenter  = Math.sqrt(mouse.x * mouse.x + mouse.y * mouse.y);
   var centerProximity = Math.max(0, 1 - distFromCenter / Math.SQRT2);
 
   var bfDist  = (this.butterflyDist !== undefined) ? this.butterflyDist : 0;
   var bfDx    = (this.butterflyDx   !== undefined) ? this.butterflyDx   : 0;
   var bfDy    = (this.butterflyDy   !== undefined) ? this.butterflyDy   : 0;
-
   var bfLen   = Math.max(1, bfDist);
   var bfNx    = bfDx / bfLen;
   var bfNy    = bfDy / bfLen;
-
   var reachUrgency = Math.min(1, bfDist / 80);
 
   var bodySpeed = Math.sqrt((typeof accelX === 'number' ? accelX : 0) * (typeof accelX === 'number' ? accelX : 0) +
                             (typeof accelY === 'number' ? accelY : 0) * (typeof accelY === 'number' ? accelY : 0));
   var momentumLimiter = Math.max(0.25, 1.0 - bodySpeed * 18);
 
+  // reachFade: soft recovery — disabled externally on spins/hits
+  this.reachFade = Math.min(1.0, this.reachFade + 0.018);
+  var reach = this.reachFade;
+
   var armReach = 0.65 - centerProximity * 2.2;
   var supermanPull = poseLow * 0.75;
 
-  var butterflyReachX = -bfNy * reachUrgency * 1.2 * momentumLimiter;
-  var butterflyReachZ = -bfNx * reachUrgency * 0.6 * momentumLimiter;
+  var butterflyReachX = -bfNy * reachUrgency * 1.2 * momentumLimiter * reach;
+  var butterflyReachZ = -bfNx * reachUrgency * 0.6 * momentumLimiter * reach;
 
   var shoulderZ = 0.55 + poseLow * (-0.43) + poseHigh * 0.63;
   var elbowZ    = 0.20 + poseLow * (-0.10) + poseHigh * 0.50;
 
-  // Right shoulder (index 0): mirror butterfly Z offset
   this.joints[0].restX = armReach - supermanPull + butterflyReachX + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
   this.joints[0].restZ = (-shoulderZ + butterflyReachZ) + Math.sin(dRS.phaseZ) * dRS.ampZ + sideDrift;
-  // Left shoulder (index 1): same reach X, opposite Z mirror
   this.joints[1].restX = armReach - supermanPull + butterflyReachX + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
   this.joints[1].restZ = ( shoulderZ - butterflyReachZ) + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
-  // Elbows follow suit
   this.joints[2].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
   this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.5) + Math.sin(dRE.phaseZ) * dRE.ampZ + sideDrift * 0.75;
   this.joints[3].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
   this.joints[3].restZ = ( elbowZ - butterflyReachZ * 0.5) + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
 
-  // Leg Z spread: together (±0.03) → default (±0.06) → wide (±0.42)
-  var legZ      = 0.06 + poseLow * (-0.03) + poseHigh * 0.36;
-  // Leg X: pull back in superman, spread slightly in baumgartner
-  var legBack   = poseLow * 0.28;
+  // Leg Z spread: tight enough to never cross
+  var legZ    = 0.10 + poseLow * (-0.04) + poseHigh * 0.16;
+  var legBack = poseLow * 0.28;
 
   // ── 5. Solve all joints ─────────────────────────────────────────────────
   for (var i = 0; i < this.joints.length; i++) {
     var j = this.joints[i], p = j.pivot, ud = p.userData;
 
     if (i >= 4) {
-      var legTrail  = forwardForce * 0.55 - reverseForce * 0.55;
-      var isHip     = (i === 4 || i === 6);
-      var hipFold   = reverseForce * 1.05;
-      var kneeLock  = Math.min(1, reverseForce * 1.2);
-      var idleAnim  = Math.sin(this.animTime * 0.9 + i) * 0.12 * (1 - kneeLock);
+      var legTrail = forwardForce * 0.55 - reverseForce * 0.55;
+      var isHip    = (i === 4 || i === 6);
+      var hipFold  = reverseForce * 1.05;
+      var kneeLock = Math.min(1, reverseForce * 1.2);
+      var idleAnim = Math.sin(this.animTime * 0.9 + i) * 0.12 * (1 - kneeLock);
 
       if (isHip) {
         j.restX = (0.08 - legBack - hipFold) + idleAnim + legTrail;
       } else {
         j.restX = (0.08 - legBack + idleAnim + legTrail) * (1 - kneeLock);
       }
-      j.restZ = (i === 4 || i === 6 ? legZ : -legZ) + Math.sin(this.animTime * 0.7 + i) * 0.08 * (1 - kneeLock * 0.6) + sideDrift * 0.50;
+      // Hip Z: outward splay — rHip(4) negative, lHip(6) positive; knees mirror
+      j.restZ = (i === 4 ? -legZ : i === 6 ? legZ : i === 5 ? -legZ : legZ)
+        + Math.sin(this.animTime * 0.7 + i) * 0.08 * (1 - kneeLock * 0.6)
+        + (i === 4 || i === 5 ? -sideDrift : sideDrift) * 0.25;
     }
 
     var errX = j.restX - p.rotation.x;
     var errZ = j.restZ - p.rotation.z;
+    // Arms (0-3): spring force fades out as scroll intensity rises — full ragdoll at peak
+    if (i < 4) { errX *= (1 - scrollIntensity); errZ *= (1 - scrollIntensity); }
     ud.velX = ud.velX * j.dampX + errX * j.stiffX;
     ud.velZ = ud.velZ * j.dampZ + errZ * j.stiffZ;
-    p.rotation.x = Math.max(-j.limX, Math.min(j.limX, p.rotation.x + ud.velX));
+    // Elbows: never bend backward
+    var minX = (i === 2 || i === 3) ? 0 : -j.limX;
+    p.rotation.x = Math.max(minX, Math.min(j.limX, p.rotation.x + ud.velX));
     p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
   }
 
-  // ── 6. Head — always trying to look toward the butterfly ────────────────
-  var headLookZ = -leanZ * 0.5 + Math.sin(this.animTime * 0.8) * 0.05 - bfNx * reachUrgency * 0.3 * momentumLimiter;
-  var headLookX = (-forwardForce * 0.30 + reverseForce * 0.35) - bfNy * reachUrgency * 0.25 * momentumLimiter;
+  // ── 6. Head ──────────────────────────────────────────────────────────────
+  var headLookZ = -leanZ * 0.5 + Math.sin(this.animTime * 0.8) * 0.05
+    - bfNx * reachUrgency * 0.3 * momentumLimiter * reach;
+  var headLookX = (-forwardForce * 0.30 + reverseForce * 0.35)
+    - bfNy * reachUrgency * 0.25 * momentumLimiter * reach;
   this.head.rotation.z += (headLookZ - this.head.rotation.z) * 0.12;
   this.head.rotation.x += (headLookX - this.head.rotation.x) * 0.10;
 };
 
-
 RagdollHuman.prototype.hitReaction = function() {
+  this.reachFade = 0;
   for (var i = 0; i < this.joints.length; i++) {
     this.joints[i].pivot.userData.velX += (Math.random() - 0.5) * 3.5;
-    this.joints[i].pivot.userData.velZ += (Math.random() - 0.5) * 3.5;
+    this.joints[i].pivot.userData.velZ += (Math.random() - 0.5) * (i >= 4 ? 1.0 : 3.5);
   }
   gsap.to(this, { flipX: this.flipX + (Math.random()-0.5)*Math.PI*2, duration: 0.8, ease: "power2.out" });
   gsap.to(this.mesh.rotation, { y: this.mesh.rotation.y + (Math.random()-0.5)*Math.PI*3, duration: 0.8, ease: "power2.out" });
@@ -1291,60 +1313,60 @@ function updateSmoke() {
   }
 }
 
-// ─── Jetpack Vapor Trail ──────────────────────────────────────────────────
-// Tiny velocity-influenced puffs from the nozzles — tight, physical, not decorative rings
+// ─── Jetpack Air Puffs ─────────────────────────────────────────────────────
+// Flat torus rings that billow out opposite to thrust direction — cosmetic only
 var airPuffs = [];
 var airPuffPool = [];
 
 function AirPuff() {
-  var g = new THREE.IcosahedronGeometry(1, 0);
-  var m = new THREE.MeshBasicMaterial({
-    color: 0xaaddff, transparent: true, opacity: 0, depthWrite: false,
-    blending: THREE.AdditiveBlending
-  });
+  // Thin flat ring — torusGeometry(radius, tube, radialSegs, tubularSegs)
+  var g = new THREE.TorusGeometry(5, 1.2, 5, 12);
+  var m = new THREE.MeshBasicMaterial({ color: 0x88ddff, transparent: true, opacity: 0, depthWrite: false });
   this.mesh = new THREE.Mesh(g, m);
   this.mesh.visible = false;
   scene.add(this.mesh);
 }
 
+// _wp reused in spawnAirPuffs to avoid GC
+
 function spawnAirPuffs(vx, vy, bfDx, bfDy) {
   if (!humanoid) return;
 
-  // Fire rate tied to how hard the body is actually moving
-  var speed = Math.sqrt(vx * vx + vy * vy);
+  // Only fire occasionally — random chance, weighted by how hard the cursor is pulling
   var cursorPull = Math.sqrt(bfDx * bfDx + bfDy * bfDy);
-  // Always a small chance; more frequent the faster we move or the harder we pull
-  var chance = 0.06 + Math.min(0.18, speed * 0.03 + cursorPull * 0.0008);
+  var chance = 0.012 + Math.min(0.03, cursorPull * 0.0004);
   if (Math.random() > chance) return;
 
-  // Alternate nozzles
+  // Pick one nozzle at random
   var wp = new THREE.Vector3();
   (Math.random() < 0.5 ? humanoid.lThruster : humanoid.rThruster).getWorldPosition(wp);
 
-  // Exhaust shoots out opposite to where the body is moving, with spread
-  var exhaustScale = 0.7 + speed * 0.25;
-  var ejVx = -vx * exhaustScale + (Math.random() - 0.5) * 1.2;
-  var ejVy = -vy * exhaustScale - 0.5 - Math.random() * 0.8;  // always drifts downward a bit
-  var ejVz = (Math.random() - 0.5) * 1.0;
+  // Drift away from where the cursor is pulling — opposite the reach direction
+  var bfLen = Math.max(1, cursorPull);
+  var ejVx = -(bfDx / bfLen) * (0.4 + Math.random() * 0.5);
+  var ejVy = -(bfDy / bfLen) * (0.4 + Math.random() * 0.5) - 0.6;
+  var ejVz = (Math.random() - 0.5) * 0.5;
 
   var p = airPuffPool.length ? airPuffPool.pop() : new AirPuff();
   p.mesh.position.set(
-    wp.x + (Math.random() - 0.5) * 2,
-    wp.y - 3 + (Math.random() - 0.5) * 2,
-    wp.z + (Math.random() - 0.5) * 2
+    wp.x + (Math.random() - 0.5) * 4,
+    wp.y - 5 + (Math.random() - 0.5) * 4,
+    wp.z + (Math.random() - 0.5) * 4
   );
-  p.mesh.scale.setScalar(0.4 + Math.random() * 0.4);
-  p.mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, 0);
-  // Hotter = whiter/brighter; cooler = blue-white
-  var heat = Math.min(1, speed * 0.15);
-  p.mesh.material.color.setRGB(0.7 + heat * 0.3, 0.85 + heat * 0.1, 1.0);
+  p.mesh.rotation.set(
+    Math.PI * 0.5 + (Math.random() - 0.5) * 0.6,
+    (Math.random() - 0.5) * 0.5,
+    (Math.random() - 0.5) * 0.5
+  );
+  p.mesh.scale.setScalar(0.12 + Math.random() * 0.1);
   p.mesh.material.opacity = 0;
+  p.mesh.material.color.setHex(Math.random() < 0.25 ? 0xffffff : 0x88ddff);
   p.mesh.visible = true;
   p.vx = ejVx; p.vy = ejVy; p.vz = ejVz;
   p.life = 1.0;
-  p.decay = 0.055 + Math.random() * 0.04;   // fades quickly — vapor, not smoke
-  p.peakOpacity = 0.22 + Math.random() * 0.12;
-  p.baseScale = p.mesh.scale.x;
+  p.decay = 0.018 + Math.random() * 0.014;  // slower fade — more time to appreciate it
+  p.peakOpacity = 0.18 + Math.random() * 0.10;
+  p.growRate = 0.07 + Math.random() * 0.05;
   airPuffs.push(p);
 }
 
@@ -1361,18 +1383,19 @@ function updateAirPuffs() {
     p.mesh.position.x += p.vx;
     p.mesh.position.y += p.vy;
     p.mesh.position.z += p.vz;
-    // Drag — vapor dissipates quickly in the slipstream
-    p.vx *= 0.88; p.vy *= 0.90; p.vz *= 0.88;
-    // Expand slightly as it disperses
-    var s = p.baseScale * (1 + (1 - p.life) * 1.4);
+    p.vx *= 0.92; p.vy *= 0.94;
+    // Ring expands as it dissipates
+    var s = (0.18 + (1 - p.life) * p.growRate * 14);
     p.mesh.scale.setScalar(s);
-    // Sharp fade-in, long fade-out
-    p.mesh.material.opacity = p.life > 0.75
-      ? p.peakOpacity * ((1 - p.life) / 0.25)
-      : p.peakOpacity * (p.life / 0.75);
+    // Fade in quickly, then fade out
+    var lifePhase = p.life;
+    p.mesh.material.opacity = lifePhase > 0.7
+      ? p.peakOpacity * ((1 - lifePhase) / 0.3)   // fade in
+      : p.peakOpacity * (lifePhase / 0.7);          // fade out
+    // Slow rotation as ring expands
+    p.mesh.rotation.z += 0.015;
   }
 }
-
 
 // ─── Comet tail sparkles ───────────────────────────────────────────────────
 var cometSparkles = [];
@@ -1555,6 +1578,8 @@ var wasInRiskZone = false;  // tracks oxygen < 30% transitions
 // Altitude zone thresholds (world-space y: range ~25–175)
 var HIGH_ORBIT_Y = 130, LOW_ORBIT_Y = 70;
 
+// Ambient flip timer — occasional idle acrobatics
+var nextFlipFrame = 0;
 var starActive = false, starEl = null;
 var starX = 0, starY = 0, starAngle = 0, starProgress = 0;
 var nextStarFrame = 900 + Math.floor(Math.random() * 1800);
@@ -1629,6 +1654,68 @@ function showToast(msg, type) {
     oldest.classList.remove('in');
     oldest.classList.add('out');
     setTimeout(function() { if (oldest.parentNode) oldest.parentNode.removeChild(oldest); }, 300);
+  }
+}
+
+// ─── Wind Streaks ──────────────────────────────────────────────────────────
+var windPool = [], windActive = [], windLayer;
+
+function initWindStreaks() {
+  windLayer = document.getElementById('wind-layer');
+  for (var i = 0; i < 24; i++) {
+    var el = document.createElement('div');
+    el.style.cssText = 'position:absolute;height:1px;border-radius:1px;opacity:0;pointer-events:none;';
+    windLayer.appendChild(el);
+    windPool.push({ el: el });
+  }
+}
+
+function spawnWindStreak(intensity, forward) {
+  if (!windPool.length) return;
+  var p = windPool.pop();
+  var w = Math.round(25 + Math.random() * 90 * intensity);
+  var y = Math.random() * HEIGHT;
+  // Forward: streaks fly right-to-left (scene scrolls right); reverse: left-to-right
+  var startX = forward ? WIDTH + w : -w;
+  var endX   = forward ? -w : WIDTH + w;
+  var spd    = 180 + intensity * 700;
+  var alpha  = 0.10 + intensity * 0.28;
+  var col    = forward
+    ? 'rgba(160,220,255,' + alpha + ')'
+    : 'rgba(255,160,80,'  + alpha + ')';
+  var grad   = forward
+    ? 'linear-gradient(to left, transparent,' + col + ',transparent)'
+    : 'linear-gradient(to right,transparent,' + col + ',transparent)';
+  var el = p.el;
+  el.style.width   = w + 'px';
+  el.style.top     = y + 'px';
+  el.style.left    = startX + 'px';
+  el.style.background = grad;
+  el.style.opacity = '1';
+  p.startX   = startX;
+  p.endX     = endX;
+  p.duration = Math.abs(endX - startX) / spd * 1000;
+  p.startTime = Date.now();
+  windActive.push(p);
+}
+
+function updateWindStreaks(intensity, forward) {
+  // Spawn
+  if (intensity > 0.05 && Math.random() < intensity * 0.55) {
+    spawnWindStreak(intensity, forward);
+  }
+  // Update active
+  var now = Date.now();
+  for (var i = windActive.length - 1; i >= 0; i--) {
+    var p = windActive[i];
+    var t = (now - p.startTime) / p.duration;
+    if (t >= 1) {
+      p.el.style.opacity = '0';
+      windPool.push(p);
+      windActive.splice(i, 1);
+    } else {
+      p.el.style.left = Math.round(p.startX + (p.endX - p.startX) * t) + 'px';
+    }
   }
 }
 
@@ -1803,6 +1890,7 @@ document.addEventListener('touchend', function(e) {
   touchState.twoFinger = false;
   if (!touchState.active) return;
   if (!touchState.hasMoved && STATUS === 'playing') {
+    humanoid.reachFade = 0;
     gsap.to(humanoid, {
       flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 3.5,
       flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 3.5,
@@ -1817,7 +1905,7 @@ document.addEventListener('touchend', function(e) {
 }, { passive: false });
 
 var reverseLerp = 0.0;
-var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -2.2;
+var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -3.2;
 
 window.addEventListener('wheel', function(e) {
   reverseLerp += e.deltaY * 0.0012;
@@ -1837,17 +1925,18 @@ window.addEventListener('pointerdown', function(e) {
   if (e.pointerType === 'touch') return;
 
   if (e.button === 0) {
-    // Sequential preset spins — cycles through distinct axes each click
-    var preset = SPIN_PRESETS[spinPresetIdx % SPIN_PRESETS.length];
-    spinPresetIdx++;
+    humanoid.reachFade = 0;
+    var rFlipX = (Math.random() * 2 - 1) * Math.PI * (2 + Math.random() * 2);
+    var rFlipZ = (Math.random() * 2 - 1) * Math.PI * (Math.random() * 1.5);
+    var rDur   = 0.55 + Math.random() * 0.65;
     gsap.to(humanoid, {
-      flipX: humanoid.flipX + preset.x,
-      flipZ: humanoid.flipZ + preset.z,
-      duration: preset.dur, ease: preset.ease
+      flipX: humanoid.flipX + rFlipX,
+      flipZ: humanoid.flipZ + rFlipZ,
+      duration: rDur, ease: 'power2.inOut'
     });
     for (var si = 0; si < humanoid.joints.length; si++) {
-      humanoid.joints[si].pivot.userData.velX += preset.jx * (0.8 + Math.random() * 0.4);
-      humanoid.joints[si].pivot.userData.velZ += preset.jz * (0.8 + Math.random() * 0.4);
+      humanoid.joints[si].pivot.userData.velX += (Math.random() - 0.5) * 8;
+      humanoid.joints[si].pivot.userData.velZ += (Math.random() - 0.5) * 8;
     }
   } else if (e.button === 2) {
     // Right click: reset to default soaring pose
@@ -1968,6 +2057,7 @@ function startGame() {
   spinPresetIdx = 0;
   heartbeatTaps = 0; voidIdleFrames = 0;
   starActive = false;
+  nextFlipFrame = frame + 180 + Math.floor(Math.random() * 300);
   nextStarFrame = frame + 900 + Math.floor(Math.random() * 1800);
   document.getElementById('void-overlay').classList.remove('active');
   document.getElementById('heartbeat-prompt').classList.remove('visible');
@@ -2011,15 +2101,16 @@ var TUMBLE_TIMEOUT = 420; // 7 seconds — then session ends
 function doTumble() {
   if (STATUS === 'void' || humanoid.singularity) return;
   STATUS = 'tumbling';
-  tumble.velX = -(orbHolder.speed*0.4 + Math.random()*1.5);
-  tumble.velY = 2.5 + Math.random()*2.0;
+  humanoid.reachFade = 0;
+  tumble.velX = -(orbHolder.speed*0.6 + Math.random()*3);
+  tumble.velY = 4 + Math.random()*3;
   tumble.bounces = 0; tumble.liftProgress = 0; tumble.frames = 0;
   tumble.spinX = (Math.random()-0.5)*0.28;
   tumble.spinY = (Math.random()-0.5)*0.22;
   tumble.spinZ = (Math.random()<0.5 ? 1 : -1) * (0.12 + Math.random()*0.2);
   for (var i = 0; i < humanoid.joints.length; i++) {
     humanoid.joints[i].pivot.userData.velX += (Math.random()-0.5)*6;
-    humanoid.joints[i].pivot.userData.velZ += (Math.random()-0.5)*6;
+    humanoid.joints[i].pivot.userData.velZ += (Math.random()-0.5) * (i >= 4 ? 1.5 : 6);
   }
   gsap.fromTo('#hit-flash', { opacity: 0.8 }, { opacity: 0, duration: 0.6 });
 }
@@ -2120,32 +2211,18 @@ function doGameOver() {
 
   // Short session grace — first impression shouldn't be an empty debrief
   if (totalSecs < 30) {
-    var screen = document.getElementById('screen-gameover');
-    screen.innerHTML =
-      '<h1>hi there.</h1>' +
-      '<p class="sol-label">sol ' + solNumber + '</p>' +
-      '<p class="sub" style="max-width:320px;text-align:center;color:rgba(255,255,255,0.45);font-size:0.9em;line-height:1.7;margin-bottom:2em;">' +
-        'You\'re just getting oriented.<br>The environment takes a moment to read.' +
-      '</p>' +
-      '<div class="sol-buttons">' +
-        '<button class="btn-play" id="btn-replay">again</button>' +
-        '<button class="btn-play" id="btn-go-welcome" style="background:transparent;border-color:rgba(255,255,255,0.08);">menu</button>' +
-        '<a href="https://zack.cx" target="_blank" class="btn-link" style="margin-top:8px;">zack.cx</a>' +
-      '</div>';
-    document.getElementById('btn-replay').addEventListener('click', startGame);
-    document.getElementById('btn-go-welcome').addEventListener('click', function() {
-      document.getElementById('screen-gameover').classList.remove('visible');
-      document.getElementById('screen-welcome').classList.add('visible');
-      STATUS = 'waiting';
-      startQuoteRotation();
-      updateHintLabel();
-    });
-    screen.classList.add('visible');
-    document.getElementById('void-overlay').classList.remove('active');
-    document.getElementById('heartbeat-prompt').classList.remove('visible');
+    // Short session — no screen, just pulse the pill and restart silently
     if (sea) { sea.mesh.visible = true; sky.mesh.visible = true; }
     if (orbHolder) { orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true; }
     if (voidLight) voidLight.intensity = 0;
+    document.getElementById('void-overlay').classList.remove('active');
+    document.getElementById('heartbeat-prompt').classList.remove('visible');
+    var pill = document.getElementById('top-hud');
+    pill.classList.add('luminous');
+    setTimeout(function() {
+      pill.classList.remove('luminous');
+      startGame();
+    }, 1500);
     return;
   }
 
@@ -2424,7 +2501,8 @@ function loop() {
       humanoid.flipX += (0 - humanoid.flipX) * 0.004;
       humanoid.flipZ += (0 - humanoid.flipZ) * 0.004;
       var tx = norm(mouse.x, -1, 1, -100, 100), ty = norm(mouse.y, -1, 1, 25, 175);
-      var bfDxP = tx - humanoid.mesh.position.x, bfDyP = ty - humanoid.mesh.position.y;
+      var headOffY_P = 8.5 * Math.cos(humanoid.baseRotX);
+      var bfDxP = tx - humanoid.mesh.position.x, bfDyP = ty - (humanoid.mesh.position.y + headOffY_P);
       var bfDistP = Math.max(1, Math.sqrt(bfDxP*bfDxP + bfDyP*bfDyP));
       butterfly.vx += (bfDxP / bfDistP) * Math.min(bfDistP * 0.08, 4) * 0.12;
       butterfly.vy += (bfDyP / bfDistP) * Math.min(bfDistP * 0.08, 4) * 0.12;
@@ -2449,7 +2527,8 @@ function loop() {
       humanoid.flipX += (0 - humanoid.flipX) * 0.004;
       humanoid.flipZ += (0 - humanoid.flipZ) * 0.004;
       var ftx = norm(mouse.x, -1, 1, -100, 100), fty = norm(mouse.y, -1, 1, 25, 175);
-      var bfDxF = ftx - humanoid.mesh.position.x, bfDyF = fty - humanoid.mesh.position.y;
+      var headOffY_F = 8.5 * Math.cos(humanoid.baseRotX);
+      var bfDxF = ftx - humanoid.mesh.position.x, bfDyF = fty - (humanoid.mesh.position.y + headOffY_F);
       var bfDistF = Math.max(1, Math.sqrt(bfDxF*bfDxF + bfDyF*bfDyF));
       butterfly.vx += (bfDxF / bfDistF) * Math.min(bfDistF * 0.08, 4) * 0.10;
       butterfly.vy += (bfDyF / bfDistF) * Math.min(bfDistF * 0.08, 4) * 0.10;
@@ -2490,6 +2569,11 @@ function loop() {
       var newSpd = orbHolder.speed + 0.3;
       orbHolder.speed = canHolder.speed = boxHolder.speed = newSpd;
       spawnInt = Math.max(22, spawnInt - 3);
+    }
+
+    // Jetpack air puffs — occasional, cursor-influenced
+    if (!humanoid.singularity) {
+      spawnAirPuffs(butterfly.vx, butterfly.vy, bfDx, bfDy);
     }
 
     // Comet tail
@@ -2557,9 +2641,17 @@ function loop() {
       var bfTx = norm(mouse.x, -1, 1, -100, 100);
       var bfTy = norm(mouse.y, -1, 1, 25, 175);
 
-      // Vector from astronaut body to butterfly (cursor)
-      var bfDx = bfTx - humanoid.mesh.position.x;
-      var bfDy = bfTy - humanoid.mesh.position.y;
+      // Pull from the head/face — the string attaches at the top of the helmet,
+      // not the body center. Head is at local y=34, scaled 0.25 = ~8.5 world units
+      // above the mesh origin, tilted forward with baseRotX.
+      var headOffsetY = 8.5 * Math.cos(humanoid.baseRotX);
+      var headOffsetX = 8.5 * Math.sin(humanoid.baseRotX) * -Math.sin(humanoid.mesh.rotation.y);
+      var anchorX = humanoid.mesh.position.x + headOffsetX;
+      var anchorY = humanoid.mesh.position.y + headOffsetY;
+
+      // Vector from head anchor to butterfly (cursor)
+      var bfDx = bfTx - anchorX;
+      var bfDy = bfTy - anchorY;
       var bfDist = Math.sqrt(bfDx * bfDx + bfDy * bfDy);
 
       // Desire force: astronaut wants to reach toward the butterfly.
@@ -2606,12 +2698,45 @@ function loop() {
       humanoid.butterflyDy = bfDy;
       humanoid.butterflyDist = bfDist;
 
-      // Jetpack air puffs — occasional, cursor-influenced
-      if (!humanoid.singularity) {
-        spawnAirPuffs(butterfly.vx, butterfly.vy, bfDx, bfDy);
+      // ── Ambient acrobatics — cursor pull direction chooses the flip ───────
+      if (frame >= nextFlipFrame && invincibleFrames < 60) {
+        // Normalise cursor offset to [-1,1] on each axis
+        var flipNx = Math.max(-1, Math.min(1, bfDx / 100));
+        var flipNy = Math.max(-1, Math.min(1, bfDy / 100));
+        var flipDeltaX, flipDeltaZ, flipDur, fjx, fjz;
+
+        // Vertical pull almost always wins — cursor above → frontflip, below → backflip
+        // Barrel roll only fires when cursor is very strongly lateral AND barely vertical
+        if (Math.abs(flipNy) >= Math.abs(flipNx) * 1.4 || Math.abs(flipNx) < 0.35) {
+          // Front/back flip
+          flipDeltaX = Math.PI * 2 * (flipNy >= 0 ? 1 : -1);
+          flipDeltaZ = flipNx * 0.18;           // tiny roll tint from lateral, not a cartwheel
+          flipDur    = 0.60 + Math.random() * 0.25;
+          fjx = flipDeltaX > 0 ? 3.2 : -3.2;
+          fjz = flipNx * 0.8;
+        } else {
+          // Hard lateral with almost no vertical — still lead with a flip, roll is secondary
+          flipDeltaX = Math.PI * 2 * (flipNy >= 0 ? 1 : -1);
+          flipDeltaZ = Math.PI * (flipNx >= 0 ? 1 : -1); // half roll, not a full cartwheel
+          flipDur    = 0.80 + Math.random() * 0.2;
+          fjx = flipDeltaX > 0 ? 2.8 : -2.8;
+          fjz = flipDeltaZ > 0 ? 2.0 : -2.0;
+        }
+
+        gsap.to(humanoid, {
+          flipX: humanoid.flipX + flipDeltaX,
+          flipZ: humanoid.flipZ + flipDeltaZ,
+          duration: flipDur, ease: 'power2.inOut'
+        });
+        for (var fji = 0; fji < humanoid.joints.length; fji++) {
+          humanoid.joints[fji].pivot.userData.velX += fjx * (0.7 + Math.random() * 0.4);
+          humanoid.joints[fji].pivot.userData.velZ += fjz * (0.7 + Math.random() * 0.4);
+        }
+
+        // Gap shortens the faster the cursor is pulling
+        var flipGap = 260 + Math.floor(Math.random() * 420) - Math.floor(bfDist * 1.2);
+        nextFlipFrame = frame + Math.max(140, flipGap);
       }
-
-
     } else {
       humanoid.update(0, 0, orbHolder.speed, 0, 0);
     }
@@ -2694,6 +2819,9 @@ function loop() {
     updateBursts(); checkCollisions();
     if (smokeParticles.length) updateSmoke();
     if (airPuffs.length) updateAirPuffs();
+    // Wind streaks — intensity kicks in above baseline scene speed
+    var windIntensity = Math.min(1, Math.max(0, (Math.abs(sceneSpeed) - 0.6) / 1.8));
+    if (windIntensity > 0) updateWindStreaks(windIntensity, sceneSpeed > 0);
 
     if (frame % 10 === 0) refreshUI();
 
@@ -2725,7 +2853,7 @@ function loop() {
     if (tumble.frames >= TUMBLE_TIMEOUT) {
       doGameOver(); return;
     }
-    var GRAVITY = -0.08, FRICTION = 0.98, BOUNCE_DAMP = 0.82, SURFACE_Y = tumble.surfaceY;
+    var GRAVITY = -0.12, FRICTION = 0.96, BOUNCE_DAMP = 0.72, SURFACE_Y = tumble.surfaceY;
     tumble.velY += GRAVITY;
     humanoid.mesh.position.y += tumble.velY;
     humanoid.mesh.position.x += tumble.velX;
@@ -2746,7 +2874,7 @@ function loop() {
         humanoid.joints[bi].pivot.userData.velX += (Math.random()-0.5)*splatStr;
         humanoid.joints[bi].pivot.userData.velZ += (Math.random()-0.5)*splatStr;
       }
-      if (tumble.velY < 0.5) tumble.velY = 0.5 + Math.random()*0.8;
+      if (tumble.velY < 2.2) tumble.velY = 2.2 + Math.random()*2.5;
     }
     humanoid.flipX += tumble.spinX;
     humanoid.flipZ += tumble.spinZ;
@@ -2767,7 +2895,7 @@ function loop() {
       tumble.liftProgress = 0; tumble.velX = 0; tumble.velY = 0;
       humanoid.flipX = 0; humanoid.flipZ = 0;
       humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
-      gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.75, duration: 0.6, ease: "power3.out" });
+      gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.25, duration: 0.6, ease: "power3.out" });
       if (liftHint) liftHint.classList.remove('visible');
     }
     updateBursts();
@@ -2813,18 +2941,33 @@ function updateHintLabel() {
   }
 }
 
-// ─── Wordmark → opens menu (same as spacebar) ───────────────────────────────
+// ─── Wordmark → home (reset to start screen) ─────────────────────────────────
+function goHome() {
+  directionState = 1; MAGNETIC_FORWARD = 1.0; reverseLerp = 0;
+  frameFrozen = false;
+  var btnBack = document.getElementById('btn-hud-back'), btnFwd = document.getElementById('btn-hud-fwd');
+  if (btnBack) btnBack.classList.remove('active');
+  if (btnFwd)  btnFwd.classList.remove('active');
+  if (STATUS === 'playing' || STATUS === 'tumbling' || STATUS === 'void') {
+    doGameOver();
+    return;
+  }
+  // already on welcome/gameover — just show welcome
+  document.getElementById('screen-gameover').classList.remove('visible');
+  document.getElementById('screen-welcome').classList.add('visible');
+  STATUS = 'waiting';
+  startQuoteRotation();
+  updateHintLabel();
+}
 
-var _wordmarkCooldown = false;
-document.getElementById('hud-wordmark').addEventListener('click', function() {
-  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
-});
+var _goHomeCooldown = false;
+document.getElementById('hud-wordmark').addEventListener('click', function() { location.reload(); });
 document.getElementById('hud-wordmark').addEventListener('touchend', function(e) {
   e.stopPropagation(); e.preventDefault();
-  if (_wordmarkCooldown) return;
-  _wordmarkCooldown = true;
-  setTimeout(function() { _wordmarkCooldown = false; }, 600);
-  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
+  if (_goHomeCooldown) return;
+  _goHomeCooldown = true;
+  setTimeout(function() { _goHomeCooldown = false; }, 600);
+  location.reload();
 }, { passive: false });
 
 // ─── Bottom HUD buttons ───────────────────────────────────────────────────────
@@ -2860,10 +3003,6 @@ function wireBtn(id, fn) {
 wireBtn('btn-hud-back', function() { setDirection(directionState === -1 ? 1 : -1); });
 wireBtn('btn-hud-fwd',  function() { setDirection(directionState === 1  ? -1 : 1); });
 
-wireBtn('btn-hud-menu', function() {
-  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
-});
-
 
 // ─── Long-press on mobile → reset character orientation ──────────────────────
 var longPressTimer = null;
@@ -2881,7 +3020,6 @@ document.addEventListener('touchstart', function(e) {
   longPressTimer = setTimeout(function() {
     humanoid.flipX = 0; humanoid.flipZ = 0;
     humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
-    gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.75, duration: 0.5, ease: 'power3.out' });
     showToast('orientation reset');
   }, LONG_PRESS_MS);
 }, { passive: true });
@@ -2978,6 +3116,7 @@ window.addEventListener('load', function() {
   var hintEl = document.getElementById('hint-label');
   isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
   createScene(); createLights(); buildWorld();
+  initWindStreaks();
   refreshUI(); loop();
   document.getElementById('screen-welcome').classList.add('visible');
   startQuoteRotation();
