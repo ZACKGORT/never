@@ -925,8 +925,8 @@ function RagdollHuman() {
   this.mesh.add(this.lHipPivot);
 
   this.joints = [
-    { pivot: this.rShoulderPivot, stiffX: 0.06, stiffZ: 0.06, dampX: 0.90, dampZ: 0.90, limX: 3.2, limZ: 2.8 },
-    { pivot: this.lShoulderPivot, stiffX: 0.06, stiffZ: 0.06, dampX: 0.90, dampZ: 0.90, limX: 3.2, limZ: 2.8 },
+    { pivot: this.rShoulderPivot, stiffX: 0.06, stiffZ: 0.06, dampX: 0.90, dampZ: 0.90, limX: 1.0, limZ: 1.0 },
+    { pivot: this.lShoulderPivot, stiffX: 0.06, stiffZ: 0.06, dampX: 0.90, dampZ: 0.90, limX: 1.0, limZ: 1.0 },
     { pivot: this.rElbowPivot,    stiffX: 0.05, stiffZ: 0.04, dampX: 0.93, dampZ: 0.93, limX: 1.6, limZ: 1.0 },
     { pivot: this.lElbowPivot,    stiffX: 0.05, stiffZ: 0.04, dampX: 0.93, dampZ: 0.93, limX: 1.6, limZ: 1.0 },
     { pivot: this.rHipPivot,      stiffX: 0.18, stiffZ: 0.14, dampX: 0.68, dampZ: 0.68, limX: 1.4, limZ: 0.28 },
@@ -1020,17 +1020,23 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var butterflyReachX = -bfNy * reachUrgency * 1.2 * momentumLimiter * reach;
   var butterflyReachZ = -bfNx * reachUrgency * 0.6 * momentumLimiter * reach;
 
-  var shoulderZ = 0.55 + poseLow * (-0.43) + poseHigh * 0.63;
+  var shoulderZ = 0.55 + poseLow * (-0.43) + poseHigh * 0.30;
   var elbowZ    = 0.20 + poseLow * (-0.10) + poseHigh * 0.50;
 
   this.joints[0].restX = armReach - supermanPull + butterflyReachX + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
-  this.joints[0].restZ = (-shoulderZ + butterflyReachZ) + Math.sin(dRS.phaseZ) * dRS.ampZ + sideDrift;
+  this.joints[0].restZ = (-shoulderZ + butterflyReachZ) + Math.sin(dRS.phaseZ) * dRS.ampZ - sideDrift;
   this.joints[1].restX = armReach - supermanPull + butterflyReachX + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
   this.joints[1].restZ = ( shoulderZ - butterflyReachZ) + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
   this.joints[2].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
-  this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.5) + Math.sin(dRE.phaseZ) * dRE.ampZ + sideDrift * 0.75;
+  this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.5) + Math.sin(dRE.phaseZ) * dRE.ampZ - sideDrift * 0.75;
   this.joints[3].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
   this.joints[3].restZ = ( elbowZ - butterflyReachZ * 0.5) + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
+
+  // During scroll: elbows target neutral hang (no bend, no lock) — spring stays fully active
+  if (scrollIntensity > 0) {
+    this.joints[2].restX = 0.10;
+    this.joints[3].restX = 0.10;
+  }
 
   // Leg Z spread: tight enough to never cross
   var legZ    = 0.10 + poseLow * (-0.04) + poseHigh * 0.16;
@@ -1060,14 +1066,16 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
 
     var errX = j.restX - p.rotation.x;
     var errZ = j.restZ - p.rotation.z;
-    // Arms (0-3): spring force fades out as scroll intensity rises — full ragdoll at peak
-    if (i < 4) { errX *= (1 - scrollIntensity); errZ *= (1 - scrollIntensity); }
     ud.velX = ud.velX * j.dampX + errX * j.stiffX;
     ud.velZ = ud.velZ * j.dampZ + errZ * j.stiffZ;
     // Elbows: never bend backward
     var minX = (i === 2 || i === 3) ? 0 : -j.limX;
     p.rotation.x = Math.max(minX, Math.min(j.limX, p.rotation.x + ud.velX));
-    p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
+    // Shoulders: asymmetric Z clamp — hard wall at body midline to prevent torso crossing
+    var minZ = -j.limZ, maxZ = j.limZ;
+    if (i === 0) maxZ =  0.15; // rShoulder: can't sweep too far inward (positive Z = toward chest)
+    if (i === 1) minZ = -0.15; // lShoulder: can't sweep too far inward (negative Z = toward chest)
+    p.rotation.z = Math.max(minZ, Math.min(maxZ, p.rotation.z + ud.velZ));
   }
 
   // ── 6. Head ──────────────────────────────────────────────────────────────
@@ -1861,7 +1869,7 @@ document.addEventListener('touchmove', function(e) {
     var delta = touchState.twoStartY - midY;
     touchState.twoStartY = midY;
     reverseLerp += delta * 0.004;
-    reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.2, reverseLerp));
+    reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.8, reverseLerp));
     return;
   }
   if (!touchState.active) return;
@@ -1905,11 +1913,11 @@ document.addEventListener('touchend', function(e) {
 }, { passive: false });
 
 var reverseLerp = 0.0;
-var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -3.2;
+var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -4.0;
 
 window.addEventListener('wheel', function(e) {
-  reverseLerp += e.deltaY * 0.0012;
-  reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.2, reverseLerp));
+  reverseLerp += e.deltaY * 0.0016;
+  reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.8, reverseLerp));
 }, { passive: true });
 
 window.addEventListener('pointerdown', function(e) {
