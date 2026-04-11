@@ -758,7 +758,7 @@ function makeBox(w, h, d, mat) {
 // ─── RAGDOLL ───────────────────────────────────────────────────────────────
 function RagdollHuman() {
   this.mesh = new THREE.Object3D();
-  this.mesh.rotation.y = Math.PI * 0.5;
+  this.mesh.rotation.y = Math.PI * 0.25;
   this.baseRotX = -0.55;
   this.baseRotZ = 0;
   this.flipX = 0;
@@ -938,6 +938,10 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var armTrail     = forwardForce * 0.75 - reverseForce * 0.65;
   var sideDrift    = forwardForce * 0.50 - reverseForce * 0.50;
 
+  // scrollIntensity: 0 at rest, 1 at full forward or reverse scroll
+  // Smoothed so it doesn't snap — driven by the raw lerp values
+  var scrollIntensity = Math.min(1, Math.max(forwardForce, reverseForce) * 1.6);
+
   // ── 1. Body ───────────────────────────────────────────────────────────────
   var altFactor = Math.max(0, Math.min(1, (this.mesh.position.y - 25) / 150));
 
@@ -949,7 +953,10 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
 
   // Superman (low): flat, nose-down, body horizontal
   // Baumgartner (high): upright, spread-eagle
-  var targetBodyX = (-1.05 + altFactor * 0.80) + inertiaPitch;
+  var baseBodyX = (-1.05 + altFactor * 0.80) + inertiaPitch;
+  // At high scroll intensity blend toward fully horizontal (-PI/2 ≈ -1.57)
+  var supermanX = -Math.PI * 0.5;
+  var targetBodyX = baseBodyX + (supermanX - baseBodyX) * scrollIntensity * scrollIntensity;
   var leanZ = -accelX * 0.8;
 
   this.baseRotZ += (leanZ       - this.baseRotZ) * 0.10;
@@ -958,22 +965,37 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   this.mesh.rotation.z = this.baseRotZ + this.flipZ;
   this.mesh.rotation.x = this.baseRotX + this.flipX;
 
-  // Facing: default is right-profile (PI*0.5 = pointed at right viewport edge).
-  // Cursor sways him toward camera (y → 0) when cursor is above/near,
-  // or away from camera (y → PI) when cursor pulls far away — a natural lean.
-  // dx (cursor left/right offset) adds a gentle left-right yaw on top.
+  // At high scroll intensity, snap facing to clean right-profile (PI*0.5)
+  // so visor isn't pointing at the floor while supermanning
+  var supermanFacingTarget = Math.PI * 0.5;
+  var facingSnapStrength = scrollIntensity * scrollIntensity * 0.12; // blends on top of normal facing lerp
+
+  this.baseRotZ += (leanZ       - this.baseRotZ) * 0.10;
+  this.baseRotX += (targetBodyX - this.baseRotX) * 0.06;
+
+  this.mesh.rotation.z = this.baseRotZ + this.flipZ;
+  this.mesh.rotation.x = this.baseRotX + this.flipX;
+
+  // Facing: cursor X position drives yaw along the camera axis.
+  // Cursor left of astronaut → face toward camera (y → 0, visor visible).
+  // Cursor right of astronaut → face ahead/right (y → PI*0.5, pure profile).
+  // dy adds a small depth tilt so upward pulls show more of the visor.
   var bfAngle;
   if (typeof dx !== 'undefined' && dx !== null) {
-    // Lateral sway: small left/right yaw from cursor X offset
-    var lateralBias = Math.max(-1, Math.min(1, dx / 150));
-    // Depth sway: cursor Y offset tilts toward (positive dy = above) or away from camera
-    var depthBias   = Math.max(-1, Math.min(1, (dy || 0) / 120));
-    // Base: PI*0.5 (right-profile). Lateral shifts ±0.18rad. Depth tilts ±0.38rad toward/away cam.
-    bfAngle = Math.PI * 0.5 - lateralBias * 0.18 + depthBias * 0.38;
+    // lateralBias: -1 = cursor hard left, +1 = cursor hard right
+    var lateralBias = Math.max(-1, Math.min(1, dx / 130));
+    // Map: hard left → 0 (camera-facing), hard right → PI*0.5 (profile)
+    // Center rests at PI*0.25 (nice three-quarter view)
+    bfAngle = Math.PI * 0.25 + lateralBias * Math.PI * 0.25;
+    // Small dy tilt: cursor above nudges slightly more toward camera
+    var depthTilt = Math.max(-1, Math.min(1, (dy || 0) / 140));
+    bfAngle -= depthTilt * 0.12;
   } else {
-    bfAngle = Math.PI * 0.5;
+    bfAngle = Math.PI * 0.25;
   }
   this.mesh.rotation.y += (bfAngle - this.mesh.rotation.y) * 0.06;
+  // Superman scroll: additionally pull toward clean right-profile
+  this.mesh.rotation.y += (supermanFacingTarget - this.mesh.rotation.y) * facingSnapStrength;
 
   // ── 2. Thruster flames ──────────────────────────────────────────────────
   var baseScale   = 0.6 + Math.random() * 0.4;
@@ -1465,8 +1487,9 @@ var wasInRiskZone = false;  // tracks oxygen < 30% transitions
 // Altitude zone thresholds (world-space y: range ~25–175)
 var HIGH_ORBIT_Y = 130, LOW_ORBIT_Y = 70;
 
-// Shooting star
-var starActive = false, starEl;
+// Ambient flip timer — occasional idle acrobatics
+var nextFlipFrame = 0;
+var starActive = false, starEl = null;
 var starX = 0, starY = 0, starAngle = 0, starProgress = 0;
 var nextStarFrame = 900 + Math.floor(Math.random() * 1800);
 
@@ -1747,17 +1770,18 @@ window.addEventListener('pointerdown', function(e) {
   if (e.pointerType === 'touch') return;
 
   if (e.button === 0) {
-    // Sequential preset spins — cycles through distinct axes each click
-    var preset = SPIN_PRESETS[spinPresetIdx % SPIN_PRESETS.length];
-    spinPresetIdx++;
+    // Random flip on a fully random axis — magnitude and direction both random
+    var rFlipX = (Math.random() * 2 - 1) * Math.PI * (2 + Math.random() * 2);
+    var rFlipZ = (Math.random() * 2 - 1) * Math.PI * (Math.random() * 1.5);
+    var rDur   = 0.55 + Math.random() * 0.65;
     gsap.to(humanoid, {
-      flipX: humanoid.flipX + preset.x,
-      flipZ: humanoid.flipZ + preset.z,
-      duration: preset.dur, ease: preset.ease
+      flipX: humanoid.flipX + rFlipX,
+      flipZ: humanoid.flipZ + rFlipZ,
+      duration: rDur, ease: 'power2.inOut'
     });
     for (var si = 0; si < humanoid.joints.length; si++) {
-      humanoid.joints[si].pivot.userData.velX += preset.jx * (0.8 + Math.random() * 0.4);
-      humanoid.joints[si].pivot.userData.velZ += preset.jz * (0.8 + Math.random() * 0.4);
+      humanoid.joints[si].pivot.userData.velX += (Math.random() - 0.5) * 8;
+      humanoid.joints[si].pivot.userData.velZ += (Math.random() - 0.5) * 8;
     }
   } else if (e.button === 2) {
     // Right click: reset to default soaring pose
@@ -1877,6 +1901,7 @@ function startGame() {
   spinPresetIdx = 0;
   heartbeatTaps = 0; voidIdleFrames = 0;
   starActive = false;
+  nextFlipFrame = frame + 180 + Math.floor(Math.random() * 300);
   nextStarFrame = frame + 900 + Math.floor(Math.random() * 1800);
   document.getElementById('void-overlay').classList.remove('active');
   document.getElementById('heartbeat-prompt').classList.remove('visible');
@@ -2510,6 +2535,46 @@ function loop() {
       humanoid.butterflyDx = bfDx;
       humanoid.butterflyDy = bfDy;
       humanoid.butterflyDist = bfDist;
+
+      // ── Ambient acrobatics — cursor pull direction chooses the flip ───────
+      if (frame >= nextFlipFrame && invincibleFrames < 60) {
+        // Normalise cursor offset to [-1,1] on each axis
+        var flipNx = Math.max(-1, Math.min(1, bfDx / 100));
+        var flipNy = Math.max(-1, Math.min(1, bfDy / 100));
+        var flipDeltaX, flipDeltaZ, flipDur, fjx, fjz;
+
+        // Vertical pull almost always wins — cursor above → frontflip, below → backflip
+        // Barrel roll only fires when cursor is very strongly lateral AND barely vertical
+        if (Math.abs(flipNy) >= Math.abs(flipNx) * 1.4 || Math.abs(flipNx) < 0.35) {
+          // Front/back flip
+          flipDeltaX = Math.PI * 2 * (flipNy >= 0 ? 1 : -1);
+          flipDeltaZ = flipNx * 0.18;           // tiny roll tint from lateral, not a cartwheel
+          flipDur    = 0.60 + Math.random() * 0.25;
+          fjx = flipDeltaX > 0 ? 3.2 : -3.2;
+          fjz = flipNx * 0.8;
+        } else {
+          // Hard lateral with almost no vertical — still lead with a flip, roll is secondary
+          flipDeltaX = Math.PI * 2 * (flipNy >= 0 ? 1 : -1);
+          flipDeltaZ = Math.PI * (flipNx >= 0 ? 1 : -1); // half roll, not a full cartwheel
+          flipDur    = 0.80 + Math.random() * 0.2;
+          fjx = flipDeltaX > 0 ? 2.8 : -2.8;
+          fjz = flipDeltaZ > 0 ? 2.0 : -2.0;
+        }
+
+        gsap.to(humanoid, {
+          flipX: humanoid.flipX + flipDeltaX,
+          flipZ: humanoid.flipZ + flipDeltaZ,
+          duration: flipDur, ease: 'power2.inOut'
+        });
+        for (var fji = 0; fji < humanoid.joints.length; fji++) {
+          humanoid.joints[fji].pivot.userData.velX += fjx * (0.7 + Math.random() * 0.4);
+          humanoid.joints[fji].pivot.userData.velZ += fjz * (0.7 + Math.random() * 0.4);
+        }
+
+        // Gap shortens the faster the cursor is pulling
+        var flipGap = 260 + Math.floor(Math.random() * 420) - Math.floor(bfDist * 1.2);
+        nextFlipFrame = frame + Math.max(140, flipGap);
+      }
     } else {
       humanoid.update(0, 0, orbHolder.speed, 0, 0);
     }
@@ -2603,7 +2668,7 @@ function loop() {
     if (tumble.frames >= TUMBLE_TIMEOUT) {
       doGameOver(); return;
     }
-    var GRAVITY = -0.45, FRICTION = 0.91, BOUNCE_DAMP = 0.48, SURFACE_Y = tumble.surfaceY;
+    var GRAVITY = -0.12, FRICTION = 0.96, BOUNCE_DAMP = 0.72, SURFACE_Y = tumble.surfaceY;
     tumble.velY += GRAVITY;
     humanoid.mesh.position.y += tumble.velY;
     humanoid.mesh.position.x += tumble.velX;
@@ -2624,7 +2689,7 @@ function loop() {
         humanoid.joints[bi].pivot.userData.velX += (Math.random()-0.5)*splatStr;
         humanoid.joints[bi].pivot.userData.velZ += (Math.random()-0.5)*splatStr;
       }
-      if (tumble.velY < 1.2) tumble.velY = 1.2 + Math.random()*1.5;
+      if (tumble.velY < 2.2) tumble.velY = 2.2 + Math.random()*2.5;
     }
     humanoid.flipX += tumble.spinX;
     humanoid.flipZ += tumble.spinZ;
@@ -2645,7 +2710,7 @@ function loop() {
       tumble.liftProgress = 0; tumble.velX = 0; tumble.velY = 0;
       humanoid.flipX = 0; humanoid.flipZ = 0;
       humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
-      gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.5, duration: 0.6, ease: "power3.out" });
+      gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.25, duration: 0.6, ease: "power3.out" });
       if (liftHint) liftHint.classList.remove('visible');
     }
     updateBursts();
@@ -2761,7 +2826,7 @@ document.addEventListener('touchstart', function(e) {
   longPressTimer = setTimeout(function() {
     humanoid.flipX = 0; humanoid.flipZ = 0;
     humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
-    gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.5, duration: 0.5, ease: 'power3.out' });
+    gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.25, duration: 0.5, ease: 'power3.out' });
     showToast('orientation reset');
   }, LONG_PRESS_MS);
 }, { passive: true });
