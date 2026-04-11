@@ -143,10 +143,7 @@
   }
   .hud-btn:hover { color: rgba(255,255,255,0.75); }
   .hud-btn.active { color: rgba(104,195,192,0.9); background: rgba(104,195,192,0.08); }
-  .hud-btn#btn-hud-spacetime.pulsing {
-    color: rgba(104,195,192,0.85);
-    animation: hud-pulse 0.4s ease;
-  }
+  /* direction arrows active state handled by .hud-btn.active */
   @keyframes hud-pulse {
     0%   { background: rgba(104,195,192,0.18); }
     100% { background: transparent; }
@@ -156,11 +153,7 @@
     background: rgba(255,255,255,0.08);
     flex-shrink: 0;
   }
-  /* space-time is touch-only */
-  @media (hover: hover) and (pointer: fine) {
-    #btn-hud-spacetime, #btn-hud-spacetime + .hud-sep,
-    .hud-sep:last-of-type { display: none; }
-  }
+  /* direction arrows visible on all devices */
   body {
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Arial, sans-serif;
     overflow: hidden;
@@ -563,13 +556,13 @@
 <!-- Toast banner area: top center, stacked -->
 <div id="toast-banner-area"></div>
 
-<!-- Bottom HUD: menu | pause (dispatch) | space-time -->
+<!-- Bottom HUD: reverse | menu | forward -->
 <div id="bottom-hud">
+  <button id="btn-hud-back" class="hud-btn">&#8592;</button>
+  <div class="hud-sep"></div>
   <button id="btn-hud-menu" class="hud-btn">menu</button>
   <div class="hud-sep"></div>
-  <button id="btn-hud-pause" class="hud-btn">pause</button>
-  <div class="hud-sep"></div>
-  <button id="btn-hud-spacetime" class="hud-btn">space-time</button>
+  <button id="btn-hud-fwd" class="hud-btn">&#8594;</button>
 </div>
 
 <div id="pause-overlay">
@@ -941,9 +934,21 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   this.mesh.rotation.z = this.baseRotZ + this.flipZ;
   this.mesh.rotation.x = this.baseRotX + this.flipX;
 
-  // Facing: track direction of travel — dx > 0 means moving right (face right)
-  var directionBias = Math.PI * 0.75 - Math.max(-0.50, Math.min(0.50, dx / 50));
-  this.mesh.rotation.y += (directionBias - this.mesh.rotation.y) * 0.055;
+  // Facing: always try to face the butterfly (cursor).
+  // bfDx > 0 = butterfly is to the right → face right (angle near PI*0.75)
+  // bfDx < 0 = butterfly is to the left  → face left  (angle near PI*1.75 / -PI*0.25)
+  // Use atan2-style mapping: center = PI*0.75 (default right-facing),
+  // full left swing to PI*1.75 when cursor is hard left.
+  var bfAngle;
+  if (typeof dx !== 'undefined' && dx !== null) {
+    // dx is the vector from astronaut to cursor. Normalize to [-1,1] over ~200 world units.
+    var facingBias = Math.max(-1, Math.min(1, dx / 120));
+    // Map: facingBias +1 (right) → PI*0.55, facingBias -1 (left) → PI*1.55
+    bfAngle = Math.PI * 0.75 - facingBias * Math.PI * 0.55;
+  } else {
+    bfAngle = Math.PI * 0.75;
+  }
+  this.mesh.rotation.y += (bfAngle - this.mesh.rotation.y) * 0.06;
 
   // ── 2. Thruster flames ──────────────────────────────────────────────────
   var baseScale   = 0.6 + Math.random() * 0.4;
@@ -964,22 +969,51 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   // Baumgartner (high): arms spread wide, legs spread, body upright
   var distFromCenter  = Math.sqrt(mouse.x * mouse.x + mouse.y * mouse.y);
   var centerProximity = Math.max(0, 1 - distFromCenter / Math.SQRT2);
-  var armReach        = 0.65 - centerProximity * 2.2;
-  var supermanPull    = poseLow * 0.75; // extra arm reach forward in low orbit
 
-  // Shoulder Z: narrow (±0.12) → default (±0.55) → wide (±1.18)
+  // Butterfly reach: arms strain toward the cursor.
+  // bfDist (distance to butterfly) and direction determine arm pose.
+  // When butterfly is far away, arms reach more desperately; when close, relax.
+  var bfDist  = (this.butterflyDist !== undefined) ? this.butterflyDist : 0;
+  var bfDx    = (this.butterflyDx   !== undefined) ? this.butterflyDx   : 0;
+  var bfDy    = (this.butterflyDy   !== undefined) ? this.butterflyDy   : 0;
+
+  // Normalised direction to butterfly (in world-space 2D, X/Y)
+  var bfLen   = Math.max(1, bfDist);
+  var bfNx    = bfDx / bfLen; // +1 = butterfly right, -1 = left
+  var bfNy    = bfDy / bfLen; // +1 = butterfly up,   -1 = down
+
+  // Reach urgency: 0 when butterfly is touching the astronaut, 1 when far away
+  var reachUrgency = Math.min(1, bfDist / 80);
+
+  // Momentum resistance — physics limits how far arms can reach when moving fast
+  var bodySpeed = Math.sqrt((typeof accelX === 'number' ? accelX : 0) * (typeof accelX === 'number' ? accelX : 0) +
+                            (typeof accelY === 'number' ? accelY : 0) * (typeof accelY === 'number' ? accelY : 0));
+  var momentumLimiter = Math.max(0.25, 1.0 - bodySpeed * 18); // high speed = arms dragged back
+
+  // Base reach from altitude pose (keeping existing pose system)
+  var armReach = 0.65 - centerProximity * 2.2;
+  var supermanPull = poseLow * 0.75;
+
+  // Butterfly overlay: arms tilt toward the butterfly direction
+  // bfNy > 0 (butterfly up) → arms reach upward (more negative X rotation = forward/up)
+  // bfNx: butterfly left/right → asymmetric shoulder Z
+  var butterflyReachX = -bfNy * reachUrgency * 1.2 * momentumLimiter;
+  var butterflyReachZ = -bfNx * reachUrgency * 0.6 * momentumLimiter;
+
   var shoulderZ = 0.55 + poseLow * (-0.43) + poseHigh * 0.63;
-  // Elbow Z: narrow → default (±0.20) → wide (±0.70)
   var elbowZ    = 0.20 + poseLow * (-0.10) + poseHigh * 0.50;
 
-  this.joints[0].restX = armReach - supermanPull + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
-  this.joints[0].restZ = -shoulderZ + Math.sin(dRS.phaseZ) * dRS.ampZ + sideDrift;
-  this.joints[1].restX = armReach - supermanPull + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
-  this.joints[1].restZ =  shoulderZ + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
-  this.joints[2].restX = 0.10 + centerProximity * -0.8 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
-  this.joints[2].restZ = -elbowZ + Math.sin(dRE.phaseZ) * dRE.ampZ + sideDrift * 0.75;
-  this.joints[3].restX = 0.10 + centerProximity * -0.8 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
-  this.joints[3].restZ =  elbowZ + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
+  // Right shoulder (index 0): mirror butterfly Z offset
+  this.joints[0].restX = armReach - supermanPull + butterflyReachX + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
+  this.joints[0].restZ = (-shoulderZ + butterflyReachZ) + Math.sin(dRS.phaseZ) * dRS.ampZ + sideDrift;
+  // Left shoulder (index 1): same reach X, opposite Z mirror
+  this.joints[1].restX = armReach - supermanPull + butterflyReachX + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
+  this.joints[1].restZ = ( shoulderZ - butterflyReachZ) + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
+  // Elbows follow suit
+  this.joints[2].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
+  this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.5) + Math.sin(dRE.phaseZ) * dRE.ampZ + sideDrift * 0.75;
+  this.joints[3].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
+  this.joints[3].restZ = ( elbowZ - butterflyReachZ * 0.5) + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
 
   // Leg Z spread: together (±0.03) → default (±0.06) → wide (±0.42)
   var legZ      = 0.06 + poseLow * (-0.03) + poseHigh * 0.36;
@@ -1016,9 +1050,12 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
     p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
   }
 
-  // ── 6. Head ─────────────────────────────────────────────────────────────
-  this.head.rotation.z += ((-leanZ * 0.5 + Math.sin(this.animTime * 0.8) * 0.05) - this.head.rotation.z) * 0.12;
-  this.head.rotation.x += ((-forwardForce * 0.30 + reverseForce * 0.35) - this.head.rotation.x) * 0.10;
+  // ── 6. Head — always trying to look toward the butterfly ────────────────
+  // Head tilts/turns toward cursor: bfNy up = head tips back to look up, etc.
+  var headLookZ = -leanZ * 0.5 + Math.sin(this.animTime * 0.8) * 0.05 - bfNx * reachUrgency * 0.3 * momentumLimiter;
+  var headLookX = (-forwardForce * 0.30 + reverseForce * 0.35) - bfNy * reachUrgency * 0.25 * momentumLimiter;
+  this.head.rotation.z += (headLookZ - this.head.rotation.z) * 0.12;
+  this.head.rotation.x += (headLookX - this.head.rotation.x) * 0.10;
 };
 
 RagdollHuman.prototype.hitReaction = function() {
@@ -1067,8 +1104,8 @@ OrbsHolder.prototype.spawn = function(type) {
 OrbsHolder.prototype.update = function() {
   for (var i = this.inUse.length-1; i >= 0; i--) {
     var e = this.inUse[i];
-    e.mesh.position.x -= this.speed;
-    e.mesh.rotation.x += 0.07; e.mesh.rotation.z += 0.05;
+    e.mesh.position.x -= this.speed * sceneSpeed;
+    e.mesh.rotation.x += 0.07 * sceneSpeed; e.mesh.rotation.z += 0.05 * sceneSpeed;
     if (e.mesh.position.x < -300) {
       this.pools[e.orbType].push(e);
       this.mesh.remove(e.mesh);
@@ -1109,8 +1146,8 @@ CanistersHolder.prototype.spawn = function() {
 CanistersHolder.prototype.update = function() {
   for (var i = this.inUse.length-1; i >= 0; i--) {
     var c = this.inUse[i];
-    c.mesh.position.x -= this.speed;
-    c.mesh.rotation.y += 0.04;
+    c.mesh.position.x -= this.speed * sceneSpeed;
+    c.mesh.rotation.y += 0.04 * sceneSpeed;
     if (c.mesh.position.x < -300) {
       if (STATUS === 'playing') stats.canistersMissed++;
       this.pool.push(c); this.mesh.remove(c.mesh); this.inUse.splice(i,1);
@@ -1132,11 +1169,11 @@ function MysteryBox() {
   this.mesh.add(body);
 }
 MysteryBox.prototype.update = function(speed) {
-  this.t += 0.03;
-  this.mesh.position.x -= speed;
-  this.mesh.rotation.x += 0.02;
-  this.mesh.rotation.y += 0.025;
-  this.mesh.rotation.z += 0.015;
+  this.t += 0.03 * sceneSpeed;
+  this.mesh.position.x -= speed * sceneSpeed;
+  this.mesh.rotation.x += 0.02 * sceneSpeed;
+  this.mesh.rotation.y += 0.025 * sceneSpeed;
+  this.mesh.rotation.z += 0.015 * sceneSpeed;
   this.mesh.position.z = Math.sin(this.t) * 8;
 };
 
@@ -1349,6 +1386,8 @@ var rocketmanTimer   = 0;
 var ROCKETMAN_DURATION = 1800; // 30 seconds
 
 var mouse = { x: 0, y: 0 };
+// Butterfly physics: the cursor is the butterfly, astronaut chases with inertia
+var butterfly = { vx: 0, vy: 0 };
 var sea, sky, humanoid, orbHolder, canHolder, boxHolder;
 var voidLight;
 
@@ -1580,7 +1619,6 @@ document.addEventListener('touchend', function(e) {
 
 var reverseLerp = 0.0;
 var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -2.2;
-var manualScrollMode = false;
 
 window.addEventListener('wheel', function(e) {
   reverseLerp += e.deltaY * 0.0012;
@@ -1600,23 +1638,17 @@ window.addEventListener('pointerdown', function(e) {
   if (e.pointerType === 'touch') return;
 
   if (e.button === 0) {
-    if (manualScrollMode) {
-      // Space mode: clean Y spin
-      gsap.killTweensOf(humanoid.mesh.rotation);
-      gsap.to(humanoid.mesh.rotation, { y: humanoid.mesh.rotation.y + Math.PI * 2, duration: 0.6, ease: "power2.inOut" });
-    } else {
-      // Sequential preset spins — cycles through distinct axes each click
-      var preset = SPIN_PRESETS[spinPresetIdx % SPIN_PRESETS.length];
-      spinPresetIdx++;
-      gsap.to(humanoid, {
-        flipX: humanoid.flipX + preset.x,
-        flipZ: humanoid.flipZ + preset.z,
-        duration: preset.dur, ease: preset.ease
-      });
-      for (var si = 0; si < humanoid.joints.length; si++) {
-        humanoid.joints[si].pivot.userData.velX += preset.jx * (0.8 + Math.random() * 0.4);
-        humanoid.joints[si].pivot.userData.velZ += preset.jz * (0.8 + Math.random() * 0.4);
-      }
+    // Sequential preset spins — cycles through distinct axes each click
+    var preset = SPIN_PRESETS[spinPresetIdx % SPIN_PRESETS.length];
+    spinPresetIdx++;
+    gsap.to(humanoid, {
+      flipX: humanoid.flipX + preset.x,
+      flipZ: humanoid.flipZ + preset.z,
+      duration: preset.dur, ease: preset.ease
+    });
+    for (var si = 0; si < humanoid.joints.length; si++) {
+      humanoid.joints[si].pivot.userData.velX += preset.jx * (0.8 + Math.random() * 0.4);
+      humanoid.joints[si].pivot.userData.velZ += preset.jz * (0.8 + Math.random() * 0.4);
     }
   } else if (e.button === 2) {
     // Right click: reset to default soaring pose
@@ -1672,7 +1704,7 @@ function buildDispatchTable() {
   '</table>';
 }
 
-var frameFrozen = false; // true = world frozen, astronaut still floats freely
+var frameFrozen = false;
 
 function openMenu() {
   if (STATUS === 'waiting' || STATUS === 'gameover' || STATUS === 'void' || STATUS === 'tumbling') return;
@@ -1681,8 +1713,8 @@ function openMenu() {
   document.getElementById('pause-dispatch-content').innerHTML = buildDispatchTable();
   document.getElementById('pause-overlay').classList.add('visible');
   document.getElementById('world-fg').style.display = 'block';
-  var pb = document.getElementById('btn-hud-pause');
-  if (pb) pb.classList.remove('active');
+  
+  
   updateHintLabel();
 }
 
@@ -1691,23 +1723,14 @@ function closeMenu() {
   frameFrozen = false;
   document.getElementById('pause-overlay').classList.remove('visible');
   document.getElementById('world-fg').style.display = 'none';
-  var pb = document.getElementById('btn-hud-pause');
-  if (pb) pb.classList.remove('active');
+  
+  
   updateHintLabel();
 }
 
 // Legacy aliases used elsewhere
 function pauseGame()  { openMenu(); }
 function resumeGame() { closeMenu(); }
-
-function toggleFreeze() {
-  if (STATUS !== 'playing') return;
-  if (pauseActive) { closeMenu(); return; }
-  frameFrozen = !frameFrozen;
-  var pb = document.getElementById('btn-hud-pause');
-  if (pb) pb.classList.toggle('active', frameFrozen);
-  showToast(frameFrozen ? 'frame frozen' : 'resumed');
-}
 
 document.getElementById('btn-pause-resume').addEventListener('click', resumeGame);
 
@@ -1731,7 +1754,12 @@ function startGame() {
   humanoid.suitMat.color.setHex(0xffffff);
   humanoid.flameMat.color.setHex(0x00ffff);
   humanoid.mesh.scale.setScalar(0.25);
-  manualScrollMode = false; MAGNETIC_FORWARD = 1.0; spacetimeReversed = false; reverseLerp = 0;
+  directionState = 1; MAGNETIC_FORWARD = 1.0; reverseLerp = 0;
+  sceneSpeed = 1.0;
+  butterfly.vx = 0; butterfly.vy = 0;
+  var btnBack = document.getElementById('btn-hud-back'), btnFwd = document.getElementById('btn-hud-fwd');
+  if (btnBack) btnBack.classList.remove('active');
+  if (btnFwd)  btnFwd.classList.remove('active');
   pauseActive = false; frameFrozen = false;
   document.getElementById('pause-overlay').classList.remove('visible');
   document.getElementById('world-fg').style.display = 'none';
@@ -2154,13 +2182,16 @@ function checkCollisions() {
 }
 
 // ─── Main Loop ─────────────────────────────────────────────────────────────
+var sceneSpeed = 1.0; // kept for object update calls; driven by currentRotSpeed below
 function loop() {
   requestAnimationFrame(loop);
   frame++;
 
+  // Magnetic snap: reverseLerp drifts back toward 0 each frame; scroll wheel pushes it away
   reverseLerp += (0 - reverseLerp) * MAGNETIC_STRENGTH;
   targetRotSpeed = MAGNETIC_FORWARD + reverseLerp;
   currentRotSpeed += (targetRotSpeed - currentRotSpeed) * 0.05;
+  sceneSpeed = currentRotSpeed;
 
   sea.mesh.rotation.z += 0.005 * currentRotSpeed;
   sky.mesh.rotation.z += 0.002 * currentRotSpeed;
@@ -2183,10 +2214,15 @@ function loop() {
       humanoid.flipX += (0 - humanoid.flipX) * 0.004;
       humanoid.flipZ += (0 - humanoid.flipZ) * 0.004;
       var tx = norm(mouse.x, -1, 1, -100, 100), ty = norm(mouse.y, -1, 1, 25, 175);
-      var dx = tx - humanoid.mesh.position.x, dy = ty - humanoid.mesh.position.y;
-      humanoid.mesh.position.x += dx * 0.1;
-      humanoid.mesh.position.y += dy * 0.1;
-      humanoid.update(dx*0.003, dy*0.003, orbHolder.speed, dx, dy);
+      var bfDxP = tx - humanoid.mesh.position.x, bfDyP = ty - humanoid.mesh.position.y;
+      var bfDistP = Math.max(1, Math.sqrt(bfDxP*bfDxP + bfDyP*bfDyP));
+      butterfly.vx += (bfDxP / bfDistP) * Math.min(bfDistP * 0.08, 4) * 0.12;
+      butterfly.vy += (bfDyP / bfDistP) * Math.min(bfDistP * 0.08, 4) * 0.12;
+      butterfly.vx *= 0.85; butterfly.vy *= 0.85;
+      humanoid.mesh.position.x += butterfly.vx;
+      humanoid.mesh.position.y += butterfly.vy;
+      humanoid.butterflyDx = bfDxP; humanoid.butterflyDy = bfDyP; humanoid.butterflyDist = bfDistP;
+      humanoid.update(butterfly.vx*0.003, butterfly.vy*0.003, orbHolder.speed, bfDxP, bfDyP);
       updateBursts();
       if (cometSparkles.length) updateCometSparkles();
       renderer.render(scene, camera);
@@ -2198,14 +2234,19 @@ function loop() {
       return;
     }
     if (frameFrozen) {
-      // World frozen — astronaut drifts freely, nothing else ticks
+      // World frozen — astronaut drifts freely with butterfly physics, nothing else ticks
       humanoid.flipX += (0 - humanoid.flipX) * 0.004;
       humanoid.flipZ += (0 - humanoid.flipZ) * 0.004;
       var ftx = norm(mouse.x, -1, 1, -100, 100), fty = norm(mouse.y, -1, 1, 25, 175);
-      var fdx = ftx - humanoid.mesh.position.x, fdy = fty - humanoid.mesh.position.y;
-      humanoid.mesh.position.x += fdx * 0.06;
-      humanoid.mesh.position.y += fdy * 0.06;
-      humanoid.update(fdx*0.002, fdy*0.002, 0, fdx, fdy);
+      var bfDxF = ftx - humanoid.mesh.position.x, bfDyF = fty - humanoid.mesh.position.y;
+      var bfDistF = Math.max(1, Math.sqrt(bfDxF*bfDxF + bfDyF*bfDyF));
+      butterfly.vx += (bfDxF / bfDistF) * Math.min(bfDistF * 0.08, 4) * 0.10;
+      butterfly.vy += (bfDyF / bfDistF) * Math.min(bfDistF * 0.08, 4) * 0.10;
+      butterfly.vx *= 0.88; butterfly.vy *= 0.88;
+      humanoid.mesh.position.x += butterfly.vx;
+      humanoid.mesh.position.y += butterfly.vy;
+      humanoid.butterflyDx = bfDxF; humanoid.butterflyDy = bfDyF; humanoid.butterflyDist = bfDistF;
+      humanoid.update(butterfly.vx*0.002, butterfly.vy*0.002, 0, bfDxF, bfDyF);
       updateBursts();
       if (smokeParticles.length) updateSmoke();
       if (cometSparkles.length) updateCometSparkles();
@@ -2297,13 +2338,61 @@ function loop() {
       nextStarFrame = frame + 1200 + Math.floor(Math.random() * 1800);
     }
 
-    // Mouse tracking (only when not in sling)
+    // ── Butterfly physics — astronaut chases the cursor like a butterfly ──
+    // The cursor is the butterfly: astronaut always wants to reach for it,
+    // but velocity/inertia/momentum/mass physics can override arm strength.
     if (!humanoid.singularity) {
-      var tx = norm(mouse.x, -1, 1, -100, 100), ty = norm(mouse.y, -1, 1, 25, 175);
-      var dx = tx - humanoid.mesh.position.x, dy = ty - humanoid.mesh.position.y;
-      humanoid.mesh.position.x += dx * 0.1;
-      humanoid.mesh.position.y += dy * 0.1;
-      humanoid.update(dx*0.003, dy*0.003, orbHolder.speed, dx, dy);
+      var bfTx = norm(mouse.x, -1, 1, -100, 100);
+      var bfTy = norm(mouse.y, -1, 1, 25, 175);
+
+      // Vector from astronaut body to butterfly (cursor)
+      var bfDx = bfTx - humanoid.mesh.position.x;
+      var bfDy = bfTy - humanoid.mesh.position.y;
+      var bfDist = Math.sqrt(bfDx * bfDx + bfDy * bfDy);
+
+      // Desire force: astronaut wants to reach toward the butterfly.
+      // Strength falls off with distance (can't reach infinitely far),
+      // and weakens when moving fast (physics limits arm strength).
+      var speed2d = Math.sqrt(butterfly.vx * butterfly.vx + butterfly.vy * butterfly.vy);
+      var armStrength = 0.018; // base reach desire per frame
+      var momentumResistance = Math.min(1.0, speed2d / 18); // 0=still, 1=very fast
+      var effectiveArm = armStrength * (1.0 - momentumResistance * 0.72);
+
+      // Apply desire: accelerate toward butterfly (capped by arm strength)
+      if (bfDist > 0.5) {
+        butterfly.vx += (bfDx / bfDist) * Math.min(bfDist * 0.12, 6.0) * effectiveArm * 9;
+        butterfly.vy += (bfDy / bfDist) * Math.min(bfDist * 0.12, 6.0) * effectiveArm * 9;
+      }
+
+      // Inertia / drag — space has near-zero friction, but suit thrusters provide some control
+      // Drag increases at higher speeds (thruster saturation)
+      var drag = 0.88 - Math.min(0.12, speed2d * 0.004);
+      butterfly.vx *= drag;
+      butterfly.vy *= drag;
+
+      // Mass-limited velocity cap: heavier suit means slower top speed
+      var MAX_SPEED = 9.5;
+      if (speed2d > MAX_SPEED) {
+        butterfly.vx *= MAX_SPEED / speed2d;
+        butterfly.vy *= MAX_SPEED / speed2d;
+      }
+
+      // Integrate position
+      humanoid.mesh.position.x += butterfly.vx;
+      humanoid.mesh.position.y += butterfly.vy;
+
+      // World bounds — soft wall (spring back gently)
+      if (humanoid.mesh.position.x < -110) { butterfly.vx += (-110 - humanoid.mesh.position.x) * 0.08; }
+      if (humanoid.mesh.position.x >  110) { butterfly.vx += ( 110 - humanoid.mesh.position.x) * 0.08; }
+      if (humanoid.mesh.position.y <  20)  { butterfly.vy += (  20 - humanoid.mesh.position.y) * 0.10; }
+      if (humanoid.mesh.position.y >  178) { butterfly.vy += ( 178 - humanoid.mesh.position.y) * 0.10; }
+
+      // Pass velocity as acceleration signals to ragdoll update,
+      // and butterfly offset (reaching direction) to arm posing
+      humanoid.update(butterfly.vx * 0.003, butterfly.vy * 0.003, orbHolder.speed, bfDx, bfDy);
+      humanoid.butterflyDx = bfDx;
+      humanoid.butterflyDy = bfDy;
+      humanoid.butterflyDist = bfDist;
     } else {
       humanoid.update(0, 0, orbHolder.speed, 0, 0);
     }
@@ -2333,10 +2422,10 @@ function loop() {
     wasInRiskZone = inRiskNow;
     if ((oxygen / MAX_O) > 0.6) stats.safeZoneFrames++;
 
-    // Spawn — density and mix shift by altitude zone
+    // Spawn — density and mix shift by altitude zone; suppressed while manual mode has stopped the scene
     var altSpawnMult = altY > HIGH_ORBIT_Y ? 1.7 : altY < LOW_ORBIT_Y ? 0.62 : 1.0;
     var effectiveSpawn = Math.round(spawnInt * altSpawnMult);
-    if (frame % Math.max(12, effectiveSpawn) === 0) {
+    if (Math.abs(sceneSpeed) > 0.15 && frame % Math.max(12, effectiveSpawn) === 0) {
       var r = Math.random();
       if (altY > HIGH_ORBIT_Y) {
         // High orbit: thin, mostly canisters
@@ -2455,6 +2544,10 @@ function loop() {
 }
 
 document.getElementById('btn-start').addEventListener('click', startGame);
+document.getElementById('btn-start').addEventListener('touchend', function(e) {
+  e.stopPropagation(); e.preventDefault();
+  startGame();
+}, { passive: false });
 
 // ─── HUD visibility ──────────────────────────────────────────────────────────
 var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -2474,10 +2567,11 @@ function updateHintLabel() {
 
 // ─── Wordmark → home (reset to start screen) ─────────────────────────────────
 function goHome() {
-  spacetimeReversed = false; MAGNETIC_FORWARD = 1.0; reverseLerp = 0;
+  directionState = 1; MAGNETIC_FORWARD = 1.0; reverseLerp = 0;
   frameFrozen = false;
-  var stBtn = document.getElementById('btn-hud-spacetime');
-  if (stBtn) stBtn.classList.remove('active');
+  var btnBack = document.getElementById('btn-hud-back'), btnFwd = document.getElementById('btn-hud-fwd');
+  if (btnBack) btnBack.classList.remove('active');
+  if (btnFwd)  btnFwd.classList.remove('active');
   if (STATUS === 'playing' || STATUS === 'tumbling' || STATUS === 'void') {
     doGameOver();
     return;
@@ -2490,63 +2584,51 @@ function goHome() {
   updateHintLabel();
 }
 
+var _goHomeCooldown = false;
 document.getElementById('hud-wordmark').addEventListener('click', goHome);
 document.getElementById('hud-wordmark').addEventListener('touchend', function(e) {
   e.stopPropagation(); e.preventDefault();
+  if (_goHomeCooldown) return;
+  _goHomeCooldown = true;
+  setTimeout(function() { _goHomeCooldown = false; }, 600);
   goHome();
 }, { passive: false });
 
 // ─── Bottom HUD buttons ───────────────────────────────────────────────────────
 
-// menu button → open menu overlay (doctrine + dispatch)
-document.getElementById('btn-hud-menu').addEventListener('click', function() {
-  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
-});
-document.getElementById('btn-hud-menu').addEventListener('touchend', function(e) {
-  e.stopPropagation(); e.preventDefault();
-  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
-}, { passive: false });
+// Direction state: 1 = forward, -1 = reverse
+var directionState = 1;
 
-// pause button → freeze world, astronaut floats freely
-document.getElementById('btn-hud-pause').addEventListener('click', function() {
-  toggleFreeze();
-});
-document.getElementById('btn-hud-pause').addEventListener('touchend', function(e) {
-  e.stopPropagation(); e.preventDefault();
-  toggleFreeze();
-}, { passive: false });
-
-// space-time button → reverse/forward toggle (mobile only)
-var spacetimeReversed = false;
-
-function toggleSpacetime() {
+function setDirection(dir) {
   if (STATUS !== 'playing') return;
-  spacetimeReversed = !spacetimeReversed;
-  var btn = document.getElementById('btn-hud-spacetime');
-  if (spacetimeReversed) {
-    // Snap into strong reverse
+  directionState = dir;
+  if (dir === -1) {
     reverseLerp = REVERSE_LIMIT * 0.75;
     MAGNETIC_FORWARD = -0.6;
-    if (btn) btn.classList.add('active');
+    document.getElementById('btn-hud-back').classList.add('active');
+    document.getElementById('btn-hud-fwd').classList.remove('active');
     showToast('reversing');
   } else {
-    // Restore forward
     reverseLerp = 0;
     MAGNETIC_FORWARD = 1.0;
-    if (btn) btn.classList.remove('active');
+    document.getElementById('btn-hud-fwd').classList.add('active');
+    document.getElementById('btn-hud-back').classList.remove('active');
     showToast('forward');
   }
 }
 
-// Only wire touch (mobile) — not click — so desktop wheel still works naturally
-document.getElementById('btn-hud-spacetime').addEventListener('touchend', function(e) {
-  e.stopPropagation(); e.preventDefault();
-  toggleSpacetime();
-}, { passive: false });
-// Desktop fallback (hidden on desktop anyway but safe)
-document.getElementById('btn-hud-spacetime').addEventListener('click', function() {
-  if (!isMobile) return;
-  toggleSpacetime();
+function wireBtn(id, fn) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('click', fn);
+  el.addEventListener('touchend', function(e) { e.stopPropagation(); e.preventDefault(); fn(); }, { passive: false });
+}
+
+wireBtn('btn-hud-back', function() { setDirection(directionState === -1 ? 1 : -1); });
+wireBtn('btn-hud-fwd',  function() { setDirection(directionState === 1  ? -1 : 1); });
+
+wireBtn('btn-hud-menu', function() {
+  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
 });
 
 // ─── Long-press on mobile → reset character orientation ──────────────────────
