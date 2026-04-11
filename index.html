@@ -153,7 +153,10 @@
     background: rgba(255,255,255,0.08);
     flex-shrink: 0;
   }
-  /* direction arrows visible on all devices */
+  /* direction arrows visible on mobile only */
+  @media (hover: hover) and (pointer: fine) {
+    #bottom-hud { display: none !important; }
+  }
   body {
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Arial, sans-serif;
     overflow: hidden;
@@ -556,11 +559,9 @@
 <!-- Toast banner area: top center, stacked -->
 <div id="toast-banner-area"></div>
 
-<!-- Bottom HUD: reverse | menu | forward -->
+<!-- Bottom HUD: reverse | forward (mobile only) -->
 <div id="bottom-hud">
   <button id="btn-hud-back" class="hud-btn">&#8592;</button>
-  <div class="hud-sep"></div>
-  <button id="btn-hud-menu" class="hud-btn">menu</button>
   <div class="hud-sep"></div>
   <button id="btn-hud-fwd" class="hud-btn">&#8594;</button>
 </div>
@@ -2585,13 +2586,13 @@ function goHome() {
 }
 
 var _goHomeCooldown = false;
-document.getElementById('hud-wordmark').addEventListener('click', goHome);
+document.getElementById('hud-wordmark').addEventListener('click', function() { location.reload(); });
 document.getElementById('hud-wordmark').addEventListener('touchend', function(e) {
   e.stopPropagation(); e.preventDefault();
   if (_goHomeCooldown) return;
   _goHomeCooldown = true;
   setTimeout(function() { _goHomeCooldown = false; }, 600);
-  goHome();
+  location.reload();
 }, { passive: false });
 
 // ─── Bottom HUD buttons ───────────────────────────────────────────────────────
@@ -2627,9 +2628,6 @@ function wireBtn(id, fn) {
 wireBtn('btn-hud-back', function() { setDirection(directionState === -1 ? 1 : -1); });
 wireBtn('btn-hud-fwd',  function() { setDirection(directionState === 1  ? -1 : 1); });
 
-wireBtn('btn-hud-menu', function() {
-  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
-});
 
 // ─── Long-press on mobile → reset character orientation ──────────────────────
 var longPressTimer = null;
