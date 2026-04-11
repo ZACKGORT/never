@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>neverever.land</title>
+<title>neverever.land | by zack.cx</title>
 <meta name="description" content="A capable person floating in an indifferent environment.">
 <meta property="og:title" content="neverever.land">
 <meta property="og:description" content="A capable person floating in an indifferent environment.">
@@ -937,64 +937,39 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var inertiaPitch = forwardForce * 0.40 - reverseForce * 0.35;
   var armTrail     = forwardForce * 0.75 - reverseForce * 0.65;
   var sideDrift    = forwardForce * 0.50 - reverseForce * 0.50;
-
-  // scrollIntensity: 0 at rest, 1 at full forward or reverse scroll
-  // Smoothed so it doesn't snap — driven by the raw lerp values
   var scrollIntensity = Math.min(1, Math.max(forwardForce, reverseForce) * 1.6);
 
   // ── 1. Body ───────────────────────────────────────────────────────────────
   var altFactor = Math.max(0, Math.min(1, (this.mesh.position.y - 25) / 150));
-
-  // Altitude pose zones (smooth, no hard edges)
-  // poseLow:  1 at ground, fades to 0 at altFactor=0.38 (≈y=82)
-  // poseHigh: 0 below altFactor=0.62 (≈y=118), rises to 1 at top
   var poseLow  = Math.max(0, 1 - altFactor / 0.38);
   var poseHigh = Math.max(0, (altFactor - 0.62) / 0.38);
 
-  // Superman (low): flat, nose-down, body horizontal
-  // Baumgartner (high): upright, spread-eagle
   var baseBodyX = (-1.05 + altFactor * 0.80) + inertiaPitch;
-  // At high scroll intensity blend toward fully horizontal (-PI/2 ≈ -1.57)
   var supermanX = -Math.PI * 0.5;
-  var targetBodyX = baseBodyX + (supermanX - baseBodyX) * scrollIntensity * scrollIntensity;
+  // Top-heavy lean: accelX = butterfly.vx * 0.003 — moving forward tips nose down,
+  // moving back tips nose up. Multiplied strongly so the heavy head/chest is felt.
+  var velocityLeanX = -accelX * 32;
+  var targetBodyX = baseBodyX + velocityLeanX + (supermanX - baseBodyX) * scrollIntensity * scrollIntensity;
   var leanZ = -accelX * 0.8;
 
   this.baseRotZ += (leanZ       - this.baseRotZ) * 0.10;
-  this.baseRotX += (targetBodyX - this.baseRotX) * 0.06;
-
+  this.baseRotX += (targetBodyX - this.baseRotX) * 0.055; // slightly stiffer than before
   this.mesh.rotation.z = this.baseRotZ + this.flipZ;
   this.mesh.rotation.x = this.baseRotX + this.flipX;
 
-  // At high scroll intensity, snap facing to clean right-profile (PI*0.5)
-  // so visor isn't pointing at the floor while supermanning
   var supermanFacingTarget = Math.PI * 0.5;
-  var facingSnapStrength = scrollIntensity * scrollIntensity * 0.12; // blends on top of normal facing lerp
+  var facingSnapStrength = scrollIntensity * scrollIntensity * 0.12;
 
-  this.baseRotZ += (leanZ       - this.baseRotZ) * 0.10;
-  this.baseRotX += (targetBodyX - this.baseRotX) * 0.06;
-
-  this.mesh.rotation.z = this.baseRotZ + this.flipZ;
-  this.mesh.rotation.x = this.baseRotX + this.flipX;
-
-  // Facing: cursor X position drives yaw along the camera axis.
-  // Cursor left of astronaut → face toward camera (y → 0, visor visible).
-  // Cursor right of astronaut → face ahead/right (y → PI*0.5, pure profile).
-  // dy adds a small depth tilt so upward pulls show more of the visor.
   var bfAngle;
   if (typeof dx !== 'undefined' && dx !== null) {
-    // lateralBias: -1 = cursor hard left, +1 = cursor hard right
     var lateralBias = Math.max(-1, Math.min(1, dx / 130));
-    // Map: hard left → 0 (camera-facing), hard right → PI*0.5 (profile)
-    // Center rests at PI*0.25 (nice three-quarter view)
     bfAngle = Math.PI * 0.25 + lateralBias * Math.PI * 0.25;
-    // Small dy tilt: cursor above nudges slightly more toward camera
     var depthTilt = Math.max(-1, Math.min(1, (dy || 0) / 140));
     bfAngle -= depthTilt * 0.12;
   } else {
     bfAngle = Math.PI * 0.25;
   }
   this.mesh.rotation.y += (bfAngle - this.mesh.rotation.y) * 0.06;
-  // Superman scroll: additionally pull toward clean right-profile
   this.mesh.rotation.y += (supermanFacingTarget - this.mesh.rotation.y) * facingSnapStrength;
 
   // ── 2. Thruster flames ──────────────────────────────────────────────────
@@ -1012,60 +987,43 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
       dRE = this.armDrift[2], dLE = this.armDrift[3];
 
   // ── 4. Altitude-blended limb poses ──────────────────────────────────────
-  // Superman (low): arms thrust forward, narrow Z, legs stream back together
-  // Baumgartner (high): arms spread wide, legs spread, body upright
   var distFromCenter  = Math.sqrt(mouse.x * mouse.x + mouse.y * mouse.y);
   var centerProximity = Math.max(0, 1 - distFromCenter / Math.SQRT2);
 
-  // Butterfly reach: arms strain toward the cursor.
-  // bfDist (distance to butterfly) and direction determine arm pose.
-  // When butterfly is far away, arms reach more desperately; when close, relax.
   var bfDist  = (this.butterflyDist !== undefined) ? this.butterflyDist : 0;
   var bfDx    = (this.butterflyDx   !== undefined) ? this.butterflyDx   : 0;
   var bfDy    = (this.butterflyDy   !== undefined) ? this.butterflyDy   : 0;
-
-  // Normalised direction to butterfly (in world-space 2D, X/Y)
   var bfLen   = Math.max(1, bfDist);
-  var bfNx    = bfDx / bfLen; // +1 = butterfly right, -1 = left
-  var bfNy    = bfDy / bfLen; // +1 = butterfly up,   -1 = down
-
-  // Reach urgency: 0 when butterfly is touching the astronaut, 1 when far away
+  var bfNx    = bfDx / bfLen;
+  var bfNy    = bfDy / bfLen;
   var reachUrgency = Math.min(1, bfDist / 80);
 
-  // Momentum resistance — physics limits how far arms can reach when moving fast
   var bodySpeed = Math.sqrt((typeof accelX === 'number' ? accelX : 0) * (typeof accelX === 'number' ? accelX : 0) +
                             (typeof accelY === 'number' ? accelY : 0) * (typeof accelY === 'number' ? accelY : 0));
-  var momentumLimiter = Math.max(0.25, 1.0 - bodySpeed * 18); // high speed = arms dragged back
+  var momentumLimiter = Math.max(0.25, 1.0 - bodySpeed * 18);
 
-  // Base reach from altitude pose (keeping existing pose system)
   var armReach = 0.65 - centerProximity * 2.2;
   var supermanPull = poseLow * 0.75;
-
-  // Butterfly overlay: arms tilt toward the butterfly direction
-  // bfNy > 0 (butterfly up) → arms reach upward (more negative X rotation = forward/up)
-  // bfNx: butterfly left/right → asymmetric shoulder Z
   var butterflyReachX = -bfNy * reachUrgency * 1.2 * momentumLimiter;
   var butterflyReachZ = -bfNx * reachUrgency * 0.6 * momentumLimiter;
 
   var shoulderZ = 0.55 + poseLow * (-0.43) + poseHigh * 0.63;
   var elbowZ    = 0.20 + poseLow * (-0.10) + poseHigh * 0.50;
 
-  // Right shoulder (index 0): mirror butterfly Z offset
+  // Right shoulder
   this.joints[0].restX = armReach - supermanPull + butterflyReachX + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
   this.joints[0].restZ = (-shoulderZ + butterflyReachZ) + Math.sin(dRS.phaseZ) * dRS.ampZ + sideDrift;
-  // Left shoulder (index 1): same reach X, opposite Z mirror
+  // Left shoulder
   this.joints[1].restX = armReach - supermanPull + butterflyReachX + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
   this.joints[1].restZ = ( shoulderZ - butterflyReachZ) + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
-  // Elbows follow suit
+  // Elbows
   this.joints[2].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
   this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.5) + Math.sin(dRE.phaseZ) * dRE.ampZ + sideDrift * 0.75;
   this.joints[3].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
   this.joints[3].restZ = ( elbowZ - butterflyReachZ * 0.5) + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
 
-  // Leg Z spread: together (±0.03) → default (±0.06) → wide (±0.42)
-  var legZ      = 0.06 + poseLow * (-0.03) + poseHigh * 0.36;
-  // Leg X: pull back in superman, spread slightly in baumgartner
-  var legBack   = poseLow * 0.28;
+  var legZ    = 0.06 + poseLow * (-0.03) + poseHigh * 0.36;
+  var legBack = poseLow * 0.28;
 
   // ── 5. Solve all joints ─────────────────────────────────────────────────
   for (var i = 0; i < this.joints.length; i++) {
@@ -1074,19 +1032,21 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
     if (i >= 4) {
       var legTrail  = forwardForce * 0.55 - reverseForce * 0.55;
       var isHip     = (i === 4 || i === 6);
-      // Reverse pull: hips fold forward, knees lock straight
-      var hipFold   = reverseForce * 1.05;  // thighs rotate toward chest
-      var kneeLock  = Math.min(1, reverseForce * 1.2); // 0 = free, 1 = locked straight
+      var hipFold   = reverseForce * 1.05;
+      var kneeLock  = Math.min(1, reverseForce * 1.2);
       var idleAnim  = Math.sin(this.animTime * 0.9 + i) * 0.12 * (1 - kneeLock);
 
       if (isHip) {
-        // Fold: drive hip restX negative (thigh forward), suppress idle wiggle
         j.restX = (0.08 - legBack - hipFold) + idleAnim + legTrail;
       } else {
-        // Lock: blend toward 0 (straight), fully suppress oscillation
         j.restX = (0.08 - legBack + idleAnim + legTrail) * (1 - kneeLock);
       }
-      j.restZ = (i === 4 || i === 6 ? legZ : -legZ) + Math.sin(this.animTime * 0.7 + i) * 0.08 * (1 - kneeLock * 0.6) + sideDrift * 0.50;
+      // Leg Z: mirrors shoulder convention — right side (i<6) gets negative, left gets positive.
+      // sideDrift also applied per-side so both legs always move symmetrically outward/inward.
+      var legZSign = (i < 6) ? -1 : 1;
+      j.restZ = legZSign * legZ
+        + Math.sin(this.animTime * 0.7 + i) * 0.06 * (1 - kneeLock * 0.6)
+        + legZSign * sideDrift * 0.20;
     }
 
     var errX = j.restX - p.rotation.x;
@@ -1097,12 +1057,15 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
     p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
   }
 
-  // ── 6. Head — always trying to look toward the butterfly ────────────────
-  // Head tilts/turns toward cursor: bfNy up = head tips back to look up, etc.
-  var headLookZ = -leanZ * 0.5 + Math.sin(this.animTime * 0.8) * 0.05 - bfNx * reachUrgency * 0.3 * momentumLimiter;
-  var headLookX = (-forwardForce * 0.30 + reverseForce * 0.35) - bfNy * reachUrgency * 0.25 * momentumLimiter;
-  this.head.rotation.z += (headLookZ - this.head.rotation.z) * 0.12;
-  this.head.rotation.x += (headLookX - this.head.rotation.x) * 0.10;
+  // ── 6. Head ─────────────────────────────────────────────────────────────
+  // Head is top-heavy: it leads the body lean, tipping forward on acceleration,
+  // back on deceleration/reverse — more exaggerated than the body.
+  var headLookZ = -leanZ * 0.6 + Math.sin(this.animTime * 0.8) * 0.05 - bfNx * reachUrgency * 0.3 * momentumLimiter;
+  var headLookX = (-forwardForce * 0.45 + reverseForce * 0.50)
+    - accelX * 40                             // velocity: head tips sharply with movement
+    - bfNy * reachUrgency * 0.25 * momentumLimiter;
+  this.head.rotation.z += (headLookZ - this.head.rotation.z) * 0.14;
+  this.head.rotation.x += (headLookX - this.head.rotation.x) * 0.12;
 };
 
 RagdollHuman.prototype.hitReaction = function() {
@@ -1461,6 +1424,142 @@ function updateCometSparkles() {
   }
 }
 
+// ─── Atmosphere & Reentry Fire ─────────────────────────────────────────────
+var heatFactor = 0.0;   // 0 = cool, 1 = full ablation
+var wasInAtmosphere = false;
+var ATMOSPHERE_Y = 58;  // world-y threshold — below this = inside the atmosphere
+
+// Fire particles: tetrahedra in orange→yellow spectrum, trail behind the astronaut
+var fireParticles = [];
+var firePool = [];
+
+function FireParticle() {
+  var g = new THREE.TetrahedronGeometry(2.2, 0);
+  var m = new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+  this.mesh = new THREE.Mesh(g, m);
+  scene.add(this.mesh);
+}
+
+function spawnFire(x, y) {
+  var p = firePool.length ? firePool.pop() : new FireParticle();
+  p.mesh.position.set(
+    x + (Math.random()-0.5) * 8,
+    y + (Math.random()-0.5) * 5,
+    (Math.random()-0.5) * 8
+  );
+  p.mesh.rotation.set(Math.random()*Math.PI*2, Math.random()*Math.PI*2, Math.random()*Math.PI*2);
+  // Colour: core white-yellow → mid orange → tip red
+  var heat = Math.random();
+  p.mesh.material.color.setRGB(1.0, 0.15 + heat * 0.7, heat < 0.35 ? 0 : (heat - 0.35) * 0.3);
+  p.mesh.material.opacity = 0.65 + Math.random() * 0.35;
+  p.mesh.visible = true;
+  p.vx = (Math.random()-0.5) * 1.2;
+  p.vy = 0.4 + Math.random() * 1.0;   // drift upward (opposite to gravity/drag)
+  p.vz = (Math.random()-0.5) * 0.8;
+  p.life = 1.0;
+  p.decay = 0.055 + Math.random() * 0.055;
+  p.baseScale = 0.5 + Math.random() * 0.8;
+  fireParticles.push(p);
+}
+
+function updateFire() {
+  for (var i = fireParticles.length-1; i >= 0; i--) {
+    var p = fireParticles[i];
+    p.life -= p.decay;
+    if (p.life <= 0) {
+      p.mesh.visible = false;
+      firePool.push(p);
+      fireParticles.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.x += p.vx;
+    p.mesh.position.y += p.vy;
+    p.mesh.position.z += p.vz;
+    p.vx *= 0.94; p.vy *= 0.96;
+    p.mesh.material.opacity = p.life * 0.85;
+    p.mesh.scale.setScalar(p.baseScale * (1 + (1 - p.life) * 1.8));
+    p.mesh.rotation.z += 0.06;
+  }
+}
+
+// Atmosphere visual: a glowing haze band hugging the planet surface.
+// Three layered rings give depth — inner cyan, mid blue, outer violet.
+var atmosphereGroup;
+function createAtmosphere() {
+  atmosphereGroup = new THREE.Object3D();
+
+  // Layer 1 — wide diffuse band (cyan, back side so it glows outward)
+  var g1 = new THREE.CylinderGeometry(615, 615, 80, 48, 1, true);
+  g1.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
+  var m1 = new THREE.MeshBasicMaterial({ color: 0x00ccff, transparent: true, opacity: 0.055,
+    side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending });
+  atmosphereGroup.add(new THREE.Mesh(g1, m1));
+
+  // Layer 2 — tighter bright band (teal)
+  var g2 = new THREE.CylinderGeometry(606, 606, 32, 48, 1, true);
+  g2.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
+  var m2 = new THREE.MeshBasicMaterial({ color: 0x44ffdd, transparent: true, opacity: 0.10,
+    side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending });
+  atmosphereGroup.add(new THREE.Mesh(g2, m2));
+
+  // Layer 3 — outer glow dome (violet-blue, front side for the sky cap)
+  var g3 = new THREE.CylinderGeometry(630, 630, 200, 48, 1, true);
+  g3.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
+  var m3 = new THREE.MeshBasicMaterial({ color: 0x2233aa, transparent: true, opacity: 0.04,
+    side: THREE.FrontSide, depthWrite: false, blending: THREE.AdditiveBlending });
+  atmosphereGroup.add(new THREE.Mesh(g3, m3));
+
+  atmosphereGroup.position.set(0, -600, 0);
+  scene.add(atmosphereGroup);
+}
+
+// ─── Atmosphere orbital line + haze fill ──────────────────────────────────
+// A thin red ring exactly at ATMOSPHERE_Y marks the entry boundary.
+// Below it, a warm gradient haze fills the zone like a planet's lower atmosphere.
+var atmosRingMesh, atmosRingGlow;
+function createAtmosphereRing() {
+  // Sharp orbital line — thin open cylinder, large radius so it reads as a horizon ring
+  var lineGeom = new THREE.CylinderGeometry(500, 500, 1.8, 80, 1, true);
+  var lineMat = new THREE.MeshBasicMaterial({
+    color: 0xff1800, transparent: true, opacity: 0.55,
+    side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending
+  });
+  atmosRingMesh = new THREE.Mesh(lineGeom, lineMat);
+  atmosRingMesh.position.y = ATMOSPHERE_Y;
+  scene.add(atmosRingMesh);
+
+  // Wider soft glow halo around the line — gives it luminous depth
+  var haloGeom = new THREE.CylinderGeometry(502, 502, 14, 80, 1, true);
+  var haloMat = new THREE.MeshBasicMaterial({
+    color: 0xff3300, transparent: true, opacity: 0.13,
+    side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending
+  });
+  atmosRingGlow = new THREE.Mesh(haloGeom, haloMat);
+  atmosRingGlow.position.y = ATMOSPHERE_Y;
+  scene.add(atmosRingGlow);
+
+  // Atmospheric haze fill — the zone between surface and the line, warm orange-red tint
+  var zoneH = ATMOSPHERE_Y - 22;
+  var hazeGeom = new THREE.CylinderGeometry(488, 488, zoneH, 72, 1, true);
+  var hazeMat = new THREE.MeshBasicMaterial({
+    color: 0xff2200, transparent: true, opacity: 0.028,
+    side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
+  });
+  var haze = new THREE.Mesh(hazeGeom, hazeMat);
+  haze.position.y = 22 + zoneH * 0.5;
+  scene.add(haze);
+
+  // Second haze pass — slightly brighter near the line (top half of zone)
+  var innerGeom = new THREE.CylinderGeometry(486, 486, zoneH * 0.5, 72, 1, true);
+  var innerMat = new THREE.MeshBasicMaterial({
+    color: 0xff4400, transparent: true, opacity: 0.025,
+    side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
+  });
+  var inner = new THREE.Mesh(innerGeom, innerMat);
+  inner.position.y = ATMOSPHERE_Y - zoneH * 0.25;
+  scene.add(inner);
+}
+
 // ─── Game state ────────────────────────────────────────────────────────────
 var STATUS = 'waiting'; // waiting | playing | tumbling | void | gameover
 var oxygen = 10, MAX_O = 10;
@@ -1581,6 +1680,8 @@ function buildWorld() {
   voidLight = new THREE.PointLight(0xffffff, 0, 0);
   voidLight.position.set(0, 130, 180);
   scene.add(voidLight);
+  createAtmosphere();
+  createAtmosphereRing();
   // Pre-warm pools
   for (var i = 0; i < 6; i++) {
     orbHolder.pools.blue.push(new Orb('blue'));
@@ -1898,6 +1999,7 @@ function startGame() {
   document.getElementById('world-fg').style.display = 'none';
   cometActive = false; cometTimer = 0;
   structuralStress = 0.0; wasInRiskZone = false;
+  heatFactor = 0.0; wasInAtmosphere = false;
   spinPresetIdx = 0;
   heartbeatTaps = 0; voidIdleFrames = 0;
   starActive = false;
@@ -2330,6 +2432,15 @@ function loop() {
 
   sea.mesh.rotation.z += 0.005 * currentRotSpeed;
   sky.mesh.rotation.z += 0.002 * currentRotSpeed;
+  if (atmosphereGroup) atmosphereGroup.rotation.z = sea.mesh.rotation.z * 0.3;
+  // Pulse the orbital line — brightens when player is near it
+  if (atmosRingMesh) {
+    var distToLine = humanoid ? Math.abs(humanoid.mesh.position.y - ATMOSPHERE_Y) : 999;
+    var proximity = Math.max(0, 1 - distToLine / 30); // brightens within 30 units
+    var pulse = 0.42 + Math.sin(Date.now() * 0.0018) * 0.13 + proximity * 0.35;
+    atmosRingMesh.material.opacity = Math.min(0.9, pulse);
+    atmosRingGlow.material.opacity = Math.min(0.3, pulse * 0.22 + proximity * 0.12);
+  }
   sea.moveWaves();
 
   var cycle = (sea.mesh.rotation.z / Math.PI) % planetColors.length;
@@ -2585,13 +2696,45 @@ function loop() {
     stats.altitudeFrames++;
 
     if (altY > HIGH_ORBIT_Y) {
-      // High orbit: structural recovery, safe haven
       structuralStress = Math.max(0, structuralStress - 0.0015);
     } else if (altY < LOW_ORBIT_Y) {
-      // Low orbit: slow structural wear from turbulence
       structuralStress = Math.min(1.0, structuralStress + 0.00015);
     }
     stats.peakStructuralStress = Math.max(stats.peakStructuralStress, structuralStress);
+
+    // ── Atmosphere reentry ─────────────────────────────────────────────────
+    var inAtmos = (altY < ATMOSPHERE_Y) && !humanoid.singularity;
+    heatFactor += ((inAtmos ? 1.0 : 0.0) - heatFactor) * (inAtmos ? 0.025 : 0.012);
+    heatFactor = Math.max(0, Math.min(1, heatFactor));
+
+    if (!wasInAtmosphere && inAtmos) {
+      wasInAtmosphere = true;
+      showToast('atmospheric entry', 'fire');
+    } else if (wasInAtmosphere && !inAtmos) {
+      wasInAtmosphere = false;
+    }
+
+    if (heatFactor > 0.01 && !rocketmanActive) {
+      // Suit scorches: white → orange → molten red
+      var h = heatFactor;
+      humanoid.suitMat.color.setRGB(1.0, Math.max(0.05, 1.0 - h * 0.78), Math.max(0, 1.0 - h * 1.1));
+      // Flames go wild — grow and shift orange
+      var fScale = 1.0 + h * 3.5;
+      humanoid.lFlame.scale.set(fScale, fScale * (0.6 + Math.random() * 0.5), fScale * 0.6);
+      humanoid.rFlame.scale.set(fScale, fScale * (0.6 + Math.random() * 0.5), fScale * 0.6);
+      if (!cometActive) humanoid.flameMat.color.setRGB(1.0, 0.35 + (1-h) * 0.65, 0);
+      // Spawn fire particles — density scales with heat
+      var fireBudget = Math.floor(h * 4) + (frame % 2 === 0 ? 1 : 0);
+      for (var fi = 0; fi < fireBudget; fi++) {
+        spawnFire(humanoid.mesh.position.x, humanoid.mesh.position.y);
+      }
+      // Deep atmosphere causes progressive structural wear
+      if (h > 0.6) structuralStress = Math.min(1.0, structuralStress + 0.0006 * h);
+    } else if (!rocketmanActive && heatFactor < 0.01) {
+      humanoid.suitMat.color.setHex(0xffffff);
+      if (!cometActive) humanoid.flameMat.color.setHex(0x00ffff);
+    }
+    if (fireParticles.length) updateFire();
 
     // Stress bar
     var stressEl = document.getElementById('stress-bar');
@@ -2823,10 +2966,10 @@ document.addEventListener('touchstart', function(e) {
   var botHud = document.getElementById('bottom-hud');
   if (topHud && topHud.contains(e.target)) return;
   if (botHud && botHud.contains(e.target)) return;
+  clearTimeout(longPressTimer);
   longPressTimer = setTimeout(function() {
     humanoid.flipX = 0; humanoid.flipZ = 0;
     humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
-    gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.25, duration: 0.5, ease: 'power3.out' });
     showToast('orientation reset');
   }, LONG_PRESS_MS);
 }, { passive: true });
