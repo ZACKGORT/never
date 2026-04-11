@@ -956,7 +956,7 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var supermanX = -Math.PI * 0.5;
   // Smooth cubic ease for the lean — feels like acceleration building
   var forwardLeanBlend = ff2 * forwardForce; // cubic — slow start, strong at peak
-  var targetBodyX = baseBodyX + (supermanX - baseBodyX) * forwardLeanBlend * 1.1;
+  var targetBodyX = baseBodyX + (supermanX - baseBodyX) * forwardLeanBlend * 0.72;
 
   // REVERSE FLAIL: pulled from behind — hips, shoulders, head all trail behind.
   // Body arches *backward* (positive X rotation = chest-up, head-back).
@@ -966,7 +966,7 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var leanZ = -accelX * 0.8;
 
   this.baseRotZ += (leanZ       - this.baseRotZ) * 0.10;
-  this.baseRotX += (targetBodyX - this.baseRotX) * 0.06;
+  this.baseRotX += (targetBodyX - this.baseRotX) * 0.038;
 
   this.mesh.rotation.z = this.baseRotZ + this.flipZ;
   this.mesh.rotation.x = this.baseRotX + this.flipX;
@@ -1024,58 +1024,51 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var butterflyReachX = -bfNy * reachUrgency * 1.2 * momentumLimiter;
   var butterflyReachZ = -bfNx * reachUrgency * 0.6 * momentumLimiter;
 
-  // FORWARD LEAN arm pose: arms sweep forward and together, streamlined like Superman.
-  // At full forward force, arms point straight ahead (strong negative X = forward).
-  var fwdArmSweepX  = -ff2 * 1.80;  // arms pulled forward (streamlined)
-  var fwdArmNarrowZ = ff2 * 0.55;   // arms pulled in toward body centerline
+  // ARM PHYSICS block follows (inertia-based, no flail)
 
-  // REVERSE FLAIL arm pose: both arms drag loosely behind/outward.
-  // Elbows drift outward & behind — like someone grabbing the astronaut's back.
-  var revArmFlailX  = rf2 * 1.40;   // arms swept back
-  var revArmWidenZ  = rf2 * 0.80;   // arms splay wide as they flail
-  // Add a lively oscillation during reverse so arms feel loose & chaotic
-  var flailWobbleR  = Math.sin(this.animTime * 3.1 + 0.0) * rf2 * 0.55;
-  var flailWobbleL  = Math.sin(this.animTime * 2.7 + 1.2) * rf2 * 0.55;
+  // ARM PHYSICS: pure inertia — arms have mass, lag opposite to direction of travel.
+  // Going forward → arms trail back (positive X). Reversing → arms trail forward (negative X).
+  // No oscillation or flailing — shoulder swivels from joint, elbows hang nearly straight.
+  // armTrail is already signed correctly: positive forward, negative reverse.
+  var armInertiaX  = armTrail * 0.85;   // shoulder lags: forward=back, reverse=forward
+  var elbowInertiaX = armTrail * 0.30;  // elbow flexes slightly with inertia, mostly straight
+
+  // Gentle lateral effect only — no dramatic splay or centerline pull
+  var fwdArmNarrowZ = ff2 * 0.18;   // very slight arm narrowing at speed
+  var revArmSpreadZ = rf2 * 0.14;   // very slight spread pulling back
 
   var shoulderZ = 0.55 + poseLow * (-0.43) + poseHigh * 0.63;
   var elbowZ    = 0.20 + poseLow * (-0.10) + poseHigh * 0.50;
 
-  // Right shoulder
+  // Right shoulder — trails from inertia; idle drift scales back as speed increases
   this.joints[0].restX = armReach - supermanPull + butterflyReachX
-    + Math.sin(dRS.phaseX) * dRS.ampX * (1 - ff2 * 0.7)
-    + armTrail + fwdArmSweepX + revArmFlailX + flailWobbleR;
+    + Math.sin(dRS.phaseX) * dRS.ampX * (1 - scrollIntensity * 0.6)
+    + armInertiaX;
   this.joints[0].restZ = (-shoulderZ + butterflyReachZ)
-    + Math.sin(dRS.phaseZ) * dRS.ampZ * (1 - ff2 * 0.7)
-    + sideDrift + fwdArmNarrowZ - revArmWidenZ;
+    + Math.sin(dRS.phaseZ) * dRS.ampZ * (1 - scrollIntensity * 0.6)
+    + sideDrift - fwdArmNarrowZ + revArmSpreadZ;
   // Left shoulder
   this.joints[1].restX = armReach - supermanPull + butterflyReachX
-    + Math.sin(dLS.phaseX) * dLS.ampX * (1 - ff2 * 0.7)
-    + armTrail + fwdArmSweepX + revArmFlailX + flailWobbleL;
+    + Math.sin(dLS.phaseX) * dLS.ampX * (1 - scrollIntensity * 0.6)
+    + armInertiaX;
   this.joints[1].restZ = ( shoulderZ - butterflyReachZ)
-    + Math.sin(dLS.phaseZ) * dLS.ampZ * (1 - ff2 * 0.7)
-    + sideDrift - fwdArmNarrowZ + revArmWidenZ;
+    + Math.sin(dLS.phaseZ) * dLS.ampZ * (1 - scrollIntensity * 0.6)
+    + sideDrift + fwdArmNarrowZ - revArmSpreadZ;
 
-  // ELBOW pose: forward = straight/locked ahead; reverse = floppy, trailing behind.
-  // "Elbows straight but not locked" forward = small positive X (gentle extension)
-  var fwdElbowX = -ff2 * 1.20;     // elbow extends forward, inline with upper arm
-  var fwdElbowNarrowZ = ff2 * 0.35;
-  var revElbowFlailX = rf2 * 1.10; // elbow swept back, loose
-  var revElbowWideZ  = rf2 * 0.65;
-  var elbowWobbleR = Math.sin(this.animTime * 3.5 + 0.5) * rf2 * 0.45;
-  var elbowWobbleL = Math.sin(this.animTime * 2.9 + 1.8) * rf2 * 0.45;
-
-  this.joints[2].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65
-    + Math.sin(dRE.phaseX) * dRE.ampX * (1 - ff2 * 0.8)
-    + armTrail * 0.6 + fwdElbowX + revElbowFlailX + elbowWobbleR;
+  // ELBOWS: nearly straight (resting ~0.10), small inertia flex, no flailing.
+  // "Not locked" = slight natural angle; arms go straight-ish in both directions.
+  this.joints[2].restX = 0.10 + centerProximity * -0.5 + butterflyReachX * 0.40
+    + Math.sin(dRE.phaseX) * dRE.ampX * (1 - scrollIntensity * 0.65)
+    + elbowInertiaX;
   this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.5)
-    + Math.sin(dRE.phaseZ) * dRE.ampZ * (1 - ff2 * 0.8)
-    + sideDrift * 0.75 + fwdElbowNarrowZ - revElbowWideZ;
-  this.joints[3].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65
-    + Math.sin(dLE.phaseX) * dLE.ampX * (1 - ff2 * 0.8)
-    + armTrail * 0.6 + fwdElbowX + revElbowFlailX + elbowWobbleL;
+    + Math.sin(dRE.phaseZ) * dRE.ampZ * (1 - scrollIntensity * 0.65)
+    + sideDrift * 0.35;
+  this.joints[3].restX = 0.10 + centerProximity * -0.5 + butterflyReachX * 0.40
+    + Math.sin(dLE.phaseX) * dLE.ampX * (1 - scrollIntensity * 0.65)
+    + elbowInertiaX;
   this.joints[3].restZ = ( elbowZ - butterflyReachZ * 0.5)
-    + Math.sin(dLE.phaseZ) * dLE.ampZ * (1 - ff2 * 0.8)
-    + sideDrift * 0.75 - fwdElbowNarrowZ + revElbowWideZ;
+    + Math.sin(dLE.phaseZ) * dLE.ampZ * (1 - scrollIntensity * 0.65)
+    + sideDrift * 0.35;
 
   // Leg Z spread: together (±0.03) → default (±0.06) → wide (±0.42)
   var legZ    = 0.06 + poseLow * (-0.03) + poseHigh * 0.36;
@@ -2856,10 +2849,12 @@ document.addEventListener('touchstart', function(e) {
   var botHud = document.getElementById('bottom-hud');
   if (topHud && topHud.contains(e.target)) return;
   if (botHud && botHud.contains(e.target)) return;
+  clearTimeout(longPressTimer); // always cancel any previous timer before arming a new one
   longPressTimer = setTimeout(function() {
     humanoid.flipX = 0; humanoid.flipZ = 0;
     humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
-    gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.25, duration: 0.5, ease: 'power3.out' });
+    // Don't call gsap.to on mesh.rotation — the update loop owns that every frame.
+    // Just reset the driving variables; the loop will lerp mesh.rotation naturally.
     showToast('orientation reset');
   }, LONG_PRESS_MS);
 }, { passive: true });
