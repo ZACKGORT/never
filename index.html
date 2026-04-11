@@ -2011,8 +2011,8 @@ var TUMBLE_TIMEOUT = 420; // 7 seconds — then session ends
 function doTumble() {
   if (STATUS === 'void' || humanoid.singularity) return;
   STATUS = 'tumbling';
-  tumble.velX = -(orbHolder.speed*0.6 + Math.random()*3);
-  tumble.velY = 4 + Math.random()*3;
+  tumble.velX = -(orbHolder.speed*0.4 + Math.random()*1.5);
+  tumble.velY = 2.5 + Math.random()*2.0;
   tumble.bounces = 0; tumble.liftProgress = 0; tumble.frames = 0;
   tumble.spinX = (Math.random()-0.5)*0.28;
   tumble.spinY = (Math.random()-0.5)*0.22;
@@ -2725,7 +2725,7 @@ function loop() {
     if (tumble.frames >= TUMBLE_TIMEOUT) {
       doGameOver(); return;
     }
-    var GRAVITY = -0.45, FRICTION = 0.91, BOUNCE_DAMP = 0.48, SURFACE_Y = tumble.surfaceY;
+    var GRAVITY = -0.08, FRICTION = 0.98, BOUNCE_DAMP = 0.82, SURFACE_Y = tumble.surfaceY;
     tumble.velY += GRAVITY;
     humanoid.mesh.position.y += tumble.velY;
     humanoid.mesh.position.x += tumble.velX;
@@ -2746,7 +2746,7 @@ function loop() {
         humanoid.joints[bi].pivot.userData.velX += (Math.random()-0.5)*splatStr;
         humanoid.joints[bi].pivot.userData.velZ += (Math.random()-0.5)*splatStr;
       }
-      if (tumble.velY < 1.2) tumble.velY = 1.2 + Math.random()*1.5;
+      if (tumble.velY < 0.5) tumble.velY = 0.5 + Math.random()*0.8;
     }
     humanoid.flipX += tumble.spinX;
     humanoid.flipZ += tumble.spinZ;
@@ -2813,33 +2813,18 @@ function updateHintLabel() {
   }
 }
 
-// ─── Wordmark → home (reset to start screen) ─────────────────────────────────
-function goHome() {
-  directionState = 1; MAGNETIC_FORWARD = 1.0; reverseLerp = 0;
-  frameFrozen = false;
-  var btnBack = document.getElementById('btn-hud-back'), btnFwd = document.getElementById('btn-hud-fwd');
-  if (btnBack) btnBack.classList.remove('active');
-  if (btnFwd)  btnFwd.classList.remove('active');
-  if (STATUS === 'playing' || STATUS === 'tumbling' || STATUS === 'void') {
-    doGameOver();
-    return;
-  }
-  // already on welcome/gameover — just show welcome
-  document.getElementById('screen-gameover').classList.remove('visible');
-  document.getElementById('screen-welcome').classList.add('visible');
-  STATUS = 'waiting';
-  startQuoteRotation();
-  updateHintLabel();
-}
+// ─── Wordmark → opens menu (same as spacebar) ───────────────────────────────
 
-var _goHomeCooldown = false;
-document.getElementById('hud-wordmark').addEventListener('click', goHome);
+var _wordmarkCooldown = false;
+document.getElementById('hud-wordmark').addEventListener('click', function() {
+  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
+});
 document.getElementById('hud-wordmark').addEventListener('touchend', function(e) {
   e.stopPropagation(); e.preventDefault();
-  if (_goHomeCooldown) return;
-  _goHomeCooldown = true;
-  setTimeout(function() { _goHomeCooldown = false; }, 600);
-  goHome();
+  if (_wordmarkCooldown) return;
+  _wordmarkCooldown = true;
+  setTimeout(function() { _wordmarkCooldown = false; }, 600);
+  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
 }, { passive: false });
 
 // ─── Bottom HUD buttons ───────────────────────────────────────────────────────
