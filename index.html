@@ -22,22 +22,141 @@
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; tap-highlight-color: transparent; }
   html, body { overscroll-behavior: none; touch-action: none; }
 
-  /* Black hole FAB */
-  #fab-bh {
+  /* ── Top HUD (wordmark pill only) ── */
+  #top-hud {
     position: fixed;
-    top: 10px; left: 10px;
-    width: 80px; height: 80px;
-    cursor: pointer;
+    top: 14px; left: 50%;
+    transform: translateX(-50%);
     z-index: 55;
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 100px;
+    padding: 7px 18px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.4s, transform 0.2s;
-    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.4s;
     touch-action: manipulation;
   }
-  #fab-bh.visible { opacity: 1; pointer-events: all; }
-  #fab-bh:hover { transform: scale(1.10); }
-  #fab-bh:active { transform: scale(0.92); }
+  #top-hud.visible { opacity: 1; pointer-events: all; }
+  #hud-wordmark {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.72em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    padding: 2px 0;
+    user-select: none;
+  }
+  #hud-wordmark .hud-main {
+    background: linear-gradient(100deg, #ffffff 0%, #b8d8ea 45%, #68c3c0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  #hud-wordmark .hud-tld {
+    background: linear-gradient(100deg, #68c3c0 0%, #4a9ea0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0.7;
+  }
+  #hud-wordmark .hud-dot {
+    -webkit-text-fill-color: rgba(104,195,192,0.55);
+    color: rgba(104,195,192,0.55);
+  }
+
+  /* ── Toast banner area — top center, stacked ── */
+  #toast-banner-area {
+    position: fixed;
+    top: 62px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 56;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+    min-width: 0;
+  }
+  .toast-banner {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 100px;
+    padding: 6px 16px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.60em;
+    letter-spacing: 1.8px;
+    color: rgba(255,255,255,0.6);
+    text-transform: lowercase;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .toast-banner.in { opacity: 1; transform: translateY(0); }
+  .toast-banner.out { opacity: 0; transform: translateY(-6px); }
+
+  /* ── Bottom HUD ── */
+  #bottom-hud {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 55;
+    display: none;
+    align-items: center;
+    gap: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 100px;
+    padding: 5px 8px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s;
+    touch-action: manipulation;
+  }
+  #bottom-hud.visible { opacity: 1; pointer-events: all; }
+  .hud-btn {
+    background: none; border: none;
+    color: rgba(255,255,255,0.35);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.60em; letter-spacing: 2px;
+    text-transform: lowercase;
+    cursor: pointer;
+    padding: 5px 13px;
+    border-radius: 100px;
+    transition: color 0.2s, background 0.2s;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+  .hud-btn:hover { color: rgba(255,255,255,0.75); }
+  .hud-btn.active { color: rgba(104,195,192,0.9); background: rgba(104,195,192,0.08); }
+  .hud-btn#btn-hud-spacetime.pulsing {
+    color: rgba(104,195,192,0.85);
+    animation: hud-pulse 0.4s ease;
+  }
+  @keyframes hud-pulse {
+    0%   { background: rgba(104,195,192,0.18); }
+    100% { background: transparent; }
+  }
+  .hud-sep {
+    width: 1px; height: 14px;
+    background: rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  /* space-time is touch-only */
+  @media (hover: hover) and (pointer: fine) {
+    #btn-hud-spacetime, #btn-hud-spacetime + .hud-sep,
+    .hud-sep:last-of-type { display: none; }
+  }
   body {
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Arial, sans-serif;
     overflow: hidden;
@@ -71,16 +190,7 @@
     transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), background 1.5s ease;
   }
 
-  /* Survival timer — top right */
-  #timer {
-    position: absolute;
-    top: 20px; right: 22px;
-    font-size: clamp(0.7em, 2vw, 0.95em);
-    font-weight: 400;
-    color: rgba(255,255,255,0.25);
-    letter-spacing: 2px;
-    font-variant-numeric: tabular-nums;
-  }
+  /* timer now inside #top-hud */
 
   #lift-hint {
     position: fixed; left: 50%; top: 50%;
@@ -342,49 +452,7 @@
     display: none;
   }
 
-  /* Toast notifications — top of screen */
-  #toast-container {
-    position: fixed;
-    left: 50%; top: 14px;
-    transform: translateX(-50%);
-    z-index: 50; pointer-events: none;
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
-  }
-  .toast {
-    display: inline-block;
-    background: rgba(0,0,0,0.6);
-    color: rgba(255,255,255,0.75);
-    padding: 4px 12px;
-    font-size: clamp(0.60em, 1.5vw, 0.70em);
-    letter-spacing: 1.5px;
-    text-transform: lowercase;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-    opacity: 0;
-    white-space: nowrap;
-  }
-  .toast-blue  { border-bottom-color: #4499ff; }
-  .toast-red   { border-bottom-color: #f23030; }
-  .toast-black { border-bottom-color: #888; color: rgba(255,255,255,0.45); }
-  .toast-oxy   { border-bottom-color: #00e5ff; }
-  .toast-box   { border-bottom-color: #ffcc00; }
-  .toast-star  { border-bottom-color: rgba(255,255,255,0.5); }
-  .toast-void  { border-bottom-color: #cc1133; }
-  .toast-rocket{ border-bottom-color: #ffcc00; color: rgba(255,220,80,0.9); }
-
-  /* Bottom hint labels */
-  #hint-label {
-    position: fixed;
-    bottom: 14px; left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255,255,255,0.18);
-    font-size: clamp(0.55em, 1.4vw, 0.65em);
-    letter-spacing: 2px;
-    text-transform: lowercase;
-    pointer-events: none;
-    z-index: 12;
-    white-space: nowrap;
-    transition: opacity 0.4s;
-  }
+  /* hint-label replaced by bottom HUD */
 
   /* Long-press menu */
   /* Sol summary screen overrides */
@@ -460,37 +528,26 @@
 <div id="hit-flash"></div>
 <div id="comet-flash"></div>
 <div id="shooting-star"></div>
-<div id="toast-container"></div>
-<div id="hint-label"></div>
+<div id="toast-container"></div><!-- legacy, kept for JS compat -->
 
-<!-- Black hole FAB — logomark / pause trigger -->
-<svg id="fab-bh" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-label="pause" style="touch-action:manipulation">
-  <defs>
-    <radialGradient id="fab-glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%"   stop-color="#ff8020" stop-opacity="0.35"/>
-      <stop offset="55%"  stop-color="#9040ff" stop-opacity="0.10"/>
-      <stop offset="100%" stop-color="#000010" stop-opacity="0"/>
-    </radialGradient>
-    <clipPath id="fab-cb"><rect x="0" y="18" width="36" height="18"/></clipPath>
-    <clipPath id="fab-cf"><rect x="0" y="0"  width="36" height="18"/></clipPath>
-  </defs>
-  <!-- Ambient glow -->
-  <circle cx="18" cy="18" r="17" fill="url(#fab-glow)"/>
-  <!-- Outer lensing rings (cool) -->
-  <ellipse cx="18" cy="18" rx="15.5" ry="3.8" fill="none" stroke="#8888ff" stroke-width="0.4" opacity="0.10"/>
-  <ellipse cx="18" cy="18" rx="12.5" ry="3.2" fill="none" stroke="#aaaaff" stroke-width="0.45" opacity="0.16"/>
-  <!-- Accretion disk — back half (behind sphere) -->
-  <ellipse cx="18" cy="18" rx="10.5" ry="2.7" fill="none" stroke="#ff9030" stroke-width="2.4" opacity="0.65" clip-path="url(#fab-cb)"/>
-  <ellipse cx="18" cy="18" rx="10.5" ry="2.7" fill="none" stroke="#ffe090" stroke-width="0.9" opacity="0.55" clip-path="url(#fab-cb)"/>
-  <!-- Inner photon ring -->
-  <ellipse cx="18" cy="18" rx="7.8" ry="2.0" fill="none" stroke="#ffdd88" stroke-width="0.7" opacity="0.45"/>
-  <!-- Event horizon -->
-  <circle cx="18" cy="18" r="6.0" fill="#000005"/>
-  <circle cx="18" cy="18" r="6.0" fill="none" stroke="#440088" stroke-width="1.4" opacity="0.45"/>
-  <!-- Accretion disk — front half (over sphere) -->
-  <ellipse cx="18" cy="18" rx="10.5" ry="2.7" fill="none" stroke="#ff9030" stroke-width="2.4" opacity="0.88" clip-path="url(#fab-cf)"/>
-  <ellipse cx="18" cy="18" rx="10.5" ry="2.7" fill="none" stroke="#ffffd0" stroke-width="0.9" opacity="0.80" clip-path="url(#fab-cf)"/>
-</svg>
+<!-- Top HUD: wordmark pill (resets to start screen) -->
+<div id="top-hud">
+  <span id="hud-wordmark" role="button" aria-label="home">
+    <span class="hud-main">neverever</span><span class="hud-dot">.</span><span class="hud-tld">land</span>
+  </span>
+</div>
+
+<!-- Toast banner area: top center, stacked -->
+<div id="toast-banner-area"></div>
+
+<!-- Bottom HUD: menu | pause (dispatch) | space-time -->
+<div id="bottom-hud">
+  <button id="btn-hud-menu" class="hud-btn">menu</button>
+  <div class="hud-sep"></div>
+  <button id="btn-hud-pause" class="hud-btn">pause</button>
+  <div class="hud-sep"></div>
+  <button id="btn-hud-spacetime" class="hud-btn">space-time</button>
+</div>
 
 <div id="pause-overlay">
   <div class="bento-grid">
@@ -529,17 +586,9 @@
 
   </div>
 </div>
-  <h2>neverever.land</h2>
-  <p id="menu-sol-label">sol 0</p>
-  <div id="menu-report"></div>
-  <div class="menu-actions">
-    <button class="btn-menu" id="btn-menu-resume">resume</button>
-    <button class="btn-menu btn-menu-end" id="btn-menu-end">end sol</button>
-  </div>
-</div>
 
 <div id="ui">
-  <div id="timer">0:00</div>
+  <div id="timer" style="display:none">0:00</div><!-- legacy, kept for JS compat -->
   <div id="rocket-bar-bg"><div id="rocket-bar"></div></div>
   <div id="stress-bar-bg"><div id="stress-bar"></div></div>
   <div id="oxy-rail-bg"><div id="oxy-rail"></div></div>
@@ -1293,30 +1342,33 @@ var SPIN_PRESETS = [
   { x:  PI*2.5,  z:  PI*1.5,   dur: 1.00, ease: "power1.inOut", jx:  3.0, jz:  2.5 }, // corkscrew
 ];
 
-// ─── Toast ─────────────────────────────────────────────────────────────────
+// ─── Toast (delegates to top-center banner system defined below in HUD JS) ──
 var MAX_TOASTS = 5;
 function showToast(msg, type) {
-  if (STATUS !== 'playing' && STATUS !== 'tumbling') return;
-  var container = document.getElementById('toast-container');
-  while (container.children.length >= MAX_TOASTS) {
-    var last = container.lastChild;
-    gsap.killTweensOf(last);
-    container.removeChild(last);
-  }
+  // Banner is created by the HUD-section showToast defined later in the file;
+  // but since JS is sequential we define a single version here that works for all callers.
+  var area = document.getElementById('toast-banner-area');
+  if (!area) return;
   var el = document.createElement('div');
-  el.className = 'toast toast-' + (type || 'blue');
+  el.className = 'toast-banner';
   el.textContent = msg;
-  container.insertBefore(el, container.firstChild);
-  gsap.fromTo(el,
-    { opacity: 0, x: -10 },
-    { opacity: 1, x: 0, duration: 0.18, ease: "power2.out",
-      onComplete: function() {
-        gsap.to(el, { opacity: 0, x: -6, duration: 0.25, delay: 1.3,
-          onComplete: function() { if (el.parentNode) el.parentNode.removeChild(el); }
-        });
-      }
-    }
-  );
+  area.appendChild(el);
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() { el.classList.add('in'); });
+  });
+  setTimeout(function() {
+    el.classList.remove('in');
+    el.classList.add('out');
+    setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 300);
+  }, 2400);
+  // cap at 3 stacked
+  var all = area.querySelectorAll('.toast-banner');
+  if (all.length > 3) {
+    var oldest = all[0];
+    oldest.classList.remove('in');
+    oldest.classList.add('out');
+    setTimeout(function() { if (oldest.parentNode) oldest.parentNode.removeChild(oldest); }, 300);
+  }
 }
 
 function buildWorld() {
@@ -1378,7 +1430,8 @@ function refreshUI() {
   var secs = Math.floor(survivalFrames / 60);
   var mins = Math.floor(secs / 60);
   secs = secs % 60;
-  document.getElementById('timer').textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+  var tStr = mins + ':' + (secs < 10 ? '0' : '') + secs;
+  document.getElementById('timer').textContent = tStr;
 }
 
 function norm(v, vmin, vmax, tmin, tmax) {
@@ -1421,13 +1474,11 @@ document.addEventListener('touchstart', function(e) {
   // Let buttons, links, inputs handle their own events
   var tag = e.target.tagName;
   if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
-  // Hit-test FAB by coordinates — works on all SVG/mobile targets
-  var fab = document.getElementById('fab-bh');
-  if (fab && fab.classList.contains('visible')) {
-    var r = fab.getBoundingClientRect();
-    var tx = e.touches[0].clientX, ty = e.touches[0].clientY;
-    if (tx >= r.left && tx <= r.right && ty >= r.top && ty <= r.bottom) return;
-  }
+  // Don't swallow touches on HUD elements
+  var topHud = document.getElementById('top-hud');
+  var botHud = document.getElementById('bottom-hud');
+  if (topHud && topHud.contains(e.target)) return;
+  if (botHud && botHud.contains(e.target)) return;
   // Don't interfere with screen overlays while waiting or showing gameover
   if (STATUS === 'waiting' || STATUS === 'gameover') return;
 
@@ -1480,16 +1531,11 @@ document.addEventListener('touchmove', function(e) {
 document.addEventListener('touchend', function(e) {
   var tag = e.target.tagName;
   if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
-  // Hit-test FAB by the touch that just ended (changedTouches)
-  var fab = document.getElementById('fab-bh');
-  if (fab && fab.classList.contains('visible') && e.changedTouches.length) {
-    var r = fab.getBoundingClientRect();
-    var tx = e.changedTouches[0].clientX, ty = e.changedTouches[0].clientY;
-    if (tx >= r.left && tx <= r.right && ty >= r.top && ty <= r.bottom) {
-      if (STATUS === 'playing' || STATUS === 'tumbling') pauseGame();
-      return;
-    }
-  }
+  // Don't swallow touches on HUD elements
+  var topHud2 = document.getElementById('top-hud');
+  var botHud2 = document.getElementById('bottom-hud');
+  if (topHud2 && topHud2.contains(e.target)) return;
+  if (botHud2 && botHud2.contains(e.target)) return;
   if (STATUS === 'waiting' || STATUS === 'gameover') return;
   e.preventDefault();
   touchState.twoFinger = false;
@@ -1602,20 +1648,41 @@ function buildDispatchTable() {
   '</table>';
 }
 
-function pauseGame() {
+var frameFrozen = false; // true = world frozen, astronaut still floats freely
+
+function openMenu() {
   if (STATUS === 'waiting' || STATUS === 'gameover' || STATUS === 'void' || STATUS === 'tumbling') return;
   pauseActive = true;
+  frameFrozen = false;
   document.getElementById('pause-dispatch-content').innerHTML = buildDispatchTable();
   document.getElementById('pause-overlay').classList.add('visible');
   document.getElementById('world-fg').style.display = 'block';
+  var pb = document.getElementById('btn-hud-pause');
+  if (pb) pb.classList.remove('active');
   updateHintLabel();
 }
 
-function resumeGame() {
+function closeMenu() {
   pauseActive = false;
+  frameFrozen = false;
   document.getElementById('pause-overlay').classList.remove('visible');
   document.getElementById('world-fg').style.display = 'none';
+  var pb = document.getElementById('btn-hud-pause');
+  if (pb) pb.classList.remove('active');
   updateHintLabel();
+}
+
+// Legacy aliases used elsewhere
+function pauseGame()  { openMenu(); }
+function resumeGame() { closeMenu(); }
+
+function toggleFreeze() {
+  if (STATUS !== 'playing') return;
+  if (pauseActive) { closeMenu(); return; }
+  frameFrozen = !frameFrozen;
+  var pb = document.getElementById('btn-hud-pause');
+  if (pb) pb.classList.toggle('active', frameFrozen);
+  showToast(frameFrozen ? 'frame frozen' : 'resumed');
 }
 
 document.getElementById('btn-pause-resume').addEventListener('click', resumeGame);
@@ -1640,8 +1707,8 @@ function startGame() {
   humanoid.suitMat.color.setHex(0xffffff);
   humanoid.flameMat.color.setHex(0x00ffff);
   humanoid.mesh.scale.setScalar(0.25);
-  manualScrollMode = false; MAGNETIC_FORWARD = 1.0;
-  pauseActive = false;
+  manualScrollMode = false; MAGNETIC_FORWARD = 1.0; spacetimeReversed = false; reverseLerp = 0;
+  pauseActive = false; frameFrozen = false;
   document.getElementById('pause-overlay').classList.remove('visible');
   document.getElementById('world-fg').style.display = 'none';
   cometActive = false; cometTimer = 0;
@@ -1770,7 +1837,7 @@ function doVoid() {
 }
 
 function exitVoid() {
-  pauseActive = false;
+  pauseActive = false; frameFrozen = false;
   document.getElementById('pause-overlay').classList.remove('visible');
   document.getElementById('world-fg').style.display = 'none';
   stats.voidRevives++;
@@ -1808,9 +1875,17 @@ function doGameOver() {
       '</p>' +
       '<div class="sol-buttons">' +
         '<button class="btn-play" id="btn-replay">again</button>' +
-        '<a href="https://zack.cx" target="_blank" class="btn-link" style="margin-top:14px;">zack.cx</a>' +
+        '<button class="btn-play" id="btn-go-welcome" style="background:transparent;border-color:rgba(255,255,255,0.08);">menu</button>' +
+        '<a href="https://zack.cx" target="_blank" class="btn-link" style="margin-top:8px;">zack.cx</a>' +
       '</div>';
     document.getElementById('btn-replay').addEventListener('click', startGame);
+    document.getElementById('btn-go-welcome').addEventListener('click', function() {
+      document.getElementById('screen-gameover').classList.remove('visible');
+      document.getElementById('screen-welcome').classList.add('visible');
+      STATUS = 'waiting';
+      startQuoteRotation();
+      updateHintLabel();
+    });
     screen.classList.add('visible');
     document.getElementById('void-overlay').classList.remove('active');
     document.getElementById('heartbeat-prompt').classList.remove('visible');
@@ -1876,18 +1951,27 @@ function doGameOver() {
     '<p class="sol-rocket-notice">rocketman boost armed for sol ' + (solNumber + 1) + '</p>' +
     '<div class="sol-buttons">' +
       '<button class="btn-play" id="btn-replay">next sol</button>' +
+      '<button class="btn-play" id="btn-go-welcome" style="background:transparent;border-color:rgba(255,255,255,0.08);">menu</button>' +
       '<a href="https://zack.cx" target="_blank" class="btn-link">zack.cx</a>' +
     '</div>';
 
   var screen = document.getElementById('screen-gameover');
   screen.innerHTML = html;
   document.getElementById('btn-replay').addEventListener('click', startGame);
+  document.getElementById('btn-go-welcome').addEventListener('click', function() {
+    document.getElementById('screen-gameover').classList.remove('visible');
+    document.getElementById('screen-welcome').classList.add('visible');
+    STATUS = 'waiting';
+    startQuoteRotation();
+    updateHintLabel();
+  });
   screen.classList.add('visible');
   document.getElementById('void-overlay').classList.remove('active');
   document.getElementById('heartbeat-prompt').classList.remove('visible');
   if (sea)      { sea.mesh.visible = true; sky.mesh.visible = true; }
   if (orbHolder){ orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true; }
   if (voidLight)  voidLight.intensity = 0;
+  updateHintLabel();
 }
 
 // ─── Shooting Star ─────────────────────────────────────────────────────────
@@ -2071,7 +2155,7 @@ function loop() {
     if (!canHolder.mesh.visible) canHolder.mesh.visible = true;
     if (!boxHolder.mesh.visible) boxHolder.mesh.visible = true;
     if (pauseActive) {
-      // Full astronaut agency — mouse tracking, all interactions live
+      // Menu open — astronaut floats above overlay via fg renderer
       humanoid.flipX += (0 - humanoid.flipX) * 0.004;
       humanoid.flipZ += (0 - humanoid.flipZ) * 0.004;
       var tx = norm(mouse.x, -1, 1, -100, 100), ty = norm(mouse.y, -1, 1, 25, 175);
@@ -2082,12 +2166,26 @@ function loop() {
       updateBursts();
       if (cometSparkles.length) updateCometSparkles();
       renderer.render(scene, camera);
-      // Foreground: astronaut above overlay
       sea.mesh.visible = false; sky.mesh.visible = false;
       orbHolder.mesh.visible = false; canHolder.mesh.visible = false; boxHolder.mesh.visible = false;
       fgRenderer.render(scene, camera);
       sea.mesh.visible = true; sky.mesh.visible = true;
       orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true;
+      return;
+    }
+    if (frameFrozen) {
+      // World frozen — astronaut drifts freely, nothing else ticks
+      humanoid.flipX += (0 - humanoid.flipX) * 0.004;
+      humanoid.flipZ += (0 - humanoid.flipZ) * 0.004;
+      var ftx = norm(mouse.x, -1, 1, -100, 100), fty = norm(mouse.y, -1, 1, 25, 175);
+      var fdx = ftx - humanoid.mesh.position.x, fdy = fty - humanoid.mesh.position.y;
+      humanoid.mesh.position.x += fdx * 0.06;
+      humanoid.mesh.position.y += fdy * 0.06;
+      humanoid.update(fdx*0.002, fdy*0.002, 0, fdx, fdy);
+      updateBursts();
+      if (smokeParticles.length) updateSmoke();
+      if (cometSparkles.length) updateCometSparkles();
+      renderer.render(scene, camera);
       return;
     }
     survivalFrames++;
@@ -2333,38 +2431,118 @@ function loop() {
 }
 
 document.getElementById('btn-start').addEventListener('click', startGame);
-document.getElementById('fab-bh').addEventListener('click', function() {
-  if (STATUS === 'playing' || STATUS === 'tumbling') pauseGame();
-});
 
-// FAB touch handled inline in document touchend
-
-// ─── Hint label ────────────────────────────────────────────────────────────
+// ─── HUD visibility ──────────────────────────────────────────────────────────
 var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-var hintEl = null;
+
 function updateHintLabel() {
-  if (!hintEl) return;
-  var fabEl = document.getElementById('fab-bh');
-  var active = !pauseActive && (STATUS === 'playing' || STATUS === 'tumbling');
-  if (fabEl) fabEl.classList.toggle('visible', active);
-  if (pauseActive) { hintEl.style.opacity = '0'; return; }
-  if (active) {
-    hintEl.style.opacity = '1';
-    hintEl.textContent = isMobile ? 'hold to pause' : 'space to pause';
-  } else {
-    hintEl.style.opacity = '0';
+  var active = STATUS === 'playing' || STATUS === 'tumbling';
+  var topHud = document.getElementById('top-hud');
+  var botHud = document.getElementById('bottom-hud');
+  if (topHud) topHud.classList.toggle('visible', active);
+  if (botHud) {
+    // Always show bottom HUD on mobile while playing; on desktop too (no harm)
+    var showBot = !pauseActive && active;
+    botHud.style.display = showBot ? 'flex' : 'none';
+    botHud.classList.toggle('visible', showBot);
   }
 }
 
-// Long-press on mobile → pause
+// ─── Wordmark → home (reset to start screen) ─────────────────────────────────
+function goHome() {
+  spacetimeReversed = false; MAGNETIC_FORWARD = 1.0; reverseLerp = 0;
+  frameFrozen = false;
+  var stBtn = document.getElementById('btn-hud-spacetime');
+  if (stBtn) stBtn.classList.remove('active');
+  if (STATUS === 'playing' || STATUS === 'tumbling' || STATUS === 'void') {
+    doGameOver();
+    return;
+  }
+  // already on welcome/gameover — just show welcome
+  document.getElementById('screen-gameover').classList.remove('visible');
+  document.getElementById('screen-welcome').classList.add('visible');
+  STATUS = 'waiting';
+  startQuoteRotation();
+  updateHintLabel();
+}
+
+document.getElementById('hud-wordmark').addEventListener('click', goHome);
+document.getElementById('hud-wordmark').addEventListener('touchend', function(e) {
+  e.stopPropagation(); e.preventDefault();
+  goHome();
+}, { passive: false });
+
+// ─── Bottom HUD buttons ───────────────────────────────────────────────────────
+
+// menu button → open menu overlay (doctrine + dispatch)
+document.getElementById('btn-hud-menu').addEventListener('click', function() {
+  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
+});
+document.getElementById('btn-hud-menu').addEventListener('touchend', function(e) {
+  e.stopPropagation(); e.preventDefault();
+  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
+}, { passive: false });
+
+// pause button → freeze world, astronaut floats freely
+document.getElementById('btn-hud-pause').addEventListener('click', function() {
+  toggleFreeze();
+});
+document.getElementById('btn-hud-pause').addEventListener('touchend', function(e) {
+  e.stopPropagation(); e.preventDefault();
+  toggleFreeze();
+}, { passive: false });
+
+// space-time button → reverse/forward toggle (mobile only)
+var spacetimeReversed = false;
+
+function toggleSpacetime() {
+  if (STATUS !== 'playing') return;
+  spacetimeReversed = !spacetimeReversed;
+  var btn = document.getElementById('btn-hud-spacetime');
+  if (spacetimeReversed) {
+    // Snap into strong reverse
+    reverseLerp = REVERSE_LIMIT * 0.75;
+    MAGNETIC_FORWARD = -0.6;
+    if (btn) btn.classList.add('active');
+    showToast('reversing');
+  } else {
+    // Restore forward
+    reverseLerp = 0;
+    MAGNETIC_FORWARD = 1.0;
+    if (btn) btn.classList.remove('active');
+    showToast('forward');
+  }
+}
+
+// Only wire touch (mobile) — not click — so desktop wheel still works naturally
+document.getElementById('btn-hud-spacetime').addEventListener('touchend', function(e) {
+  e.stopPropagation(); e.preventDefault();
+  toggleSpacetime();
+}, { passive: false });
+// Desktop fallback (hidden on desktop anyway but safe)
+document.getElementById('btn-hud-spacetime').addEventListener('click', function() {
+  if (!isMobile) return;
+  toggleSpacetime();
+});
+
+// ─── Long-press on mobile → reset character orientation ──────────────────────
 var longPressTimer = null;
-var LONG_PRESS_MS  = 500;
+var LONG_PRESS_MS  = 600;
 
 document.addEventListener('touchstart', function(e) {
-  if (STATUS === 'gameover' || STATUS === 'waiting' || STATUS === 'void' || STATUS === 'tumbling') return;
+  if (STATUS !== 'playing') return;
   if (pauseActive) return;
   if (e.touches.length !== 1) { clearTimeout(longPressTimer); return; }
-  longPressTimer = setTimeout(pauseGame, LONG_PRESS_MS);
+  var topHud = document.getElementById('top-hud');
+  var botHud = document.getElementById('bottom-hud');
+  if (topHud && topHud.contains(e.target)) return;
+  if (botHud && botHud.contains(e.target)) return;
+  longPressTimer = setTimeout(function() {
+    humanoid.flipX = 0; humanoid.flipZ = 0;
+    humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
+    gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.75, duration: 0.5, ease: 'power3.out' });
+    showToast('orientation reset');
+  }, LONG_PRESS_MS);
 }, { passive: true });
 document.addEventListener('touchend',  function() { clearTimeout(longPressTimer); }, { passive: true });
 document.addEventListener('touchmove', function() { clearTimeout(longPressTimer); }, { passive: true });
@@ -2443,7 +2621,7 @@ function startQuoteRotation() {
 function stopQuoteRotation() { clearInterval(_quoteInterval); }
 
 window.addEventListener('load', function() {
-  hintEl = document.getElementById('hint-label');
+  var hintEl = document.getElementById('hint-label');
   isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
   createScene(); createLights(); buildWorld();
   refreshUI(); loop();
