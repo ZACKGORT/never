@@ -1025,17 +1025,14 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var butterflyReachZ = -bfNx * reachUrgency * 0.6 * momentumLimiter;
 
   // FORWARD LEAN arm pose: arms sweep forward and together, streamlined like Superman.
-  // At full forward force, arms point straight ahead (strong negative X = forward).
-  var fwdArmSweepX  = -ff2 * 1.80;  // arms pulled forward (streamlined)
-  var fwdArmNarrowZ = ff2 * 0.55;   // arms pulled in toward body centerline
+  var fwdArmSweepX  = -ff2 * 1.80;
+  var fwdArmNarrowZ = ff2 * 0.55;
 
-  // REVERSE FLAIL arm pose: both arms drag loosely behind/outward.
-  // Elbows drift outward & behind — like someone grabbing the astronaut's back.
-  var revArmFlailX  = rf2 * 1.40;   // arms swept back
-  var revArmWidenZ  = rf2 * 0.80;   // arms splay wide as they flail
-  // Add a lively oscillation during reverse so arms feel loose & chaotic
-  var flailWobbleR  = Math.sin(this.animTime * 3.1 + 0.0) * rf2 * 0.55;
-  var flailWobbleL  = Math.sin(this.animTime * 2.7 + 1.2) * rf2 * 0.55;
+  // REVERSE: arms trail behind smoothly — same inertia principle as hips, no wobble.
+  var revArmTrailX  = reverseForce * 0.90;  // arms pulled back linearly (like hipFold)
+  var revArmWidenZ  = reverseForce * 0.30;  // slight outward drift, no oscillation
+  var revElbowTrailX = reverseForce * 0.70;
+  var revElbowWidenZ = reverseForce * 0.20;
 
   var shoulderZ = 0.55 + poseLow * (-0.43) + poseHigh * 0.63;
   var elbowZ    = 0.20 + poseLow * (-0.10) + poseHigh * 0.50;
@@ -1043,42 +1040,37 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   // Right shoulder
   this.joints[0].restX = armReach - supermanPull + butterflyReachX
     + Math.sin(dRS.phaseX) * dRS.ampX * (1 - ff2 * 0.7)
-    + armTrail + fwdArmSweepX + revArmFlailX + flailWobbleR;
+    + armTrail + fwdArmSweepX + revArmTrailX;
   this.joints[0].restZ = (-shoulderZ + butterflyReachZ)
     + Math.sin(dRS.phaseZ) * dRS.ampZ * (1 - ff2 * 0.7)
     + sideDrift + fwdArmNarrowZ - revArmWidenZ;
   // Left shoulder
   this.joints[1].restX = armReach - supermanPull + butterflyReachX
     + Math.sin(dLS.phaseX) * dLS.ampX * (1 - ff2 * 0.7)
-    + armTrail + fwdArmSweepX + revArmFlailX + flailWobbleL;
+    + armTrail + fwdArmSweepX + revArmTrailX;
   this.joints[1].restZ = ( shoulderZ - butterflyReachZ)
     + Math.sin(dLS.phaseZ) * dLS.ampZ * (1 - ff2 * 0.7)
     + sideDrift - fwdArmNarrowZ + revArmWidenZ;
 
-  // ELBOW pose: forward = straight/locked ahead; reverse = floppy, trailing behind.
-  // "Elbows straight but not locked" forward = small positive X (gentle extension)
-  var fwdElbowX = -ff2 * 1.20;     // elbow extends forward, inline with upper arm
+  // Elbows: forward = extends inline, reverse = trails back, no wobble
+  var fwdElbowX      = -ff2 * 1.20;
   var fwdElbowNarrowZ = ff2 * 0.35;
-  var revElbowFlailX = rf2 * 1.10; // elbow swept back, loose
-  var revElbowWideZ  = rf2 * 0.65;
-  var elbowWobbleR = Math.sin(this.animTime * 3.5 + 0.5) * rf2 * 0.45;
-  var elbowWobbleL = Math.sin(this.animTime * 2.9 + 1.8) * rf2 * 0.45;
 
   this.joints[2].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65
     + Math.sin(dRE.phaseX) * dRE.ampX * (1 - ff2 * 0.8)
-    + armTrail * 0.6 + fwdElbowX + revElbowFlailX + elbowWobbleR;
+    + armTrail * 0.6 + fwdElbowX + revElbowTrailX;
   this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.5)
     + Math.sin(dRE.phaseZ) * dRE.ampZ * (1 - ff2 * 0.8)
-    + sideDrift * 0.75 + fwdElbowNarrowZ - revElbowWideZ;
+    + sideDrift * 0.75 + fwdElbowNarrowZ - revElbowWidenZ;
   this.joints[3].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65
     + Math.sin(dLE.phaseX) * dLE.ampX * (1 - ff2 * 0.8)
-    + armTrail * 0.6 + fwdElbowX + revElbowFlailX + elbowWobbleL;
+    + armTrail * 0.6 + fwdElbowX + revElbowTrailX;
   this.joints[3].restZ = ( elbowZ - butterflyReachZ * 0.5)
     + Math.sin(dLE.phaseZ) * dLE.ampZ * (1 - ff2 * 0.8)
-    + sideDrift * 0.75 - fwdElbowNarrowZ + revElbowWideZ;
+    + sideDrift * 0.75 - fwdElbowNarrowZ + revElbowWidenZ;
 
   // Leg Z spread: modest — never splay, never cross
-  var legZ    = 0.06 + poseLow * (-0.03) + poseHigh * 0.16;
+  var legZ    = 0.10 + poseLow * (-0.04) + poseHigh * 0.16;
   var legBack = poseLow * 0.28;
 
   // ── 5. Solve all joints ─────────────────────────────────────────────────
@@ -1103,11 +1095,11 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
 
       if (isHip) {
         j.restX = (0.08 - legBack - hipFold) + idleAnim + legTrail + fwdLegSweepX;
-        j.restZ = (i === 4 ? legZ : -legZ) + fwdLegNarrowZ
-          + (i === 4 ? legFlailZ : -legFlailZ)
+        j.restZ = (i === 4 ? -legZ : legZ) + fwdLegNarrowZ
+          + (i === 4 ? -legFlailZ : legFlailZ)
           + legWobble
           + Math.sin(this.animTime * 0.7 + i) * 0.08 * (1 - kneeLock * 0.6)
-          + (i === 4 ? sideDrift : -sideDrift) * 0.25;
+          + (i === 4 ? -sideDrift : sideDrift) * 0.25;
       } else {
         j.restX = (0.08 - legBack + idleAnim + legTrail + fwdLegSweepX) * (1 - kneeLock);
         j.restZ = (i === 5 ? -legZ : legZ) + fwdLegNarrowZ
@@ -2085,6 +2077,7 @@ function startGame() {
   refreshUI();
   stopQuoteRotation();
   updateHintLabel();
+  document.getElementById('world-fg').style.display = 'none';
   document.getElementById('screen-welcome').classList.remove('visible');
   document.getElementById('screen-gameover').classList.remove('visible');
 }
@@ -2897,9 +2890,17 @@ function loop() {
     if (cometSparkles.length) updateCometSparkles();
 
   } else {
-    // waiting / gameover — idle float
-    humanoid.mesh.position.y = 100 + Math.sin(Date.now()*0.001)*6;
+    // waiting / gameover — float above the welcome text, rendered on top of the overlay
+    humanoid.mesh.position.x = 0;
+    humanoid.mesh.position.y = 152 + Math.sin(Date.now()*0.001)*5;
     humanoid.update(0, 0, 0, 0, 0);
+    renderer.render(scene, camera);
+    // Punch astronaut through the screen overlay using the fg layer (z-index 70)
+    document.getElementById('world-fg').style.display = 'block';
+    sea.mesh.visible = false; sky.mesh.visible = false;
+    fgRenderer.render(scene, camera);
+    sea.mesh.visible = true; sky.mesh.visible = true;
+    return;
   }
 
   renderer.render(scene, camera);
