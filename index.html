@@ -354,6 +354,25 @@
     display: none;
   }
 
+  /* Pause overlay close button */
+  #btn-menu-close {
+    position: absolute;
+    top: 18px; right: 18px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.45);
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: color 0.2s, background 0.2s;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    z-index: 2;
+  }
+  #btn-menu-close:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.1); }
+
   /* Pause bento overlay */
   #pause-overlay {
     position: fixed; inset: 0;
@@ -550,6 +569,7 @@
 </div>
 
 <div id="pause-overlay">
+  <button id="btn-menu-close" aria-label="close menu">&#x2715;</button>
   <div class="bento-grid">
 
     <div class="bento-card bento-manifesto">
@@ -2547,10 +2567,23 @@ document.addEventListener('touchstart', function(e) {
 document.addEventListener('touchend',  function() { clearTimeout(longPressTimer); }, { passive: true });
 document.addEventListener('touchmove', function() { clearTimeout(longPressTimer); }, { passive: true });
 
-// Tap pause overlay background to resume
-document.getElementById('pause-overlay').addEventListener('click', function(e) {
-  if (e.target === this) resumeGame();
+// Close button (× — reliable on mobile)
+var closeBtn = document.getElementById('btn-menu-close');
+if (closeBtn) {
+  closeBtn.addEventListener('click', function(e) { e.stopPropagation(); closeMenu(); });
+  closeBtn.addEventListener('touchend', function(e) {
+    e.stopPropagation(); e.preventDefault(); closeMenu();
+  }, { passive: false });
+}
+
+// Tap / touch backdrop to dismiss
+var overlayEl = document.getElementById('pause-overlay');
+overlayEl.addEventListener('click', function(e) {
+  if (e.target === this) closeMenu();
 });
+overlayEl.addEventListener('touchend', function(e) {
+  if (e.target === this) { e.preventDefault(); closeMenu(); }
+}, { passive: false });
 
 // ─── Welcome quotes ────────────────────────────────────────────────────────
 var QUOTES = [
