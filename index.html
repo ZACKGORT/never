@@ -758,7 +758,7 @@ function makeBox(w, h, d, mat) {
 // ─── RAGDOLL ───────────────────────────────────────────────────────────────
 function RagdollHuman() {
   this.mesh = new THREE.Object3D();
-  this.mesh.rotation.y = Math.PI * 0.75;
+  this.mesh.rotation.y = Math.PI * 0.5;
   this.baseRotX = -0.55;
   this.baseRotZ = 0;
   this.flipX = 0;
@@ -790,20 +790,43 @@ function RagdollHuman() {
   torsoU.position.set(0, 15, 0); torsoU.castShadow = true;
   this.mesh.add(torsoU);
 
-  var pack = makeBox(18, 22, 10, packMat);
-  pack.position.set(0, 0, -12); pack.castShadow = true;
+  var pack = makeBox(26, 30, 14, packMat);
+  pack.position.set(0, 0, -14); pack.castShadow = true;
   torsoU.add(pack);
 
-  var lThruster = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 3.5, 8, 8), thrusterMat);
-  lThruster.position.set(-6, -11, 0); pack.add(lThruster);
-  var rThruster = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 3.5, 8, 8), thrusterMat);
-  rThruster.position.set(6, -11, 0); pack.add(rThruster);
+  // Ridge detail across the pack
+  var packRidge = makeBox(28, 4, 16, thrusterMat);
+  packRidge.position.set(0, 4, 0);
+  pack.add(packRidge);
 
-  this.lFlame = new THREE.Mesh(new THREE.ConeGeometry(2.5, 12, 8), this.flameMat);
-  this.lFlame.position.set(0, -9, 0); this.lFlame.rotation.x = Math.PI;
+  // Fuel line nubs
+  var fuelMat = new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true });
+  var fuelL = makeBox(3, 18, 3, fuelMat);
+  fuelL.position.set(-10, -4, 6); pack.add(fuelL);
+  var fuelR = makeBox(3, 18, 3, fuelMat);
+  fuelR.position.set(10, -4, 6); pack.add(fuelR);
+
+  var lThruster = new THREE.Mesh(new THREE.CylinderGeometry(4, 5.5, 12, 10), thrusterMat);
+  lThruster.position.set(-9, -17, 0); pack.add(lThruster);
+  var rThruster = new THREE.Mesh(new THREE.CylinderGeometry(4, 5.5, 12, 10), thrusterMat);
+  rThruster.position.set(9, -17, 0); pack.add(rThruster);
+
+  // Thruster rim rings
+  var rimMat = new THREE.MeshPhongMaterial({ color: 0xaaaaaa, flatShading: true });
+  var lRim = new THREE.Mesh(new THREE.CylinderGeometry(5.8, 5.8, 2, 10), rimMat);
+  lRim.position.set(0, -7, 0); lThruster.add(lRim);
+  var rRim = new THREE.Mesh(new THREE.CylinderGeometry(5.8, 5.8, 2, 10), rimMat);
+  rRim.position.set(0, -7, 0); rThruster.add(rRim);
+
+  // Store thruster refs so we can get world positions for puff spawning
+  this.lThruster = lThruster;
+  this.rThruster = rThruster;
+
+  this.lFlame = new THREE.Mesh(new THREE.ConeGeometry(4, 16, 10), this.flameMat);
+  this.lFlame.position.set(0, -12, 0); this.lFlame.rotation.x = Math.PI;
   lThruster.add(this.lFlame);
-  this.rFlame = new THREE.Mesh(new THREE.ConeGeometry(2.5, 12, 8), this.flameMat);
-  this.rFlame.position.set(0, -9, 0); this.rFlame.rotation.x = Math.PI;
+  this.rFlame = new THREE.Mesh(new THREE.ConeGeometry(4, 16, 10), this.flameMat);
+  this.rFlame.position.set(0, -12, 0); this.rFlame.rotation.x = Math.PI;
   rThruster.add(this.rFlame);
 
   var torsoL = makeBox(22, 12, 14, this.suitMat);
@@ -909,8 +932,8 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   this.animTime += 0.08;
 
   // ── Scroll forces ────────────────────────────────────────────────────────
-  var reverseForce = Math.max(0, -reverseLerp) / 2.2;
-  var forwardForce = Math.max(0,  reverseLerp) / 1.2;
+  var reverseForce = Math.max(0, -reverseLerp) / 3.8;
+  var forwardForce = Math.max(0,  reverseLerp) / 2.4;
   var inertiaPitch = forwardForce * 0.40 - reverseForce * 0.35;
   var armTrail     = forwardForce * 0.75 - reverseForce * 0.65;
   var sideDrift    = forwardForce * 0.50 - reverseForce * 0.50;
@@ -935,19 +958,20 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   this.mesh.rotation.z = this.baseRotZ + this.flipZ;
   this.mesh.rotation.x = this.baseRotX + this.flipX;
 
-  // Facing: always try to face the butterfly (cursor).
-  // bfDx > 0 = butterfly is to the right → face right (angle near PI*0.75)
-  // bfDx < 0 = butterfly is to the left  → face left  (angle near PI*1.75 / -PI*0.25)
-  // Use atan2-style mapping: center = PI*0.75 (default right-facing),
-  // full left swing to PI*1.75 when cursor is hard left.
+  // Facing: default is right-profile (PI*0.5 = pointed at right viewport edge).
+  // Cursor sways him toward camera (y → 0) when cursor is above/near,
+  // or away from camera (y → PI) when cursor pulls far away — a natural lean.
+  // dx (cursor left/right offset) adds a gentle left-right yaw on top.
   var bfAngle;
   if (typeof dx !== 'undefined' && dx !== null) {
-    // dx is the vector from astronaut to cursor. Normalize to [-1,1] over ~200 world units.
-    var facingBias = Math.max(-1, Math.min(1, dx / 120));
-    // Map: facingBias +1 (right) → PI*0.55, facingBias -1 (left) → PI*1.55
-    bfAngle = Math.PI * 0.75 - facingBias * Math.PI * 0.55;
+    // Lateral sway: small left/right yaw from cursor X offset
+    var lateralBias = Math.max(-1, Math.min(1, dx / 150));
+    // Depth sway: cursor Y offset tilts toward (positive dy = above) or away from camera
+    var depthBias   = Math.max(-1, Math.min(1, (dy || 0) / 120));
+    // Base: PI*0.5 (right-profile). Lateral shifts ±0.18rad. Depth tilts ±0.38rad toward/away cam.
+    bfAngle = Math.PI * 0.5 - lateralBias * 0.18 + depthBias * 0.38;
   } else {
-    bfAngle = Math.PI * 0.75;
+    bfAngle = Math.PI * 0.5;
   }
   this.mesh.rotation.y += (bfAngle - this.mesh.rotation.y) * 0.06;
 
@@ -1292,6 +1316,90 @@ function updateSmoke() {
   }
 }
 
+// ─── Jetpack Air Puffs ─────────────────────────────────────────────────────
+// Flat torus rings that billow out opposite to thrust direction — cosmetic only
+var airPuffs = [];
+var airPuffPool = [];
+
+function AirPuff() {
+  // Thin flat ring — torusGeometry(radius, tube, radialSegs, tubularSegs)
+  var g = new THREE.TorusGeometry(5, 1.2, 5, 12);
+  var m = new THREE.MeshBasicMaterial({ color: 0x88ddff, transparent: true, opacity: 0, depthWrite: false });
+  this.mesh = new THREE.Mesh(g, m);
+  this.mesh.visible = false;
+  scene.add(this.mesh);
+}
+
+// _wp reused in spawnAirPuffs to avoid GC
+
+function spawnAirPuffs(vx, vy, bfDx, bfDy) {
+  if (!humanoid) return;
+
+  // Only fire occasionally — random chance, weighted by how hard the cursor is pulling
+  var cursorPull = Math.sqrt(bfDx * bfDx + bfDy * bfDy);
+  var chance = 0.012 + Math.min(0.03, cursorPull * 0.0004);
+  if (Math.random() > chance) return;
+
+  // Pick one nozzle at random
+  var wp = new THREE.Vector3();
+  (Math.random() < 0.5 ? humanoid.lThruster : humanoid.rThruster).getWorldPosition(wp);
+
+  // Drift away from where the cursor is pulling — opposite the reach direction
+  var bfLen = Math.max(1, cursorPull);
+  var ejVx = -(bfDx / bfLen) * (0.4 + Math.random() * 0.5);
+  var ejVy = -(bfDy / bfLen) * (0.4 + Math.random() * 0.5) - 0.6;
+  var ejVz = (Math.random() - 0.5) * 0.5;
+
+  var p = airPuffPool.length ? airPuffPool.pop() : new AirPuff();
+  p.mesh.position.set(
+    wp.x + (Math.random() - 0.5) * 4,
+    wp.y - 5 + (Math.random() - 0.5) * 4,
+    wp.z + (Math.random() - 0.5) * 4
+  );
+  p.mesh.rotation.set(
+    Math.PI * 0.5 + (Math.random() - 0.5) * 0.6,
+    (Math.random() - 0.5) * 0.5,
+    (Math.random() - 0.5) * 0.5
+  );
+  p.mesh.scale.setScalar(0.12 + Math.random() * 0.1);
+  p.mesh.material.opacity = 0;
+  p.mesh.material.color.setHex(Math.random() < 0.25 ? 0xffffff : 0x88ddff);
+  p.mesh.visible = true;
+  p.vx = ejVx; p.vy = ejVy; p.vz = ejVz;
+  p.life = 1.0;
+  p.decay = 0.018 + Math.random() * 0.014;  // slower fade — more time to appreciate it
+  p.peakOpacity = 0.18 + Math.random() * 0.10;
+  p.growRate = 0.07 + Math.random() * 0.05;
+  airPuffs.push(p);
+}
+
+function updateAirPuffs() {
+  for (var i = airPuffs.length - 1; i >= 0; i--) {
+    var p = airPuffs[i];
+    p.life -= p.decay;
+    if (p.life <= 0) {
+      p.mesh.visible = false;
+      airPuffPool.push(p);
+      airPuffs.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.x += p.vx;
+    p.mesh.position.y += p.vy;
+    p.mesh.position.z += p.vz;
+    p.vx *= 0.92; p.vy *= 0.94;
+    // Ring expands as it dissipates
+    var s = (0.18 + (1 - p.life) * p.growRate * 14);
+    p.mesh.scale.setScalar(s);
+    // Fade in quickly, then fade out
+    var lifePhase = p.life;
+    p.mesh.material.opacity = lifePhase > 0.7
+      ? p.peakOpacity * ((1 - lifePhase) / 0.3)   // fade in
+      : p.peakOpacity * (lifePhase / 0.7);          // fade out
+    // Slow rotation as ring expands
+    p.mesh.rotation.z += 0.015;
+  }
+}
+
 // ─── Comet tail sparkles ───────────────────────────────────────────────────
 var cometSparkles = [];
 var cometSparklePool = [];
@@ -1575,8 +1683,8 @@ document.addEventListener('touchmove', function(e) {
     var midY = (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
     var delta = touchState.twoStartY - midY;
     touchState.twoStartY = midY;
-    reverseLerp += delta * 0.004;
-    reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.2, reverseLerp));
+    reverseLerp += delta * 0.007;
+    reverseLerp = Math.max(REVERSE_LIMIT, Math.min(2.4, reverseLerp));
     return;
   }
   if (!touchState.active) return;
@@ -1619,11 +1727,11 @@ document.addEventListener('touchend', function(e) {
 }, { passive: false });
 
 var reverseLerp = 0.0;
-var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -2.2;
+var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -3.8;
 
 window.addEventListener('wheel', function(e) {
-  reverseLerp += e.deltaY * 0.0012;
-  reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.2, reverseLerp));
+  reverseLerp += e.deltaY * 0.0022;
+  reverseLerp = Math.max(REVERSE_LIMIT, Math.min(2.4, reverseLerp));
 }, { passive: true });
 
 window.addEventListener('pointerdown', function(e) {
@@ -2227,6 +2335,7 @@ function loop() {
       humanoid.update(butterfly.vx*0.003, butterfly.vy*0.003, orbHolder.speed, bfDxP, bfDyP);
       updateBursts();
       if (cometSparkles.length) updateCometSparkles();
+      if (airPuffs.length) updateAirPuffs();
       renderer.render(scene, camera);
       sea.mesh.visible = false; sky.mesh.visible = false;
       orbHolder.mesh.visible = false; canHolder.mesh.visible = false; boxHolder.mesh.visible = false;
@@ -2252,6 +2361,7 @@ function loop() {
       updateBursts();
       if (smokeParticles.length) updateSmoke();
       if (cometSparkles.length) updateCometSparkles();
+      if (airPuffs.length) updateAirPuffs();
       renderer.render(scene, camera);
       return;
     }
@@ -2280,6 +2390,11 @@ function loop() {
       var newSpd = orbHolder.speed + 0.3;
       orbHolder.speed = canHolder.speed = boxHolder.speed = newSpd;
       spawnInt = Math.max(22, spawnInt - 3);
+    }
+
+    // Jetpack air puffs — occasional, cursor-influenced
+    if (!humanoid.singularity) {
+      spawnAirPuffs(butterfly.vx, butterfly.vy, bfDx, bfDy);
     }
 
     // Comet tail
@@ -2456,6 +2571,7 @@ function loop() {
     orbHolder.update(); canHolder.update(); boxHolder.update();
     updateBursts(); checkCollisions();
     if (smokeParticles.length) updateSmoke();
+    if (airPuffs.length) updateAirPuffs();
 
     if (frame % 10 === 0) refreshUI();
 
@@ -2529,7 +2645,7 @@ function loop() {
       tumble.liftProgress = 0; tumble.velX = 0; tumble.velY = 0;
       humanoid.flipX = 0; humanoid.flipZ = 0;
       humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
-      gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.75, duration: 0.6, ease: "power3.out" });
+      gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.5, duration: 0.6, ease: "power3.out" });
       if (liftHint) liftHint.classList.remove('visible');
     }
     updateBursts();
@@ -2645,7 +2761,7 @@ document.addEventListener('touchstart', function(e) {
   longPressTimer = setTimeout(function() {
     humanoid.flipX = 0; humanoid.flipZ = 0;
     humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
-    gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.75, duration: 0.5, ease: 'power3.out' });
+    gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.5, duration: 0.5, ease: 'power3.out' });
     showToast('orientation reset');
   }, LONG_PRESS_MS);
 }, { passive: true });
