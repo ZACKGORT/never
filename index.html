@@ -28,18 +28,20 @@
     top: 14px; left: 50%;
     transform: translateX(-50%);
     z-index: 55;
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    white-space: nowrap;
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 100px;
-    padding: 7px 18px;
+    padding: 7px 22px;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.4s;
     touch-action: manipulation;
+    overflow: visible;
   }
   #top-hud.visible { opacity: 1; pointer-events: all; }
   #hud-wordmark {
@@ -48,14 +50,16 @@
     font-weight: 600;
     letter-spacing: -0.01em;
     cursor: pointer;
-    padding: 2px 0;
+    padding: 2px 4px 2px 0;
     user-select: none;
+    display: inline-block;
   }
   #hud-wordmark .hud-main {
-    background: linear-gradient(100deg, #ffffff 0%, #b8d8ea 45%, #68c3c0 100%);
+    background: linear-gradient(100deg, #ffffff 0%, #b8d8ea 40%, #68c3c0 90%, #68c3c0 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    padding-right: 2px;
   }
   #hud-wordmark .hud-tld {
     background: linear-gradient(100deg, #68c3c0 0%, #4a9ea0 100%);
@@ -585,7 +589,7 @@
         <br>
         <p>need air. seeking gravity.</p>
         <br>
-        <p>anyway, this is a metaphor for life.</p>
+        <p>Anyway, this is a metaphor for life.</p>
         <span class="manifesto-sign">— zack</span>
       </div>
       <button class="bento-resume" id="btn-pause-resume">spacebar to space-out</button>
@@ -1888,7 +1892,7 @@ function doGameOver() {
   if (totalSecs < 30) {
     var screen = document.getElementById('screen-gameover');
     screen.innerHTML =
-      '<h1>hi there.</h1>' +
+      '<h1>still here</h1>' +
       '<p class="sol-label">sol ' + solNumber + '</p>' +
       '<p class="sub" style="max-width:320px;text-align:center;color:rgba(255,255,255,0.45);font-size:0.9em;line-height:1.7;margin-bottom:2em;">' +
         'You\'re just getting oriented.<br>The environment takes a moment to read.' +
