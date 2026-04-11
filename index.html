@@ -155,7 +155,7 @@
   }
   /* direction arrows visible on mobile only */
   @media (hover: hover) and (pointer: fine) {
-    .hud-arrows-only { display: none !important; }
+    #bottom-hud { display: none !important; }
   }
   body {
     font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Arial, sans-serif;
@@ -559,13 +559,11 @@
 <!-- Toast banner area: top center, stacked -->
 <div id="toast-banner-area"></div>
 
-<!-- Bottom HUD: reverse | menu | forward (arrows mobile-only, menu always) -->
+<!-- Bottom HUD: reverse | forward (mobile only) -->
 <div id="bottom-hud">
-  <button id="btn-hud-back" class="hud-btn hud-arrows-only">&#8592;</button>
-  <div class="hud-sep hud-arrows-only"></div>
-  <button id="btn-hud-menu" class="hud-btn">menu</button>
-  <div class="hud-sep hud-arrows-only"></div>
-  <button id="btn-hud-fwd" class="hud-btn hud-arrows-only">&#8594;</button>
+  <button id="btn-hud-back" class="hud-btn">&#8592;</button>
+  <div class="hud-sep"></div>
+  <button id="btn-hud-fwd" class="hud-btn">&#8594;</button>
 </div>
 
 <div id="pause-overlay">
@@ -1778,7 +1776,8 @@ function startGame() {
   document.getElementById('lift-hint').classList.remove('visible');
   document.getElementById('world').style.background = 'linear-gradient(180deg,#020111 0%,#0d0820 100%)';
   // Clear toasts
-  document.getElementById('toast-container').innerHTML = '';
+  var toastArea = document.getElementById('toast-banner-area');
+  if (toastArea) toastArea.innerHTML = '';
   // Restore scene
   if (sea) { sea.mesh.visible = true; sky.mesh.visible = true; }
   if (orbHolder) { orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true; }
@@ -2629,10 +2628,6 @@ function wireBtn(id, fn) {
 
 wireBtn('btn-hud-back', function() { setDirection(directionState === -1 ? 1 : -1); });
 wireBtn('btn-hud-fwd',  function() { setDirection(directionState === 1  ? -1 : 1); });
-
-wireBtn('btn-hud-menu', function() {
-  if (STATUS === 'playing' || STATUS === 'tumbling') openMenu();
-});
 
 
 // ─── Long-press on mobile → reset character orientation ──────────────────────
