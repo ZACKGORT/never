@@ -1898,6 +1898,7 @@ document.addEventListener('touchend', function(e) {
   touchState.twoFinger = false;
   if (!touchState.active) return;
   if (!touchState.hasMoved && STATUS === 'playing') {
+    if (longPressFired) { longPressFired = false; touchState.active = false; touchState.id = null; return; }
     humanoid.reachFade = 0;
     gsap.to(humanoid, {
       flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 3.5,
@@ -3019,6 +3020,7 @@ wireBtn('btn-hud-fwd',  function() { setDirection(directionState === 1  ? -1 : 1
 
 // ─── Long-press on mobile → reset character orientation ──────────────────────
 var longPressTimer = null;
+var longPressFired = false;
 var LONG_PRESS_MS  = 600;
 
 document.addEventListener('touchstart', function(e) {
@@ -3029,8 +3031,10 @@ document.addEventListener('touchstart', function(e) {
   var botHud = document.getElementById('bottom-hud');
   if (topHud && topHud.contains(e.target)) return;
   if (botHud && botHud.contains(e.target)) return;
+  longPressFired = false;
   clearTimeout(longPressTimer);
   longPressTimer = setTimeout(function() {
+    longPressFired = true;
     humanoid.flipX = 0; humanoid.flipZ = 0;
     humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
     showToast('orientation reset');
