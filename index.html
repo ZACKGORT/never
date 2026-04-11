@@ -934,58 +934,67 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   // ── Scroll forces ────────────────────────────────────────────────────────
   var reverseForce = Math.max(0, -reverseLerp) / 3.8;
   var forwardForce = Math.max(0,  reverseLerp) / 2.4;
-  // Squared versions for smooth acceleration feel
-  var ff2 = forwardForce * forwardForce;
-  var rf2 = reverseForce * reverseForce;
-
   var inertiaPitch = forwardForce * 0.40 - reverseForce * 0.35;
   var armTrail     = forwardForce * 0.75 - reverseForce * 0.65;
   var sideDrift    = forwardForce * 0.50 - reverseForce * 0.50;
 
   // scrollIntensity: 0 at rest, 1 at full forward or reverse scroll
+  // Smoothed so it doesn't snap — driven by the raw lerp values
   var scrollIntensity = Math.min(1, Math.max(forwardForce, reverseForce) * 1.6);
 
   // ── 1. Body ───────────────────────────────────────────────────────────────
   var altFactor = Math.max(0, Math.min(1, (this.mesh.position.y - 25) / 150));
+
+  // Altitude pose zones (smooth, no hard edges)
+  // poseLow:  1 at ground, fades to 0 at altFactor=0.38 (≈y=82)
+  // poseHigh: 0 below altFactor=0.62 (≈y=118), rises to 1 at top
   var poseLow  = Math.max(0, 1 - altFactor / 0.38);
   var poseHigh = Math.max(0, (altFactor - 0.62) / 0.38);
 
-  // FORWARD LEAN: progressively nose-dive like Superman cutting through space.
-  // At full forward scroll, body pitches to fully horizontal (-PI/2).
+  // Superman (low): flat, nose-down, body horizontal
+  // Baumgartner (high): upright, spread-eagle
   var baseBodyX = (-1.05 + altFactor * 0.80) + inertiaPitch;
+  // At high scroll intensity blend toward fully horizontal (-PI/2 ≈ -1.57)
   var supermanX = -Math.PI * 0.5;
-  // Smooth cubic ease for the lean — feels like acceleration building
-  var forwardLeanBlend = ff2 * forwardForce; // cubic — slow start, strong at peak
-  var targetBodyX = baseBodyX + (supermanX - baseBodyX) * forwardLeanBlend * 0.72;
-
-  // REVERSE FLAIL: pulled from behind — hips, shoulders, head all trail behind.
-  // Body arches *backward* (positive X rotation = chest-up, head-back).
-  var reverseArchX = rf2 * 0.90; // body arches backward at the chest
-  targetBodyX += reverseArchX;
-
+  var targetBodyX = baseBodyX + (supermanX - baseBodyX) * scrollIntensity * scrollIntensity;
   var leanZ = -accelX * 0.8;
 
   this.baseRotZ += (leanZ       - this.baseRotZ) * 0.10;
-  this.baseRotX += (targetBodyX - this.baseRotX) * 0.038;
+  this.baseRotX += (targetBodyX - this.baseRotX) * 0.06;
 
   this.mesh.rotation.z = this.baseRotZ + this.flipZ;
   this.mesh.rotation.x = this.baseRotX + this.flipX;
 
-  // Facing yaw
+  // At high scroll intensity, snap facing to clean right-profile (PI*0.5)
+  // so visor isn't pointing at the floor while supermanning
   var supermanFacingTarget = Math.PI * 0.5;
-  var facingSnapStrength = forwardLeanBlend * 0.14;
+  var facingSnapStrength = scrollIntensity * scrollIntensity * 0.12; // blends on top of normal facing lerp
 
+  this.baseRotZ += (leanZ       - this.baseRotZ) * 0.10;
+  this.baseRotX += (targetBodyX - this.baseRotX) * 0.06;
+
+  this.mesh.rotation.z = this.baseRotZ + this.flipZ;
+  this.mesh.rotation.x = this.baseRotX + this.flipX;
+
+  // Facing: cursor X position drives yaw along the camera axis.
+  // Cursor left of astronaut → face toward camera (y → 0, visor visible).
+  // Cursor right of astronaut → face ahead/right (y → PI*0.5, pure profile).
+  // dy adds a small depth tilt so upward pulls show more of the visor.
   var bfAngle;
   if (typeof dx !== 'undefined' && dx !== null) {
+    // lateralBias: -1 = cursor hard left, +1 = cursor hard right
     var lateralBias = Math.max(-1, Math.min(1, dx / 130));
+    // Map: hard left → 0 (camera-facing), hard right → PI*0.5 (profile)
+    // Center rests at PI*0.25 (nice three-quarter view)
     bfAngle = Math.PI * 0.25 + lateralBias * Math.PI * 0.25;
+    // Small dy tilt: cursor above nudges slightly more toward camera
     var depthTilt = Math.max(-1, Math.min(1, (dy || 0) / 140));
     bfAngle -= depthTilt * 0.12;
   } else {
     bfAngle = Math.PI * 0.25;
   }
   this.mesh.rotation.y += (bfAngle - this.mesh.rotation.y) * 0.06;
-  // During forward lean, snap to right-profile so visor faces forward
+  // Superman scroll: additionally pull toward clean right-profile
   this.mesh.rotation.y += (supermanFacingTarget - this.mesh.rotation.y) * facingSnapStrength;
 
   // ── 2. Thruster flames ──────────────────────────────────────────────────
@@ -1002,77 +1011,61 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var dRS = this.armDrift[0], dLS = this.armDrift[1],
       dRE = this.armDrift[2], dLE = this.armDrift[3];
 
-  // ── 4. Limb poses ────────────────────────────────────────────────────────
+  // ── 4. Altitude-blended limb poses ──────────────────────────────────────
+  // Superman (low): arms thrust forward, narrow Z, legs stream back together
+  // Baumgartner (high): arms spread wide, legs spread, body upright
   var distFromCenter  = Math.sqrt(mouse.x * mouse.x + mouse.y * mouse.y);
   var centerProximity = Math.max(0, 1 - distFromCenter / Math.SQRT2);
 
+  // Butterfly reach: arms strain toward the cursor.
+  // bfDist (distance to butterfly) and direction determine arm pose.
+  // When butterfly is far away, arms reach more desperately; when close, relax.
   var bfDist  = (this.butterflyDist !== undefined) ? this.butterflyDist : 0;
   var bfDx    = (this.butterflyDx   !== undefined) ? this.butterflyDx   : 0;
   var bfDy    = (this.butterflyDy   !== undefined) ? this.butterflyDy   : 0;
+
+  // Normalised direction to butterfly (in world-space 2D, X/Y)
   var bfLen   = Math.max(1, bfDist);
-  var bfNx    = bfDx / bfLen;
-  var bfNy    = bfDy / bfLen;
+  var bfNx    = bfDx / bfLen; // +1 = butterfly right, -1 = left
+  var bfNy    = bfDy / bfLen; // +1 = butterfly up,   -1 = down
+
+  // Reach urgency: 0 when butterfly is touching the astronaut, 1 when far away
   var reachUrgency = Math.min(1, bfDist / 80);
 
+  // Momentum resistance — physics limits how far arms can reach when moving fast
   var bodySpeed = Math.sqrt((typeof accelX === 'number' ? accelX : 0) * (typeof accelX === 'number' ? accelX : 0) +
                             (typeof accelY === 'number' ? accelY : 0) * (typeof accelY === 'number' ? accelY : 0));
-  var momentumLimiter = Math.max(0.25, 1.0 - bodySpeed * 18);
+  var momentumLimiter = Math.max(0.25, 1.0 - bodySpeed * 18); // high speed = arms dragged back
 
+  // Base reach from altitude pose (keeping existing pose system)
   var armReach = 0.65 - centerProximity * 2.2;
   var supermanPull = poseLow * 0.75;
 
+  // Butterfly overlay: arms tilt toward the butterfly direction
+  // bfNy > 0 (butterfly up) → arms reach upward (more negative X rotation = forward/up)
+  // bfNx: butterfly left/right → asymmetric shoulder Z
   var butterflyReachX = -bfNy * reachUrgency * 1.2 * momentumLimiter;
   var butterflyReachZ = -bfNx * reachUrgency * 0.6 * momentumLimiter;
-
-  // ARM PHYSICS block follows (inertia-based, no flail)
-
-  // ARM PHYSICS: pure inertia — arms have mass, lag opposite to direction of travel.
-  // Going forward → arms trail back (positive X). Reversing → arms trail forward (negative X).
-  // No oscillation or flailing — shoulder swivels from joint, elbows hang nearly straight.
-  // armTrail is already signed correctly: positive forward, negative reverse.
-  var armInertiaX  = armTrail * 0.85;   // shoulder lags: forward=back, reverse=forward
-  var elbowInertiaX = armTrail * 0.30;  // elbow flexes slightly with inertia, mostly straight
-
-  // Gentle lateral effect only — no dramatic splay or centerline pull
-  var fwdArmNarrowZ = ff2 * 0.18;   // very slight arm narrowing at speed
-  var revArmSpreadZ = rf2 * 0.14;   // very slight spread pulling back
 
   var shoulderZ = 0.55 + poseLow * (-0.43) + poseHigh * 0.63;
   var elbowZ    = 0.20 + poseLow * (-0.10) + poseHigh * 0.50;
 
-  // Right shoulder — trails from inertia; idle drift scales back as speed increases
-  this.joints[0].restX = armReach - supermanPull + butterflyReachX
-    + Math.sin(dRS.phaseX) * dRS.ampX * (1 - scrollIntensity * 0.6)
-    + armInertiaX;
-  this.joints[0].restZ = (-shoulderZ + butterflyReachZ)
-    + Math.sin(dRS.phaseZ) * dRS.ampZ * (1 - scrollIntensity * 0.6)
-    + sideDrift - fwdArmNarrowZ + revArmSpreadZ;
-  // Left shoulder
-  this.joints[1].restX = armReach - supermanPull + butterflyReachX
-    + Math.sin(dLS.phaseX) * dLS.ampX * (1 - scrollIntensity * 0.6)
-    + armInertiaX;
-  this.joints[1].restZ = ( shoulderZ - butterflyReachZ)
-    + Math.sin(dLS.phaseZ) * dLS.ampZ * (1 - scrollIntensity * 0.6)
-    + sideDrift + fwdArmNarrowZ - revArmSpreadZ;
-
-  // ELBOWS: nearly straight (resting ~0.10), small inertia flex, no flailing.
-  // "Not locked" = slight natural angle; arms go straight-ish in both directions.
-  this.joints[2].restX = 0.10 + centerProximity * -0.5 + butterflyReachX * 0.40
-    + Math.sin(dRE.phaseX) * dRE.ampX * (1 - scrollIntensity * 0.65)
-    + elbowInertiaX;
-  this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.5)
-    + Math.sin(dRE.phaseZ) * dRE.ampZ * (1 - scrollIntensity * 0.65)
-    + sideDrift * 0.35;
-  this.joints[3].restX = 0.10 + centerProximity * -0.5 + butterflyReachX * 0.40
-    + Math.sin(dLE.phaseX) * dLE.ampX * (1 - scrollIntensity * 0.65)
-    + elbowInertiaX;
-  this.joints[3].restZ = ( elbowZ - butterflyReachZ * 0.5)
-    + Math.sin(dLE.phaseZ) * dLE.ampZ * (1 - scrollIntensity * 0.65)
-    + sideDrift * 0.35;
+  // Right shoulder (index 0): mirror butterfly Z offset
+  this.joints[0].restX = armReach - supermanPull + butterflyReachX + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
+  this.joints[0].restZ = (-shoulderZ + butterflyReachZ) + Math.sin(dRS.phaseZ) * dRS.ampZ + sideDrift;
+  // Left shoulder (index 1): same reach X, opposite Z mirror
+  this.joints[1].restX = armReach - supermanPull + butterflyReachX + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
+  this.joints[1].restZ = ( shoulderZ - butterflyReachZ) + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
+  // Elbows follow suit
+  this.joints[2].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
+  this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.5) + Math.sin(dRE.phaseZ) * dRE.ampZ + sideDrift * 0.75;
+  this.joints[3].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
+  this.joints[3].restZ = ( elbowZ - butterflyReachZ * 0.5) + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
 
   // Leg Z spread: together (±0.03) → default (±0.06) → wide (±0.42)
-  var legZ    = 0.06 + poseLow * (-0.03) + poseHigh * 0.36;
-  var legBack = poseLow * 0.28;
+  var legZ      = 0.06 + poseLow * (-0.03) + poseHigh * 0.36;
+  // Leg X: pull back in superman, spread slightly in baumgartner
+  var legBack   = poseLow * 0.28;
 
   // ── 5. Solve all joints ─────────────────────────────────────────────────
   for (var i = 0; i < this.joints.length; i++) {
@@ -1081,34 +1074,19 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
     if (i >= 4) {
       var legTrail  = forwardForce * 0.55 - reverseForce * 0.55;
       var isHip     = (i === 4 || i === 6);
-
-      // FORWARD: legs stream back tightly together behind the body (streamlined).
-      var fwdLegSweepX  =  ff2 * 0.60;  // legs trail back (positive = rotate back)
-      var fwdLegNarrowZ = -ff2 * 0.04;  // legs pinch slightly together
-
-      // REVERSE FLAIL: hips fold toward chest, legs splay wide & oscillate loosely.
-      var hipFold  = reverseForce * 1.05;
-      var kneeLock = Math.min(1, reverseForce * 1.2);
-      // Legs flail with loose oscillation when being pulled backward
-      var legFlailZ  = rf2 * 0.50;
-      var legWobble  = Math.sin(this.animTime * 2.5 + i * 1.3) * rf2 * 0.35 * (1 - kneeLock);
-      var idleAnim   = Math.sin(this.animTime * 0.9 + i) * 0.12 * (1 - kneeLock);
+      // Reverse pull: hips fold forward, knees lock straight
+      var hipFold   = reverseForce * 1.05;  // thighs rotate toward chest
+      var kneeLock  = Math.min(1, reverseForce * 1.2); // 0 = free, 1 = locked straight
+      var idleAnim  = Math.sin(this.animTime * 0.9 + i) * 0.12 * (1 - kneeLock);
 
       if (isHip) {
-        j.restX = (0.08 - legBack - hipFold) + idleAnim + legTrail + fwdLegSweepX;
-        j.restZ = (i === 4 ? legZ : -legZ) + fwdLegNarrowZ
-          + (i === 4 ? legFlailZ : -legFlailZ)
-          + legWobble
-          + Math.sin(this.animTime * 0.7 + i) * 0.08 * (1 - kneeLock * 0.6)
-          + sideDrift * 0.50;
+        // Fold: drive hip restX negative (thigh forward), suppress idle wiggle
+        j.restX = (0.08 - legBack - hipFold) + idleAnim + legTrail;
       } else {
-        j.restX = (0.08 - legBack + idleAnim + legTrail + fwdLegSweepX) * (1 - kneeLock);
-        j.restZ = (i === 5 ? -legZ : legZ) + fwdLegNarrowZ
-          + (i === 5 ? -legFlailZ : legFlailZ)
-          + legWobble
-          + Math.sin(this.animTime * 0.7 + i) * 0.08 * (1 - kneeLock * 0.6)
-          + sideDrift * 0.50;
+        // Lock: blend toward 0 (straight), fully suppress oscillation
+        j.restX = (0.08 - legBack + idleAnim + legTrail) * (1 - kneeLock);
       }
+      j.restZ = (i === 4 || i === 6 ? legZ : -legZ) + Math.sin(this.animTime * 0.7 + i) * 0.08 * (1 - kneeLock * 0.6) + sideDrift * 0.50;
     }
 
     var errX = j.restX - p.rotation.x;
@@ -1119,14 +1097,10 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
     p.rotation.z = Math.max(-j.limZ, Math.min(j.limZ, p.rotation.z + ud.velZ));
   }
 
-  // ── 6. Head ─────────────────────────────────────────────────────────────
-  // FORWARD: head tucks forward/down (nose into the wind, Superman style).
-  // REVERSE: head flails backward (dragged from the shoulders — chin up, looking behind).
-  var headLookZ = -leanZ * 0.5 + Math.sin(this.animTime * 0.8) * 0.05
-    - bfNx * reachUrgency * 0.3 * momentumLimiter;
-  var headLookX = (-forwardForce * 0.42 + rf2 * 0.65) // forward=tuck, reverse=fling back
-    - bfNy * reachUrgency * 0.25 * momentumLimiter
-    + Math.sin(this.animTime * 2.2) * rf2 * 0.20; // loose head wobble when flailing
+  // ── 6. Head — always trying to look toward the butterfly ────────────────
+  // Head tilts/turns toward cursor: bfNy up = head tips back to look up, etc.
+  var headLookZ = -leanZ * 0.5 + Math.sin(this.animTime * 0.8) * 0.05 - bfNx * reachUrgency * 0.3 * momentumLimiter;
+  var headLookX = (-forwardForce * 0.30 + reverseForce * 0.35) - bfNy * reachUrgency * 0.25 * momentumLimiter;
   this.head.rotation.z += (headLookZ - this.head.rotation.z) * 0.12;
   this.head.rotation.x += (headLookX - this.head.rotation.x) * 0.10;
 };
@@ -2849,12 +2823,10 @@ document.addEventListener('touchstart', function(e) {
   var botHud = document.getElementById('bottom-hud');
   if (topHud && topHud.contains(e.target)) return;
   if (botHud && botHud.contains(e.target)) return;
-  clearTimeout(longPressTimer); // always cancel any previous timer before arming a new one
   longPressTimer = setTimeout(function() {
     humanoid.flipX = 0; humanoid.flipZ = 0;
     humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
-    // Don't call gsap.to on mesh.rotation — the update loop owns that every frame.
-    // Just reset the driving variables; the loop will lerp mesh.rotation naturally.
+    gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.25, duration: 0.5, ease: 'power3.out' });
     showToast('orientation reset');
   }, LONG_PRESS_MS);
 }, { passive: true });
