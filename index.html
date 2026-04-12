@@ -500,27 +500,6 @@
 
   /* hint-label replaced by bottom HUD */
 
-  /* Long-press menu */
-  /* Sol summary screen overrides */
-  #screen-gameover {
-    background: rgba(0,0,0,0.75);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    justify-content: flex-start;
-    padding-top: max(40px, 8vh);
-    padding-bottom: 40px;
-  }
-  #screen-gameover h1 { margin-bottom: 0.05em; }
-  .sol-label { color: rgba(255,255,255,0.35); font-size: 0.72em; letter-spacing: 2px; margin-bottom: 1.5em; }
-  .sol-table { font-size: clamp(0.72em, 1.8vw, 0.85em); letter-spacing: 1px; color: rgba(255,255,255,0.7); margin-bottom: 1.8em; width: 100%; max-width: 340px; border-collapse: collapse; }
-  .sol-table td { padding: 3px 8px 3px 0; vertical-align: top; }
-  .sol-table td:first-child { color: rgba(255,255,255,0.35); white-space: nowrap; padding-right: 16px; }
-  .sol-table td:last-child { color: rgba(255,255,255,0.4); font-size: 0.9em; padding-left: 8px; }
-  .sol-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 6px 0; }
-  .sol-count { color: rgba(255,255,255,0.85); font-weight: 600; }
-  .sol-rocket-notice { font-size: clamp(0.7em, 1.8vw, 0.82em); color: rgba(255,200,60,0.7); letter-spacing: 2px; margin-bottom: 1.6em; }
-  .sol-buttons { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-
   #hit-flash { position: fixed; inset: 0; background: #f25346; opacity: 0; pointer-events: none; z-index: 30; mix-blend-mode: multiply; }
 
   /* Structural integrity bar — thin white line just above oxy rail */
@@ -678,7 +657,6 @@
   <p id="welcome-nudge"></p>
 </div>
 
-<div class="screen" id="screen-gameover"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
@@ -2041,6 +2019,10 @@ function buildDispatchTable() {
   }
   function div() { return '<tr><td colspan="2"><hr class="dispatch-divider"/></td></tr>'; }
 
+  var suffix = _gameOverPending
+    ? '<p style="font-size:0.85em;color:rgba(255,200,60,0.6);letter-spacing:1.5px;margin-top:12px;">boost armed for sol ' + (solNumber + 1) + '</p>'
+    : '';
+
   return '<table class="dispatch-table">' +
     row('sol',       solNumber) +
     row('elapsed',   timeStr) +
@@ -2054,13 +2036,13 @@ function buildDispatchTable() {
     div() +
     row('recoveries', stats.tumbleRecoveries + ' ×') +
     row('revivals',   stats.voidRevives + ' ×') +
-  '</table>';
+  '</table>' + suffix;
 }
 
 var frameFrozen = false;
 
 function openMenu() {
-  if (STATUS === 'waiting' || STATUS === 'gameover' || STATUS === 'void' || STATUS === 'tumbling') return;
+  if (STATUS === 'waiting' || STATUS === 'void' || STATUS === 'tumbling') return;
   pauseActive = true;
   frameFrozen = false;
   document.getElementById('pause-dispatch-content').innerHTML = buildDispatchTable();
@@ -2077,8 +2059,16 @@ function closeMenu() {
   _bumpInteraction();
   document.getElementById('pause-overlay').classList.remove('visible');
   document.getElementById('world-fg').style.display = 'none';
-  
-  
+
+  // Reset resume button label always
+  var resumeBtn = document.getElementById('btn-pause-resume');
+  if (resumeBtn) resumeBtn.textContent = 'spacebar to space-out';
+
+  if (_gameOverPending) {
+    _gameOverPending = false;
+    startGame();
+    return;
+  }
   updateHintLabel();
 }
 
@@ -2157,7 +2147,6 @@ function startGame() {
   updateHintLabel();
   document.getElementById('world-fg').style.display = 'none';
   document.getElementById('screen-welcome').classList.remove('visible');
-  document.getElementById('screen-gameover').classList.remove('visible');
   // Reset welcome screen opacity for next visit
   var _ws = document.getElementById('screen-welcome');
   if (_ws) _ws.style.opacity = '';
@@ -2305,20 +2294,25 @@ function exitVoid() {
 }
 
 
+var _gameOverPending = false; // when true, closing/resuming the menu starts next sol
+
 function doGameOver() {
-  STATUS = 'gameover';
   rocketmanPending = true;
+  _gameOverPending = true;
 
   var totalSecs = Math.floor(survivalFrames / 60);
 
-  // Short session grace — first impression shouldn't be an empty debrief
+  // Restore scene visuals
+  if (sea)      { sea.mesh.visible = true; sky.mesh.visible = true; }
+  if (orbHolder){ orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true; }
+  if (voidLight) voidLight.intensity = 0;
+  document.getElementById('void-overlay').classList.remove('active');
+  document.getElementById('heartbeat-prompt').classList.remove('visible');
+  document.getElementById('world-fg').style.display = 'none';
+
+  // Short session grace — silent restart, no menu
   if (totalSecs < 30) {
-    // Short session — no screen, just pulse the pill and restart silently
-    if (sea) { sea.mesh.visible = true; sky.mesh.visible = true; }
-    if (orbHolder) { orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true; }
-    if (voidLight) voidLight.intensity = 0;
-    document.getElementById('void-overlay').classList.remove('active');
-    document.getElementById('heartbeat-prompt').classList.remove('visible');
+    _gameOverPending = false;
     var pill = document.getElementById('top-hud');
     pill.classList.add('luminous');
     setTimeout(function() {
@@ -2328,84 +2322,18 @@ function doGameOver() {
     return;
   }
 
-  var secs = totalSecs % 60;
-  var mins = Math.floor(totalSecs / 60);
-  var timeStr = mins > 0 ? mins + 'm ' + secs + 's' : secs + 's';
+  // Set status to playing so openMenu() isn't blocked, then open it
+  STATUS = 'playing';
 
-  var avgAlt = stats.altitudeFrames ? stats.altitudeSum / stats.altitudeFrames : 100;
-  var altLabel = avgAlt > HIGH_ORBIT_Y ? 'high orbit' : avgAlt < LOW_ORBIT_Y ? 'low orbit' : 'operational';
-  var altNote  = avgAlt > HIGH_ORBIT_Y ? 'cautious' : avgAlt < LOW_ORBIT_Y ? 'aggressive' : 'balanced';
+  // Update the resume button label to signal "next sol"
+  var resumeBtn = document.getElementById('btn-pause-resume');
+  if (resumeBtn) resumeBtn.textContent = 'next sol →';
 
-  var totalOpp    = stats.canistersCollected + stats.canistersMissed;
-  var captureRate = totalOpp > 0 ? Math.round(stats.canistersCollected / totalOpp * 100) : 0;
-  var safeTimeSecs    = Math.round(stats.safeZoneFrames / 60);
-  var peakStressPct   = Math.round(stats.peakStructuralStress * 100);
-  var stressLabel     = peakStressPct >= 100 ? 'forced tumble' :
-                        peakStressPct >= 75  ? 'critical' :
-                        peakStressPct >= 40  ? 'elevated' : 'stable';
-  var totalSetbacks   = stats.blueOrbHits + stats.redOrbHits + stats.blackOrbHits +
-                        stats.shootingStarHits + stats.boxTumbles + stats.boxSlings;
-
-  function row(label, val, note) {
-    return '<tr><td>' + label + '</td><td><span class="sol-count">' + val +
-           '</span></td><td>' + (note||'') + '</td></tr>';
-  }
-  function div() {
-    return '<tr><td colspan="3"><hr class="sol-divider"/></td></tr>';
-  }
-
-  var html =
-    '<p class="sol-label">sol ' + solNumber + '</p>' +
-    '<table class="sol-table">' +
-      row('survived',        timeStr,      '') +
-      row('altitude',        altLabel,     altNote) +
-      div() +
-      row('opportunities',   stats.canistersCollected + ' / ' + totalOpp, captureRate + '% captured') +
-      (stats.canistersMissed ? row('&nbsp;missed',  stats.canistersMissed + ' ×', 'passed') : '') +
-      (stats.boxesMissed     ? row('&nbsp;boxes',   stats.boxesMissed     + ' ×', 'unresolved') : '') +
-      div() +
-      row('setbacks',        totalSetbacks + ' ×', 'total') +
-      (stats.blueOrbHits     ? row('&nbsp;friction',    stats.blueOrbHits    + ' ×', 'minor — safe bet threshold')  : '') +
-      (stats.redOrbHits      ? row('&nbsp;collision',   stats.redOrbHits     + ' ×', 'significant — risk threshold') : '') +
-      (stats.blackOrbHits    ? row('&nbsp;singularity', stats.blackOrbHits   + ' ×', 'total — removed')  : '') +
-      (stats.shootingStarHits? row('&nbsp;external',    stats.shootingStarHits + ' ×', 'uncontrolled')   : '') +
-      (stats.boxTumbles      ? row('&nbsp;surprise',    stats.boxTumbles     + ' ×', 'grounded')         : '') +
-      (stats.boxSlings       ? row('&nbsp;ejection',    stats.boxSlings      + ' ×', 'orbital')          : '') +
-      (stats.boxComets       ? row('&nbsp;windfall',    stats.boxComets      + ' ×', 'lucky')             : '') +
-      div() +
-      row('risk zone',       stats.riskZoneEntries + ' ×',  'entries below 30%') +
-      row('safe bet',        safeTimeSecs + 's',             'above 60% oxygen') +
-      row('structural peak', peakStressPct + '%',            stressLabel) +
-      div() +
-      row('got back up',     stats.tumbleRecoveries + ' ×', 'recoveries') +
-      row('revived',         stats.voidRevives      + ' ×', 'heartbeat restored') +
-    '</table>' +
-    '<p class="sol-rocket-notice">rocketman boost armed for sol ' + (solNumber + 1) + '</p>' +
-    '<div class="sol-buttons">' +
-      '<button class="btn-play" id="btn-replay">next sol</button>' +
-      '<button class="btn-play" id="btn-go-welcome" style="background:transparent;border-color:rgba(255,255,255,0.08);">menu</button>' +
-      '<a href="https://zack.cx" target="_blank" class="btn-link">zack.cx</a>' +
-    '</div>';
-
-  var screen = document.getElementById('screen-gameover');
-  screen.innerHTML = html;
-  document.getElementById('btn-replay').addEventListener('click', startGame);
-  document.getElementById('btn-go-welcome').addEventListener('click', function() {
-    document.getElementById('screen-gameover').classList.remove('visible');
-    var _wsEl = document.getElementById('screen-welcome');
-    if (_wsEl) { _wsEl.style.opacity = ''; _wsEl.classList.add('visible'); }
-    _welcomeStarted = false;
-    _welcomeMouseOriginX = null; _welcomeMouseOriginY = null;
-    STATUS = 'waiting';
-    startQuoteRotation();
-    updateHintLabel();
-  });
-  screen.classList.add('visible');
-  document.getElementById('void-overlay').classList.remove('active');
-  document.getElementById('heartbeat-prompt').classList.remove('visible');
-  if (sea)      { sea.mesh.visible = true; sky.mesh.visible = true; }
-  if (orbHolder){ orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true; }
-  if (voidLight)  voidLight.intensity = 0;
+  // Rebuild dispatch with end-of-sol context
+  document.getElementById('pause-dispatch-content').innerHTML = buildDispatchTable();
+  document.getElementById('pause-overlay').classList.add('visible');
+  document.getElementById('world-fg').style.display = 'block';
+  pauseActive = true;
   updateHintLabel();
 }
 
@@ -3065,7 +2993,7 @@ function loop() {
     if (cometSparkles.length) updateCometSparkles();
 
   } else {
-    // waiting / gameover — float above the welcome text, rendered on top of the overlay
+    // waiting — float above the welcome text, rendered on top of the overlay
     humanoid.mesh.position.x = 0;
     humanoid.mesh.position.y = 152 + Math.sin(Date.now()*0.001)*5;
     humanoid.update(0, 0, 0, 0, 0);
@@ -3159,8 +3087,7 @@ function goHome() {
     doGameOver();
     return;
   }
-  // already on welcome/gameover — just show welcome
-  document.getElementById('screen-gameover').classList.remove('visible');
+  // already on welcome — just show welcome
   var _wsEl2 = document.getElementById('screen-welcome');
   if (_wsEl2) { _wsEl2.style.opacity = ''; _wsEl2.classList.add('visible'); }
   _welcomeStarted = false;
