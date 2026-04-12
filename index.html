@@ -341,6 +341,21 @@
     margin-bottom: 2.2em;
     transition: opacity 0.6s ease;
   }
+  #welcome-nudge {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(0.55em, 1.4vw, 0.63em);
+    color: rgba(255,255,255,0.18);
+    letter-spacing: 3.5px;
+    text-transform: lowercase;
+    margin-top: 0;
+    animation: nudge-breathe 3.8s ease-in-out infinite;
+    pointer-events: none;
+    user-select: none;
+  }
+  @keyframes nudge-breathe {
+    0%, 100% { opacity: 0.10; }
+    50%       { opacity: 0.28; }
+  }
     text-decoration: none; text-transform: lowercase;
     transition: color 0.2s; pointer-events: all;
   }
@@ -451,6 +466,18 @@
     letter-spacing: -0.02em; transition: color 0.2s;
   }
   .bento-zack:hover { color: rgba(255,255,255,0.9); }
+  .bento-linkedin {
+    display: inline-block;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.54em;
+    color: rgba(255,255,255,0.18);
+    text-decoration: none;
+    letter-spacing: 2px;
+    text-transform: lowercase;
+    margin-top: 8px;
+    transition: color 0.2s;
+  }
+  .bento-linkedin:hover { color: rgba(104,195,192,0.7); }
   .bento-zack-sub {
     display: block; font-size: 0.58em; letter-spacing: 1.5px;
     color: rgba(255,255,255,0.2); text-transform: lowercase;
@@ -575,11 +602,9 @@
 <!-- Toast banner area: top center, stacked -->
 <div id="toast-banner-area"></div>
 
-<!-- Bottom HUD: reverse | forward (mobile only) -->
+<!-- Bottom HUD: direction toggle (mobile only) -->
 <div id="bottom-hud">
-  <button id="btn-hud-back" class="hud-btn">&#8592;</button>
-  <div class="hud-sep"></div>
-  <button id="btn-hud-fwd" class="hud-btn">&#8594;</button>
+  <button id="btn-hud-dir" class="hud-btn">forward &#8594;</button>
 </div>
 
 <div id="pause-overlay">
@@ -616,6 +641,9 @@
         zack.cx
         <span class="bento-zack-sub">thinker & maker</span>
       </a>
+      <a href="https://linkedin.com/in/zackargyle" target="_blank" class="bento-linkedin">
+        linkedin
+      </a>
     </div>
 
   </div>
@@ -647,7 +675,7 @@
 
   <p id="welcome-quote"></p>
   <p id="welcome-attribution"></p>
-  <button class="btn-play" id="btn-start">float on.</button>
+  <p id="welcome-nudge"></p>
 </div>
 
 <div class="screen" id="screen-gameover"></div>
@@ -1189,7 +1217,9 @@ CanistersHolder.prototype.update = function() {
 function MysteryBox() {
   this.mesh = new THREE.Object3D();
   this.t = 0;
+  this.colorPhase = Math.random() * Math.PI * 2;
   var mat = new THREE.MeshPhongMaterial({ color: 0xffcc00, emissive: 0x221100, flatShading: true });
+  this.mat = mat;
   var body = makeBox(14, 14, 14, mat);
   body.castShadow = true;
   // Question mark vibe — cross stripe
@@ -1198,8 +1228,19 @@ function MysteryBox() {
   var stripeV = makeBox(2, 16, 2, stripeMat); this.mesh.add(stripeV);
   this.mesh.add(body);
 }
+
+// Mystery box color palette — vivid cycling colors
+var MYSTERY_COLORS = [0xff2244, 0xff8800, 0xffee00, 0x44ff44, 0x00ffcc, 0x4488ff, 0xcc44ff, 0xff44aa];
 MysteryBox.prototype.update = function(speed) {
   this.t += 0.03 * sceneSpeed;
+  this.colorPhase += 0.11 * sceneSpeed; // rapid hue cycle
+  var ci = Math.floor(this.colorPhase) % MYSTERY_COLORS.length;
+  var ci2 = (ci + 1) % MYSTERY_COLORS.length;
+  var blend = this.colorPhase - Math.floor(this.colorPhase);
+  var c1 = new THREE.Color(MYSTERY_COLORS[ci]);
+  var c2 = new THREE.Color(MYSTERY_COLORS[ci2]);
+  this.mat.color.copy(c1).lerp(c2, blend);
+  this.mat.emissive.copy(this.mat.color).multiplyScalar(0.15);
   this.mesh.position.x -= speed * sceneSpeed;
   this.mesh.rotation.x += 0.02 * sceneSpeed;
   this.mesh.rotation.y += 0.025 * sceneSpeed;
@@ -1340,9 +1381,9 @@ function AirPuff() {
 function spawnAirPuffs(vx, vy, bfDx, bfDy) {
   if (!humanoid) return;
 
-  // Only fire occasionally — random chance, weighted by how hard the cursor is pulling
+  // Fire more aggressively — always firing, weighted by cursor pull
   var cursorPull = Math.sqrt(bfDx * bfDx + bfDy * bfDy);
-  var chance = 0.012 + Math.min(0.03, cursorPull * 0.0004);
+  var chance = 0.15 + Math.min(0.35, cursorPull * 0.003);
   if (Math.random() > chance) return;
 
   // Pick one nozzle at random
@@ -1366,15 +1407,15 @@ function spawnAirPuffs(vx, vy, bfDx, bfDy) {
     (Math.random() - 0.5) * 0.5,
     (Math.random() - 0.5) * 0.5
   );
-  p.mesh.scale.setScalar(0.12 + Math.random() * 0.1);
+  p.mesh.scale.setScalar(0.25 + Math.random() * 0.15);
   p.mesh.material.opacity = 0;
   p.mesh.material.color.setHex(Math.random() < 0.25 ? 0xffffff : 0x88ddff);
   p.mesh.visible = true;
   p.vx = ejVx; p.vy = ejVy; p.vz = ejVz;
   p.life = 1.0;
   p.decay = 0.018 + Math.random() * 0.014;  // slower fade — more time to appreciate it
-  p.peakOpacity = 0.18 + Math.random() * 0.10;
-  p.growRate = 0.07 + Math.random() * 0.05;
+  p.peakOpacity = 0.45 + Math.random() * 0.20;
+  p.growRate = 0.10 + Math.random() * 0.06;
   airPuffs.push(p);
 }
 
@@ -1622,6 +1663,11 @@ var butterfly = { vx: 0, vy: 0 };
 var sea, sky, humanoid, orbHolder, canHolder, boxHolder;
 var voidLight;
 
+// AFK detection — open menu after 45s of no interaction while playing
+var _lastInteractionTime = Date.now();
+var AFK_MS = 45000;
+function _bumpInteraction() { _lastInteractionTime = Date.now(); }
+
 // ─── Sequential spin presets ───────────────────────────────────────────────
 var spinPresetIdx = 0;
 var PI = Math.PI;
@@ -1800,6 +1846,7 @@ function norm(v, vmin, vmax, tmin, tmax) {
 document.addEventListener('mousemove', function(e) {
   mouse.x = -1 + (e.clientX / WIDTH) * 2;
   mouse.y =  1 - (e.clientY / HEIGHT) * 2;
+  _bumpInteraction();
   var cursorEl = document.getElementById('cursor');
   if (cursorEl) { cursorEl.style.left = e.clientX+'px'; cursorEl.style.top = e.clientY+'px'; }
 });
@@ -1838,6 +1885,7 @@ document.addEventListener('touchstart', function(e) {
   if (botHud && botHud.contains(e.target)) return;
   // Don't interfere with screen overlays while waiting or showing gameover
   if (STATUS === 'waiting' || STATUS === 'gameover') return;
+  _bumpInteraction();
 
   e.preventDefault();
   if (STATUS === 'void') { handleHeartbeatTap(); return; }
@@ -1896,9 +1944,17 @@ document.addEventListener('touchend', function(e) {
   if (STATUS === 'waiting' || STATUS === 'gameover') return;
   e.preventDefault();
   touchState.twoFinger = false;
+
+  // Long-press guard — must be checked BEFORE anything else, regardless of touchState.active
+  if (longPressFired) {
+    longPressFired = false;
+    touchState.active = false;
+    touchState.id = null;
+    return;
+  }
+
   if (!touchState.active) return;
   if (!touchState.hasMoved && STATUS === 'playing') {
-    if (longPressFired) { longPressFired = false; touchState.active = false; touchState.id = null; return; }
     humanoid.reachFade = 0;
     gsap.to(humanoid, {
       flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 3.5,
@@ -2018,6 +2074,7 @@ function openMenu() {
 function closeMenu() {
   pauseActive = false;
   frameFrozen = false;
+  _bumpInteraction();
   document.getElementById('pause-overlay').classList.remove('visible');
   document.getElementById('world-fg').style.display = 'none';
   
@@ -2054,9 +2111,8 @@ function startGame() {
   directionState = 1; MAGNETIC_FORWARD = 1.0; reverseLerp = 0;
   sceneSpeed = 1.0;
   butterfly.vx = 0; butterfly.vy = 0;
-  var btnBack = document.getElementById('btn-hud-back'), btnFwd = document.getElementById('btn-hud-fwd');
-  if (btnBack) btnBack.classList.remove('active');
-  if (btnFwd)  btnFwd.classList.remove('active');
+  var dirBtn = document.getElementById('btn-hud-dir');
+  if (dirBtn) { dirBtn.textContent = 'forward \u2192'; dirBtn.classList.remove('active'); }
   pauseActive = false; frameFrozen = false;
   document.getElementById('pause-overlay').classList.remove('visible');
   document.getElementById('world-fg').style.display = 'none';
@@ -2102,6 +2158,11 @@ function startGame() {
   document.getElementById('world-fg').style.display = 'none';
   document.getElementById('screen-welcome').classList.remove('visible');
   document.getElementById('screen-gameover').classList.remove('visible');
+  // Reset welcome screen opacity for next visit
+  var _ws = document.getElementById('screen-welcome');
+  if (_ws) _ws.style.opacity = '';
+  _welcomeStarted = false;
+  _welcomeMouseOriginX = null; _welcomeMouseOriginY = null;
 }
 
 var tumble = { surfaceY: 22, velX: 0, velY: 0, bounces: 0, spinX: 0, spinY: 0, spinZ: 0, liftProgress: 0, frames: 0 };
@@ -2125,29 +2186,61 @@ function doTumble() {
 }
 
 function doSingularity() {
-  // Black orb: compress to nothing, fling from offscreen
-  invincibleFrames = 300;
+  invincibleFrames = 600;
   humanoid.singularity = true;
+
+  // Phase 1: magnetic crush — scale down as if consumed
   gsap.to(humanoid.mesh.scale, {
-    x: 0.001, y: 0.001, z: 0.001, duration: 0.35, ease: "power3.in",
+    x: 0.04, y: 0.04, z: 0.04, duration: 0.45, ease: "power3.in",
     onComplete: function() {
-      // Fling from random offscreen edge
-      var edge = Math.floor(Math.random() * 4);
-      var px, py;
-      if (edge === 0)      { px = -280; py = 60 + Math.random()*80; humanoid.slingVx = 6; humanoid.slingVy = 0; }
-      else if (edge === 1) { px =  280; py = 60 + Math.random()*80; humanoid.slingVx = -6; humanoid.slingVy = 0; }
-      else if (edge === 2) { px = (Math.random()-0.5)*160; py = 280; humanoid.slingVx = 0; humanoid.slingVy = -4; }
-      else                 { px = (Math.random()-0.5)*160; py = -60; humanoid.slingVx = 0; humanoid.slingVy = 4; }
-      humanoid.mesh.position.set(px, py, 0);
-      humanoid.slingFrames = 35;
-      humanoid.flipX = 0; humanoid.flipZ = 0;
-      gsap.to(humanoid.mesh.scale, {
-        x: 0.25, y: 0.25, z: 0.25, duration: 0.5, ease: "power2.out",
-        onComplete: function() { humanoid.singularity = false; }
-      });
+
+      // Phase 2: shoot across scene 3 times before settling
+      var shotsLeft = 3;
+      function fireShot() {
+        // Pick a random offscreen edge
+        var edge = Math.floor(Math.random() * 4);
+        var toX, toY, fromX, fromY;
+        if (edge === 0)      { fromX = -340; fromY = 55 + Math.random()*90; toX =  220 + Math.random()*80; toY = 55 + Math.random()*90; }
+        else if (edge === 1) { fromX =  340; fromY = 55 + Math.random()*90; toX = -220 - Math.random()*80; toY = 55 + Math.random()*90; }
+        else if (edge === 2) { fromX = (Math.random()-0.5)*160; fromY =  300; toX = (Math.random()-0.5)*160; toY = -80; }
+        else                 { fromX = (Math.random()-0.5)*160; fromY = -100; toX = (Math.random()-0.5)*160; toY =  240; }
+
+        humanoid.mesh.position.set(fromX, fromY, 0);
+        humanoid.flipX = (Math.random()-0.5) * Math.PI * 4;
+        humanoid.flipZ = (Math.random()-0.5) * Math.PI * 4;
+
+        // Flash visible briefly as you shoot through
+        gsap.to(humanoid.mesh.scale, { x: 0.20, y: 0.20, z: 0.20, duration: 0.08, ease: "power2.out" });
+        new Burst(0x6622aa, 10).mesh.position.copy(humanoid.mesh.position);
+
+        gsap.to(humanoid.mesh.position, {
+          x: toX, y: toY, duration: 0.28, ease: "none",
+          onComplete: function() {
+            // Shrink again between shots
+            if (shotsLeft > 0) {
+              gsap.to(humanoid.mesh.scale, { x: 0.04, y: 0.04, z: 0.04, duration: 0.10, ease: "power2.in",
+                onComplete: function() {
+                  shotsLeft--;
+                  fireShot();
+                }
+              });
+            } else {
+              // Phase 3: settle — drift back toward center
+              var cx = (Math.random()-0.5)*60, cy = 70 + Math.random()*70;
+              humanoid.mesh.position.set(toX, toY, 0);
+              humanoid.flipX = 0; humanoid.flipZ = 0;
+              gsap.to(humanoid.mesh.scale, { x: 0.25, y: 0.25, z: 0.25, duration: 0.5, ease: "power2.out" });
+              gsap.to(humanoid.mesh.position, { x: cx, y: cy, duration: 0.7, ease: "power2.out",
+                onComplete: function() { humanoid.singularity = false; }
+              });
+            }
+          }
+        });
+      }
+      fireShot();
     }
   });
-  new Burst(0x111118, 14).mesh.position.copy(new THREE.Vector3().copy(humanoid.mesh.position));
+  new Burst(0x220033, 18).mesh.position.copy(humanoid.mesh.position);
 }
 
 function doOrbitalSling() {
@@ -2262,7 +2355,6 @@ function doGameOver() {
   }
 
   var html =
-    '<h1>still here</h1>' +
     '<p class="sol-label">sol ' + solNumber + '</p>' +
     '<table class="sol-table">' +
       row('survived',        timeStr,      '') +
@@ -2300,7 +2392,10 @@ function doGameOver() {
   document.getElementById('btn-replay').addEventListener('click', startGame);
   document.getElementById('btn-go-welcome').addEventListener('click', function() {
     document.getElementById('screen-gameover').classList.remove('visible');
-    document.getElementById('screen-welcome').classList.add('visible');
+    var _wsEl = document.getElementById('screen-welcome');
+    if (_wsEl) { _wsEl.style.opacity = ''; _wsEl.classList.add('visible'); }
+    _welcomeStarted = false;
+    _welcomeMouseOriginX = null; _welcomeMouseOriginY = null;
     STATUS = 'waiting';
     startQuoteRotation();
     updateHintLabel();
@@ -2387,18 +2482,36 @@ function checkCollisions() {
 
       oxygen -= def.oxygenCost;
       if (def.hitStr === 'heavy') {
+        // Red orb: bouncy hit, no tumble, no ragdoll snap — just a solid knock
         stats.redOrbHits++;
-        structuralStress += 0.28;
+        structuralStress += 0.18;
         showToast('not moving forward', 'red');
         gsap.fromTo('#hit-flash', { opacity: 0.7 }, { opacity: 0, duration: 0.5 });
-        humanoid.hitReaction();
-        humanoid.hitReaction();
+        // Bounce velocity impulse — pushes away, no spin
+        butterfly.vx += (humanoid.mesh.position.x - _eWorld.x) * 0.12;
+        butterfly.vy += (humanoid.mesh.position.y - _eWorld.y) * 0.12 + 1.5;
+        // Small joint rattle but NO flipX/Z change
+        for (var ri = 0; ri < humanoid.joints.length; ri++) {
+          humanoid.joints[ri].pivot.userData.velX += (Math.random() - 0.5) * 1.5;
+          humanoid.joints[ri].pivot.userData.velZ += (Math.random() - 0.5) * (ri >= 4 ? 0.5 : 1.5);
+        }
       } else {
+        // Blue orb: moderate rotation effect
         stats.blueOrbHits++;
-        structuralStress += 0.15;
+        structuralStress += 0.10;
         showToast('processed by filter', 'blue');
         gsap.fromTo('#hit-flash', { opacity: 0.35 }, { opacity: 0, duration: 0.3 });
-        humanoid.hitReaction();
+        // Moderate rotation — visible but not catastrophic
+        humanoid.reachFade = Math.min(humanoid.reachFade, 0.4);
+        gsap.to(humanoid, {
+          flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 1.2,
+          flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 0.8,
+          duration: 0.6, ease: "power2.out"
+        });
+        for (var bi = 0; bi < humanoid.joints.length; bi++) {
+          humanoid.joints[bi].pivot.userData.velX += (Math.random() - 0.5) * 2.0;
+          humanoid.joints[bi].pivot.userData.velZ += (Math.random() - 0.5) * (bi >= 4 ? 0.6 : 2.0);
+        }
       }
 
       // Structural threshold — too many hits regardless of oxygen
@@ -2556,6 +2669,12 @@ function loop() {
     survivalFrames++;
     if (invincibleFrames > 0) invincibleFrames--;
 
+    // AFK check — auto-open spacebar menu after inactivity
+    if (!pauseActive && (Date.now() - _lastInteractionTime) > AFK_MS) {
+      _lastInteractionTime = Date.now(); // reset so it doesn't re-fire immediately on close
+      openMenu();
+    }
+
     // Sling recovery — move toward center
     if (humanoid.slingFrames > 0) {
       humanoid.mesh.position.x += humanoid.slingVx;
@@ -2688,6 +2807,17 @@ function loop() {
       if (speed2d > MAX_SPEED) {
         butterfly.vx *= MAX_SPEED / speed2d;
         butterfly.vy *= MAX_SPEED / speed2d;
+      }
+
+      // ── Ambient air turbulence — velocity imparts a whisper of rotation ──────
+      // Proportional to speed so it only manifests when actually moving fast
+      if (!humanoid.singularity && invincibleFrames <= 0) {
+        var _airSpd = Math.sqrt(butterfly.vx * butterfly.vx + butterfly.vy * butterfly.vy);
+        if (_airSpd > 1.5) {
+          var _airNudge = _airSpd * 0.00018;
+          humanoid.flipX += butterfly.vy * _airNudge;
+          humanoid.flipZ -= butterfly.vx * _airNudge;
+        }
       }
 
       // Integrate position
@@ -2825,6 +2955,29 @@ function loop() {
     }
 
     orbHolder.update(); canHolder.update(); boxHolder.update();
+
+    // ── Black hole magnetic pull ──────────────────────────────────────────────
+    // Black orbs exert a strong gravity well before actual collision
+    if (!humanoid.singularity) {
+      for (var _bhi = 0; _bhi < orbHolder.inUse.length; _bhi++) {
+        var _bh = orbHolder.inUse[_bhi];
+        if (_bh.orbType !== 'black') continue;
+        _bh.mesh.getWorldPosition(_eWorld);
+        humanoid.mesh.getWorldPosition(_pWorld);
+        var _bhDx = _eWorld.x - _pWorld.x, _bhDy = _eWorld.y - _pWorld.y;
+        var _bhDist = Math.sqrt(_bhDx*_bhDx + _bhDy*_bhDy);
+        if (_bhDist < 120 && _bhDist > 9) {
+          // Inverse square pull, capped so it can't crush velocity instantly
+          var _bhStr = Math.min(2.2, 1800 / (_bhDist * _bhDist));
+          butterfly.vx += (_bhDx / _bhDist) * _bhStr;
+          butterfly.vy += (_bhDy / _bhDist) * _bhStr;
+          // Pulse the black orb emissive so the player can see the pull
+          var _bhPulse = 0.08 + Math.sin(Date.now() * 0.006 + _bhi) * 0.06;
+          _bh.mat.emissive.setRGB(_bhPulse * 0.4, 0, _bhPulse * 0.8);
+        }
+      }
+    }
+
     updateBursts(); checkCollisions();
     if (smokeParticles.length) updateSmoke();
     if (airPuffs.length) updateAirPuffs();
@@ -2928,11 +3081,57 @@ function loop() {
   renderer.render(scene, camera);
 }
 
-document.getElementById('btn-start').addEventListener('click', startGame);
-document.getElementById('btn-start').addEventListener('touchend', function(e) {
-  e.stopPropagation(); e.preventDefault();
-  startGame();
-}, { passive: false });
+// ─── Welcome nudge copy (device-aware) ────────────────────────────────────────
+(function() {
+  var nudge = document.getElementById('welcome-nudge');
+  if (!nudge) return;
+  var mobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  nudge.textContent = mobile ? 'touch anywhere' : 'move to begin';
+})();
+
+// ─── Any interaction on welcome screen starts the game ────────────────────────
+var _welcomeStarted = false;
+function welcomeStart(e) {
+  if (_welcomeStarted) return;
+  if (STATUS !== 'waiting') return;
+  // Allow the menu button, links etc. to still work normally
+  if (e && e.target) {
+    var tag = e.target.tagName;
+    if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
+    var overlay = document.getElementById('pause-overlay');
+    if (overlay && overlay.contains(e.target)) return;
+  }
+  _welcomeStarted = true;
+  // Brief fade-out of the welcome screen, then launch
+  var ws = document.getElementById('screen-welcome');
+  if (ws) {
+    ws.style.transition = 'opacity 0.35s ease';
+    ws.style.opacity = '0';
+  }
+  setTimeout(function() {
+    _welcomeStarted = false; // reset for next visit to welcome screen
+    startGame();
+  }, 320);
+}
+
+var _welcomeMouseMoved = false;
+var _welcomeMouseOriginX = null, _welcomeMouseOriginY = null;
+document.addEventListener('mousemove', function(e) {
+  if (STATUS !== 'waiting') return;
+  if (_welcomeStarted) return;
+  // Capture the first position as origin — don't fire until moved 8px+ from it
+  if (_welcomeMouseOriginX === null) { _welcomeMouseOriginX = e.clientX; _welcomeMouseOriginY = e.clientY; return; }
+  var dx = e.clientX - _welcomeMouseOriginX, dy = e.clientY - _welcomeMouseOriginY;
+  if (Math.sqrt(dx*dx + dy*dy) > 8) welcomeStart(e);
+}, { passive: true });
+
+document.addEventListener('mousedown', function(e) { welcomeStart(e); });
+document.addEventListener('touchstart', function(e) { welcomeStart(e); }, { passive: true });
+document.addEventListener('keydown',    function(e) {
+  if (e.code === 'Space' || e.code === 'Enter' || e.code === 'ArrowUp' || e.code === 'ArrowDown') {
+    welcomeStart(e);
+  }
+});
 
 // ─── HUD visibility ──────────────────────────────────────────────────────────
 var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -2954,16 +3153,18 @@ function updateHintLabel() {
 function goHome() {
   directionState = 1; MAGNETIC_FORWARD = 1.0; reverseLerp = 0;
   frameFrozen = false;
-  var btnBack = document.getElementById('btn-hud-back'), btnFwd = document.getElementById('btn-hud-fwd');
-  if (btnBack) btnBack.classList.remove('active');
-  if (btnFwd)  btnFwd.classList.remove('active');
+  var dirBtn = document.getElementById('btn-hud-dir');
+  if (dirBtn) { dirBtn.textContent = 'forward \u2192'; dirBtn.classList.remove('active'); }
   if (STATUS === 'playing' || STATUS === 'tumbling' || STATUS === 'void') {
     doGameOver();
     return;
   }
   // already on welcome/gameover — just show welcome
   document.getElementById('screen-gameover').classList.remove('visible');
-  document.getElementById('screen-welcome').classList.add('visible');
+  var _wsEl2 = document.getElementById('screen-welcome');
+  if (_wsEl2) { _wsEl2.style.opacity = ''; _wsEl2.classList.add('visible'); }
+  _welcomeStarted = false;
+  _welcomeMouseOriginX = null; _welcomeMouseOriginY = null;
   STATUS = 'waiting';
   startQuoteRotation();
   updateHintLabel();
@@ -2992,17 +3193,16 @@ var directionState = 1;
 function setDirection(dir) {
   if (STATUS !== 'playing') return;
   directionState = dir;
+  var dirBtn = document.getElementById('btn-hud-dir');
   if (dir === -1) {
     reverseLerp = REVERSE_LIMIT * 0.75;
     MAGNETIC_FORWARD = -0.6;
-    document.getElementById('btn-hud-back').classList.add('active');
-    document.getElementById('btn-hud-fwd').classList.remove('active');
+    if (dirBtn) { dirBtn.textContent = 'back \u2190'; dirBtn.classList.add('active'); }
     showToast('reversing');
   } else {
     reverseLerp = 0;
     MAGNETIC_FORWARD = 1.0;
-    document.getElementById('btn-hud-fwd').classList.add('active');
-    document.getElementById('btn-hud-back').classList.remove('active');
+    if (dirBtn) { dirBtn.textContent = 'forward \u2192'; dirBtn.classList.remove('active'); }
     showToast('forward');
   }
 }
@@ -3014,8 +3214,7 @@ function wireBtn(id, fn) {
   el.addEventListener('touchend', function(e) { e.stopPropagation(); e.preventDefault(); fn(); }, { passive: false });
 }
 
-wireBtn('btn-hud-back', function() { setDirection(directionState === -1 ? 1 : -1); });
-wireBtn('btn-hud-fwd',  function() { setDirection(directionState === 1  ? -1 : 1); });
+wireBtn('btn-hud-dir', function() { setDirection(directionState === 1 ? -1 : 1); });
 
 
 // ─── Long-press on mobile → reset character orientation ──────────────────────
@@ -3026,22 +3225,50 @@ var LONG_PRESS_MS  = 600;
 document.addEventListener('touchstart', function(e) {
   if (STATUS !== 'playing') return;
   if (pauseActive) return;
-  if (e.touches.length !== 1) { clearTimeout(longPressTimer); return; }
+  if (e.touches.length !== 1) { clearTimeout(longPressTimer); longPressFired = false; return; }
   var topHud = document.getElementById('top-hud');
   var botHud = document.getElementById('bottom-hud');
   if (topHud && topHud.contains(e.target)) return;
   if (botHud && botHud.contains(e.target)) return;
   longPressFired = false;
   clearTimeout(longPressTimer);
+  // Capture which touch we're watching
+  var _lpTouch = e.touches[0];
   longPressTimer = setTimeout(function() {
     longPressFired = true;
+
+    // Defuse touchState RIGHT NOW so touchend has nothing to act on
+    touchState.active = false;
+    touchState.id = null;
+    touchState.hasMoved = false;
+
+    // Anchor mouse to the held position so butterfly doesn't snap on lift
+    if (_lpTouch) {
+      mouse.x = -1 + (_lpTouch.clientX / WIDTH)  * 2;
+      mouse.y =  1 - (_lpTouch.clientY / HEIGHT) * 2;
+    }
+    // Drain butterfly velocity — prevents the position snap on touchend
+    butterfly.vx = 0; butterfly.vy = 0;
+
+    // Kill only flip tweens on humanoid (not mesh position/scale tweens)
+    if (typeof gsap !== 'undefined') {
+      gsap.killTweensOf(humanoid, 'flipX');
+      gsap.killTweensOf(humanoid, 'flipZ');
+    }
     humanoid.flipX = 0; humanoid.flipZ = 0;
     humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
+
+    // Drain joint velocities so nothing snaps next frame
+    for (var _lpi = 0; _lpi < humanoid.joints.length; _lpi++) {
+      humanoid.joints[_lpi].pivot.userData.velX = 0;
+      humanoid.joints[_lpi].pivot.userData.velZ = 0;
+    }
     showToast('orientation reset');
   }, LONG_PRESS_MS);
-}, { passive: true });
+}, { passive: false });
+
 document.addEventListener('touchend',  function() { clearTimeout(longPressTimer); }, { passive: true });
-document.addEventListener('touchmove', function() { clearTimeout(longPressTimer); }, { passive: true });
+document.addEventListener('touchmove', function() { clearTimeout(longPressTimer); longPressFired = false; }, { passive: true });
 
 // Close button (× — reliable on mobile)
 var closeBtn = document.getElementById('btn-menu-close');
