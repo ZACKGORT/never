@@ -37,13 +37,15 @@
     padding: 7px 22px;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    pointer-events: none;
-    opacity: 0;
+    pointer-events: all;
+    opacity: 1;
     transition: opacity 0.4s;
     touch-action: manipulation;
     overflow: visible;
   }
   #top-hud.visible { opacity: 1; pointer-events: all; }
+  /* World buttons always interactive even before HUD fades in */
+  #hud-world-pills { pointer-events: all; }
   #hud-wordmark {
     font-family: 'Instrument Sans', sans-serif;
     font-size: 0.72em;
@@ -526,12 +528,18 @@
     border-radius: 50%;
     pointer-events: none; z-index: 100;
     transform: translate(-50%, -50%);
-    transition: width 0.2s, height 0.2s, border-color 0.2s;
+    transition: width 0.2s, height 0.2s, border-color 0.3s;
   }
   #cursor.active {
     width: 44px; height: 28px;
     border-color: rgba(242, 83, 70, 0.7);
   }
+  body.world-culdesac #cursor { border-color: rgba(255,220,0,0.55); }
+  body.world-culdesac #cursor.active { border-color: rgba(255,100,0,0.85); }
+  body.world-deep #cursor { border-color: rgba(212,160,48,0.55); }
+  body.world-deep #cursor.active { border-color: rgba(255,80,0,0.85); }
+  body.world-mall #cursor { border-color: rgba(255,255,255,0.38); }
+  body.world-mall #cursor.active { border-color: rgba(255,255,255,0.88); }
 
   /* Shooting star DOM element (pure CSS streak) */
   @keyframes pill-luminous {
@@ -549,6 +557,81 @@
     pointer-events: none; z-index: 18;
     overflow: hidden;
   }
+
+  /* ── World atmosphere overlays ── */
+  #world-atmos {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 8;
+    opacity: 0;
+    transition: opacity 1.2s ease, background 1.2s ease;
+  }
+  body.world-culdesac #world-atmos {
+    opacity: 1;
+    background: radial-gradient(ellipse 120% 55% at 50% 0%, rgba(91,200,245,0.55) 0%, rgba(135,217,247,0.18) 55%, transparent 100%);
+  }
+  body.world-deep #world-atmos {
+    opacity: 1;
+    background:
+      radial-gradient(ellipse 200% 30% at 85% 72%, rgba(255,120,0,0.70) 0%, rgba(196,90,16,0.35) 40%, transparent 70%),
+      radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(20,5,0,0.65) 100%);
+  }
+  body.world-mall #world-atmos {
+    opacity: 1;
+    background: radial-gradient(ellipse 90% 90% at 50% 50%, transparent 25%, rgba(0,0,0,0.82) 100%);
+  }
+  body.world-mall #world-atmos::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.08) 3px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+  }
+  #world-sun {
+    position: fixed;
+    top: 40px; right: 80px;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff176 0%, #ffee00 55%, #ffd600 100%);
+    box-shadow: 0 0 40px 18px rgba(255,240,80,0.55), 0 0 80px 40px rgba(255,220,0,0.22);
+    pointer-events: none; z-index: 9;
+    opacity: 0;
+    transition: opacity 1.0s ease;
+  }
+  body.world-culdesac #world-sun { opacity: 1; }
+  #world-westsun {
+    position: fixed;
+    bottom: 28%; right: 6%;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffe0a0 0%, #ff8c00 60%, #c44000 100%);
+    box-shadow: 0 0 60px 30px rgba(255,100,0,0.55), 0 0 120px 80px rgba(200,60,0,0.22);
+    pointer-events: none; z-index: 9;
+    opacity: 0;
+    transition: opacity 1.0s ease;
+  }
+  body.world-deep #world-westsun { opacity: 1; }
+  #world-lamp {
+    position: fixed;
+    left: 50%; top: 0;
+    transform: translateX(-50%);
+    width: 320px; height: 100%;
+    background: linear-gradient(180deg, rgba(255,255,220,0.13) 0%, rgba(255,255,180,0.04) 50%, transparent 100%);
+    pointer-events: none; z-index: 9;
+    clip-path: polygon(42% 0%, 58% 0%, 90% 100%, 10% 100%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  @keyframes lamp-flicker {
+    0%,100%,5%,7%,55%,57% { opacity: 0.9; }
+    6%,56% { opacity: 0.4; }
+    30%,31% { opacity: 0.7; }
+  }
+  body.world-mall #world-lamp { animation: lamp-flicker 12s ease-in-out infinite; }
   #shooting-star {
     position: fixed;
     width: 120px; height: 2px;
@@ -558,24 +641,83 @@
     opacity: 0;
     transform-origin: left center;
   }
+
+  /* ── World buttons in top HUD ── */
+  #hud-world-pills {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .hud-world-btn {
+    background: none;
+    border: none;
+    font-size: 0.85em;
+    line-height: 1;
+    padding: 3px 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0.35;
+    transition: opacity 0.2s, background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    filter: grayscale(0.6);
+  }
+  .hud-world-btn:hover { opacity: 0.75; filter: grayscale(0); }
+  .hud-world-btn.active { opacity: 1; filter: grayscale(0); background: rgba(255,255,255,0.08); }
+  :root { --world-accent: rgba(104,195,192,0.95); }
+
+  /* ── NOIR MODE ─────────────────────────────────────────────────── */
+  #noir-overlay {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 22;
+    display: none;
+  }
+  body.world-mall #noir-overlay { display: block; }
+  #noir-red-wash {
+    position: fixed; inset: 0;
+    background: rgba(160,0,0,0);
+    pointer-events: none; z-index: 21;
+    transition: background 1.0s ease;
+  }
+  #noir-throw-hint {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    font-family: monospace; font-size: 10px; letter-spacing: 2px;
+    color: rgba(180,230,255,0.35); pointer-events: none; z-index: 23;
+    display: none;
+  }
+  body.world-mall #noir-throw-hint { display: block; }
 </style>
 </head>
 <body>
 
+<canvas id="noir-overlay"></canvas>
+<div id="noir-red-wash"></div>
+<div id="noir-throw-hint">[ f ] throw ice &nbsp;·&nbsp; double-tap mobile</div>
 <div id="cursor"></div>
 <div id="world"></div>
 <div id="world-fg"></div>
+<div id="world-atmos"></div>
+<div id="world-sun"></div>
+<div id="world-westsun"></div>
+<div id="world-lamp"></div>
 <div id="hit-flash"></div>
 <div id="comet-flash"></div>
 <div id="shooting-star"></div>
 <div id="wind-layer"></div>
 <div id="toast-container"></div><!-- legacy, kept for JS compat -->
 
-<!-- Top HUD: wordmark pill (resets to start screen) -->
+<!-- Top HUD: wordmark + world selector -->
 <div id="top-hud">
   <span id="hud-wordmark" role="button" aria-label="home">
     <span class="hud-main">neverever</span><span class="hud-dot">.</span><span class="hud-tld">land</span>
   </span>
+  <div class="hud-sep"></div>
+  <div id="hud-world-pills">
+    <button class="hud-world-btn active" data-world="cosmos">🌌</button>
+    <button class="hud-world-btn" data-world="culdesac">🍩</button>
+    <button class="hud-world-btn" data-world="deep">🤠</button>
+  </div>
 </div>
 
 <!-- Toast banner area: top center, stacked -->
@@ -680,6 +822,340 @@ var C = {
 };
 
 var planetColors = [0x68c3c0, 0x4a3b69, 0x2b596b, 0x5c3a41];
+
+// ─── World Definitions ─────────────────────────────────────────────────────
+var WORLDS = {
+  cosmos: {
+    name: 'cosmos',
+    accent: 'rgba(104,195,192,0.95)',
+    bgFrom: '#020111', bgTo: '#0d0820',
+    fogColor: 0x1a1025, fogNear: 100, fogFar: 950,
+    seaColor: 0x68c3c0,
+    starColor: 0xffffff,
+    orbColors: { blue: 0x4499ff, red: 0xf23030, black: 0x111118 },
+    canColor: 0x00e5ff,
+    flameColor: 0x00ffff,
+    dustColors: [0x68c3c0, 0x4a3b69, 0x2b596b, 0x444455, 0x556677],
+    puffColor: 0x88ddff,
+    windForward: 'rgba(160,220,255,',
+    windReverse: 'rgba(255,160,80,',
+    hudAccent: '#68c3c0',
+    oxyRailColor: '#00e5ff',
+    hat: 'helmet',
+    makeHat: null,
+    toastLabel: 'orbit',
+    particleLabel: 'stars',
+  },
+  culdesac: {
+    // ── THE SIMPSONS ── Springfield sky blue, Kwik-E-Mart yellow, cartoon flat vibrancy
+    name: 'springfield',
+    accent: 'rgba(255,220,0,0.98)',
+    bgFrom: '#5bc8f5', bgTo: '#87d9f7',   // cartoon sky blue
+    fogColor: 0x87d9f7, fogNear: 120, fogFar: 800,
+    seaColor: 0x74c947,   // Springfield grass green
+    starColor: 0xffee00,  // bright cartoon sun-glint dots
+    orbColors: { blue: 0x0099ff, red: 0xff3300, black: 0x222222 },
+    canColor: 0xffdd00,   // Duff beer can gold
+    flameColor: 0xff6600,
+    dustColors: [0xffdd00, 0xff8800, 0x74c947, 0xf7941d, 0xff4444],
+    puffColor: 0xffffff,
+    windForward: 'rgba(255,240,100,',
+    windReverse: 'rgba(255,150,0,',
+    hudAccent: '#ffdd00',
+    oxyRailColor: '#ffee00',
+    hat: 'helmet',
+    toastLabel: 'D\'oh!',
+    particleLabel: 'donuts',
+  },
+  deep: {
+    // ── WESTERN ── Dusty mesa, golden hour, ultra atmospheric
+    name: 'high noon',
+    accent: 'rgba(255,160,30,0.98)',
+    bgFrom: '#c45a10', bgTo: '#7a1e00',   // blazing sunset ochre to deep crimson
+    fogColor: 0xb05020, fogNear: 40, fogFar: 380,  // thick dusty haze, close fog
+    seaColor: 0x8b4513,   // cracked red earth
+    starColor: 0xffcc55,  // heat shimmer / distant firelight
+    orbColors: { blue: 0xc07830, red: 0x8b1a00, black: 0x1a0800 },
+    canColor: 0xd4a855,   // old brass canteen
+    flameColor: 0xff6600,
+    dustColors: [0xb06020, 0x8b4010, 0xd08030, 0x9a5020, 0xc07040],
+    puffColor: 0xddaa66,
+    windForward: 'rgba(220,160,60,',
+    windReverse: 'rgba(180,80,20,',
+    hudAccent: '#d4a030',
+    oxyRailColor: '#d4a030',
+    hat: 'helmet',
+    toastLabel: 'pardner',
+    particleLabel: 'dust devils',
+  },
+  mall: {
+    // ── FILM NOIR ── Flat black & white, dramatic chiaroscuro lighting, no color
+    name: 'noir',
+    accent: 'rgba(220,220,220,0.95)',
+    bgFrom: '#000000', bgTo: '#0a0a0a',   // pitch black
+    fogColor: 0x111111, fogNear: 50, fogFar: 300,  // dense noir fog
+    seaColor: 0x1a1a1a,   // wet rain-slicked street
+    starColor: 0xffffff,  // rain drops / neon flicker
+    orbColors: { blue: 0x888888, red: 0x444444, black: 0x080808 },
+    canColor: 0xcccccc,   // silver flask
+    flameColor: 0xffffff,
+    dustColors: [0x333333, 0x555555, 0x222222, 0x444444, 0x666666],
+    puffColor: 0x999999,
+    windForward: 'rgba(200,200,200,',
+    windReverse: 'rgba(100,100,100,',
+    hudAccent: '#cccccc',
+    oxyRailColor: '#cccccc',
+    hat: 'helmet',
+    toastLabel: 'suspect',
+    particleLabel: 'rain',
+  }
+};
+
+var currentWorld = 'cosmos';
+
+// Per-world dynamic lights stored so we can remove them on world switch
+var _worldLights = [];
+
+function applyWorld(worldKey) {
+  currentWorld = worldKey;
+  var W = WORLDS[worldKey];
+  if (!W) return;
+
+  // Background
+  document.getElementById('world').style.background = 'linear-gradient(180deg,' + W.bgFrom + ' 0%,' + W.bgTo + ' 100%)';
+  document.getElementById('world').style.transition = 'background 1.2s ease';
+
+  // Body class for CSS world theming
+  document.body.className = document.body.className.replace(/\bworld-\S+/g, '').trim();
+  document.body.classList.add('world-' + worldKey);
+
+  // CSS accent variable
+  document.documentElement.style.setProperty('--world-accent', W.accent);
+
+  // Fog
+  if (scene && scene.fog) {
+    scene.fog.color.setHex(W.fogColor);
+    scene.fog.near = W.fogNear;
+    scene.fog.far  = W.fogFar;
+  }
+
+  // Sea color
+  if (sea && sea.mesh && sea.mesh.material) {
+    sea.mesh.material.color.setHex(W.seaColor);
+    // Sea flatness: Simpsons = very flat cartoon, Western = cracked flat earth, Noir = still
+    if (worldKey === 'culdesac') {
+      sea.mesh.material.flatShading = true;
+      sea.mesh.material.opacity = 1.0;
+    } else if (worldKey === 'deep') {
+      sea.mesh.material.opacity = 0.95;
+    } else if (worldKey === 'mall') {
+      sea.mesh.material.opacity = 0.9;
+    } else {
+      sea.mesh.material.opacity = 0.8;
+    }
+    sea.mesh.material.needsUpdate = true;
+  }
+
+  // Stars (sky cubes)
+  if (sky) {
+    sky.mesh.traverse(function(obj) {
+      if (obj.isMesh && obj.material) {
+        obj.material.color.setHex(W.starColor);
+        // Simpsons: bigger bright dots; Noir: subtle rain-like streaks
+        if (worldKey === 'culdesac') { obj.scale.setScalar(2.2); }
+        else if (worldKey === 'mall') { obj.scale.set(0.4, 2.5, 0.4); } // rain streaks
+        else { obj.scale.setScalar(1.0); }
+      }
+    });
+  }
+
+  // Remove old world-specific lights
+  _worldLights.forEach(function(l) { scene.remove(l); });
+  _worldLights = [];
+
+  // Per-world lighting
+  if (worldKey === 'culdesac') {
+    // Simpsons: bright overhead sun, saturated blue ambient, vibrant fill
+    scene.children.forEach(function(c) { if (c.isHemisphereLight) c.intensity = 0.3; if (c.isAmbientLight) c.intensity = 0.4; if (c.isDirectionalLight) { c.color.setHex(0xfffde0); c.intensity = 1.8; c.position.set(100, 500, 200); } });
+    var sunFill = new THREE.DirectionalLight(0x87ceeb, 0.9);
+    sunFill.position.set(-200, 300, 100);
+    scene.add(sunFill); _worldLights.push(sunFill);
+    var groundBounce = new THREE.HemisphereLight(0x74c947, 0xffee00, 0.7);
+    scene.add(groundBounce); _worldLights.push(groundBounce);
+  } else if (worldKey === 'deep') {
+    // Western: harsh low-angle sun blazing from the side, deep shadow fill, heat shimmer
+    scene.children.forEach(function(c) { if (c.isHemisphereLight) c.intensity = 0.15; if (c.isAmbientLight) { c.color.setHex(0x3a1800); c.intensity = 0.3; } if (c.isDirectionalLight) { c.color.setHex(0xff8c20); c.intensity = 2.2; c.position.set(800, 80, 100); } });
+    var rimLight = new THREE.DirectionalLight(0xd46010, 0.8);
+    rimLight.position.set(-300, 50, -200);
+    scene.add(rimLight); _worldLights.push(rimLight);
+    var duskFill = new THREE.HemisphereLight(0xff5500, 0x1a0800, 0.5);
+    scene.add(duskFill); _worldLights.push(duskFill);
+    // Heat haze point light
+    var heat = new THREE.PointLight(0xff6600, 1.5, 600);
+    heat.position.set(0, -500, 200);
+    scene.add(heat); _worldLights.push(heat);
+  } else if (worldKey === 'mall') {
+    // Film Noir: single harsh overhead spotlight, deep shadows, no color
+    scene.children.forEach(function(c) { if (c.isHemisphereLight) c.intensity = 0.05; if (c.isAmbientLight) { c.color.setHex(0x111111); c.intensity = 0.1; } if (c.isDirectionalLight) { c.color.setHex(0xffffff); c.intensity = 0.4; c.position.set(0, 500, 50); } });
+    // Streetlamp cone — single brutal top-down spot
+    var spot = new THREE.SpotLight(0xffffff, 3.5, 800, Math.PI * 0.18, 0.6, 1.5);
+    spot.position.set(0, 400, 150);
+    spot.target.position.set(0, 0, 0);
+    scene.add(spot); scene.add(spot.target); _worldLights.push(spot); _worldLights.push(spot.target);
+    // Cold fill from below — morgue light
+    var coldFill = new THREE.PointLight(0x334455, 0.8, 500);
+    coldFill.position.set(0, -200, 200);
+    scene.add(coldFill); _worldLights.push(coldFill);
+  } else {
+    // Cosmos: restore defaults
+    scene.children.forEach(function(c) { if (c.isHemisphereLight) { c.color.setHex(0xffffff); c.groundColor.setHex(0x000000); c.intensity = 0.5; } if (c.isAmbientLight) { c.color.setHex(0x404040); c.intensity = 0.7; } if (c.isDirectionalLight) { c.color.setHex(0xffffff); c.intensity = 0.9; c.position.set(150, 350, 350); } });
+  }
+
+  // Atmosphere visuals: hide for Simpsons/Western/Noir, show for Cosmos
+  if (atmosphereGroup) atmosphereGroup.visible = (worldKey === 'cosmos');
+  if (atmosRingMesh)   atmosRingMesh.visible   = (worldKey === 'cosmos');
+  if (atmosRingGlow)   atmosRingGlow.visible   = (worldKey === 'cosmos');
+
+  // Orb colors
+  if (orbHolder) {
+    orbHolder.inUse.forEach(function(e) {
+      var col = W.orbColors[e.orbType];
+      if (col !== undefined) e.mat.color.setHex(col);
+    });
+    ['blue','red','black'].forEach(function(t) {
+      orbHolder.pools[t].forEach(function(e) {
+        var col = W.orbColors[t];
+        if (col !== undefined) e.mat.color.setHex(col);
+      });
+    });
+  }
+
+  // Canister color
+  if (canHolder) {
+    canHolder.inUse.forEach(function(c) { recolorGroup(c.mesh, W.canColor); });
+    canHolder.pool.forEach(function(c) { recolorGroup(c.mesh, W.canColor); });
+  }
+
+  // Flame color
+  if (humanoid) {
+    humanoid.flameMat.color.setHex(W.flameColor);
+    swapHat(W.hat);
+  }
+
+  // Dust & puff colors
+  DUST_COLORS.length = 0;
+  W.dustColors.forEach(function(c) { DUST_COLORS.push(c); });
+
+  // Pill UI accent
+  var hudMain = document.querySelector('.hud-main');
+  var hudTld  = document.querySelector('.hud-tld');
+  if (hudMain) hudMain.style.cssText = '';
+  if (hudTld)  hudTld.style.cssText  = '';
+
+  // World pills active state
+  document.querySelectorAll('.hud-world-btn').forEach(function(p) {
+    p.classList.toggle('active', p.dataset.world === worldKey);
+  });
+
+  // Oxy rail
+  document.getElementById('oxy-rail').style.background = W.oxyRailColor;
+}
+
+function recolorGroup(group, hex) {
+  group.traverse(function(obj) {
+    if (obj.isMesh && obj.material) obj.material.color.setHex(hex);
+  });
+}
+
+// Hat geometry registry — each world hat is built once, stored here
+var _hatMeshes = {};
+
+function buildHatMesh(hatType) {
+  if (_hatMeshes[hatType]) return _hatMeshes[hatType];
+  var group = new THREE.Object3D();
+
+  if (hatType === 'bikehelmet') {
+    // Chunky 90s bike helmet — rounded shell + chin strap hint + vents
+    var shellMat = new THREE.MeshPhongMaterial({ color: 0xff5522, flatShading: true });
+    var shell = new THREE.Mesh(new THREE.SphereGeometry(11, 8, 6), shellMat);
+    shell.scale.set(1.0, 0.72, 1.0);
+    shell.position.set(0, 2, 0);
+    group.add(shell);
+    // Visor brim
+    var brimMat = new THREE.MeshPhongMaterial({ color: 0x222222, flatShading: true });
+    var brim = new THREE.Mesh(new THREE.BoxGeometry(18, 2, 8), brimMat);
+    brim.position.set(0, -4, 5);
+    group.add(brim);
+    // Vent stripes
+    var ventMat = new THREE.MeshPhongMaterial({ color: 0xcc3300, flatShading: true });
+    for (var vi = -1; vi <= 1; vi++) {
+      var vent = new THREE.Mesh(new THREE.BoxGeometry(3, 2, 12), ventMat);
+      vent.position.set(vi * 5, 4, 0);
+      group.add(vent);
+    }
+  } else if (hatType === 'divinghelmet') {
+    // Old brass diving helmet — big round dome with porthole + bolts
+    var brassMat = new THREE.MeshPhongMaterial({ color: 0xb8860b, shininess: 80, flatShading: true });
+    var dome = new THREE.Mesh(new THREE.SphereGeometry(12, 10, 8), brassMat);
+    dome.scale.set(1.0, 1.1, 1.0);
+    dome.position.set(0, 2, 0);
+    group.add(dome);
+    // Porthole ring
+    var portMat = new THREE.MeshPhongMaterial({ color: 0x8b6914, shininess: 60, flatShading: true });
+    var porthole = new THREE.Mesh(new THREE.TorusGeometry(5, 1.5, 6, 12), portMat);
+    porthole.position.set(0, 2, 11);
+    group.add(porthole);
+    // Dark porthole glass
+    var glassMat = new THREE.MeshPhongMaterial({ color: 0x112233, shininess: 120, flatShading: true });
+    var glass = new THREE.Mesh(new THREE.CircleGeometry(4.5, 12), glassMat);
+    glass.position.set(0, 2, 11.5);
+    group.add(glass);
+    // Bolts around the collar
+    var boltMat = new THREE.MeshPhongMaterial({ color: 0xd4a800, flatShading: true });
+    for (var bi = 0; bi < 8; bi++) {
+      var ba = (Math.PI * 2 * bi) / 8;
+      var bolt = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 3, 6), boltMat);
+      bolt.position.set(Math.cos(ba) * 11, -5, Math.sin(ba) * 8);
+      group.add(bolt);
+    }
+  } else if (hatType === 'securitycap') {
+    // Flat-brim security guard cap
+    var capMat = new THREE.MeshPhongMaterial({ color: 0x1a2a1a, flatShading: true });
+    var crown = new THREE.Mesh(new THREE.CylinderGeometry(9, 10, 8, 8), capMat);
+    crown.position.set(0, 3, 0);
+    group.add(crown);
+    // Brim
+    var capBrimMat = new THREE.MeshPhongMaterial({ color: 0x111811, flatShading: true });
+    var capBrim = new THREE.Mesh(new THREE.CylinderGeometry(14, 14, 1.5, 12), capBrimMat);
+    capBrim.position.set(0, -1, 2);
+    capBrim.scale.set(1.0, 1.0, 0.55);
+    group.add(capBrim);
+    // Badge
+    var badgeMat = new THREE.MeshPhongMaterial({ color: 0xd4aa00, shininess: 90, flatShading: true });
+    var badge = new THREE.Mesh(new THREE.BoxGeometry(5, 4, 1), badgeMat);
+    badge.position.set(0, 4, 9);
+    group.add(badge);
+  }
+
+  _hatMeshes[hatType] = group;
+  return group;
+}
+
+function swapHat(hatType) {
+  if (!humanoid || !humanoid.head) return;
+  // Remove any previous hat
+  var prev = humanoid.head.getObjectByName('_worldHat');
+  if (prev) humanoid.head.remove(prev);
+
+  if (hatType === 'helmet') return; // cosmos = default visor, no extra hat
+
+  var hat = buildHatMesh(hatType);
+  hat.name = '_worldHat';
+  hat.scale.setScalar(0.9);
+  hat.position.set(0, 8, -1);
+  humanoid.head.add(hat);
+}
+
 var scene, camera, renderer, fgRenderer;
 var pauseActive = false;
 var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
@@ -1804,7 +2280,13 @@ function refreshUI() {
   }
   document.getElementById('oxy-rail').style.background = barColor;
   if (STATUS !== 'void') {
-    document.getElementById('world').style.background = 'linear-gradient(180deg,' + bgFrom + ' 0%,' + bgTo + ' 100%)';
+    var W = WORLDS[currentWorld];
+    if (W && oxygen / MAX_O > 0.85) {
+      // Use world's native bg when oxygen is healthy
+      document.getElementById('world').style.background = 'linear-gradient(180deg,' + W.bgFrom + ' 0%,' + W.bgTo + ' 100%)';
+    } else {
+      document.getElementById('world').style.background = 'linear-gradient(180deg,' + bgFrom + ' 0%,' + bgTo + ' 100%)';
+    }
   }
 
   // Survival timer
@@ -2119,6 +2601,8 @@ function startGame() {
   document.getElementById('hb-bar').style.width = '0%';
   document.getElementById('lift-hint').classList.remove('visible');
   document.getElementById('world').style.background = 'linear-gradient(180deg,#020111 0%,#0d0820 100%)';
+  // Apply current world colors
+  applyWorld(currentWorld);
   // Clear toasts
   var toastArea = document.getElementById('toast-banner-area');
   if (toastArea) toastArea.innerHTML = '';
@@ -3287,12 +3771,597 @@ window.addEventListener('load', function() {
   var hintEl = document.getElementById('hint-label');
   isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
   createScene(); createLights(); buildWorld();
+  applyWorld('cosmos');
   initWindStreaks();
   refreshUI(); loop();
   document.getElementById('screen-welcome').classList.add('visible');
   startQuoteRotation();
   STATUS = 'waiting';
+
+  // Wire world selector pills
+  document.querySelectorAll('.hud-world-btn').forEach(function(pill) {
+    function onSelect(e) {
+      e.stopPropagation();
+      var w = pill.dataset.world;
+      if (w === currentWorld) return;
+      applyWorld(w);
+      // Update quote flavor
+      var flavorQuotes = {
+        cosmos:   null, // use default pool
+        culdesac: [{ text: 'D\'oh.', attr: 'Homer Simpson' },
+                   { text: 'Mmm... donuts.', attr: 'Homer Simpson' },
+                   { text: 'Why you little—', attr: 'Homer Simpson' }],
+        deep:     [{ text: 'There are two kinds of people in this world, and I am one of them.', attr: 'anonymous cowboy' },
+                   { text: 'The sun does not ask permission to set.', attr: 'Tombstone, AZ' },
+                   { text: 'Ride hard, leave no trail.', attr: 'anonymous' }],
+        mall:     [{ text: 'In this city, everyone\'s hiding something.', attr: 'anonymous' },
+                   { text: 'The dame walked in like trouble wearing heels.', attr: 'anonymous' },
+                   { text: 'Even the shadows have shadows here.', attr: 'neverever.land' }],
+      };
+      var pool = flavorQuotes[w];
+      if (pool) {
+        var q = pool[Math.floor(Math.random() * pool.length)];
+        var qEl = document.getElementById('welcome-quote');
+        var aEl = document.getElementById('welcome-attribution');
+        if (qEl) { qEl.style.opacity='0'; setTimeout(function(){ qEl.textContent='\u201c'+q.text+'\u201d'; qEl.style.opacity='1'; }, 300); }
+        if (aEl) { aEl.style.opacity='0'; setTimeout(function(){ aEl.textContent='\u2014 '+q.attr; aEl.style.opacity='1'; }, 300); }
+      }
+    }
+    pill.addEventListener('click', onSelect);
+    pill.addEventListener('touchend', function(e) { e.preventDefault(); onSelect(e); }, { passive: false });
+  });
 });
+
+
+
+
+// ════════════════════════════════════════════════════════════════════
+// NOIR MODE — Spaceman Spiff Saucer System
+// Completely replaces normal gameplay loop when currentWorld === 'mall'
+// ════════════════════════════════════════════════════════════════════
+
+var _nc = null, _nctx = null;  // noir canvas & ctx
+
+// ── State ──
+var noir = {
+  active: false,
+  hits: 0,
+  MAX_HITS: 8,
+
+  // Astronaut Y lerp target (locked low)
+  astTargetY: 42,   // world units
+  astTargetX: 0,    // follows mouse X gently
+
+  // Saucer
+  saucerX: 0,       // screen px
+  saucerY: 0,       // screen px
+  saucerVx: 0,
+  saucerFrozenTimer: 0,
+  FREEZE_DURATION: 320,
+  windowIce: 0,
+  ICE_PER_HIT: 0.30,
+  ICE_THAW: 0.0007,
+  laserTimer: 0,
+  LASER_RATE: 95,
+
+  // Debris/clouds (decorative)
+  debris: [],
+
+  // Lasers
+  lasers: [],
+
+  // Iceballs
+  ice: [],
+
+  // Throw
+  throwCooldown: 0,
+  THROW_COOLDOWN: 32,
+};
+
+function noirResize() {
+  if (!_nc) return;
+  _nc.width  = window.innerWidth;
+  _nc.height = window.innerHeight;
+}
+
+function noirInit() {
+  _nc   = document.getElementById('noir-overlay');
+  _nctx = _nc.getContext('2d');
+  noirResize();
+}
+
+function noirEnter() {
+  if (!_nc) noirInit();
+  noirResize();
+  noir.active       = true;
+  noir.hits         = 0;
+  noir.saucerX      = window.innerWidth  * 0.5;
+  noir.saucerY      = window.innerHeight * 0.12;
+  noir.saucerVx     = 0;
+  noir.windowIce    = 0;
+  noir.saucerFrozenTimer = 0;
+  noir.laserTimer   = 90;
+  noir.lasers       = [];
+  noir.ice          = [];
+  noir.throwCooldown = 0;
+  noir.debris       = [];
+
+  // Spawn decorative debris / clouds
+  for (var i = 0; i < 14; i++) {
+    noir.debris.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight * 0.75 + 20,
+      vx: (Math.random()-0.5) * 0.22,
+      vy: (Math.random()-0.5) * 0.08,
+      r: 18 + Math.random() * 55,
+      sides: Math.floor(Math.random() * 4) + 5,
+      angle: Math.random() * Math.PI * 2,
+      spin: (Math.random()-0.5) * 0.003,
+      alpha: 0.04 + Math.random() * 0.07,
+      type: Math.random() < 0.5 ? 'cloud' : 'debris',
+    });
+  }
+
+  // Hide orbs/canisters/boxes
+  if (orbHolder)  orbHolder.mesh.visible  = false;
+  if (canHolder)  canHolder.mesh.visible  = false;
+  if (boxHolder)  boxHolder.mesh.visible  = false;
+  if (starEl)     starEl.style.opacity    = '0';
+
+  document.getElementById('noir-red-wash').style.background = 'rgba(160,0,0,0)';
+  _nc.style.display = 'block';
+}
+
+function noirExit() {
+  noir.active = false;
+  if (_nc) { _nc.style.display = 'none'; if (_nctx) _nctx.clearRect(0,0,_nc.width,_nc.height); }
+  if (orbHolder)  orbHolder.mesh.visible  = true;
+  if (canHolder)  canHolder.mesh.visible  = true;
+  if (boxHolder)  boxHolder.mesh.visible  = true;
+  document.getElementById('noir-red-wash').style.background = 'rgba(160,0,0,0)';
+  if (humanoid) {
+    humanoid.suitMat.color.setHex(0xffffff);
+    humanoid.mesh.scale.setScalar(0.25);
+  }
+}
+
+// ── Draw a polygonal cloud/debris shape ──
+function noirDrawPoly(ctx, x, y, r, sides, angle, alpha, isCloud) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.globalAlpha = alpha;
+  if (isCloud) {
+    // Soft cloud — overlapping circles
+    var cg = ctx.createRadialGradient(0,0,0,0,0,r);
+    cg.addColorStop(0, 'rgba(200,210,220,0.5)');
+    cg.addColorStop(1, 'rgba(180,200,215,0)');
+    ctx.fillStyle = cg;
+    ctx.beginPath();
+    for (var ci = 0; ci < 5; ci++) {
+      var ca = ci / 5 * Math.PI * 2;
+      var cx2 = Math.cos(ca) * r * 0.45;
+      var cy2 = Math.sin(ca) * r * 0.3;
+      ctx.arc(cx2, cy2, r * 0.55, 0, Math.PI*2);
+    }
+    ctx.fill();
+  } else {
+    // Hard polygon debris
+    ctx.strokeStyle = 'rgba(160,170,180,0.6)';
+    ctx.fillStyle   = 'rgba(30,35,40,0.7)';
+    ctx.lineWidth   = 1;
+    ctx.shadowColor = 'rgba(180,200,220,0.2)';
+    ctx.shadowBlur  = 6;
+    ctx.beginPath();
+    for (var pi = 0; pi < sides; pi++) {
+      var pa = pi / sides * Math.PI * 2;
+      var pr = r * (0.7 + Math.sin(pa * 2.3 + angle) * 0.3);
+      pi === 0 ? ctx.moveTo(Math.cos(pa)*pr, Math.sin(pa)*pr)
+               : ctx.lineTo(Math.cos(pa)*pr, Math.sin(pa)*pr);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ── Draw Spaceman Spiff saucer (2D canvas) ──
+function noirDrawSaucer(ctx, x, y, frozen) {
+  var sw = 120, sh = 56;
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Disc body
+  var dg = ctx.createRadialGradient(0, -6, 4, 0, 4, sw*0.52);
+  dg.addColorStop(0,   'rgba(230,230,232,1)');
+  dg.addColorStop(0.55,'rgba(160,162,168,1)');
+  dg.addColorStop(1,   'rgba(60,62,68,1)');
+  ctx.shadowColor = 'rgba(255,255,255,0.18)';
+  ctx.shadowBlur  = 22;
+  ctx.fillStyle   = dg;
+  ctx.beginPath();
+  ctx.ellipse(0, 10, sw*0.5, sh*0.30, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur  = 0;
+
+  // Underbelly glow / thruster ring
+  var ug = ctx.createRadialGradient(0, 14, 0, 0, 14, sw*0.42);
+  ug.addColorStop(0,   frozen ? 'rgba(100,200,255,0.35)' : 'rgba(255,40,0,0.22)');
+  ug.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = ug;
+  ctx.beginPath();
+  ctx.ellipse(0, 14, sw*0.38, sh*0.18, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Rim lights
+  for (var ri = -4; ri <= 4; ri++) {
+    var rl_frozen = frozen;
+    ctx.fillStyle = rl_frozen ? 'rgba(130,210,255,0.9)' :
+                    (Math.abs(ri)%2 === 0 ? 'rgba(255,40,0,0.95)' : 'rgba(180,180,180,0.5)');
+    ctx.shadowColor = rl_frozen ? '#88ddff' : '#ff2200';
+    ctx.shadowBlur  = rl_frozen ? 5 : 7;
+    ctx.beginPath();
+    ctx.arc(ri * 13, 17, 3.2, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+
+  // Red dome
+  var domeg = ctx.createRadialGradient(-10, -18, 2, 0, -8, sw*0.24);
+  domeg.addColorStop(0,  frozen ? '#aaddff' : '#ff7777');
+  domeg.addColorStop(0.6, frozen ? '#4499cc' : '#cc0000');
+  domeg.addColorStop(1,  frozen ? '#114466' : '#550000');
+  ctx.fillStyle = domeg;
+  ctx.shadowColor = frozen ? '#44aaff' : '#ff0000';
+  ctx.shadowBlur  = 16;
+  ctx.beginPath();
+  ctx.ellipse(0, -2, sw*0.24, sh*0.52, 0, Math.PI, 0);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Porthole window
+  var winR = 14;
+  ctx.fillStyle = frozen ? 'rgba(160,225,255,0.95)' : 'rgba(12,12,16,0.92)';
+  ctx.shadowColor = frozen ? '#aaeeff' : '#ff3300';
+  ctx.shadowBlur  = frozen ? 10 : 8;
+  ctx.beginPath();
+  ctx.arc(0, -4, winR, 0, Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Ice accumulation on window
+  if (noir.windowIce > 0 && !frozen) {
+    ctx.globalAlpha = noir.windowIce * 0.88;
+    ctx.fillStyle = 'rgba(170,225,255,0.85)';
+    ctx.beginPath();
+    ctx.arc(0, -4, winR * noir.windowIce, 0, Math.PI*2);
+    ctx.fill();
+    // crack lines
+    ctx.strokeStyle = 'rgba(220,245,255,0.7)';
+    ctx.lineWidth   = 0.7;
+    for (var ci2 = 0; ci2 < 6; ci2++) {
+      var ca2 = ci2 * Math.PI / 3 + 0.2;
+      ctx.beginPath();
+      ctx.moveTo(0, -4);
+      ctx.lineTo(Math.cos(ca2)*winR*noir.windowIce, -4+Math.sin(ca2)*winR*noir.windowIce);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // Spiff eye (if visible)
+  if (!frozen && noir.windowIce < 0.75) {
+    ctx.fillStyle = '#ff2200';
+    ctx.shadowColor = '#ff4400'; ctx.shadowBlur = 5;
+    ctx.beginPath();
+    ctx.ellipse(0, -4, 5, 4, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // Label
+  ctx.fillStyle   = frozen ? 'rgba(140,215,255,0.75)' : 'rgba(255,255,255,0.38)';
+  ctx.font        = 'bold 7px monospace';
+  ctx.textAlign   = 'center';
+  ctx.fillText(frozen ? '❄ FROZEN ❄' : 'SPACEMAN SPIFF', 0, -sh*0.65);
+
+  // Ice meter bar (fill progress)
+  if (!frozen && noir.windowIce > 0.02) {
+    var bw = sw * 0.72, bh = 4, bx = -bw/2, by = -sh * 0.74;
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(bx, by, bw, bh);
+    ctx.fillStyle = 'rgba(140,215,255,0.85)';
+    ctx.fillRect(bx, by, bw * noir.windowIce, bh);
+  }
+
+  // Frozen countdown bar
+  if (frozen) {
+    var fbPct = noir.saucerFrozenTimer / noir.FREEZE_DURATION;
+    var bw2 = sw * 0.72, bh2 = 4, bx2 = -bw2/2, by2 = -sh * 0.74;
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(bx2, by2, bw2, bh2);
+    ctx.fillStyle = 'rgba(100,190,255,0.9)';
+    ctx.fillRect(bx2, by2, bw2 * fbPct, bh2);
+  }
+
+  ctx.restore();
+}
+
+// ── Main noir tick — called from rAF ──
+function noirTick() {
+  if (!noir.active || currentWorld !== 'mall') return;
+  var W = window.innerWidth, H = window.innerHeight;
+  if (_nc.width !== W || _nc.height !== H) noirResize();
+  _nctx.clearRect(0, 0, W, H);
+
+  var frozen = noir.saucerFrozenTimer > 0;
+
+  // ── Lock astronaut low-center, mouse steers X gently ──
+  var astWorldX = noir.astTargetX + (mouse.x * 55);
+  astWorldX = Math.max(-85, Math.min(85, astWorldX));
+  var astWorldY = 36;  // locked low
+  // Lerp position
+  humanoid.mesh.position.x += (astWorldX - humanoid.mesh.position.x) * 0.07;
+  humanoid.mesh.position.y += (astWorldY - humanoid.mesh.position.y) * 0.07;
+  humanoid.mesh.scale.setScalar(0.25);
+
+  // Astronaut screen coords
+  var astSX = norm(humanoid.mesh.position.x, -100, 100, 0, W);
+  var astSY = norm(humanoid.mesh.position.y, 25, 175, H * 0.92, H * 0.08);
+
+  // ── Saucer tracks astronaut X ──
+  var targSX = Math.max(80, Math.min(W - 80, astSX + (Math.random()-0.5)*12));
+  noir.saucerVx += (targSX - noir.saucerX) * 0.035;
+  noir.saucerVx *= 0.80;
+  noir.saucerX  += noir.saucerVx;
+  noir.saucerY   = H * 0.11;
+
+  // ── Ice thaw ──
+  if (frozen) {
+    noir.saucerFrozenTimer--;
+    if (noir.saucerFrozenTimer <= 0) {
+      noir.windowIce = 0;
+      showToast('saucer defrosted — lasers online', 'black');
+    }
+  } else {
+    noir.windowIce = Math.max(0, noir.windowIce - noir.ICE_THAW);
+  }
+
+  // ── Lasers ──
+  if (!frozen && STATUS === 'playing') {
+    noir.laserTimer--;
+    if (noir.laserTimer <= 0) {
+      noir.laserTimer = noir.LASER_RATE;
+      var ldx = astSX - noir.saucerX, ldy = astSY - noir.saucerY;
+      var llen = Math.sqrt(ldx*ldx+ldy*ldy)||1;
+      var spd = 8.5;
+      noir.lasers.push({ x: noir.saucerX, y: noir.saucerY + 18, vx: ldx/llen*spd, vy: ldy/llen*spd, life: 1.0 });
+    }
+  }
+
+  // ── Throw cooldown ──
+  if (noir.throwCooldown > 0) noir.throwCooldown--;
+
+  // ── Draw debris / clouds ──
+  for (var di = 0; di < noir.debris.length; di++) {
+    var db = noir.debris[di];
+    db.x += db.vx; db.y += db.vy;
+    db.angle += db.spin;
+    if (db.x < -db.r*2) db.x = W + db.r;
+    if (db.x > W+db.r*2) db.x = -db.r;
+    noirDrawPoly(_nctx, db.x, db.y, db.r, db.sides, db.angle, db.alpha, db.type === 'cloud');
+  }
+
+  // ── Draw & update lasers ──
+  for (var li = noir.lasers.length-1; li >= 0; li--) {
+    var l = noir.lasers[li];
+    l.x += l.vx; l.y += l.vy;
+    l.life -= 0.007;
+
+    // Collision with astronaut
+    var ldist = Math.sqrt((l.x-astSX)*(l.x-astSX)+(l.y-astSY)*(l.y-astSY));
+    if (ldist < 30 && STATUS === 'playing' && invincibleFrames <= 0) {
+      noir.lasers.splice(li, 1);
+      noir.hits++;
+      invincibleFrames = 80;
+
+      // Physics bump
+      var bumpDir = (humanoid.mesh.position.x > 0) ? -1 : 1;
+      butterfly.vx += bumpDir * (1.5 + Math.random());
+      butterfly.vy -= 1.2 + Math.random() * 1.2;
+      humanoid.reachFade = 0;
+
+      // Joint rattle
+      for (var ji = 0; ji < humanoid.joints.length; ji++) {
+        humanoid.joints[ji].pivot.userData.velX += (Math.random()-0.5)*2.2;
+        humanoid.joints[ji].pivot.userData.velZ += (Math.random()-0.5)*2.2;
+      }
+      gsap.to(humanoid, { flipX: humanoid.flipX+(Math.random()-0.5)*Math.PI*1.2, flipZ: humanoid.flipZ+(Math.random()-0.5)*Math.PI*0.8, duration:0.45, ease:'power2.out'});
+
+      gsap.fromTo('#hit-flash', { opacity: 0.55 }, { opacity: 0, duration: 0.4 });
+      showToast('zapped by spiff · ' + noir.hits + '/' + noir.MAX_HITS, 'black');
+
+      // Red tint
+      var redAmt = Math.min(0.68, (noir.hits / noir.MAX_HITS) * 0.68);
+      document.getElementById('noir-red-wash').style.background = 'rgba(160,0,0,' + redAmt + ')';
+
+      // Suit reddening
+      var sr2 = 1.0, sg2 = Math.max(0, 1-(noir.hits/noir.MAX_HITS)*0.92), sb2 = sg2;
+      humanoid.suitMat.color.setRGB(sr2, sg2, sb2);
+
+      if (noir.hits >= noir.MAX_HITS) {
+        showToast('spiff wins. resetting…', 'black');
+        setTimeout(function() {
+          if (currentWorld === 'mall') {
+            noir.hits = 0;
+            humanoid.suitMat.color.setHex(0xffffff);
+            document.getElementById('noir-red-wash').style.background = 'rgba(160,0,0,0)';
+            showToast('back to the shadows.', 'black');
+          }
+        }, 2200);
+      }
+      continue;
+    }
+
+    if (l.life <= 0 || l.y > H+20 || l.x < -20 || l.x > W+20) { noir.lasers.splice(li,1); continue; }
+
+    // Draw laser beam
+    _nctx.save();
+    _nctx.globalAlpha = l.life * 0.9;
+    var lg = _nctx.createLinearGradient(l.x-l.vx*5, l.y-l.vy*5, l.x, l.y);
+    lg.addColorStop(0, 'rgba(255,40,0,0)');
+    lg.addColorStop(0.5,'rgba(255,80,0,0.95)');
+    lg.addColorStop(1, 'rgba(255,220,80,0.6)');
+    _nctx.strokeStyle  = lg;
+    _nctx.lineWidth    = 3.5;
+    _nctx.shadowColor  = '#ff2200';
+    _nctx.shadowBlur   = 12;
+    _nctx.beginPath();
+    _nctx.moveTo(l.x - l.vx*6, l.y - l.vy*6);
+    _nctx.lineTo(l.x, l.y);
+    _nctx.stroke();
+    _nctx.restore();
+  }
+
+  // ── Draw & update iceballs ──
+  for (var ii = noir.ice.length-1; ii >= 0; ii--) {
+    var ib = noir.ice[ii];
+    ib.x  += ib.vx; ib.y += ib.vy;
+    ib.vy += 0.22;
+    ib.vx *= 0.993;
+    ib.angle += ib.spin;
+    ib.life  -= 0.013;
+
+    // Hit saucer?
+    if (!ib.hitSaucer) {
+      var sdist = Math.sqrt((ib.x-noir.saucerX)*(ib.x-noir.saucerX)+(ib.y-noir.saucerY)*(ib.y-noir.saucerY));
+      if (sdist < 62) {
+        ib.hitSaucer = true;
+        ib.vx *= -0.25; ib.vy *= -0.25;
+        if (!frozen) {
+          noir.windowIce = Math.min(1.0, noir.windowIce + noir.ICE_PER_HIT);
+          if (noir.windowIce >= 1.0) {
+            noir.windowIce = 1.0;
+            noir.saucerFrozenTimer = noir.FREEZE_DURATION;
+            showToast('window frozen! lasers offline ❄', 'oxy');
+          } else {
+            showToast('ice hit · ' + Math.round(noir.windowIce*100) + '% frosted', 'blue');
+          }
+        }
+      }
+    }
+
+    if (ib.life <= 0 || ib.y > H + 40) { noir.ice.splice(ii,1); continue; }
+
+    // Draw crystal iceball
+    _nctx.save();
+    _nctx.translate(ib.x, ib.y);
+    _nctx.rotate(ib.angle);
+    _nctx.globalAlpha = Math.min(1, ib.life * 1.3);
+    _nctx.shadowColor = '#88ddff';
+    _nctx.shadowBlur  = 14;
+    var ir = 10;
+    _nctx.fillStyle   = 'rgba(170,225,255,0.82)';
+    _nctx.strokeStyle = 'rgba(210,245,255,0.7)';
+    _nctx.lineWidth   = 1;
+    // hexagonal snowflake
+    _nctx.beginPath();
+    for (var hp = 0; hp < 6; hp++) {
+      var ha = hp / 6 * Math.PI * 2;
+      var hr = hp%2===0 ? ir : ir*0.52;
+      hp===0 ? _nctx.moveTo(Math.cos(ha)*hr, Math.sin(ha)*hr)
+             : _nctx.lineTo(Math.cos(ha)*hr, Math.sin(ha)*hr);
+    }
+    _nctx.closePath();
+    _nctx.fill();
+    _nctx.stroke();
+    _nctx.restore();
+  }
+
+  // ── Draw saucer ──
+  noirDrawSaucer(_nctx, noir.saucerX, noir.saucerY, frozen);
+
+  // ── Throw hint ──
+  var hintEl = document.getElementById('noir-throw-hint');
+  if (hintEl) {
+    hintEl.textContent = frozen
+      ? '❄ saucer frozen ❄'
+      : (noir.throwCooldown > 0 ? '' : '[ f ] throw ice · double-tap mobile');
+  }
+}
+
+// ── Throw ice ──
+function noirThrowIce() {
+  if (!noir.active || STATUS !== 'playing') return;
+  if (noir.throwCooldown > 0) return;
+  noir.throwCooldown = noir.THROW_COOLDOWN;
+
+  var W = window.innerWidth, H = window.innerHeight;
+  var ax = norm(humanoid.mesh.position.x, -100, 100, 0, W);
+  var ay = norm(humanoid.mesh.position.y, 25, 175, H * 0.92, H * 0.08);
+
+  var tx = noir.saucerX + (Math.random()-0.5)*28;
+  var ty = noir.saucerY;
+  var dx = tx - ax, dy = ty - ay;
+  var len = Math.sqrt(dx*dx+dy*dy)||1;
+  var spd = 13 + Math.random()*4;
+
+  noir.ice.push({
+    x: ax, y: ay,
+    vx: dx/len*spd + (Math.random()-0.5)*1.5,
+    vy: dy/len*spd,
+    life: 1.0, angle: 0,
+    spin: (Math.random()-0.5)*0.28,
+    hitSaucer: false,
+  });
+
+  // Throw arm animation
+  humanoid.reachFade = 0;
+  gsap.to(humanoid, { flipX: humanoid.flipX - 0.8, flipZ: humanoid.flipZ + (humanoid.mesh.rotation.y > 0 ? 0.6 : -0.6), duration: 0.18, ease:'power2.out',
+    onComplete: function() { gsap.to(humanoid, { flipX: humanoid.flipX + 0.8, duration:0.3, ease:'power2.inOut', onComplete: function(){ humanoid.reachFade = 1; }}); }
+  });
+}
+
+// ── Wire F key and double-tap ──
+window.addEventListener('keydown', function(e) {
+  if (currentWorld === 'mall' && (e.code === 'KeyF' || e.code === 'KeyZ')) noirThrowIce();
+});
+
+(function(){
+  var lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    if (currentWorld !== 'mall') return;
+    var now = Date.now();
+    if (now - lastTap < 260 && e.changedTouches.length === 1) noirThrowIce();
+    lastTap = now;
+  }, { passive: true });
+})();
+
+// ── Hook applyWorld ──
+var _origApplyWorld = applyWorld;
+applyWorld = function(worldKey) {
+  _origApplyWorld(worldKey);
+  if (worldKey === 'mall') {
+    setTimeout(noirEnter, 350);
+  } else {
+    noirExit();
+  }
+};
+
+// ── rAF loop ──
+(function noirLoop() {
+  requestAnimationFrame(noirLoop);
+  if (noir.active && currentWorld === 'mall') {
+    noirTick();
+  } else if (_nctx && currentWorld !== 'mall') {
+    _nctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  }
+})();
+
+window.addEventListener('resize', noirResize);
+window.addEventListener('load', function() { noirInit(); }, true);
+
 </script>
 </body>
 </html>
