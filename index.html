@@ -358,6 +358,8 @@
     0%, 100% { opacity: 0.10; }
     50%       { opacity: 0.28; }
   }
+  .btn-link {
+    color: rgba(255,255,255,0.35);
     text-decoration: none; text-transform: lowercase;
     transition: color 0.2s; pointer-events: all;
   }
@@ -579,6 +581,12 @@
     opacity: 1;
     background: radial-gradient(ellipse 90% 90% at 50% 50%, transparent 25%, rgba(0,0,0,0.82) 100%);
   }
+  body.world-tundra #world-atmos {
+    opacity: 1;
+    background:
+      radial-gradient(ellipse 140% 40% at 50% 0%, rgba(200,235,255,0.60) 0%, rgba(180,220,255,0.18) 55%, transparent 100%),
+      radial-gradient(ellipse 80% 30% at 50% 100%, rgba(220,245,255,0.35) 0%, transparent 70%);
+  }
   body.world-mall #world-atmos::after {
     content: '';
     position: absolute; inset: 0;
@@ -603,6 +611,11 @@
     transition: opacity 1.0s ease;
   }
   body.world-culdesac #world-sun { opacity: 1; }
+  body.world-tundra #world-sun {
+    opacity: 1;
+    background: radial-gradient(circle, #ffffff 0%, #e8f4ff 55%, #c8e8ff 100%);
+    box-shadow: 0 0 50px 22px rgba(200,235,255,0.70), 0 0 100px 55px rgba(180,220,255,0.28);
+  }
   #world-westsun {
     position: fixed;
     bottom: 28%; right: 6%;
@@ -687,11 +700,20 @@
     display: none;
   }
   body.world-mall #noir-throw-hint { display: block; }
+
+  /* ── Ink effect overlay ── */
+  #ink-overlay {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 19;
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
 
 <canvas id="noir-overlay"></canvas>
+<canvas id="ink-overlay"></canvas>
 <div id="noir-red-wash"></div>
 <div id="noir-throw-hint">[ f ] throw ice &nbsp;·&nbsp; double-tap mobile</div>
 <div id="cursor"></div>
@@ -717,6 +739,7 @@
     <button class="hud-world-btn active" data-world="cosmos">🌌</button>
     <button class="hud-world-btn" data-world="culdesac">🍩</button>
     <button class="hud-world-btn" data-world="deep">🤠</button>
+    <button class="hud-world-btn" data-world="tundra">🏔️</button>
   </div>
 </div>
 
@@ -908,6 +931,27 @@ var WORLDS = {
     hat: 'helmet',
     toastLabel: 'suspect',
     particleLabel: 'rain',
+  },
+  tundra: {
+    // ── ICE PLANET ── Crisp alpine, snowboard glide, powder spray
+    name: 'ice planet',
+    accent: 'rgba(180,230,255,0.98)',
+    bgFrom: '#c8e8f8', bgTo: '#e8f5ff',
+    fogColor: 0xd8eef8, fogNear: 120, fogFar: 700,
+    seaColor: 0xa8d8f0,
+    starColor: 0xffffff,
+    orbColors: { blue: 0x88ccff, red: 0xff8888, black: 0x334455 },
+    canColor: 0xaaeeff,
+    flameColor: 0xccf4ff,
+    dustColors: [0xffffff, 0xe0f4ff, 0xc8e8ff, 0xd0eeff, 0xf0faff],
+    puffColor: 0xffffff,
+    windForward: 'rgba(200,235,255,',
+    windReverse: 'rgba(160,200,240,',
+    hudAccent: '#88d8f8',
+    oxyRailColor: '#88d8f8',
+    hat: 'helmet',
+    toastLabel: 'powder',
+    particleLabel: 'snow spray',
   }
 };
 
@@ -1006,6 +1050,18 @@ function applyWorld(worldKey) {
     var coldFill = new THREE.PointLight(0x334455, 0.8, 500);
     coldFill.position.set(0, -200, 200);
     scene.add(coldFill); _worldLights.push(coldFill);
+  } else if (worldKey === 'tundra') {
+    // Ice Planet: crisp alpine sun high and slightly angled, cold blue fill, bright snow bounce
+    scene.children.forEach(function(c) {
+      if (c.isHemisphereLight) c.intensity = 0.25;
+      if (c.isAmbientLight) { c.color.setHex(0xc8eeff); c.intensity = 0.7; }
+      if (c.isDirectionalLight) { c.color.setHex(0xfff8f0); c.intensity = 2.0; c.position.set(200, 600, 150); }
+    });
+    var snowBounce = new THREE.HemisphereLight(0xe8f8ff, 0xaaddff, 0.9);
+    scene.add(snowBounce); _worldLights.push(snowBounce);
+    var rimIce = new THREE.DirectionalLight(0x88ccff, 0.55);
+    rimIce.position.set(-300, 200, -100);
+    scene.add(rimIce); _worldLights.push(rimIce);
   } else {
     // Cosmos: restore defaults
     scene.children.forEach(function(c) { if (c.isHemisphereLight) { c.color.setHex(0xffffff); c.groundColor.setHex(0x000000); c.intensity = 0.5; } if (c.isAmbientLight) { c.color.setHex(0x404040); c.intensity = 0.7; } if (c.isDirectionalLight) { c.color.setHex(0xffffff); c.intensity = 0.9; c.position.set(150, 350, 350); } });
@@ -1582,6 +1638,458 @@ RagdollHuman.prototype.hitReaction = function() {
   this.baseRotX += (Math.random() - 0.5) * 0.6;
 };
 
+// ─── Companion Dog ─────────────────────────────────────────────────────────
+// White, small, short-legged ruffian. Has its own physics/agency — orbits the
+// astronaut with attention-seeking randomized behavior. Totally impervious to
+// the game (no damage, no tumble, no status changes). Full ragdoll limbs.
+var companionPoodle = null;
+
+function CompanionPoodle() {
+  this.animT = 0;
+
+  // ── Own position/velocity (independent physics) ──
+  this.px = 0; this.py = 100;  // world position
+  this.vx = 0; this.vy = 0;    // velocity
+
+  // ── Attention / behavior state ──
+  this.behaviorTimer  = 0;      // frames until next behavior switch
+  this.behavior       = 'orbit';// 'orbit' | 'zoom' | 'stare' | 'circle'
+  this.orbitAngle     = 0.8;    // current angle around astronaut
+  this.orbitRadius    = 38;     // desired orbit radius
+  this.orbitDir       = 1;      // +1 or -1
+  this.zoomTargetX    = 0;
+  this.zoomTargetY    = 100;
+  this.attentionYaw   = 0;      // desired body yaw to face astronaut
+  this.bodyYaw        = 0;      // smoothed yaw
+
+  // ── Ragdoll joint velocities ──
+  // Each joint: angVx, angVz (angular vel on x and z axes)
+  this._jv = {
+    neck:  { vx:0, vz:0 },
+    tail1: { vx:0, vz:0 },
+    tail2: { vx:0, vz:0 },
+    tail3: { vx:0, vz:0 },
+    earL:  { vx:0, vz:0 },
+    earR:  { vx:0, vz:0 },
+    flUp:  { vx:0, vz:0 }, flKn: { vx:0, vz:0 },
+    frUp:  { vx:0, vz:0 }, frKn: { vx:0, vz:0 },
+    blUp:  { vx:0, vz:0 }, blKn: { vx:0, vz:0 },
+    brUp:  { vx:0, vz:0 }, brKn: { vx:0, vz:0 },
+  };
+
+  // ── Materials — all white, black nose/eyes ──
+  var fur  = new THREE.MeshPhongMaterial({ color: 0xf4f0e8, flatShading: true });
+  var furS = new THREE.MeshPhongMaterial({ color: 0xdedad0, flatShading: true }); // slight shadow tone
+  var blk  = new THREE.MeshPhongMaterial({ color: 0x111111, flatShading: true });
+  var pink = new THREE.MeshPhongMaterial({ color: 0xf0909a, flatShading: true });
+  var nose = new THREE.MeshPhongMaterial({ color: 0x1a0a0a, flatShading: true });
+
+  // Wolfgang — slightly larger than original, scale 0.20 vs humanoid's 0.25
+  this.mesh = new THREE.Object3D();
+  this.mesh.name = 'wolfgang';
+  this.mesh.scale.setScalar(0.20);
+
+  this.body = new THREE.Object3D();
+  this.mesh.add(this.body);
+
+  // ── Torso ──
+  var torsoGeom = new THREE.BoxGeometry(16, 11, 24);
+  this.torso = new THREE.Mesh(torsoGeom, fur);
+  this.torso.castShadow = true;
+  this.body.add(this.torso);
+
+  // ── Tail — 3 segments, shorter and waggier ──
+  // Segment 1 (base) — thick, pivots at rump
+  this.tail1Pivot = new THREE.Object3D();
+  this.tail1Pivot.position.set(0, 3, -13);
+  this.tail1Pivot.rotation.x = -0.9; // points up and back at rest
+  this.torso.add(this.tail1Pivot);
+
+  var t1g = new THREE.BoxGeometry(6, 6, 10); // was 16 — shorter
+  var t1m = new THREE.Mesh(t1g, fur);
+  t1m.position.z = 5; // was 8
+  this.tail1Pivot.add(t1m);
+
+  // Segment 2 — mid, thinner
+  this.tail2Pivot = new THREE.Object3D();
+  this.tail2Pivot.position.z = 10; // was 16
+  this.tail1Pivot.add(this.tail2Pivot);
+
+  var t2g = new THREE.BoxGeometry(5, 5, 9); // was 14
+  var t2m = new THREE.Mesh(t2g, furS);
+  t2m.position.z = 4.5; // was 7
+  this.tail2Pivot.add(t2m);
+
+  // Segment 3 — tip, wispy
+  this.tail3Pivot = new THREE.Object3D();
+  this.tail3Pivot.position.z = 9; // was 14
+  this.tail2Pivot.add(this.tail3Pivot);
+
+  var t3g = new THREE.BoxGeometry(4, 4, 7); // was 11
+  var t3m = new THREE.Mesh(t3g, fur);
+  t3m.position.z = 3.5; // was 5.5
+  this.tail3Pivot.add(t3m);
+
+  // ── Neck + Head ──
+  this.neckPivot = new THREE.Object3D();
+  this.neckPivot.position.set(0, 4, 12);
+  this.neckPivot.rotation.x = 0.5;
+  this.torso.add(this.neckPivot);
+
+  var nkG = new THREE.BoxGeometry(8, 8, 10);
+  var nkM = new THREE.Mesh(nkG, fur);
+  nkM.position.z = 5;
+  this.neckPivot.add(nkM);
+
+  this.headNode = new THREE.Object3D();
+  this.headNode.position.z = 10;
+  this.neckPivot.add(this.headNode);
+
+  var hdG = new THREE.BoxGeometry(14, 12, 14);
+  this.head = new THREE.Mesh(hdG, fur);
+  this.head.castShadow = true;
+  this.headNode.add(this.head);
+
+  // Muzzle
+  var mzG = new THREE.BoxGeometry(10, 7, 10);
+  var muzzle = new THREE.Mesh(mzG, furS);
+  muzzle.position.set(0, -2, 11);
+  this.head.add(muzzle);
+
+  // Nose
+  var nsM = new THREE.Mesh(new THREE.BoxGeometry(5, 3.5, 2.5), nose);
+  nsM.position.set(0, 1.5, 5);
+  muzzle.add(nsM);
+
+  // Eyes — small beady, very forward-set, intense focus
+  var eyG = new THREE.BoxGeometry(2.5, 4, 4);
+  this.eyeL = new THREE.Mesh(eyG, new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true }));
+  this.eyeL.position.set(6, 2, 6);
+  this.head.add(this.eyeL);
+  var irL = new THREE.Mesh(new THREE.BoxGeometry(1, 2.5, 2.5), blk);
+  irL.position.set(1.5, 0.3, 1.5);
+  this.eyeL.add(irL);
+
+  this.eyeR = this.eyeL.clone();
+  this.eyeR.position.x = -6;
+  this.eyeR.children[0].position.x = -1.5;
+  this.head.add(this.eyeR);
+
+  // Ears — short floppy triangular, pivot at crown
+  this.earLPivot = new THREE.Object3D();
+  this.earLPivot.position.set(7, 5, 1);
+  this.earLPivot.rotation.z = 0.15; // slight outward tilt at rest
+  this.head.add(this.earLPivot);
+
+  var erG = new THREE.BoxGeometry(7, 10, 4);
+  var erL = new THREE.Mesh(erG, furS);
+  erL.position.set(0, -5, 0); // hangs below pivot
+  this.earLPivot.add(erL);
+
+  this.earRPivot = new THREE.Object3D();
+  this.earRPivot.position.set(-7, 5, 1);
+  this.earRPivot.rotation.z = -0.15;
+  this.head.add(this.earRPivot);
+
+  var erR = erL.clone();
+  this.earRPivot.add(erR);
+
+  // ── Bubble helmet — clear astronaut dome ──
+  // Outer shell: large transparent sphere, slight blue tint
+  var helmetGeom = new THREE.SphereGeometry(12, 16, 12);
+  var helmetMat = new THREE.MeshPhongMaterial({
+    color: 0xaaddff,
+    transparent: true,
+    opacity: 0.18,
+    shininess: 120,
+    specular: 0xffffff,
+    side: THREE.FrontSide,
+    depthWrite: false,
+  });
+  var helmetSphere = new THREE.Mesh(helmetGeom, helmetMat);
+  helmetSphere.position.set(0, 1, 0);
+  this.headNode.add(helmetSphere);
+
+  // Inner shell: slightly smaller, gives the bubble depth/thickness illusion
+  var helmetInnerMat = new THREE.MeshPhongMaterial({
+    color: 0xcceeff,
+    transparent: true,
+    opacity: 0.07,
+    shininess: 60,
+    specular: 0xffffff,
+    side: THREE.BackSide,
+    depthWrite: false,
+  });
+  var helmetInner = new THREE.Mesh(new THREE.SphereGeometry(11.2, 16, 12), helmetInnerMat);
+  helmetInner.position.set(0, 1, 0);
+  this.headNode.add(helmetInner);
+
+  // Glint — a small bright highlight sphere at upper-left of dome
+  var glintMat = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.55,
+    depthWrite: false,
+  });
+  var glint = new THREE.Mesh(new THREE.SphereGeometry(2.2, 8, 8), glintMat);
+  glint.position.set(5, 8, 7);
+  this.headNode.add(glint);
+
+  // ── Legs — SHORT (upper 9, lower 8 units), two-segment ragdoll, comedic splay ──
+  var _t = this;
+  function makeLeg(bx, bz, front, splayZ) {
+    var upPivot = new THREE.Object3D();
+    upPivot.position.set(bx, -5, bz);
+    upPivot.rotation.z = splayZ; // resting outward splay
+    _t.body.add(upPivot);
+
+    var upMesh = new THREE.Mesh(new THREE.BoxGeometry(5, 9, 5), fur);
+    upMesh.position.y = -4.5;
+    upPivot.add(upMesh);
+
+    var knPivot = new THREE.Object3D();
+    knPivot.position.y = -9;
+    knPivot.rotation.x = front ? 0.25 : -0.35;
+    upPivot.add(knPivot);
+
+    var loMesh = new THREE.Mesh(new THREE.BoxGeometry(4, 8, 4), furS);
+    loMesh.position.y = -4;
+    knPivot.add(loMesh);
+
+    var pawMesh = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 7), fur);
+    pawMesh.position.set(0, -8, front ? 1.5 : -1.5);
+    knPivot.add(pawMesh);
+
+    return { up: upPivot, kn: knPivot };
+  }
+
+  // splayZ: negative = left leg splays left, positive = right leg splays right
+  this.legFL = makeLeg(-7,  11, true,  -0.38);
+  this.legFR = makeLeg( 7,  11, true,   0.38);
+  this.legBL = makeLeg(-7, -11, false, -0.38);
+  this.legBR = makeLeg( 7, -11, false,  0.38);
+
+  this.mesh.traverse(function(o) {
+    if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; }
+  });
+
+  // Pick a random starting behavior timer
+  this.behaviorTimer = Math.floor(Math.random() * 120) + 60;
+}
+
+// ── Spring-damp helper: apply angular velocity, spring toward rest, clamp ──
+function _jSpring(jv, axis, curr, restAngle, stiff, damp, drive, lo, hi) {
+  jv[axis] = (jv[axis] + drive) * damp - (curr - restAngle) * stiff;
+  return Math.max(lo, Math.min(hi, curr + jv[axis]));
+}
+
+CompanionPoodle.prototype.update = function(hx, hy) {
+  this.animT += 0.08;
+  var t = this.animT;
+
+  // ── Behavior state machine ──────────────────────────────────────────────
+  this.behaviorTimer--;
+  if (this.behaviorTimer <= 0) {
+    var roll = Math.random();
+    if (roll < 0.45)      { this.behavior = 'orbit';  this.orbitDir = Math.random() < 0.5 ? 1 : -1; this.behaviorTimer = 180 + Math.floor(Math.random() * 240); }
+    else if (roll < 0.65) { this.behavior = 'zoom';   this.behaviorTimer = 60  + Math.floor(Math.random() * 80);
+                             // Pick a wild offset target near the astronaut
+                             this.zoomTargetX = hx + (Math.random() - 0.5) * 80;
+                             this.zoomTargetY = hy + (Math.random() - 0.5) * 60; }
+    else if (roll < 0.82) { this.behavior = 'stare';  this.behaviorTimer = 90  + Math.floor(Math.random() * 120); }
+    else                  { this.behavior = 'circle'; this.orbitDir = Math.random() < 0.5 ? 1 : -1; this.behaviorTimer = 100 + Math.floor(Math.random() * 140); }
+  }
+
+  // ── Position / velocity ─────────────────────────────────────────────────
+  var targetX, targetY, pull;
+
+  if (this.behavior === 'orbit') {
+    // Orbit the astronaut at a comfortable radius — attention but not clinging
+    this.orbitAngle += 0.018 * this.orbitDir;
+    targetX = hx + Math.cos(this.orbitAngle) * this.orbitRadius;
+    targetY = hy + Math.sin(this.orbitAngle) * this.orbitRadius * 0.55;
+    pull = 0.055;
+  } else if (this.behavior === 'zoom') {
+    // Dart to a random spot near astronaut — excited burst
+    targetX = this.zoomTargetX;
+    targetY = this.zoomTargetY;
+    pull = 0.12;
+  } else if (this.behavior === 'stare') {
+    // Hover relatively still nearby, just gazing at astronaut
+    targetX = hx + 32 + Math.sin(t * 0.3) * 8;
+    targetY = hy - 10 + Math.cos(t * 0.25) * 6;
+    pull = 0.03;
+  } else { // circle — tight fast circles around the astronaut
+    this.orbitAngle += 0.038 * this.orbitDir;
+    targetX = hx + Math.cos(this.orbitAngle) * 22;
+    targetY = hy + Math.sin(this.orbitAngle) * 14;
+    pull = 0.09;
+  }
+
+  // Soft spring toward target
+  this.vx += (targetX - this.px) * pull * 0.15;
+  this.vy += (targetY - this.py) * pull * 0.15;
+
+  // Drag
+  this.vx *= 0.86;
+  this.vy *= 0.86;
+
+  // Clamp speed
+  var spd = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+  var maxSpd = (this.behavior === 'zoom') ? 12 : (this.behavior === 'circle') ? 8 : 5;
+  if (spd > maxSpd) { this.vx *= maxSpd / spd; this.vy *= maxSpd / spd; }
+
+  this.px += this.vx;
+  this.py += this.vy;
+
+  // World bounds — same soft walls as astronaut
+  if (this.px < -115) this.vx += (-115 - this.px) * 0.08;
+  if (this.px >  115) this.vx += ( 115 - this.px) * 0.08;
+  if (this.py <  18)  this.vy += (  18 - this.py) * 0.10;
+  if (this.py >  175) this.vy += ( 175 - this.py) * 0.10;
+
+  this.mesh.position.set(this.px, this.py, 16);
+
+  // ── Body orientation — always tries to face the astronaut ──────────────
+  var toAstX = hx - this.px;
+  var toAstY = hy - this.py;
+  var toAstDist = Math.sqrt(toAstX * toAstX + toAstY * toAstY) || 1;
+
+  // Yaw: atan2 in the XZ plane (we use X and the scene depth offset)
+  // In this game X is lateral, Z is depth — dog faces +Z by default
+  // We want body to rotate toward astronaut on Y axis
+  var desiredYaw = Math.atan2(toAstX, 1) + Math.PI * 0.5;
+  // Velocity-based yaw for movement direction
+  if (spd > 0.5) desiredYaw = Math.atan2(this.vx, 0.5) + Math.PI * 0.55;
+
+  this.bodyYaw += (desiredYaw - this.bodyYaw) * 0.10;
+  this.mesh.rotation.y = this.bodyYaw;
+
+  // Gentle body tilt based on velocity
+  this.mesh.rotation.x = this.vy * -0.018;
+  this.mesh.rotation.z = this.vx * -0.022;
+
+  // ── Run cycle speed driven by actual speed ──────────────────────────────
+  var runSpd = Math.min(1, spd / 8);
+  var runT   = t * (1.5 + runSpd * 2.5); // faster stride when moving fast
+
+  // Body bob
+  this.body.position.y = Math.sin(runT * 2) * 2 * runSpd;
+
+  // Eyes blink
+  var blink = (Math.sin(t * 0.11) > 0.96) ? 0.05 : 1;
+  this.eyeL.scale.y = blink;
+  this.eyeR.scale.y = blink;
+
+  // ── Ragdoll ─────────────────────────────────────────────────────────────
+  // Impulse sources: velocity change (acceleration), and run cycle
+  var accelX = this.vx - (this._pvx || 0);
+  var accelY = this.vy - (this._pvy || 0);
+  this._pvx = this.vx; this._pvy = this.vy;
+
+  var jv = this._jv;
+  var D = 0.75, S = 0.12; // global damp and stiffness defaults
+
+  // Neck — pitches with accelY (lurch when accelerating), tilts with accelX
+  jv.neck.vx = (jv.neck.vx + accelY * 1.8) * D - (this.neckPivot.rotation.x - 0.5) * S;
+  jv.neck.vz = (jv.neck.vz - accelX * 1.2) * D - (this.neckPivot.rotation.z)       * (S * 0.7);
+  // Stare behavior: head tilts charmingly toward astronaut
+  var stareTilt = (this.behavior === 'stare') ? Math.sin(t * 0.4) * 0.35 : 0;
+  jv.neck.vz += stareTilt * 0.04;
+  this.neckPivot.rotation.x = Math.max(-0.2, Math.min(1.3, this.neckPivot.rotation.x + jv.neck.vx));
+  this.neckPivot.rotation.z = Math.max(-0.6, Math.min(0.6, this.neckPivot.rotation.z + jv.neck.vz));
+
+  // Ears — swing outward with lateral accel, flap back with speed
+  var earDriveZ = accelX * 2.2;
+  var earDriveX = -runSpd * 0.8 + accelY * 0.6;
+  jv.earL.vz = (jv.earL.vz + earDriveZ) * 0.68 - this.earLPivot.rotation.z * 0.20;
+  jv.earR.vz = (jv.earR.vz - earDriveZ) * 0.68 - this.earRPivot.rotation.z * 0.20;
+  jv.earL.vx = (jv.earL.vx + earDriveX) * 0.70 - this.earLPivot.rotation.x * 0.18;
+  jv.earR.vx = (jv.earR.vx + earDriveX) * 0.70 - this.earRPivot.rotation.x * 0.18;
+  this.earLPivot.rotation.z = Math.max(-0.8, Math.min(0.8, this.earLPivot.rotation.z + jv.earL.vz));
+  this.earRPivot.rotation.z = Math.max(-0.8, Math.min(0.8, this.earRPivot.rotation.z + jv.earR.vz));
+  this.earLPivot.rotation.x = Math.max(-0.7, Math.min(0.5, this.earLPivot.rotation.x + jv.earL.vx));
+  this.earRPivot.rotation.x = Math.max(-0.7, Math.min(0.5, this.earRPivot.rotation.x + jv.earR.vx));
+
+  // Tail — 3 segments, whips enthusiastically; wag speed by behavior
+  var wagFreq  = this.behavior === 'stare' ? 6.0 : this.behavior === 'circle' ? 11 : 8.5; // faster
+  var wagAmp   = this.behavior === 'stare' ? 2.0 : 1.6; // bigger swing
+  var wagPhase = Math.sin(t * wagFreq) * wagAmp;
+
+  // Seg 1: base — driven by wag + accel, less damping = freer swing
+  jv.tail1.vx = (jv.tail1.vx + accelX * 2.5) * 0.78 - (this.tail1Pivot.rotation.x - (-0.8)) * 0.08;
+  jv.tail1.vz = (jv.tail1.vz + wagPhase * 0.10 + accelY * 1.5) * 0.75 - this.tail1Pivot.rotation.z * 0.09;
+  this.tail1Pivot.rotation.x = Math.max(-1.6, Math.min(0.3, this.tail1Pivot.rotation.x + jv.tail1.vx));
+  this.tail1Pivot.rotation.z = Math.max(-1.8, Math.min(1.8, this.tail1Pivot.rotation.z + jv.tail1.vz));
+
+  // Seg 2: mid — lags behind seg 1, amplifies the wag
+  jv.tail2.vx = (jv.tail2.vx + accelX * 1.8) * 0.70 - (this.tail2Pivot.rotation.x) * 0.07;
+  jv.tail2.vz = (jv.tail2.vz + wagPhase * 0.16) * 0.68 - this.tail2Pivot.rotation.z * 0.08;
+  this.tail2Pivot.rotation.x = Math.max(-0.8, Math.min(0.8, this.tail2Pivot.rotation.x + jv.tail2.vx));
+  this.tail2Pivot.rotation.z = Math.max(-1.6, Math.min(1.6, this.tail2Pivot.rotation.z + jv.tail2.vz));
+
+  // Seg 3: tip — most exaggerated, barely damped
+  jv.tail3.vz = (jv.tail3.vz + wagPhase * 0.22) * 0.63 - this.tail3Pivot.rotation.z * 0.07;
+  jv.tail3.vx = (jv.tail3.vx + accelX * 1.2) * 0.65 - this.tail3Pivot.rotation.x * 0.07;
+  this.tail3Pivot.rotation.z = Math.max(-1.4, Math.min(1.4, this.tail3Pivot.rotation.z + jv.tail3.vz));
+  this.tail3Pivot.rotation.x = Math.max(-0.8, Math.min(0.8, this.tail3Pivot.rotation.x + jv.tail3.vx));
+
+  // ── Legs — alternating stride + ragdoll sway ──────────────────────────
+  var stride = runSpd * 0.9;
+
+  // Scroll signal — same global reverseLerp the astronaut uses
+  var _rl = (typeof reverseLerp !== 'undefined' ? reverseLerp : 0);
+  var scrollFwd = Math.max(0,  _rl);
+  var scrollRev = Math.max(0, -_rl);
+  // scrollDrive: positive = forward lean, negative = backpedal
+  // Flip the sign so stride direction visually matches scene direction
+  var scrollDrive = scrollFwd * 0.9 - scrollRev * 0.7;
+  // strideSign: +1 forward, -1 reverse — reverses the alternating leg cycle
+  var strideSign = (_rl < -0.05) ? -1 : 1;
+
+  // Upper legs: stride cycle flips with scroll direction
+  var strF =  Math.sin(runT) * stride * strideSign;
+  var strB = -Math.sin(runT) * stride * strideSign;
+
+  // Ragdoll kick from accel + scroll on upper legs
+  jv.flUp.vx = (jv.flUp.vx + strF * 0.05 - accelY * 0.8 - scrollDrive * 0.55) * D - this.legFL.up.rotation.x * S;
+  jv.frUp.vx = (jv.frUp.vx - strF * 0.05 - accelY * 0.8 - scrollDrive * 0.55) * D - this.legFR.up.rotation.x * S;
+  jv.blUp.vx = (jv.blUp.vx + strB * 0.05 - accelY * 0.7 - scrollDrive * 0.45) * D - this.legBL.up.rotation.x * S;
+  jv.brUp.vx = (jv.brUp.vx - strB * 0.05 - accelY * 0.7 - scrollDrive * 0.45) * D - this.legBR.up.rotation.x * S;
+
+  // Lateral sway from accelX — also flip when reversing so sway stays intuitive
+  var latKick = accelX * 0.6 * strideSign;
+  jv.flUp.vz = (jv.flUp.vz + latKick) * D - this.legFL.up.rotation.z * S;
+  jv.frUp.vz = (jv.frUp.vz + latKick) * D - this.legFR.up.rotation.z * S;
+  jv.blUp.vz = (jv.blUp.vz + latKick * 0.8) * D - this.legBL.up.rotation.z * S;
+  jv.brUp.vz = (jv.brUp.vz + latKick * 0.8) * D - this.legBR.up.rotation.z * S;
+
+  this.legFL.up.rotation.x = Math.max(-0.9, Math.min(1.0, this.legFL.up.rotation.x + jv.flUp.vx));
+  this.legFR.up.rotation.x = Math.max(-0.9, Math.min(1.0, this.legFR.up.rotation.x + jv.frUp.vx));
+  this.legBL.up.rotation.x = Math.max(-1.0, Math.min(0.9, this.legBL.up.rotation.x + jv.blUp.vx));
+  this.legBR.up.rotation.x = Math.max(-1.0, Math.min(0.9, this.legBR.up.rotation.x + jv.brUp.vx));
+
+  this.legFL.up.rotation.z = Math.max(-0.85, Math.min(0.20, this.legFL.up.rotation.z + jv.flUp.vz));
+  this.legFR.up.rotation.z = Math.max(-0.20, Math.min(0.85, this.legFR.up.rotation.z + jv.frUp.vz));
+  this.legBL.up.rotation.z = Math.max(-0.85, Math.min(0.20, this.legBL.up.rotation.z + jv.blUp.vz));
+  this.legBR.up.rotation.z = Math.max(-0.20, Math.min(0.85, this.legBR.up.rotation.z + jv.brUp.vz));
+
+  // Knees — rest bend flips with direction:
+  // Forward: front knees tuck up, back knees kick back. Reverse: opposite.
+  var knFrontRest =  0.40 + scrollDrive * 0.35 * strideSign;
+  var knBackRest  = -0.45 - scrollDrive * 0.30 * strideSign;
+
+  jv.flKn.vx = (jv.flKn.vx + jv.flUp.vx * 0.55) * 0.72 - (this.legFL.kn.rotation.x - knFrontRest) * 0.14;
+  jv.frKn.vx = (jv.frKn.vx + jv.frUp.vx * 0.55) * 0.72 - (this.legFR.kn.rotation.x - knFrontRest) * 0.14;
+  jv.blKn.vx = (jv.blKn.vx + jv.blUp.vx * 0.55) * 0.72 - (this.legBL.kn.rotation.x - knBackRest)  * 0.14;
+  jv.brKn.vx = (jv.brKn.vx + jv.brUp.vx * 0.55) * 0.72 - (this.legBR.kn.rotation.x - knBackRest)  * 0.14;
+
+  this.legFL.kn.rotation.x = Math.max(0.10, Math.min(1.1,  this.legFL.kn.rotation.x + jv.flKn.vx));
+  this.legFR.kn.rotation.x = Math.max(0.10, Math.min(1.1,  this.legFR.kn.rotation.x + jv.frKn.vx));
+  this.legBL.kn.rotation.x = Math.max(-1.1, Math.min(-0.10, this.legBL.kn.rotation.x + jv.blKn.vx));
+  this.legBR.kn.rotation.x = Math.max(-1.1, Math.min(-0.10, this.legBR.kn.rotation.x + jv.brKn.vx));
+};
+
 // ─── Orbs (tiered enemy system) ────────────────────────────────────────────
 var ORB_DEFS = {
   blue:  { color: 0x4499ff, emissive: 0x001133, oxygenCost: 1.0,  size: 8,  hitStr: 'light'       },
@@ -1897,6 +2405,78 @@ function updateAirPuffs() {
       : p.peakOpacity * (lifePhase / 0.7);          // fade out
     // Slow rotation as ring expands
     p.mesh.rotation.z += 0.015;
+  }
+}
+
+// ─── Snow Spray (Tundra world) ─────────────────────────────────────────────
+var snowParticles = [];
+var snowPool = [];
+
+function SnowFlake() {
+  var g = new THREE.OctahedronGeometry(1.2, 0);
+  g.applyMatrix4(new THREE.Matrix4().makeScale(1, 0.35, 1));
+  var m = new THREE.MeshBasicMaterial({
+    color: 0xffffff, transparent: true, opacity: 0,
+    depthWrite: false, blending: THREE.AdditiveBlending
+  });
+  this.mesh = new THREE.Mesh(g, m);
+  this.mesh.visible = false;
+  scene.add(this.mesh);
+}
+
+function spawnSnowSpray(x, y, z, velX, velY, speed) {
+  if (currentWorld !== 'tundra') return;
+  var count = Math.floor(2 + speed * 18);
+  for (var i = 0; i < count; i++) {
+    var p = snowPool.length ? snowPool.pop() : new SnowFlake();
+    var sideDir = (Math.random() > 0.5 ? 1 : -1);
+    p.mesh.position.set(
+      x + (Math.random() - 0.5) * 6,
+      y - 18 + (Math.random() - 0.5) * 4,
+      z + (Math.random() - 0.5) * 8
+    );
+    p.mesh.rotation.set(
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2
+    );
+    var spd = 0.6 + Math.random() * 1.4;
+    p.vx = velX * -0.12 + sideDir * (0.8 + Math.random() * 1.6) * spd;
+    p.vy = Math.abs(velY) * 0.08 + (0.3 + Math.random() * 0.8) * spd;
+    p.vz = (Math.random() - 0.5) * 1.2 * spd;
+    p.vr = (Math.random() - 0.5) * 0.12;
+    p.life = 1.0;
+    p.decay = 0.022 + Math.random() * 0.028;
+    p.baseScale = 0.4 + Math.random() * 0.9;
+    p.mesh.scale.setScalar(p.baseScale);
+    p.mesh.material.opacity = 0.0;
+    p.peakOpacity = 0.55 + Math.random() * 0.35;
+    p.mesh.visible = true;
+    snowParticles.push(p);
+  }
+}
+
+function updateSnowSpray() {
+  for (var i = snowParticles.length - 1; i >= 0; i--) {
+    var p = snowParticles[i];
+    p.life -= p.decay;
+    if (p.life <= 0) {
+      p.mesh.visible = false;
+      snowPool.push(p);
+      snowParticles.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.x += p.vx;
+    p.mesh.position.y += p.vy;
+    p.mesh.position.z += p.vz;
+    p.vx *= 0.91; p.vy *= 0.88;
+    p.mesh.rotation.x += p.vr;
+    p.mesh.rotation.z += p.vr * 0.6;
+    var s = p.baseScale * (1 + (1 - p.life) * 1.4);
+    p.mesh.scale.setScalar(s);
+    p.mesh.material.opacity = p.life > 0.75
+      ? p.peakOpacity * ((1 - p.life) / 0.25)
+      : p.peakOpacity * (p.life / 0.75);
   }
 }
 
@@ -2234,6 +2814,9 @@ function buildWorld() {
   humanoid.mesh.scale.setScalar(0.25);
   humanoid.mesh.position.set(0, 100, 0);
   scene.add(humanoid.mesh);
+  companionPoodle = new CompanionPoodle();
+  companionPoodle.mesh.position.set(28, 88, 18);
+  scene.add(companionPoodle.mesh);
   orbHolder  = new OrbsHolder();      scene.add(orbHolder.mesh);
   canHolder  = new CanistersHolder(); scene.add(canHolder.mesh);
   boxHolder  = new MysteryBoxHolder();scene.add(boxHolder.mesh);
@@ -3021,7 +3604,11 @@ function loop() {
   var cycle = (sea.mesh.rotation.z / Math.PI) % planetColors.length;
   var idx1 = Math.floor(Math.abs(cycle)), idx2 = (idx1+1) % planetColors.length;
   var c1 = new THREE.Color(planetColors[idx1]), c2 = new THREE.Color(planetColors[idx2]);
-  sea.mesh.material.color.copy(c1).lerp(c2, Math.abs(cycle) - idx1);
+  if (currentWorld === 'tundra') {
+    sea.mesh.material.color.setHex(0xa8d8f0); // lock to ice blue
+  } else {
+    sea.mesh.material.color.copy(c1).lerp(c2, Math.abs(cycle) - idx1);
+  }
 
   if (STATUS === 'playing') {
     // Safety net — ensure scene is always visible during play
@@ -3046,6 +3633,7 @@ function loop() {
       humanoid.butterflyDx = bfDxP; humanoid.butterflyDy = bfDyP; humanoid.butterflyDist = bfDistP;
       humanoid.update(butterfly.vx*0.003, butterfly.vy*0.003, orbHolder.speed, bfDxP, bfDyP);
       updateBursts();
+      if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
       if (cometSparkles.length) updateCometSparkles();
       if (airPuffs.length) updateAirPuffs();
       renderer.render(scene, camera);
@@ -3072,9 +3660,11 @@ function loop() {
       humanoid.butterflyDx = bfDxF; humanoid.butterflyDy = bfDyF; humanoid.butterflyDist = bfDistF;
       humanoid.update(butterfly.vx*0.002, butterfly.vy*0.002, 0, bfDxF, bfDyF);
       updateBursts();
+      if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
       if (smokeParticles.length) updateSmoke();
       if (cometSparkles.length) updateCometSparkles();
       if (airPuffs.length) updateAirPuffs();
+      if (snowParticles.length) updateSnowSpray();
       renderer.render(scene, camera);
       return;
     }
@@ -3248,7 +3838,6 @@ function loop() {
       humanoid.butterflyDx = bfDx;
       humanoid.butterflyDy = bfDy;
       humanoid.butterflyDist = bfDist;
-
       // ── Ambient acrobatics — cursor pull direction chooses the flip ───────
       if (frame >= nextFlipFrame && invincibleFrames < 60) {
         // Normalise cursor offset to [-1,1] on each axis
@@ -3291,6 +3880,9 @@ function loop() {
     } else {
       humanoid.update(0, 0, orbHolder.speed, 0, 0);
     }
+
+    // Companion poodle trails the astronaut every frame during play
+    if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
 
     // Altitude tracking + zone effects
     var altY = humanoid.mesh.position.y;
@@ -3393,6 +3985,20 @@ function loop() {
     updateBursts(); checkCollisions();
     if (smokeParticles.length) updateSmoke();
     if (airPuffs.length) updateAirPuffs();
+    if (snowParticles.length) updateSnowSpray();
+
+    // Snow spray — spawn when moving in tundra world
+    if (currentWorld === 'tundra' && !humanoid.singularity && STATUS === 'playing') {
+      var snowSpeed = Math.sqrt(butterfly.vx * butterfly.vx + butterfly.vy * butterfly.vy);
+      if (snowSpeed > 0.4 && frame % 2 === 0) {
+        spawnSnowSpray(
+          humanoid.mesh.position.x,
+          humanoid.mesh.position.y,
+          humanoid.mesh.position.z,
+          butterfly.vx, butterfly.vy, snowSpeed / 9.5
+        );
+      }
+    }
     // Wind streaks — intensity kicks in above baseline scene speed
     var windIntensity = Math.min(1, Math.max(0, (Math.abs(sceneSpeed) - 0.6) / 1.8));
     if (windIntensity > 0) updateWindStreaks(windIntensity, sceneSpeed > 0);
@@ -3403,6 +4009,7 @@ function loop() {
     // Void — astronaut locked to center, suit pulses
     humanoid.mesh.position.set(0, 100, 0);
     humanoid.update(0, 0, 0, 0, 0);
+    if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
 
     // Idle timer — if they stop tapping, game over
     voidIdleFrames++;
@@ -3454,6 +4061,7 @@ function loop() {
     humanoid.flipZ += tumble.spinZ;
     humanoid.mesh.rotation.y += tumble.spinY;
     humanoid.update(tumble.velX*0.004, tumble.velY*0.003, 0, 0, 0);
+    if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
     var sx = humanoid.mesh.position.x, sy = humanoid.mesh.position.y;
     var numSmoke = 2 + (frame % 3 === 0 ? 1 : 0);
     for (var si = 0; si < numSmoke; si++) spawnSmoke(sx, sy, 0, tumble.velX, tumble.velY);
@@ -3481,6 +4089,7 @@ function loop() {
     humanoid.mesh.position.x = 0;
     humanoid.mesh.position.y = 152 + Math.sin(Date.now()*0.001)*5;
     humanoid.update(0, 0, 0, 0, 0);
+    if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
     renderer.render(scene, camera);
     // Punch astronaut through the screen overlay using the fg layer (z-index 70)
     document.getElementById('world-fg').style.display = 'block';
@@ -3885,6 +4494,12 @@ function noirEnter() {
   noir.ice          = [];
   noir.throwCooldown = 0;
   noir.debris       = [];
+  noir._pendAngle   = 0;
+  noir._pendVel     = 0;
+  noir._lGunFlash   = 0;
+  noir._rGunFlash   = 0;
+  noir._lGunCooldown = 0;
+  noir._rGunCooldown = 0;
 
   // Spawn decorative debris / clouds
   for (var i = 0; i < 14; i++) {
@@ -4097,25 +4712,121 @@ function noirTick() {
 
   var frozen = noir.saucerFrozenTimer > 0;
 
-  // ── Lock astronaut low-center, mouse steers X gently ──
-  var astWorldX = noir.astTargetX + (mouse.x * 55);
-  astWorldX = Math.max(-85, Math.min(85, astWorldX));
-  var astWorldY = 36;  // locked low
-  // Lerp position
-  humanoid.mesh.position.x += (astWorldX - humanoid.mesh.position.x) * 0.07;
-  humanoid.mesh.position.y += (astWorldY - humanoid.mesh.position.y) * 0.07;
+  // ── Saucer moves freely — tracks mouse X ──
+  var targSX = Math.max(80, Math.min(W - 80, norm(mouse.x, -1, 1, 0, W)));
+  noir.saucerVx += (targSX - noir.saucerX) * 0.045;
+  noir.saucerVx *= 0.78;
+  noir.saucerX  += noir.saucerVx;
+
+  // ── Pendulum physics — astronaut hangs from saucer like a bob ──
+  // Pendulum anchor is the underside of the saucer in world space
+  var PEND_LEN   = 75;  // world units — rope length
+  var PEND_GRAV  = 0.012; // gravitational restoring force
+  var PEND_DAMP  = 0.97;  // angular damping
+
+  // Convert saucer screen pos → world pos
+  var saucerWX = norm(noir.saucerX, 0, W, -100, 100);
+  var saucerWY = norm(noir.saucerY + 28, 0, H, 175, 25); // +28px = bottom of saucer
+
+  // Current angle of pendulum (from vertical downward)
+  if (typeof noir._pendAngle === 'undefined') {
+    noir._pendAngle  = 0;
+    noir._pendVel    = 0;
+  }
+
+  // Saucer acceleration drives a horizontal impulse on the bob
+  var saucerAccelX = noir.saucerVx / W * 200; // screen px/frame → world impulse
+  var targetAngle  = Math.atan2(saucerAccelX * -0.18, 1); // inertia: bob lags saucer
+  noir._pendVel   += -PEND_GRAV * Math.sin(noir._pendAngle) - saucerAccelX * 0.0008;
+  noir._pendVel   *= PEND_DAMP;
+  noir._pendAngle += noir._pendVel;
+  noir._pendAngle  = Math.max(-0.9, Math.min(0.9, noir._pendAngle)); // clamp swing
+
+  // Bob world position
+  var bobWX = saucerWX + Math.sin(noir._pendAngle) * PEND_LEN;
+  var bobWY = saucerWY - Math.cos(noir._pendAngle) * PEND_LEN;
+  bobWY = Math.max(22, Math.min(170, bobWY));
+
+  humanoid.mesh.position.x = bobWX;
+  humanoid.mesh.position.y = bobWY;
   humanoid.mesh.scale.setScalar(0.25);
 
-  // Astronaut screen coords
-  var astSX = norm(humanoid.mesh.position.x, -100, 100, 0, W);
-  var astSY = norm(humanoid.mesh.position.y, 25, 175, H * 0.92, H * 0.08);
+  // ── Face the saucer at all times ──
+  var toSaucerX = saucerWX - bobWX;
+  var toSaucerY = saucerWY - bobWY;
+  var facingYaw = Math.atan2(-toSaucerX, Math.abs(toSaucerY) + 0.01) + Math.PI;
+  humanoid.mesh.rotation.y += (facingYaw - humanoid.mesh.rotation.y) * 0.18;
 
-  // ── Saucer tracks astronaut X ──
-  var targSX = Math.max(80, Math.min(W - 80, astSX + (Math.random()-0.5)*12));
-  noir.saucerVx += (targSX - noir.saucerX) * 0.035;
-  noir.saucerVx *= 0.80;
-  noir.saucerX  += noir.saucerVx;
-  noir.saucerY   = H * 0.11;
+  // Body: face UP toward saucer — strong forward pitch so chest points at saucer
+  humanoid.baseRotX = -1.35 + noir._pendAngle * 0.18; // pitched back hard so face points up
+  humanoid.baseRotZ =  noir._pendAngle * 0.45;
+  humanoid.mesh.rotation.x = humanoid.baseRotX;
+  humanoid.mesh.rotation.z = humanoid.baseRotZ;
+
+  // ── Override ALL joints — John Wick akimbo pose ──
+  var _aimT   = Date.now() * 0.001;
+  var _lRecoil = (noir._lGunFlash > 0) ? 0.18 : 0;
+  var _rRecoil = (noir._rGunFlash > 0) ? 0.18 : 0;
+
+  // Arms: spread wide to the sides, slightly forward — akimbo
+  // Right shoulder: swept out to right side (neg Z in local), forward pitch
+  humanoid.rShoulderPivot.rotation.x =  0.10 + _rRecoil + Math.sin(_aimT * 0.6) * 0.015;
+  humanoid.rShoulderPivot.rotation.z = -0.92; // arm swept wide right
+  humanoid.rElbowPivot.rotation.x    =  0.05;
+  humanoid.rElbowPivot.rotation.z    = -0.12;
+
+  // Left shoulder: swept out to left side (pos Z), forward pitch
+  humanoid.lShoulderPivot.rotation.x =  0.10 + _lRecoil + Math.sin(_aimT * 0.6 + 0.4) * 0.015;
+  humanoid.lShoulderPivot.rotation.z =  0.92;
+  humanoid.lElbowPivot.rotation.x    =  0.05;
+  humanoid.lElbowPivot.rotation.z    =  0.12;
+
+  // Legs: knees pulled up — tucked like a hanging action hero
+  var _legSway = Math.sin(_aimT * 0.45) * 0.08 + noir._pendAngle * 0.15;
+  humanoid.rHipPivot.rotation.x   = -0.55 + _legSway; // hip hinge upward
+  humanoid.rHipPivot.rotation.z   = -0.18;
+  humanoid.rKneePivot.rotation.x  =  0.85; // knee bent back sharply
+  humanoid.lHipPivot.rotation.x   = -0.55 - _legSway;
+  humanoid.lHipPivot.rotation.z   =  0.18;
+  humanoid.lKneePivot.rotation.x  =  0.85;
+
+  // Head: craned upward toward saucer
+  humanoid.head.rotation.x =  0.55 - (_rRecoil + _lRecoil) * 0.2;
+  humanoid.head.rotation.z =  noir._pendAngle * -0.20;
+
+  // Zero ragdoll velocities every frame
+  for (var _ji = 0; _ji < humanoid.joints.length; _ji++) {
+    humanoid.joints[_ji].pivot.userData.velX = 0;
+    humanoid.joints[_ji].pivot.userData.velZ = 0;
+  }
+  humanoid.flipX *= 0.85;
+  humanoid.flipZ *= 0.85;
+
+  // ── Draw tether line from saucer to astronaut (screen space) ──
+  var astSX = norm(bobWX, -100, 100, 0, W);
+  var astSY = norm(bobWY, 25, 175, H * 0.92, H * 0.08);
+  noir.saucerY = H * 0.11;
+
+  // Rope / tether
+  _nctx.save();
+  var tetherAnchorX = noir.saucerX;
+  var tetherAnchorY = noir.saucerY + 28;
+  var tg = _nctx.createLinearGradient(tetherAnchorX, tetherAnchorY, astSX, astSY);
+  tg.addColorStop(0,   'rgba(180,180,180,0.55)');
+  tg.addColorStop(0.5, 'rgba(140,140,140,0.35)');
+  tg.addColorStop(1,   'rgba(100,100,100,0.18)');
+  _nctx.strokeStyle = tg;
+  _nctx.lineWidth   = 1.5;
+  _nctx.setLineDash([4, 5]);
+  _nctx.beginPath();
+  _nctx.moveTo(tetherAnchorX, tetherAnchorY);
+  // Slight droop — catenary approximated with a quadratic bezier
+  var midX = (tetherAnchorX + astSX) * 0.5;
+  var midY = (tetherAnchorY + astSY) * 0.5 + 8 * Math.cos(noir._pendAngle);
+  _nctx.quadraticCurveTo(midX, midY, astSX, astSY);
+  _nctx.stroke();
+  _nctx.setLineDash([]);
+  _nctx.restore();
 
   // ── Ice thaw ──
   if (frozen) {
@@ -4141,7 +4852,9 @@ function noirTick() {
   }
 
   // ── Throw cooldown ──
-  if (noir.throwCooldown > 0) noir.throwCooldown--;
+  if (noir.throwCooldown   > 0) noir.throwCooldown--;
+  if (noir._lGunCooldown   > 0) noir._lGunCooldown--;
+  if (noir._rGunCooldown   > 0) noir._rGunCooldown--;
 
   // ── Draw debris / clouds ──
   for (var di = 0; di < noir.debris.length; di++) {
@@ -4159,9 +4872,9 @@ function noirTick() {
     l.x += l.vx; l.y += l.vy;
     l.life -= 0.007;
 
-    // Collision with astronaut
+    // Collision with astronaut (saucer shots only)
     var ldist = Math.sqrt((l.x-astSX)*(l.x-astSX)+(l.y-astSY)*(l.y-astSY));
-    if (ldist < 30 && STATUS === 'playing' && invincibleFrames <= 0) {
+    if (!l._playerShot && ldist < 30 && STATUS === 'playing' && invincibleFrames <= 0) {
       noir.lasers.splice(li, 1);
       noir.hits++;
       invincibleFrames = 80;
@@ -4209,13 +4922,21 @@ function noirTick() {
     // Draw laser beam
     _nctx.save();
     _nctx.globalAlpha = l.life * 0.9;
+    var _lc1, _lc2, _lc3, _lshadow;
+    if (l._playerShot && l._color === 'cyan') {
+      _lc1 = 'rgba(0,200,255,0)'; _lc2 = 'rgba(0,220,255,0.95)'; _lc3 = 'rgba(180,255,255,0.6)'; _lshadow = '#00ddff';
+    } else if (l._playerShot && l._color === 'orange') {
+      _lc1 = 'rgba(255,120,0,0)'; _lc2 = 'rgba(255,160,0,0.95)'; _lc3 = 'rgba(255,240,80,0.6)'; _lshadow = '#ff8800';
+    } else {
+      _lc1 = 'rgba(255,40,0,0)'; _lc2 = 'rgba(255,80,0,0.95)'; _lc3 = 'rgba(255,220,80,0.6)'; _lshadow = '#ff2200';
+    }
     var lg = _nctx.createLinearGradient(l.x-l.vx*5, l.y-l.vy*5, l.x, l.y);
-    lg.addColorStop(0, 'rgba(255,40,0,0)');
-    lg.addColorStop(0.5,'rgba(255,80,0,0.95)');
-    lg.addColorStop(1, 'rgba(255,220,80,0.6)');
+    lg.addColorStop(0, _lc1);
+    lg.addColorStop(0.5, _lc2);
+    lg.addColorStop(1, _lc3);
     _nctx.strokeStyle  = lg;
-    _nctx.lineWidth    = 3.5;
-    _nctx.shadowColor  = '#ff2200';
+    _nctx.lineWidth    = l._playerShot ? 2.5 : 3.5;
+    _nctx.shadowColor  = _lshadow;
     _nctx.shadowBlur   = 12;
     _nctx.beginPath();
     _nctx.moveTo(l.x - l.vx*6, l.y - l.vy*6);
@@ -4282,12 +5003,81 @@ function noirTick() {
   // ── Draw saucer ──
   noirDrawSaucer(_nctx, noir.saucerX, noir.saucerY, frozen);
 
+  // ── Draw two akimbo laser guns (screen space) ──
+  (function() {
+    var ang = Math.atan2(noir.saucerY - astSY, noir.saucerX - astSX); // toward saucer
+
+    // Right gun — fires on right-click, cyan laser
+    var rFlash  = (noir._rGunFlash > 0);
+    var rOff    = rFlash ? 3 : 0;
+    // Offset rightward from astronaut center in screen space
+    var perpAng = ang - Math.PI * 0.5;
+    var rGunX   = astSX + Math.cos(perpAng) * -22 + Math.cos(ang) * rOff;
+    var rGunY   = astSY + Math.sin(perpAng) * -22 + Math.sin(ang) * rOff;
+
+    _nctx.save();
+    _nctx.translate(rGunX, rGunY);
+    _nctx.rotate(ang);
+    // Barrel
+    _nctx.fillStyle   = '#3a3a3a';
+    _nctx.strokeStyle = 'rgba(80,220,255,0.5)';
+    _nctx.lineWidth   = 0.9;
+    _nctx.shadowColor = 'rgba(80,220,255,0.3)';
+    _nctx.shadowBlur  = rFlash ? 12 : 4;
+    _nctx.beginPath(); _nctx.roundRect(-3, -3, 20, 6, 1.5); _nctx.fill(); _nctx.stroke();
+    // Grip
+    _nctx.fillStyle = '#222'; _nctx.strokeStyle = 'rgba(100,200,255,0.4)';
+    _nctx.beginPath(); _nctx.roundRect(-7, -2, 9, 4, 1); _nctx.fill(); _nctx.stroke();
+    // Scope dot — cyan
+    _nctx.fillStyle = 'rgba(0,220,255,0.95)'; _nctx.shadowColor = '#00ddff'; _nctx.shadowBlur = 6;
+    _nctx.beginPath(); _nctx.arc(1, 0, 1.6, 0, Math.PI*2); _nctx.fill();
+    // Muzzle flash
+    if (rFlash) {
+      _nctx.globalAlpha = 0.6 + Math.random() * 0.4;
+      _nctx.fillStyle = 'rgba(0,220,255,0.9)'; _nctx.shadowColor = '#00ffff'; _nctx.shadowBlur = 18;
+      _nctx.beginPath(); _nctx.ellipse(21, 0, 8 + Math.random()*5, 3 + Math.random()*2, 0, 0, Math.PI*2); _nctx.fill();
+    }
+    _nctx.restore();
+
+    // Left gun — fires on left-click, orange/red laser
+    var lFlash  = (noir._lGunFlash > 0);
+    var lOff    = lFlash ? 3 : 0;
+    var lGunX   = astSX + Math.cos(perpAng) * 22 + Math.cos(ang) * lOff;
+    var lGunY   = astSY + Math.sin(perpAng) * 22 + Math.sin(ang) * lOff;
+
+    _nctx.save();
+    _nctx.translate(lGunX, lGunY);
+    _nctx.rotate(ang);
+    _nctx.fillStyle   = '#3a3a3a';
+    _nctx.strokeStyle = 'rgba(255,120,0,0.5)';
+    _nctx.lineWidth   = 0.9;
+    _nctx.shadowColor = 'rgba(255,120,0,0.3)';
+    _nctx.shadowBlur  = lFlash ? 12 : 4;
+    _nctx.beginPath(); _nctx.roundRect(-3, -3, 20, 6, 1.5); _nctx.fill(); _nctx.stroke();
+    _nctx.fillStyle = '#222'; _nctx.strokeStyle = 'rgba(255,140,0,0.4)';
+    _nctx.beginPath(); _nctx.roundRect(-7, -2, 9, 4, 1); _nctx.fill(); _nctx.stroke();
+    // Scope dot — orange
+    _nctx.fillStyle = 'rgba(255,80,0,0.95)'; _nctx.shadowColor = '#ff4400'; _nctx.shadowBlur = 6;
+    _nctx.beginPath(); _nctx.arc(1, 0, 1.6, 0, Math.PI*2); _nctx.fill();
+    // Muzzle flash
+    if (lFlash) {
+      _nctx.globalAlpha = 0.6 + Math.random() * 0.4;
+      _nctx.fillStyle = 'rgba(255,120,0,0.9)'; _nctx.shadowColor = '#ff6600'; _nctx.shadowBlur = 18;
+      _nctx.beginPath(); _nctx.ellipse(21, 0, 8 + Math.random()*5, 3 + Math.random()*2, 0, 0, Math.PI*2); _nctx.fill();
+    }
+    _nctx.restore();
+
+    // Decay flash timers
+    if (noir._rGunFlash > 0) noir._rGunFlash--;
+    if (noir._lGunFlash > 0) noir._lGunFlash--;
+  })();
+
   // ── Throw hint ──
   var hintEl = document.getElementById('noir-throw-hint');
   if (hintEl) {
     hintEl.textContent = frozen
       ? '❄ saucer frozen ❄'
-      : (noir.throwCooldown > 0 ? '' : '[ f ] throw ice · double-tap mobile');
+      : 'left-click · right-click to fire';
   }
 }
 
@@ -4323,7 +5113,70 @@ function noirThrowIce() {
   });
 }
 
-// ── Wire F key and double-tap ──
+// ── Left gun (left-click) — orange laser toward saucer ──
+function noirFireLeft() {
+  if (!noir.active || STATUS !== 'playing') return;
+  if (noir._lGunCooldown > 0) return;
+  noir._lGunCooldown = 18;
+  noir._lGunFlash    = 5;
+  var W = window.innerWidth, H = window.innerHeight;
+  var ax = norm(humanoid.mesh.position.x, -100, 100, 0, W);
+  var ay = norm(humanoid.mesh.position.y, 25, 175, H * 0.92, H * 0.08);
+  var dx = noir.saucerX - ax, dy = noir.saucerY - ay;
+  var len = Math.sqrt(dx*dx+dy*dy)||1;
+  var spd = 14 + Math.random()*3;
+  noir.lasers.push({
+    x: ax + (dx/len)*14, y: ay + (dy/len)*14,
+    vx: dx/len*spd + (Math.random()-0.5)*1.2,
+    vy: dy/len*spd,
+    life: 1.0,
+    _playerShot: true, _color: 'orange'
+  });
+}
+
+// ── Right gun (right-click) — cyan/ice laser toward saucer ──
+function noirFireRight() {
+  if (!noir.active || STATUS !== 'playing') return;
+  if (noir._rGunCooldown > 0) return;
+  noir._rGunCooldown = 18;
+  noir._rGunFlash    = 5;
+  var W = window.innerWidth, H = window.innerHeight;
+  var ax = norm(humanoid.mesh.position.x, -100, 100, 0, W);
+  var ay = norm(humanoid.mesh.position.y, 25, 175, H * 0.92, H * 0.08);
+  var dx = noir.saucerX - ax, dy = noir.saucerY - ay;
+  var len = Math.sqrt(dx*dx+dy*dy)||1;
+  var spd = 14 + Math.random()*3;
+  // Cyan shot freezes the saucer (same as ice mechanic)
+  if (!noir.saucerFrozenTimer) {
+    noir.windowIce = Math.min(1.0, noir.windowIce + noir.ICE_PER_HIT);
+    if (noir.windowIce >= 1.0) {
+      noir.windowIce = 1.0;
+      noir.saucerFrozenTimer = noir.FREEZE_DURATION;
+      showToast('window frozen! lasers offline ❄', 'oxy');
+    } else {
+      showToast('ice hit · ' + Math.round(noir.windowIce*100) + '% frosted', 'blue');
+    }
+  }
+  noir.lasers.push({
+    x: ax + (dx/len)*14, y: ay + (dy/len)*14,
+    vx: dx/len*spd + (Math.random()-0.5)*1.2,
+    vy: dy/len*spd,
+    life: 1.0,
+    _playerShot: true, _color: 'cyan'
+  });
+}
+
+// ── Wire mouse buttons ──
+document.addEventListener('mousedown', function(e) {
+  if (currentWorld !== 'mall') return;
+  if (e.button === 0) noirFireLeft();
+  if (e.button === 2) noirFireRight();
+});
+document.addEventListener('contextmenu', function(e) {
+  if (currentWorld === 'mall') e.preventDefault();
+});
+
+// ── Keep F/Z as ice throw for legacy; double-tap still works ──
 window.addEventListener('keydown', function(e) {
   if (currentWorld === 'mall' && (e.code === 'KeyF' || e.code === 'KeyZ')) noirThrowIce();
 });
@@ -4338,15 +5191,12 @@ window.addEventListener('keydown', function(e) {
   }, { passive: true });
 })();
 
-// ── Hook applyWorld ──
+// ── Hook applyWorld ── (noir mode hidden for now — code preserved)
 var _origApplyWorld = applyWorld;
 applyWorld = function(worldKey) {
   _origApplyWorld(worldKey);
-  if (worldKey === 'mall') {
-    setTimeout(noirEnter, 350);
-  } else {
-    noirExit();
-  }
+  // noir disabled: noirEnter/noirExit kept but not triggered
+  // if (worldKey === 'mall') { setTimeout(noirEnter, 350); } else { noirExit(); }
 };
 
 // ── rAF loop ──
@@ -4361,6 +5211,158 @@ applyWorld = function(worldKey) {
 
 window.addEventListener('resize', noirResize);
 window.addEventListener('load', function() { noirInit(); }, true);
+
+// ════════════════════════════════════════════════════════════════════
+// INK EFFECT — Canvas 2D overlay applied to ALL scenes
+// Draws animated ink splat trails + edge vignette tinted per world
+// ════════════════════════════════════════════════════════════════════
+
+(function() {
+  var _ic = document.getElementById('ink-overlay');
+  var _ictx = _ic.getContext('2d');
+
+  function inkResize() {
+    _ic.width  = window.innerWidth;
+    _ic.height = window.innerHeight;
+  }
+  inkResize();
+  window.addEventListener('resize', inkResize);
+
+  // Per-world ink palette: [edgeColor, splatColor, edgeOpacity, splatOpacity]
+  var INK_WORLDS = {
+    cosmos:   { edge: '20,10,50',    splat: '80,160,220',  eOp: 0.32, sOp: 0.22, grain: 0.055 },
+    culdesac: { edge: '40,20,0',     splat: '220,160,0',   eOp: 0.20, sOp: 0.18, grain: 0.035 },
+    deep:     { edge: '60,15,0',     splat: '180,90,20',   eOp: 0.38, sOp: 0.26, grain: 0.07  },
+    mall:     { edge: '0,0,0',       splat: '20,20,20',    eOp: 0.55, sOp: 0.35, grain: 0.11  },
+    tundra:   { edge: '180,220,255', splat: '200,235,255', eOp: 0.22, sOp: 0.16, grain: 0.04  },
+  };
+
+  // Ink splats — persistent drip marks that slowly fade
+  var inkSplats = [];
+  var MAX_SPLATS = 28;
+  var inkFrame = 0;
+  var lastHumanoidX = 0, lastHumanoidY = 0;
+
+  function spawnInkSplat(wx, wy, palette) {
+    if (inkSplats.length >= MAX_SPLATS) inkSplats.shift();
+    inkSplats.push({
+      x: norm(wx, -100, 100, 0, window.innerWidth),
+      y: norm(wy, 25, 175, window.innerHeight * 0.92, window.innerHeight * 0.08),
+      r: 8 + Math.random() * 28,
+      alpha: 0.12 + Math.random() * 0.18,
+      life: 1.0,
+      decay: 0.003 + Math.random() * 0.004,
+      drips: Math.floor(Math.random() * 3),
+      dripLen: 10 + Math.random() * 28,
+      dripAngle: Math.PI * 0.3 + Math.random() * Math.PI * 1.4,
+      palette: palette,
+    });
+  }
+
+  function drawInkTick() {
+    inkFrame++;
+    var W = window.innerWidth, H = window.innerHeight;
+    if (_ic.width !== W || _ic.height !== H) inkResize();
+
+    _ictx.clearRect(0, 0, W, H);
+
+    var worldKey = (typeof currentWorld !== 'undefined') ? currentWorld : 'cosmos';
+    var pal = INK_WORLDS[worldKey] || INK_WORLDS.cosmos;
+
+    // ── 1. Vignette edge ink wash ──
+    var vg = _ictx.createRadialGradient(W/2, H/2, H * 0.28, W/2, H/2, Math.max(W, H) * 0.78);
+    vg.addColorStop(0,   'rgba(' + pal.edge + ',0)');
+    vg.addColorStop(0.6, 'rgba(' + pal.edge + ',' + (pal.eOp * 0.4).toFixed(3) + ')');
+    vg.addColorStop(1,   'rgba(' + pal.edge + ',' + pal.eOp.toFixed(3) + ')');
+    _ictx.fillStyle = vg;
+    _ictx.fillRect(0, 0, W, H);
+
+    // ── 2. Ink grain texture (subtle noise) ──
+    if (inkFrame % 2 === 0) {
+      var grainCount = Math.floor(W * H * pal.grain * 0.00008);
+      _ictx.fillStyle = 'rgba(' + pal.splat + ',0.18)';
+      for (var gi = 0; gi < grainCount; gi++) {
+        var gx = Math.random() * W, gy = Math.random() * H;
+        _ictx.fillRect(gx | 0, gy | 0, 1, 1);
+      }
+    }
+
+    // ── 3. Spawn ink splats from astronaut movement ──
+    if (typeof humanoid !== 'undefined' && humanoid && humanoid.mesh && STATUS === 'playing') {
+      var hx = humanoid.mesh.position.x, hy = humanoid.mesh.position.y;
+      var spd2 = Math.sqrt(butterfly.vx * butterfly.vx + butterfly.vy * butterfly.vy);
+      var moved = Math.sqrt((hx - lastHumanoidX) * (hx - lastHumanoidX) + (hy - lastHumanoidY) * (hy - lastHumanoidY));
+      if (moved > 1.8 && inkFrame % 6 === 0) {
+        spawnInkSplat(hx, hy, pal);
+      }
+      // Extra splats on fast movement
+      if (spd2 > 5 && inkFrame % 20 === 0) {
+        spawnInkSplat(hx + (Math.random()-0.5)*12, hy + (Math.random()-0.5)*12, pal);
+      }
+      lastHumanoidX = hx; lastHumanoidY = hy;
+    }
+
+    // ── 4. Draw & age splats ──
+    for (var si = inkSplats.length - 1; si >= 0; si--) {
+      var s = inkSplats[si];
+      s.life -= s.decay;
+      if (s.life <= 0) { inkSplats.splice(si, 1); continue; }
+
+      var a = s.alpha * s.life * pal.sOp / 0.22;
+
+      // Main splat blob
+      var sg = _ictx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r);
+      sg.addColorStop(0,   'rgba(' + s.palette.splat + ',' + (a * 0.9).toFixed(3) + ')');
+      sg.addColorStop(0.5, 'rgba(' + s.palette.splat + ',' + (a * 0.4).toFixed(3) + ')');
+      sg.addColorStop(1,   'rgba(' + s.palette.splat + ',0)');
+      _ictx.fillStyle = sg;
+      _ictx.beginPath();
+      _ictx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      _ictx.fill();
+
+      // Ink drips below splat
+      for (var di2 = 0; di2 < s.drips; di2++) {
+        var dang = s.dripAngle + di2 * 0.5 - 0.25;
+        var dlen = s.dripLen * (0.6 + di2 * 0.3) * s.life;
+        var dw   = (2 + di2) * s.life;
+        var dx1 = s.x + Math.cos(dang) * s.r * 0.6;
+        var dy1 = s.y + Math.sin(dang) * s.r * 0.6;
+        var dx2 = dx1 + Math.cos(dang) * dlen;
+        var dy2 = dy1 + Math.sin(dang) * dlen;
+        var lg = _ictx.createLinearGradient(dx1, dy1, dx2, dy2);
+        lg.addColorStop(0, 'rgba(' + s.palette.splat + ',' + (a * 0.7).toFixed(3) + ')');
+        lg.addColorStop(1, 'rgba(' + s.palette.splat + ',0)');
+        _ictx.strokeStyle = lg;
+        _ictx.lineWidth   = dw;
+        _ictx.lineCap     = 'round';
+        _ictx.beginPath();
+        _ictx.moveTo(dx1, dy1);
+        _ictx.lineTo(dx2, dy2);
+        _ictx.stroke();
+      }
+    }
+
+    // ── 5. Ink streak in noir (extra heavy) ──
+    if (worldKey === 'mall' && typeof humanoid !== 'undefined' && humanoid && humanoid.mesh) {
+      var nsx = norm(humanoid.mesh.position.x, -100, 100, 0, W);
+      var nsy = norm(humanoid.mesh.position.y, 25, 175, H * 0.92, H * 0.08);
+      var halo = _ictx.createRadialGradient(nsx, nsy, 0, nsx, nsy, 80);
+      halo.addColorStop(0,   'rgba(0,0,0,0.08)');
+      halo.addColorStop(1,   'rgba(0,0,0,0)');
+      _ictx.fillStyle = halo;
+      _ictx.beginPath();
+      _ictx.arc(nsx, nsy, 80, 0, Math.PI * 2);
+      _ictx.fill();
+    }
+
+    requestAnimationFrame(drawInkTick);
+  }
+
+  // Start after scene is ready
+  window.addEventListener('load', function() {
+    setTimeout(drawInkTick, 800);
+  });
+})();
 
 </script>
 </body>
