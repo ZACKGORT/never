@@ -170,10 +170,11 @@
   #world {
     position: fixed;
     width: 100%; height: 100%;
-    background: linear-gradient(180deg, #020111 0%, #0d0820 100%);
+    background: transparent;
     overflow: hidden;
     touch-action: none;
     transition: background 1.2s ease;
+    z-index: 2;
   }
   #ui { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
 
@@ -610,9 +611,9 @@
     opacity: 0;
     transition: opacity 1.0s ease;
   }
-  body.world-culdesac #world-sun { opacity: 1; }
+  body.world-culdesac #world-sun { opacity: 1; z-index: 1; }
   body.world-tundra #world-sun {
-    opacity: 1;
+    opacity: 1; z-index: 1;
     background: radial-gradient(circle, #ffffff 0%, #e8f4ff 55%, #c8e8ff 100%);
     box-shadow: 0 0 50px 22px rgba(200,235,255,0.70), 0 0 100px 55px rgba(180,220,255,0.28);
   }
@@ -627,7 +628,7 @@
     opacity: 0;
     transition: opacity 1.0s ease;
   }
-  body.world-deep #world-westsun { opacity: 1; }
+  body.world-deep #world-westsun { opacity: 1; z-index: 1; }
   #world-lamp {
     position: fixed;
     left: 50%; top: 0;
@@ -1796,7 +1797,7 @@ function CompanionPoodle() {
 
   // ── Bubble helmet — clear astronaut dome ──
   // Outer shell: large transparent sphere, slight blue tint
-  var helmetGeom = new THREE.SphereGeometry(12, 16, 12);
+  var helmetGeom = new THREE.SphereGeometry(15.5, 16, 12);
   var helmetMat = new THREE.MeshPhongMaterial({
     color: 0xaaddff,
     transparent: true,
@@ -1807,7 +1808,7 @@ function CompanionPoodle() {
     depthWrite: false,
   });
   var helmetSphere = new THREE.Mesh(helmetGeom, helmetMat);
-  helmetSphere.position.set(0, 1, 0);
+  helmetSphere.position.set(0, -1, 2);
   this.headNode.add(helmetSphere);
 
   // Inner shell: slightly smaller, gives the bubble depth/thickness illusion
@@ -1820,8 +1821,8 @@ function CompanionPoodle() {
     side: THREE.BackSide,
     depthWrite: false,
   });
-  var helmetInner = new THREE.Mesh(new THREE.SphereGeometry(11.2, 16, 12), helmetInnerMat);
-  helmetInner.position.set(0, 1, 0);
+  var helmetInner = new THREE.Mesh(new THREE.SphereGeometry(14.5, 16, 12), helmetInnerMat);
+  helmetInner.position.set(0, -1, 2);
   this.headNode.add(helmetInner);
 
   // Glint — a small bright highlight sphere at upper-left of dome
@@ -1832,7 +1833,7 @@ function CompanionPoodle() {
     depthWrite: false,
   });
   var glint = new THREE.Mesh(new THREE.SphereGeometry(2.2, 8, 8), glintMat);
-  glint.position.set(5, 8, 7);
+  glint.position.set(5, 9, 9);
   this.headNode.add(glint);
 
   // ── Legs — SHORT (upper 9, lower 8 units), two-segment ragdoll, comedic splay ──
@@ -2041,9 +2042,8 @@ CompanionPoodle.prototype.update = function(hx, hy) {
   var _rl = (typeof reverseLerp !== 'undefined' ? reverseLerp : 0);
   var scrollFwd = Math.max(0,  _rl);
   var scrollRev = Math.max(0, -_rl);
-  // scrollDrive: positive = forward lean, negative = backpedal
-  // Flip the sign so stride direction visually matches scene direction
-  var scrollDrive = scrollFwd * 0.9 - scrollRev * 0.7;
+  // scrollDrive: negative = forward lean (legs trail back), positive = backpedal (legs trail forward)
+  var scrollDrive = scrollRev * 0.9 - scrollFwd * 0.7;
   // strideSign: +1 forward, -1 reverse — reverses the alternating leg cycle
   var strideSign = (_rl < -0.05) ? -1 : 1;
 
@@ -2425,10 +2425,12 @@ function SnowFlake() {
 }
 
 function spawnSnowSpray(x, y, z, velX, velY, speed) {
-  if (currentWorld !== 'tundra') return;
   var count = Math.floor(2 + speed * 18);
   for (var i = 0; i < count; i++) {
     var p = snowPool.length ? snowPool.pop() : new SnowFlake();
+    // Pick a color from this world's dust palette
+    var wDust = WORLDS[currentWorld] ? WORLDS[currentWorld].dustColors : [0xffffff];
+    p.mesh.material.color.setHex(wDust[Math.floor(Math.random() * wDust.length)]);
     var sideDir = (Math.random() > 0.5 ? 1 : -1);
     p.mesh.position.set(
       x + (Math.random() - 0.5) * 6,
@@ -3987,8 +3989,8 @@ function loop() {
     if (airPuffs.length) updateAirPuffs();
     if (snowParticles.length) updateSnowSpray();
 
-    // Snow spray — spawn when moving in tundra world
-    if (currentWorld === 'tundra' && !humanoid.singularity && STATUS === 'playing') {
+    // Particle spray — spawn when moving in any world
+    if (!humanoid.singularity && STATUS === 'playing') {
       var snowSpeed = Math.sqrt(butterfly.vx * butterfly.vx + butterfly.vy * butterfly.vy);
       if (snowSpeed > 0.4 && frame % 2 === 0) {
         spawnSnowSpray(
@@ -5230,16 +5232,16 @@ window.addEventListener('load', function() { noirInit(); }, true);
 
   // Per-world ink palette: [edgeColor, splatColor, edgeOpacity, splatOpacity]
   var INK_WORLDS = {
-    cosmos:   { edge: '20,10,50',    splat: '80,160,220',  eOp: 0.32, sOp: 0.22, grain: 0.055 },
-    culdesac: { edge: '40,20,0',     splat: '220,160,0',   eOp: 0.20, sOp: 0.18, grain: 0.035 },
-    deep:     { edge: '60,15,0',     splat: '180,90,20',   eOp: 0.38, sOp: 0.26, grain: 0.07  },
-    mall:     { edge: '0,0,0',       splat: '20,20,20',    eOp: 0.55, sOp: 0.35, grain: 0.11  },
-    tundra:   { edge: '180,220,255', splat: '200,235,255', eOp: 0.22, sOp: 0.16, grain: 0.04  },
+    cosmos:   { edge: '20,10,60',      splat: '100,195,220',  eOp: 0.38, sOp: 0.30, grain: 0.060 },
+    culdesac: { edge: '80,40,0',       splat: '255,210,0',    eOp: 0.30, sOp: 0.28, grain: 0.050 },
+    deep:     { edge: '80,20,0',       splat: '210,110,20',   eOp: 0.45, sOp: 0.34, grain: 0.08  },
+    mall:     { edge: '0,0,0',         splat: '20,20,20',     eOp: 0.55, sOp: 0.35, grain: 0.11  },
+    tundra:   { edge: '160,215,255',   splat: '210,240,255',  eOp: 0.38, sOp: 0.30, grain: 0.060 },
   };
 
   // Ink splats — persistent drip marks that slowly fade
   var inkSplats = [];
-  var MAX_SPLATS = 28;
+  var MAX_SPLATS = 40;
   var inkFrame = 0;
   var lastHumanoidX = 0, lastHumanoidY = 0;
 
@@ -5292,7 +5294,7 @@ window.addEventListener('load', function() { noirInit(); }, true);
       var hx = humanoid.mesh.position.x, hy = humanoid.mesh.position.y;
       var spd2 = Math.sqrt(butterfly.vx * butterfly.vx + butterfly.vy * butterfly.vy);
       var moved = Math.sqrt((hx - lastHumanoidX) * (hx - lastHumanoidX) + (hy - lastHumanoidY) * (hy - lastHumanoidY));
-      if (moved > 1.8 && inkFrame % 6 === 0) {
+      if (moved > 1.2 && inkFrame % 5 === 0) {
         spawnInkSplat(hx, hy, pal);
       }
       // Extra splats on fast movement
