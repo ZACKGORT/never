@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>neverever.land | by zack.cx</title>
+<title>neverever.land</title>
 <meta name="description" content="by zack.cx ">
 <meta property="og:title" content="neverever.land">
 <meta property="og:description" content="by zack.cx — made with wolfie.love*">
@@ -680,7 +680,27 @@
   .hud-world-btn.active { opacity: 1; filter: grayscale(0); background: rgba(255,255,255,0.08); }
   :root { --world-accent: rgba(104,195,192,0.95); }
 
-
+  /* ── NOIR MODE ─────────────────────────────────────────────────── */
+  #noir-overlay {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 22;
+    display: none;
+  }
+  body.world-mall #noir-overlay { display: block; }
+  #noir-red-wash {
+    position: fixed; inset: 0;
+    background: rgba(160,0,0,0);
+    pointer-events: none; z-index: 21;
+    transition: background 1.0s ease;
+  }
+  #noir-throw-hint {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    font-family: monospace; font-size: 10px; letter-spacing: 2px;
+    color: rgba(180,230,255,0.35); pointer-events: none; z-index: 23;
+    display: none;
+  }
+  body.world-mall #noir-throw-hint { display: block; }
 
   /* ── Ink effect overlay ── */
   #ink-overlay {
@@ -693,7 +713,10 @@
 </head>
 <body>
 
+<canvas id="noir-overlay"></canvas>
 <canvas id="ink-overlay"></canvas>
+<div id="noir-red-wash"></div>
+<div id="noir-throw-hint">[ f ] throw ice &nbsp;·&nbsp; double-tap mobile</div>
 <div id="cursor"></div>
 <div id="world"></div>
 <div id="world-fg"></div>
@@ -1093,21 +1116,6 @@ function applyWorld(worldKey) {
 
   // Oxy rail
   document.getElementById('oxy-rail').style.background = W.oxyRailColor;
-
-  // Reflective surface tint — matches world accent/sea palette
-  if (iceUniforms) {
-    var iceTints = {
-      cosmos:   0x68c3c0,
-      culdesac: 0x74c947,
-      deep:     0xb06020,
-      mall:     0x333333,
-      tundra:   0xa8d8f0,
-    };
-    iceUniforms.tintColor.value.setHex(iceTints[worldKey] || 0x68c3c0);
-    // Reflectivity: tundra most mirror-like, noir least
-    var icePower = { cosmos: 0.38, culdesac: 0.30, deep: 0.28, mall: 0.18, tundra: 0.52 };
-    iceUniforms.reflectPower.value = icePower[worldKey] !== undefined ? icePower[worldKey] : 0.38;
-  }
 }
 
 function recolorGroup(group, hex) {
@@ -1206,8 +1214,6 @@ function swapHat(hatType) {
 }
 
 var scene, camera, renderer, fgRenderer;
-var mirrorRT = null, mirrorCam = null;
-var iceMesh = null, iceUniforms = null;
 var pauseActive = false;
 var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
 var targetRotSpeed = 1.0, currentRotSpeed = 1.0;
@@ -1232,26 +1238,12 @@ function createScene() {
   fgRenderer.shadowMap.enabled = false;
   document.getElementById('world-fg').appendChild(fgRenderer.domElement);
 
-  // Mirror render target for planet surface reflection
-  mirrorRT = new THREE.WebGLRenderTarget(
-    Math.floor(WIDTH * renderer.getPixelRatio()),
-    Math.floor(HEIGHT * renderer.getPixelRatio()),
-    { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat }
-  );
-  mirrorCam = camera.clone();
-
   window.addEventListener('resize', function() {
     WIDTH = window.innerWidth; HEIGHT = window.innerHeight;
     camera.aspect = WIDTH / HEIGHT;
     camera.updateProjectionMatrix();
-    mirrorCam.aspect = WIDTH / HEIGHT;
-    mirrorCam.updateProjectionMatrix();
     renderer.setSize(WIDTH, HEIGHT);
     fgRenderer.setSize(WIDTH, HEIGHT);
-    mirrorRT.setSize(
-      Math.floor(WIDTH * renderer.getPixelRatio()),
-      Math.floor(HEIGHT * renderer.getPixelRatio())
-    );
   });
 }
 
@@ -2836,72 +2828,6 @@ function buildWorld() {
   scene.add(voidLight);
   createAtmosphere();
   createAtmosphereRing();
-  // ── Reflective surface — sits at the planet floor (y=22) ──
-  var ICE_Y = 22;
-  iceUniforms = {
-    tReflect:     { value: mirrorRT.texture },
-    tintColor:    { value: new THREE.Color(0x68c3c0) }, // cosmos teal default
-    reflectPower: { value: 0.38 },
-    time:         { value: 0.0 },
-  };
-  var iceMat = new THREE.ShaderMaterial({
-    uniforms: iceUniforms,
-    vertexShader: [
-      'varying vec2 vUv;',
-      'varying vec4 vMirrorCoord;',
-      'void main(){',
-      '  vUv=uv;',
-      '  vec4 wp=modelMatrix*vec4(position,1.0);',
-      '  vec4 cp=projectionMatrix*viewMatrix*wp;',
-      '  vMirrorCoord=cp;',
-      '  gl_Position=cp;',
-      '}',
-    ].join('\n'),
-    fragmentShader: [
-      'uniform sampler2D tReflect;',
-      'uniform vec3 tintColor;',
-      'uniform float reflectPower;',
-      'uniform float time;',
-      'varying vec2 vUv;',
-      'varying vec4 vMirrorCoord;',
-      // Subtle scratch/ripple pattern
-      'float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
-      'float scratch(vec2 uv){',
-      '  float s=0.0;',
-      '  for(int i=0;i<8;i++){',
-      '    float fi=float(i);',
-      '    vec2 dir=normalize(vec2(hash(vec2(fi,0.))*2.-1.,hash(vec2(fi,1.))*2.-1.));',
-      '    vec2 ori=vec2(hash(vec2(fi,2.))*6.-3.,hash(vec2(fi,3.))*6.-3.);',
-      '    float d=abs(dot(uv-ori,dir));',
-      '    float proj=dot(uv-ori,dir);',
-      '    float len=0.15+hash(vec2(fi,4.))*0.55;',
-      '    s+=(1.-smoothstep(0.,0.004,d))*step(0.,proj)*step(proj,len)*0.45;',
-      '  }',
-      '  return clamp(s,0.,1.);',
-      '}',
-      'void main(){',
-      '  vec2 ndc=(vMirrorCoord.xy/vMirrorCoord.w)*0.5+0.5;',
-      '  float wave=sin(vUv.x*55.+time*0.6)*0.0018+sin(vUv.y*45.+time*0.85)*0.0014;',
-      '  vec2 reflUV=vec2(ndc.x+wave,1.0-ndc.y+wave*0.5);',
-      '  vec4 refl=texture2D(tReflect,clamp(reflUV,0.001,0.999));',
-      '  float df=1.-smoothstep(0.,1.,length(vUv-0.5)*1.4);',
-      '  vec3 base=mix(vec3(0.03,0.04,0.06),tintColor*0.45,df*0.6);',
-      '  float sc=scratch(vUv*2.2+vec2(time*0.0004,0.));',
-      '  vec3 scrCol=tintColor*sc*0.12;',
-      '  vec2 tc=vUv-0.5;',
-      '  float spec=pow(max(0.,1.-length(tc)*2.0),3.)*0.10;',
-      '  vec3 col=mix(base,refl.rgb,reflectPower)+scrCol+spec;',
-      '  gl_FragColor=vec4(col,0.88);',
-      '}',
-    ].join('\n'),
-    transparent: true,
-    depthWrite: false,
-    side: THREE.FrontSide,
-  });
-  iceMesh = new THREE.Mesh(new THREE.PlaneGeometry(2400, 2400), iceMat);
-  iceMesh.rotation.x = -Math.PI / 2;
-  iceMesh.position.y = ICE_Y;
-  scene.add(iceMesh);
   // Pre-warm pools
   for (var i = 0; i < 6; i++) {
     orbHolder.pools.blue.push(new Orb('blue'));
@@ -3653,26 +3579,6 @@ function checkCollisions() {
   }
 }
 
-// ─── Mirror pre-pass — renders reflected scene into mirrorRT ──────────────────
-var _mirrorElapsed = 0;
-function doMirrorPass() {
-  if (!mirrorRT || !iceMesh) return;
-  var ICE_Y = 22;
-  var camY = camera.position.y;
-  var reflY = ICE_Y - (camY - ICE_Y);
-  mirrorCam.position.set(camera.position.x, reflY, camera.position.z);
-  mirrorCam.rotation.set(-camera.rotation.x, camera.rotation.y, camera.rotation.z, camera.rotation.order);
-  mirrorCam.updateProjectionMatrix();
-  iceMesh.visible = false;
-  renderer.setRenderTarget(mirrorRT);
-  renderer.setClearColor(0x020111, 1);
-  renderer.clear();
-  renderer.render(scene, mirrorCam);
-  renderer.setRenderTarget(null);
-  renderer.setClearColor(0x000000, 0);
-  iceMesh.visible = true;
-}
-
 // ─── Main Loop ─────────────────────────────────────────────────────────────
 var sceneSpeed = 1.0; // kept for object update calls; driven by currentRotSpeed below
 function loop() {
@@ -3688,7 +3594,6 @@ function loop() {
   sea.mesh.rotation.z += 0.005 * currentRotSpeed;
   sky.mesh.rotation.z += 0.002 * currentRotSpeed;
   sea.moveWaves();
-  if (iceUniforms) iceUniforms.time.value += 0.016;
   if (atmosphereGroup) atmosphereGroup.rotation.z = sea.mesh.rotation.z * 0.3;
   if (atmosRingMesh) {
     var distToLine = humanoid ? Math.abs(humanoid.mesh.position.y - ATMOSPHERE_Y) : 999;
@@ -3733,7 +3638,6 @@ function loop() {
       if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
       if (cometSparkles.length) updateCometSparkles();
       if (airPuffs.length) updateAirPuffs();
-      doMirrorPass();
       renderer.render(scene, camera);
       sea.mesh.visible = false; sky.mesh.visible = false;
       orbHolder.mesh.visible = false; canHolder.mesh.visible = false; boxHolder.mesh.visible = false;
@@ -3763,7 +3667,6 @@ function loop() {
       if (cometSparkles.length) updateCometSparkles();
       if (airPuffs.length) updateAirPuffs();
       if (snowParticles.length) updateSnowSpray();
-      doMirrorPass();
       renderer.render(scene, camera);
       return;
     }
@@ -4189,7 +4092,6 @@ function loop() {
     humanoid.mesh.position.y = 152 + Math.sin(Date.now()*0.001)*5;
     humanoid.update(0, 0, 0, 0, 0);
     if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
-    doMirrorPass();
     renderer.render(scene, camera);
     // Punch astronaut through the screen overlay using the fg layer (z-index 70)
     document.getElementById('world-fg').style.display = 'block';
@@ -4199,7 +4101,6 @@ function loop() {
     return;
   }
 
-  doMirrorPass();
   renderer.render(scene, camera);
 }
 
@@ -4524,6 +4425,19 @@ window.addEventListener('load', function() {
 
 
 
+
+// ── rAF loop ──
+(function noirLoop() {
+  requestAnimationFrame(noirLoop);
+  if (noir.active && currentWorld === 'mall') {
+    noirTick();
+  } else if (_nctx && currentWorld !== 'mall') {
+    _nctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  }
+})();
+
+window.addEventListener('resize', noirResize);
+window.addEventListener('load', function() { noirInit(); }, true);
 
 // ════════════════════════════════════════════════════════════════════
 // INK EFFECT — Canvas 2D overlay applied to ALL scenes
