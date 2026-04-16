@@ -1,0 +1,4611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>neverever.land</title>
+<meta name="description" content="by zack.cx ">
+<meta property="og:title" content="neverever.land">
+<meta property="og:description" content="by zack.cx — made with wolfie.love*">
+<meta property="og:url" content="https://neverever.land">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://neverever.land/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="neverever.land">
+<meta name="twitter:description" content="by zack.cx — made with wolfie.love*">
+<meta name="twitter:image" content="https://neverever.land/og.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23020111' rx='6'/%3E%3Ccircle cx='16' cy='10' r='7' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Cellipse cx='16' cy='10' rx='4.5' ry='3.5' fill='%231a2a4a'/%3E%3Cellipse cx='14' cy='8.5' rx='1.5' ry='1' fill='%234466aa' opacity='0.7'/%3E%3Crect x='9' y='16' width='14' height='10' rx='3' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.5'/%3E%3Crect x='9.5' y='17' width='4' height='6' rx='1' fill='%23ccc' stroke='%23aaa' stroke-width='0.3'/%3E%3Crect x='4' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='22.5' y='17' width='5.5' height='3' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Ccircle cx='4.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Ccircle cx='27.5' cy='18.5' r='1.8' fill='%23ccc'/%3E%3Crect x='10' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='18' y='25' width='4' height='5' rx='1.5' fill='%23e8e8e8' stroke='%23aaa' stroke-width='0.4'/%3E%3Crect x='9.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Crect x='17.5' y='29' width='5' height='2.5' rx='1' fill='%23bbb'/%3E%3Ccircle cx='4' cy='4' r='0.6' fill='%23fff' opacity='0.8'/%3E%3Ccircle cx='28' cy='6' r='0.8' fill='%23fff' opacity='0.9'/%3E%3Ccircle cx='26' cy='28' r='0.5' fill='%23fff' opacity='0.7'/%3E%3C/svg%3E">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; tap-highlight-color: transparent; }
+  html, body { overscroll-behavior: none; touch-action: none; }
+
+  /* ── Top HUD (wordmark pill only) ── */
+  #top-hud {
+    position: fixed;
+    top: 14px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 55;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 100px;
+    padding: 7px 22px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    pointer-events: all;
+    opacity: 1;
+    transition: opacity 0.4s;
+    touch-action: manipulation;
+    overflow: visible;
+  }
+  #top-hud.visible { opacity: 1; pointer-events: all; }
+  /* World buttons always interactive even before HUD fades in */
+  #hud-world-pills { pointer-events: all; }
+  #hud-wordmark {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.72em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    padding: 2px 4px 2px 0;
+    user-select: none;
+    display: inline-block;
+  }
+  #hud-wordmark .hud-main {
+    background: linear-gradient(100deg, #ffffff 0%, #b8d8ea 40%, #68c3c0 90%, #68c3c0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding-right: 2px;
+  }
+  #hud-wordmark .hud-tld {
+    background: linear-gradient(100deg, #68c3c0 0%, #4a9ea0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0.7;
+  }
+  #hud-wordmark .hud-dot {
+    -webkit-text-fill-color: rgba(104,195,192,0.55);
+    color: rgba(104,195,192,0.55);
+  }
+
+  /* ── Toast banner area — top center, stacked ── */
+  #toast-banner-area {
+    position: fixed;
+    top: 62px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 56;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+    min-width: 0;
+  }
+  .toast-banner {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 100px;
+    padding: 6px 16px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.60em;
+    letter-spacing: 1.8px;
+    color: rgba(255,255,255,0.6);
+    text-transform: lowercase;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .toast-banner.in { opacity: 1; transform: translateY(0); }
+  .toast-banner.out { opacity: 0; transform: translateY(-6px); }
+
+  /* ── Bottom HUD ── */
+  #bottom-hud {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 55;
+    display: none;
+    align-items: center;
+    gap: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 100px;
+    padding: 5px 8px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s;
+    touch-action: manipulation;
+  }
+  #bottom-hud.visible { opacity: 1; pointer-events: all; }
+  .hud-btn {
+    background: none; border: none;
+    color: rgba(255,255,255,0.35);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.60em; letter-spacing: 2px;
+    text-transform: lowercase;
+    cursor: pointer;
+    padding: 5px 13px;
+    border-radius: 100px;
+    transition: color 0.2s, background 0.2s;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+  .hud-btn:hover { color: rgba(255,255,255,0.75); }
+  .hud-btn.active { color: rgba(104,195,192,0.9); background: rgba(104,195,192,0.08); }
+  /* direction arrows active state handled by .hud-btn.active */
+  @keyframes hud-pulse {
+    0%   { background: rgba(104,195,192,0.18); }
+    100% { background: transparent; }
+  }
+  .hud-sep {
+    width: 1px; height: 14px;
+    background: rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+  /* direction arrows visible on mobile only */
+  @media (hover: hover) and (pointer: fine) {
+    #bottom-hud { display: none !important; }
+  }
+  body {
+    font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Arial, sans-serif;
+    overflow: hidden;
+    background: #020111;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: none;
+  }
+  #world {
+    position: fixed;
+    width: 100%; height: 100%;
+    background: transparent;
+    overflow: hidden;
+    touch-action: none;
+    transition: background 1.2s ease;
+    z-index: 2;
+  }
+  #ui { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+
+  /* Oxygen rail — thin bar, color shifts with depletion */
+  #oxy-rail-bg {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 3px;
+    background: rgba(255,255,255,0.06);
+  }
+  #oxy-rail {
+    height: 100%;
+    background: #00e5ff;
+    width: 100%;
+    transform-origin: left center;
+    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), background 1.5s ease;
+  }
+
+  /* timer now inside #top-hud */
+
+  #lift-hint {
+    position: fixed; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; pointer-events: none; z-index: 15;
+    opacity: 0; transition: opacity 0.4s;
+  }
+  #lift-hint.visible { opacity: 1; }
+  #lift-hint p { color: rgba(255,255,255,0.7); font-size: 1em; font-weight: 400; letter-spacing: 2px; text-transform: lowercase; }
+
+  /* Void overlay — invisible tap-catcher, darkness comes from the scene itself */
+  #void-overlay {
+    position: fixed; inset: 0;
+    background: transparent;
+    opacity: 0; pointer-events: none;
+    z-index: 25;
+  }
+  #void-overlay.active { opacity: 1; pointer-events: all; }
+
+  /* Heartbeat prompt */
+  #heartbeat-prompt {
+    position: fixed; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; pointer-events: none; z-index: 35;
+    opacity: 0; transition: opacity 0.6s;
+  }
+  #heartbeat-prompt.visible { opacity: 1; }
+  #heartbeat-prompt .hb-text {
+    color: rgba(255,255,255,0.5);
+    font-size: clamp(0.85em, 2.5vw, 1em);
+    letter-spacing: 3px;
+    text-transform: lowercase;
+    font-weight: 300;
+  }
+  #hb-bar-bg {
+    width: 160px; height: 2px;
+    background: rgba(255,255,255,0.1);
+    margin: 16px auto 0;
+    border-radius: 1px;
+  }
+  #hb-bar {
+    height: 100%; width: 0%;
+    background: #cc1133;
+    border-radius: 1px;
+    transition: width 0.1s, background 0.8s;
+  }
+
+  /* Comet tail flash */
+  #comet-flash {
+    position: fixed; inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255,220,80,0.15), transparent 70%);
+    opacity: 0; pointer-events: none; z-index: 30;
+  }
+
+  .screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 40; pointer-events: none;
+    opacity: 0; transition: opacity .5s;
+    background: rgba(0,0,0,0.4);
+  }
+  .screen.visible { opacity: 1; pointer-events: all; }
+  .screen h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(3em, 8vw, 5.5em);
+    font-weight: 700; color: #fff;
+    text-shadow: 0 4px 20px rgba(0,0,0,.2);
+    margin-bottom: .15em; letter-spacing: -1px;
+  }
+  .screen .sub {
+    font-size: clamp(0.9em, 2.5vw, 1.1em);
+    color: rgba(255,255,255,.55);
+    margin-bottom: 2em; min-height: 1.5em;
+    letter-spacing: 1px; font-weight: 300;
+    text-align: center; padding: 0 20px;
+  }
+  .btn-play {
+    pointer-events: all;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px; padding: 12px 36px;
+    font-size: 0.85em; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Wordmark */
+  #wordmark {
+    display: block;
+    margin-bottom: 1.4em;
+    text-align: center;
+    line-height: 1;
+    user-select: none;
+  }
+  #wordmark .wm-main {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(2.8em, 8vw, 5.2em);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    background: linear-gradient(100deg, #ffffff 0%, #b8d8ea 45%, #68c3c0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  #wordmark .wm-dot {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(2.8em, 8vw, 5.2em);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    -webkit-text-fill-color: rgba(104, 195, 192, 0.55);
+    color: rgba(104, 195, 192, 0.55);
+  }
+  #wordmark .wm-tld {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(2.8em, 8vw, 5.2em);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    background: linear-gradient(100deg, #68c3c0 0%, #4a9ea0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0.7;
+  }
+
+  /* Quote rotator */
+  #welcome-quote {
+    font-size: clamp(0.78em, 2vw, 0.95em);
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 0.5em;
+    min-height: 2.8em;
+    letter-spacing: 0.5px;
+    font-weight: 300;
+    font-style: italic;
+    text-align: center;
+    padding: 0 24px;
+    max-width: 480px;
+    line-height: 1.55;
+    transition: opacity 0.6s ease;
+  }
+  #welcome-attribution {
+    font-size: clamp(0.62em, 1.5vw, 0.72em);
+    color: rgba(255,255,255,0.22);
+    letter-spacing: 2px;
+    text-transform: lowercase;
+    margin-bottom: 2.2em;
+    transition: opacity 0.6s ease;
+  }
+  #welcome-nudge {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(0.55em, 1.4vw, 0.63em);
+    color: rgba(255,255,255,0.18);
+    letter-spacing: 3.5px;
+    text-transform: lowercase;
+    margin-top: 0;
+    animation: nudge-breathe 3.8s ease-in-out infinite;
+    pointer-events: none;
+    user-select: none;
+  }
+  @keyframes nudge-breathe {
+    0%, 100% { opacity: 0.10; }
+    50%       { opacity: 0.28; }
+  }
+  .btn-link {
+    color: rgba(255,255,255,0.35);
+    text-decoration: none; text-transform: lowercase;
+    transition: color 0.2s; pointer-events: all;
+  }
+  .btn-link:hover { color: rgba(255,255,255,0.65); }
+
+  /* Foreground canvas — astronaut above pause overlay */
+  #world-fg {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 70;
+    display: none;
+  }
+
+  /* Pause overlay close button */
+  #btn-menu-close {
+    position: absolute;
+    top: 18px; right: 18px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.45);
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: color 0.2s, background 0.2s;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    z-index: 2;
+  }
+  #btn-menu-close:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.1); }
+
+  /* Pause bento overlay */
+  #pause-overlay {
+    position: fixed; inset: 0;
+    background: rgba(2, 1, 17, 0.72);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 60;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-y: auto;
+  }
+  #pause-overlay.visible { opacity: 1; pointer-events: all; }
+  .bento-grid {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
+    width: 100%;
+    max-width: 580px;
+  }
+  @media (max-width: 520px) {
+    .bento-grid { grid-template-columns: 1fr; }
+  }
+  .bento-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .bento-manifesto { grid-column: 1; grid-row: 1 / 3; display: flex; flex-direction: column; justify-content: space-between; }
+  .bento-dispatch  { grid-column: 2; grid-row: 1; }
+  .bento-link      { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; justify-content: flex-end; }
+  @media (max-width: 520px) {
+    .bento-manifesto, .bento-dispatch, .bento-link { grid-column: 1; grid-row: auto; }
+  }
+  .bento-label {
+    font-size: 0.58em; letter-spacing: 2.5px;
+    color: rgba(255,255,255,0.2); text-transform: lowercase; margin-bottom: 14px;
+  }
+  .bento-manifesto-text {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(0.78em, 2vw, 0.90em);
+    font-weight: 300; color: rgba(255,255,255,0.62);
+    line-height: 1.75; letter-spacing: 0.1px;
+  }
+  .bento-manifesto-text strong { color: rgba(255,255,255,0.88); font-weight: 500; }
+  .bento-manifesto-text .manifesto-sign {
+    display: block; margin-top: 18px;
+    font-size: 0.85em; color: rgba(104,195,192,0.55); letter-spacing: 1px;
+  }
+  .bento-resume {
+    margin-top: 20px; font-size: 0.65em; letter-spacing: 2px;
+    color: rgba(255,255,255,0.22); text-transform: lowercase;
+    cursor: pointer; transition: color 0.2s;
+    background: none; border: none; padding: 0; font-family: inherit;
+  }
+  .bento-resume:hover { color: rgba(255,255,255,0.6); }
+  .dispatch-table {
+    font-size: clamp(0.58em, 1.4vw, 0.68em);
+    letter-spacing: 0.8px; color: rgba(255,255,255,0.5);
+    border-collapse: collapse; width: 100%;
+  }
+  .dispatch-table td { padding: 2px 0; vertical-align: top; }
+  .dispatch-table td:first-child { color: rgba(255,255,255,0.25); padding-right: 10px; white-space: nowrap; }
+  .dispatch-val { color: rgba(255,255,255,0.75); }
+  .dispatch-divider { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 5px 0; }
+  .bento-zack {
+    display: inline-block;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: clamp(1em, 2.5vw, 1.2em); font-weight: 500;
+    color: rgba(255,255,255,0.5); text-decoration: none;
+    letter-spacing: -0.02em; transition: color 0.2s;
+  }
+  .bento-zack:hover { color: rgba(255,255,255,0.9); }
+  .bento-linkedin {
+    display: inline-block;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.54em;
+    color: rgba(255,255,255,0.18);
+    text-decoration: none;
+    letter-spacing: 2px;
+    text-transform: lowercase;
+    margin-top: 8px;
+    transition: color 0.2s;
+  }
+  .bento-linkedin:hover { color: rgba(104,195,192,0.7); }
+  .bento-zack-sub {
+    display: block; font-size: 0.58em; letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.2); text-transform: lowercase;
+    margin-top: 4px; font-weight: 300;
+  }
+  #rocket-bar-bg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: transparent;
+  }
+  #rocket-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ffcc00, #fff);
+    width: 100%;
+    transform-origin: left center;
+    transition: transform 0.1s linear;
+    display: none;
+  }
+
+  /* hint-label replaced by bottom HUD */
+
+  #hit-flash { position: fixed; inset: 0; background: #f25346; opacity: 0; pointer-events: none; z-index: 30; mix-blend-mode: multiply; }
+
+  /* Structural integrity bar — thin white line just above oxy rail */
+  #stress-bar-bg {
+    position: absolute;
+    bottom: 5px; left: 0;
+    width: 100%; height: 2px;
+    background: transparent;
+  }
+  #stress-bar {
+    height: 100%;
+    background: rgba(255,255,255,0.5);
+    width: 100%;
+    transform-origin: left center;
+    transform: scaleX(0);
+    transition: transform 0.3s ease, background 0.5s;
+  }
+  #stress-bar.critical { background: rgba(255,80,80,0.8); }
+
+  #cursor {
+    position: fixed;
+    width: 32px; height: 20px;
+    border: 1.5px solid rgba(0, 229, 255, 0.35);
+    border-radius: 50%;
+    pointer-events: none; z-index: 100;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.2s, border-color 0.3s;
+  }
+  #cursor.active {
+    width: 44px; height: 28px;
+    border-color: rgba(242, 83, 70, 0.7);
+  }
+  body.world-culdesac #cursor { border-color: rgba(255,220,0,0.55); }
+  body.world-culdesac #cursor.active { border-color: rgba(255,100,0,0.85); }
+  body.world-deep #cursor { border-color: rgba(212,160,48,0.55); }
+  body.world-deep #cursor.active { border-color: rgba(255,80,0,0.85); }
+  body.world-mall #cursor { border-color: rgba(255,255,255,0.38); }
+  body.world-mall #cursor.active { border-color: rgba(255,255,255,0.88); }
+
+  /* Shooting star DOM element (pure CSS streak) */
+  @keyframes pill-luminous {
+    0%   { box-shadow: 0 0 0 0 rgba(104,195,192,0); border-color: rgba(255,255,255,0.08); }
+    25%  { box-shadow: 0 0 22px 6px rgba(104,195,192,0.4); border-color: rgba(104,195,192,0.7); }
+    100% { box-shadow: 0 0 0 0 rgba(104,195,192,0); border-color: rgba(255,255,255,0.08); }
+  }
+  #top-hud.luminous {
+    opacity: 1 !important;
+    pointer-events: none !important;
+    animation: pill-luminous 1.4s ease-out forwards;
+  }
+  #wind-layer {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 18;
+    overflow: hidden;
+  }
+
+  /* ── World atmosphere overlays ── */
+  #world-atmos {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 8;
+    opacity: 0;
+    transition: opacity 1.2s ease, background 1.2s ease;
+  }
+  body.world-culdesac #world-atmos {
+    opacity: 1;
+    background: radial-gradient(ellipse 120% 55% at 50% 0%, rgba(91,200,245,0.55) 0%, rgba(135,217,247,0.18) 55%, transparent 100%);
+  }
+  body.world-deep #world-atmos {
+    opacity: 1;
+    background:
+      radial-gradient(ellipse 200% 30% at 85% 72%, rgba(255,120,0,0.70) 0%, rgba(196,90,16,0.35) 40%, transparent 70%),
+      radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(20,5,0,0.65) 100%);
+  }
+  body.world-mall #world-atmos {
+    opacity: 1;
+    background: radial-gradient(ellipse 90% 90% at 50% 50%, transparent 25%, rgba(0,0,0,0.82) 100%);
+  }
+  body.world-tundra #world-atmos {
+    opacity: 1;
+    background:
+      radial-gradient(ellipse 140% 40% at 50% 0%, rgba(200,235,255,0.60) 0%, rgba(180,220,255,0.18) 55%, transparent 100%),
+      radial-gradient(ellipse 80% 30% at 50% 100%, rgba(220,245,255,0.35) 0%, transparent 70%);
+  }
+  body.world-mall #world-atmos::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.08) 3px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+  }
+  #world-sun {
+    position: fixed;
+    top: 40px; right: 80px;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff176 0%, #ffee00 55%, #ffd600 100%);
+    box-shadow: 0 0 40px 18px rgba(255,240,80,0.55), 0 0 80px 40px rgba(255,220,0,0.22);
+    pointer-events: none; z-index: 9;
+    opacity: 0;
+    transition: opacity 1.0s ease;
+  }
+  body.world-culdesac #world-sun { opacity: 1; z-index: 1; }
+  body.world-tundra #world-sun {
+    opacity: 1; z-index: 1;
+    background: radial-gradient(circle, #ffffff 0%, #e8f4ff 55%, #c8e8ff 100%);
+    box-shadow: 0 0 50px 22px rgba(200,235,255,0.70), 0 0 100px 55px rgba(180,220,255,0.28);
+  }
+  #world-westsun {
+    position: fixed;
+    bottom: 28%; right: 6%;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffe0a0 0%, #ff8c00 60%, #c44000 100%);
+    box-shadow: 0 0 60px 30px rgba(255,100,0,0.55), 0 0 120px 80px rgba(200,60,0,0.22);
+    pointer-events: none; z-index: 9;
+    opacity: 0;
+    transition: opacity 1.0s ease;
+  }
+  body.world-deep #world-westsun { opacity: 1; z-index: 1; }
+  #world-lamp {
+    position: fixed;
+    left: 50%; top: 0;
+    transform: translateX(-50%);
+    width: 320px; height: 100%;
+    background: linear-gradient(180deg, rgba(255,255,220,0.13) 0%, rgba(255,255,180,0.04) 50%, transparent 100%);
+    pointer-events: none; z-index: 9;
+    clip-path: polygon(42% 0%, 58% 0%, 90% 100%, 10% 100%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  @keyframes lamp-flicker {
+    0%,100%,5%,7%,55%,57% { opacity: 0.9; }
+    6%,56% { opacity: 0.4; }
+    30%,31% { opacity: 0.7; }
+  }
+  body.world-mall #world-lamp { animation: lamp-flicker 12s ease-in-out infinite; }
+  #shooting-star {
+    position: fixed;
+    width: 120px; height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.9), rgba(255,255,255,0));
+    border-radius: 1px;
+    pointer-events: none; z-index: 8;
+    opacity: 0;
+    transform-origin: left center;
+  }
+
+  /* ── World buttons in top HUD ── */
+  #hud-world-pills {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .hud-world-btn {
+    background: none;
+    border: none;
+    font-size: 0.85em;
+    line-height: 1;
+    padding: 3px 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0.35;
+    transition: opacity 0.2s, background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    filter: grayscale(0.6);
+  }
+  .hud-world-btn:hover { opacity: 0.75; filter: grayscale(0); }
+  .hud-world-btn.active { opacity: 1; filter: grayscale(0); background: rgba(255,255,255,0.08); }
+  :root { --world-accent: rgba(104,195,192,0.95); }
+
+  /* ── NOIR MODE ─────────────────────────────────────────────────── */
+  #noir-overlay {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 22;
+    display: none;
+  }
+  body.world-mall #noir-overlay { display: block; }
+  #noir-red-wash {
+    position: fixed; inset: 0;
+    background: rgba(160,0,0,0);
+    pointer-events: none; z-index: 21;
+    transition: background 1.0s ease;
+  }
+  #noir-throw-hint {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    font-family: monospace; font-size: 10px; letter-spacing: 2px;
+    color: rgba(180,230,255,0.35); pointer-events: none; z-index: 23;
+    display: none;
+  }
+  body.world-mall #noir-throw-hint { display: block; }
+
+  /* ── Ink effect overlay ── */
+  #ink-overlay {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 19;
+    opacity: 1;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="noir-overlay"></canvas>
+<canvas id="ink-overlay"></canvas>
+<div id="noir-red-wash"></div>
+<div id="noir-throw-hint">[ f ] throw ice &nbsp;·&nbsp; double-tap mobile</div>
+<div id="cursor"></div>
+<div id="world"></div>
+<div id="world-fg"></div>
+<div id="world-atmos"></div>
+<div id="world-sun"></div>
+<div id="world-westsun"></div>
+<div id="world-lamp"></div>
+<div id="hit-flash"></div>
+<div id="comet-flash"></div>
+<div id="shooting-star"></div>
+<div id="wind-layer"></div>
+<div id="toast-container"></div><!-- legacy, kept for JS compat -->
+
+<!-- Top HUD: wordmark + world selector -->
+<div id="top-hud">
+  <span id="hud-wordmark" role="button" aria-label="home">
+    <span class="hud-main">neverever</span><span class="hud-dot">.</span><span class="hud-tld">land</span>
+  </span>
+  <div class="hud-sep"></div>
+  <div id="hud-world-pills">
+    <button class="hud-world-btn active" data-world="cosmos">◼</button>
+    <button class="hud-world-btn" data-world="tundra">◻</button>
+  </div>
+</div>
+
+<!-- Toast banner area: top center, stacked -->
+<div id="toast-banner-area"></div>
+
+<!-- Bottom HUD: direction toggle (mobile only) -->
+<div id="bottom-hud">
+  <button id="btn-hud-dir" class="hud-btn">forward &#8594;</button>
+</div>
+
+<div id="pause-overlay">
+  <button id="btn-menu-close" aria-label="close menu">&#x2715;</button>
+  <div class="bento-grid">
+
+    <div class="bento-card bento-manifesto">
+      <p class="bento-label">doctrine</p>
+      <div class="bento-manifesto-text">
+        <p>be me.</p>
+        <br>
+        <p>be floating in space.</p>
+        <br>
+        <p>somehow be in counter-orbit.</p>
+        <br>
+        <p>even though already clockwise.</p>
+        <br>
+        <p>need air. seeking gravity.</p>
+        <br>
+        <p>meanwhile, minding metaphors over monuments.</p>
+        <span class="manifesto-sign">— zack</span>
+      </div>
+      <button class="bento-resume" id="btn-pause-resume">spacebar to space-out</button>
+    </div>
+
+    <div class="bento-card bento-dispatch">
+      <p class="bento-label">dispatch</p>
+      <div id="pause-dispatch-content"></div>
+    </div>
+
+    <div class="bento-card bento-link">
+      <p class="bento-label">origin</p>
+      <a href="https://zack.cx" target="_blank" class="bento-zack">
+        zack.cx
+        <span class="bento-zack-sub">thinker & maker</span>
+      </a>
+      <a href="https://linkedin.com/in/zackargyle" target="_blank" class="bento-linkedin">
+        linkedin
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<div id="ui">
+  <div id="timer" style="display:none">0:00</div><!-- legacy, kept for JS compat -->
+  <div id="rocket-bar-bg"><div id="rocket-bar"></div></div>
+  <div id="stress-bar-bg"><div id="stress-bar"></div></div>
+  <div id="oxy-rail-bg"><div id="oxy-rail"></div></div>
+</div>
+
+<div id="void-overlay"></div>
+<div id="heartbeat-prompt">
+  <p class="hb-text">tap to restore heartbeat</p>
+  <div id="hb-bar-bg"><div id="hb-bar"></div></div>
+</div>
+
+<div id="lift-hint">
+  <p>tap anywhere to get up</p>
+</div>
+
+<div class="screen" id="screen-welcome">
+
+  <!-- Wordmark -->
+  <div id="wordmark" aria-label="neverever.land">
+    <span class="wm-main">neverever</span><span class="wm-dot">.</span><span class="wm-tld">land</span>
+  </div>
+
+  <p id="welcome-quote"></p>
+  <p id="welcome-attribution"></p>
+  <p id="welcome-nudge"></p>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+
+<script>
+"use strict";
+
+document.addEventListener('touchmove', function(e) {
+  if (STATUS === 'waiting' || STATUS === 'gameover') return;
+  e.preventDefault();
+}, { passive: false });
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', function() { history.pushState(null, '', location.href); });
+
+var C = {
+  red: 0xf25346, white: 0xd8d0d1,
+  blue: 0x68c3c0, yellow: 0xf4e783,
+  orbBlue: 0x4499ff, orbRed: 0xf23030, orbBlack: 0x111118,
+  oxygenCanister: 0x00e5ff,
+  mysteryBox: 0xffcc00
+};
+
+var planetColors = [0x68c3c0, 0x4a3b69, 0x2b596b, 0x5c3a41];
+
+// ─── World Definitions ─────────────────────────────────────────────────────
+var WORLDS = {
+  cosmos: {
+    name: 'studio black',
+    accent: 'rgba(104,195,192,0.95)',
+    bgFrom: '#020111', bgTo: '#0d0820',
+    fogColor: 0x1a1025, fogNear: 100, fogFar: 950,
+    seaColor: 0x68c3c0,
+    starColor: 0xffffff,
+    orbColors: { blue: 0x4499ff, red: 0xf23030, black: 0x111118 },
+    canColor: 0x00e5ff,
+    flameColor: 0x00ffff,
+    dustColors: [0x68c3c0, 0x4a3b69, 0x2b596b, 0x444455, 0x556677],
+    puffColor: 0x88ddff,
+    windForward: 'rgba(160,220,255,',
+    windReverse: 'rgba(255,160,80,',
+    hudAccent: '#68c3c0',
+    oxyRailColor: '#00e5ff',
+    hat: 'helmet',
+    makeHat: null,
+    toastLabel: 'orbit',
+    particleLabel: 'stars',
+  },
+  tundra: {
+    // ── ICE PLANET ── Crisp alpine, snowboard glide, powder spray
+    name: 'studio white',
+    accent: 'rgba(180,230,255,0.98)',
+    bgFrom: '#c8e8f8', bgTo: '#e8f5ff',
+    fogColor: 0xd8eef8, fogNear: 120, fogFar: 700,
+    seaColor: 0xa8d8f0,
+    starColor: 0xffffff,
+    orbColors: { blue: 0x88ccff, red: 0xff8888, black: 0x334455 },
+    canColor: 0xaaeeff,
+    flameColor: 0xccf4ff,
+    dustColors: [0xffffff, 0xe0f4ff, 0xc8e8ff, 0xd0eeff, 0xf0faff],
+    puffColor: 0xffffff,
+    windForward: 'rgba(200,235,255,',
+    windReverse: 'rgba(160,200,240,',
+    hudAccent: '#88d8f8',
+    oxyRailColor: '#88d8f8',
+    hat: 'helmet',
+    toastLabel: 'powder',
+    particleLabel: 'snow spray',
+  }
+};
+
+var currentWorld = 'cosmos';
+
+// Per-world dynamic lights stored so we can remove them on world switch
+var _worldLights = [];
+
+function applyWorld(worldKey) {
+  currentWorld = worldKey;
+  var W = WORLDS[worldKey];
+  if (!W) return;
+
+  // Background
+  document.getElementById('world').style.background = 'linear-gradient(180deg,' + W.bgFrom + ' 0%,' + W.bgTo + ' 100%)';
+  document.getElementById('world').style.transition = 'background 1.2s ease';
+
+  // Body class for CSS world theming
+  document.body.className = document.body.className.replace(/\bworld-\S+/g, '').trim();
+  document.body.classList.add('world-' + worldKey);
+
+  // CSS accent variable
+  document.documentElement.style.setProperty('--world-accent', W.accent);
+
+  // Fog
+  if (scene && scene.fog) {
+    scene.fog.color.setHex(W.fogColor);
+    scene.fog.near = W.fogNear;
+    scene.fog.far  = W.fogFar;
+  }
+
+  // Sea color
+  if (sea && sea.mesh && sea.mesh.material) {
+    sea.mesh.material.color.setHex(W.seaColor);
+    sea.mesh.material.opacity = 0.8;
+    sea.mesh.material.needsUpdate = true;
+  }
+
+  // Stars (sky cubes)
+  if (sky) {
+    sky.mesh.traverse(function(obj) {
+      if (obj.isMesh && obj.material) {
+        obj.material.color.setHex(W.starColor);
+        obj.scale.setScalar(1.0);
+      }
+    });
+  }
+
+  // Remove old world-specific lights
+  _worldLights.forEach(function(l) { scene.remove(l); });
+  _worldLights = [];
+
+  // Per-world lighting
+  if (worldKey === 'tundra') {
+    // Ice Planet: crisp alpine sun high and slightly angled, cold blue fill, bright snow bounce
+    scene.children.forEach(function(c) {
+      if (c.isHemisphereLight) c.intensity = 0.25;
+      if (c.isAmbientLight) { c.color.setHex(0xc8eeff); c.intensity = 0.7; }
+      if (c.isDirectionalLight) { c.color.setHex(0xfff8f0); c.intensity = 2.0; c.position.set(200, 600, 150); }
+    });
+    var snowBounce = new THREE.HemisphereLight(0xe8f8ff, 0xaaddff, 0.9);
+    scene.add(snowBounce); _worldLights.push(snowBounce);
+    var rimIce = new THREE.DirectionalLight(0x88ccff, 0.55);
+    rimIce.position.set(-300, 200, -100);
+    scene.add(rimIce); _worldLights.push(rimIce);
+  } else {
+    // Cosmos: restore defaults
+    scene.children.forEach(function(c) { if (c.isHemisphereLight) { c.color.setHex(0xffffff); c.groundColor.setHex(0x000000); c.intensity = 0.5; } if (c.isAmbientLight) { c.color.setHex(0x404040); c.intensity = 0.7; } if (c.isDirectionalLight) { c.color.setHex(0xffffff); c.intensity = 0.9; c.position.set(150, 350, 350); } });
+  }
+
+  // Atmosphere visuals: hide for Simpsons/Western/Noir, show for Cosmos
+  if (atmosphereGroup) atmosphereGroup.visible = (worldKey === 'cosmos');
+  if (atmosRingMesh)   atmosRingMesh.visible   = (worldKey === 'cosmos');
+  if (atmosRingGlow)   atmosRingGlow.visible   = (worldKey === 'cosmos');
+
+  // Orb colors
+  if (orbHolder) {
+    orbHolder.inUse.forEach(function(e) {
+      var col = W.orbColors[e.orbType];
+      if (col !== undefined) e.mat.color.setHex(col);
+    });
+    ['blue','red','black'].forEach(function(t) {
+      orbHolder.pools[t].forEach(function(e) {
+        var col = W.orbColors[t];
+        if (col !== undefined) e.mat.color.setHex(col);
+      });
+    });
+  }
+
+  // Canister color
+  if (canHolder) {
+    canHolder.inUse.forEach(function(c) { recolorGroup(c.mesh, W.canColor); });
+    canHolder.pool.forEach(function(c) { recolorGroup(c.mesh, W.canColor); });
+  }
+
+  // Flame color
+  if (humanoid) {
+    humanoid.flameMat.color.setHex(W.flameColor);
+    swapHat(W.hat);
+  }
+
+  // Dust & puff colors
+  DUST_COLORS.length = 0;
+  W.dustColors.forEach(function(c) { DUST_COLORS.push(c); });
+
+  // Pill UI accent
+  var hudMain = document.querySelector('.hud-main');
+  var hudTld  = document.querySelector('.hud-tld');
+  if (hudMain) hudMain.style.cssText = '';
+  if (hudTld)  hudTld.style.cssText  = '';
+
+  // World pills active state
+  document.querySelectorAll('.hud-world-btn').forEach(function(p) {
+    p.classList.toggle('active', p.dataset.world === worldKey);
+  });
+
+  // Oxy rail
+  document.getElementById('oxy-rail').style.background = W.oxyRailColor;
+
+  // Reflective surface tint — matches world accent/sea palette
+  if (iceUniforms) {
+    var iceTints = {
+      cosmos:   0x68c3c0,
+      tundra:   0xa8d8f0,
+    };
+    iceUniforms.tintColor.value.setHex(iceTints[worldKey] || 0x68c3c0);
+    var icePower = { cosmos: 0.38, tundra: 0.52 };
+    iceUniforms.reflectPower.value = icePower[worldKey] !== undefined ? icePower[worldKey] : 0.38;
+  }
+}
+
+function recolorGroup(group, hex) {
+  group.traverse(function(obj) {
+    if (obj.isMesh && obj.material) obj.material.color.setHex(hex);
+  });
+}
+
+// Hat geometry registry — each world hat is built once, stored here
+var _hatMeshes = {};
+
+function buildHatMesh(hatType) {
+  if (_hatMeshes[hatType]) return _hatMeshes[hatType];
+  var group = new THREE.Object3D();
+
+  if (hatType === 'bikehelmet') {
+    // Chunky 90s bike helmet — rounded shell + chin strap hint + vents
+    var shellMat = new THREE.MeshPhongMaterial({ color: 0xff5522, flatShading: true });
+    var shell = new THREE.Mesh(new THREE.SphereGeometry(11, 8, 6), shellMat);
+    shell.scale.set(1.0, 0.72, 1.0);
+    shell.position.set(0, 2, 0);
+    group.add(shell);
+    // Visor brim
+    var brimMat = new THREE.MeshPhongMaterial({ color: 0x222222, flatShading: true });
+    var brim = new THREE.Mesh(new THREE.BoxGeometry(18, 2, 8), brimMat);
+    brim.position.set(0, -4, 5);
+    group.add(brim);
+    // Vent stripes
+    var ventMat = new THREE.MeshPhongMaterial({ color: 0xcc3300, flatShading: true });
+    for (var vi = -1; vi <= 1; vi++) {
+      var vent = new THREE.Mesh(new THREE.BoxGeometry(3, 2, 12), ventMat);
+      vent.position.set(vi * 5, 4, 0);
+      group.add(vent);
+    }
+  } else if (hatType === 'divinghelmet') {
+    // Old brass diving helmet — big round dome with porthole + bolts
+    var brassMat = new THREE.MeshPhongMaterial({ color: 0xb8860b, shininess: 80, flatShading: true });
+    var dome = new THREE.Mesh(new THREE.SphereGeometry(12, 10, 8), brassMat);
+    dome.scale.set(1.0, 1.1, 1.0);
+    dome.position.set(0, 2, 0);
+    group.add(dome);
+    // Porthole ring
+    var portMat = new THREE.MeshPhongMaterial({ color: 0x8b6914, shininess: 60, flatShading: true });
+    var porthole = new THREE.Mesh(new THREE.TorusGeometry(5, 1.5, 6, 12), portMat);
+    porthole.position.set(0, 2, 11);
+    group.add(porthole);
+    // Dark porthole glass
+    var glassMat = new THREE.MeshPhongMaterial({ color: 0x112233, shininess: 120, flatShading: true });
+    var glass = new THREE.Mesh(new THREE.CircleGeometry(4.5, 12), glassMat);
+    glass.position.set(0, 2, 11.5);
+    group.add(glass);
+    // Bolts around the collar
+    var boltMat = new THREE.MeshPhongMaterial({ color: 0xd4a800, flatShading: true });
+    for (var bi = 0; bi < 8; bi++) {
+      var ba = (Math.PI * 2 * bi) / 8;
+      var bolt = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 3, 6), boltMat);
+      bolt.position.set(Math.cos(ba) * 11, -5, Math.sin(ba) * 8);
+      group.add(bolt);
+    }
+  } else if (hatType === 'securitycap') {
+    // Flat-brim security guard cap
+    var capMat = new THREE.MeshPhongMaterial({ color: 0x1a2a1a, flatShading: true });
+    var crown = new THREE.Mesh(new THREE.CylinderGeometry(9, 10, 8, 8), capMat);
+    crown.position.set(0, 3, 0);
+    group.add(crown);
+    // Brim
+    var capBrimMat = new THREE.MeshPhongMaterial({ color: 0x111811, flatShading: true });
+    var capBrim = new THREE.Mesh(new THREE.CylinderGeometry(14, 14, 1.5, 12), capBrimMat);
+    capBrim.position.set(0, -1, 2);
+    capBrim.scale.set(1.0, 1.0, 0.55);
+    group.add(capBrim);
+    // Badge
+    var badgeMat = new THREE.MeshPhongMaterial({ color: 0xd4aa00, shininess: 90, flatShading: true });
+    var badge = new THREE.Mesh(new THREE.BoxGeometry(5, 4, 1), badgeMat);
+    badge.position.set(0, 4, 9);
+    group.add(badge);
+  }
+
+  _hatMeshes[hatType] = group;
+  return group;
+}
+
+function swapHat(hatType) {
+  if (!humanoid || !humanoid.head) return;
+  // Remove any previous hat
+  var prev = humanoid.head.getObjectByName('_worldHat');
+  if (prev) humanoid.head.remove(prev);
+
+  if (hatType === 'helmet') return; // cosmos = default visor, no extra hat
+
+  var hat = buildHatMesh(hatType);
+  hat.name = '_worldHat';
+  hat.scale.setScalar(0.9);
+  hat.position.set(0, 8, -1);
+  humanoid.head.add(hat);
+}
+
+var scene, camera, renderer, fgRenderer;
+var mirrorRT = null, mirrorCam = null;
+var iceMesh = null, iceUniforms = null;
+var pauseActive = false;
+var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
+var targetRotSpeed = 1.0, currentRotSpeed = 1.0;
+
+// ─── Scene ─────────────────────────────────────────────────────────────────
+function createScene() {
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x1a1025, 100, 950);
+  camera = new THREE.PerspectiveCamera(60, WIDTH / HEIGHT, 1, 10000);
+  camera.position.set(0, 100, 200);
+  renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(WIDTH, HEIGHT);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.getElementById('world').appendChild(renderer.domElement);
+
+  // Foreground renderer — renders only the astronaut, above the pause overlay
+  fgRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  fgRenderer.setSize(WIDTH, HEIGHT);
+  fgRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  fgRenderer.shadowMap.enabled = false;
+  document.getElementById('world-fg').appendChild(fgRenderer.domElement);
+
+  // Mirror render target for planet surface reflection
+  mirrorRT = new THREE.WebGLRenderTarget(
+    Math.floor(WIDTH * renderer.getPixelRatio()),
+    Math.floor(HEIGHT * renderer.getPixelRatio()),
+    { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat }
+  );
+  mirrorCam = camera.clone();
+
+  window.addEventListener('resize', function() {
+    WIDTH = window.innerWidth; HEIGHT = window.innerHeight;
+    camera.aspect = WIDTH / HEIGHT;
+    camera.updateProjectionMatrix();
+    mirrorCam.aspect = WIDTH / HEIGHT;
+    mirrorCam.updateProjectionMatrix();
+    renderer.setSize(WIDTH, HEIGHT);
+    fgRenderer.setSize(WIDTH, HEIGHT);
+    mirrorRT.setSize(
+      Math.floor(WIDTH * renderer.getPixelRatio()),
+      Math.floor(HEIGHT * renderer.getPixelRatio())
+    );
+  });
+}
+
+function createLights() {
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x000000, 0.5));
+  scene.add(new THREE.AmbientLight(0x404040, 0.7));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.9);
+  sun.position.set(150, 350, 350);
+  sun.castShadow = true;
+  sun.shadow.camera.left = -500; sun.shadow.camera.right = 500;
+  sun.shadow.camera.top = 500; sun.shadow.camera.bottom = -500;
+  sun.shadow.camera.near = 1; sun.shadow.camera.far = 1000;
+  sun.shadow.mapSize.width = 2048; sun.shadow.mapSize.height = 2048;
+  scene.add(sun);
+}
+
+// ─── Sea ───────────────────────────────────────────────────────────────────
+function Sea() {
+  var geom = new THREE.CylinderGeometry(600, 600, 800, 40, 10);
+  geom.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+  var pos = geom.attributes.position;
+  this.waveData = [];
+  for (var i = 0; i < pos.count; i++) {
+    this.waveData.push({
+      x: pos.getX(i), y: pos.getY(i), z: pos.getZ(i),
+      ang: Math.random() * Math.PI * 2,
+      amp: 5 + Math.random() * 15,
+      speed: 0.016 + Math.random() * 0.032,
+    });
+  }
+  var mat = new THREE.MeshPhongMaterial({ color: planetColors[0], transparent: true, opacity: 0.8, flatShading: true });
+  this.mesh = new THREE.Mesh(geom, mat);
+  this.mesh.receiveShadow = true;
+}
+Sea.prototype.moveWaves = function() {
+  var pos = this.mesh.geometry.attributes.position;
+  for (var i = 0, d; i < this.waveData.length; i++) {
+    d = this.waveData[i];
+    pos.setX(i, d.x + Math.cos(d.ang) * d.amp);
+    pos.setY(i, d.y + Math.sin(d.ang) * d.amp);
+    d.ang += d.speed;
+  }
+  pos.needsUpdate = true;
+  this.mesh.geometry.computeVertexNormals();
+};
+
+function Star() {
+  var m = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+  this.mesh = new THREE.Object3D();
+  this.mesh.add(m);
+}
+function Sky() {
+  this.mesh = new THREE.Object3D();
+  for (var i = 0; i < 150; i++) {
+    var s = new Star();
+    var a = Math.random() * Math.PI * 2;
+    var h = 650 + Math.random() * 300;
+    s.mesh.position.set(Math.cos(a) * h, Math.sin(a) * h, -200 - Math.random() * 600);
+    this.mesh.add(s.mesh);
+  }
+}
+
+function makeBox(w, h, d, mat) {
+  return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+}
+
+// ─── RAGDOLL ───────────────────────────────────────────────────────────────
+function RagdollHuman() {
+  this.mesh = new THREE.Object3D();
+  this.mesh.rotation.y = Math.PI * 0.25;
+  this.baseRotX = -0.55;
+  this.baseRotZ = 0;
+  this.flipX = 0;
+  this.flipZ = 0;
+  this.mesh.rotation.x = -0.55;
+  this.singularity = false;
+  this.slingVx = 0; this.slingVy = 0; this.slingFrames = 0;
+  this.reachFade = 1.0; // 1 = full cursor reach, 0 = disabled (during spins/hits)
+
+  this.suitMat  = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true });
+  var jointMat  = new THREE.MeshPhongMaterial({ color: 0x666666, flatShading: true });
+  var visorMat  = new THREE.MeshPhongMaterial({ color: 0x111115, flatShading: true, shininess: 100, specular: 0xffffff });
+  var packMat   = new THREE.MeshPhongMaterial({ color: 0xdddddd, flatShading: true });
+  var thrusterMat = new THREE.MeshPhongMaterial({ color: 0x444444, flatShading: true });
+  this.flameMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+
+  var head = makeBox(18, 18, 18, this.suitMat);
+  head.position.set(0, 34, 0); head.castShadow = true;
+  this.mesh.add(head); this.head = head;
+
+  var visor = makeBox(14, 10, 4, visorMat);
+  visor.position.set(0, 2, 8);
+  head.add(visor);
+
+  var neck = makeBox(12, 4, 12, jointMat);
+  neck.position.set(0, 24, 0);
+  this.mesh.add(neck);
+
+  var torsoU = makeBox(24, 16, 16, this.suitMat);
+  torsoU.position.set(0, 15, 0); torsoU.castShadow = true;
+  this.mesh.add(torsoU);
+
+  var pack = makeBox(26, 30, 14, packMat);
+  pack.position.set(0, 0, -14); pack.castShadow = true;
+  torsoU.add(pack);
+
+  // Ridge detail across the pack
+  var packRidge = makeBox(28, 4, 16, thrusterMat);
+  packRidge.position.set(0, 4, 0);
+  pack.add(packRidge);
+
+  // Fuel line nubs
+  var fuelMat = new THREE.MeshPhongMaterial({ color: 0x888888, flatShading: true });
+  var fuelL = makeBox(3, 18, 3, fuelMat);
+  fuelL.position.set(-10, -4, 6); pack.add(fuelL);
+  var fuelR = makeBox(3, 18, 3, fuelMat);
+  fuelR.position.set(10, -4, 6); pack.add(fuelR);
+
+  var lThruster = new THREE.Mesh(new THREE.CylinderGeometry(4, 5.5, 12, 10), thrusterMat);
+  lThruster.position.set(-9, -17, 0); pack.add(lThruster);
+  var rThruster = new THREE.Mesh(new THREE.CylinderGeometry(4, 5.5, 12, 10), thrusterMat);
+  rThruster.position.set(9, -17, 0); pack.add(rThruster);
+
+  // Thruster rim rings
+  var rimMat = new THREE.MeshPhongMaterial({ color: 0xaaaaaa, flatShading: true });
+  var lRim = new THREE.Mesh(new THREE.CylinderGeometry(5.8, 5.8, 2, 10), rimMat);
+  lRim.position.set(0, -7, 0); lThruster.add(lRim);
+  var rRim = new THREE.Mesh(new THREE.CylinderGeometry(5.8, 5.8, 2, 10), rimMat);
+  rRim.position.set(0, -7, 0); rThruster.add(rRim);
+
+  // Store thruster refs so we can get world positions for puff spawning
+  this.lThruster = lThruster;
+  this.rThruster = rThruster;
+
+  this.lFlame = new THREE.Mesh(new THREE.ConeGeometry(4, 16, 10), this.flameMat);
+  this.lFlame.position.set(0, -12, 0); this.lFlame.rotation.x = Math.PI;
+  lThruster.add(this.lFlame);
+  this.rFlame = new THREE.Mesh(new THREE.ConeGeometry(4, 16, 10), this.flameMat);
+  this.rFlame.position.set(0, -12, 0); this.rFlame.rotation.x = Math.PI;
+  rThruster.add(this.rFlame);
+
+  var torsoL = makeBox(22, 12, 14, this.suitMat);
+  torsoL.position.set(0, 3, 0); torsoL.castShadow = true;
+  this.mesh.add(torsoL);
+
+  var pelvis = makeBox(20, 8, 12, jointMat);
+  pelvis.position.set(0, -5, 0);
+  this.mesh.add(pelvis);
+
+  // Arms
+  this.rShoulderPivot = new THREE.Object3D();
+  this.rShoulderPivot.position.set(-15, 16, 0);
+  this.rShoulderPivot.rotation.x =  0.65;
+  this.rShoulderPivot.rotation.z = -0.55;
+  this.rShoulderPivot.userData = { velX: 0, velZ: 0 };
+  var rUpperArm = makeBox(8, 18, 8, this.suitMat);
+  rUpperArm.position.set(0, -9, 0);
+  this.rShoulderPivot.add(rUpperArm);
+  this.rElbowPivot = new THREE.Object3D();
+  this.rElbowPivot.position.set(0, -18, 0);
+  this.rElbowPivot.rotation.x =  0.10;
+  this.rElbowPivot.rotation.z = -0.20;
+  this.rElbowPivot.userData = { velX: 0, velZ: 0 };
+  var rForearm = makeBox(7, 14, 7, this.suitMat);
+  rForearm.position.set(0, -7, 0);
+  this.rElbowPivot.add(rForearm);
+  this.rShoulderPivot.add(this.rElbowPivot);
+  this.mesh.add(this.rShoulderPivot);
+
+  this.lShoulderPivot = new THREE.Object3D();
+  this.lShoulderPivot.position.set(15, 16, 0);
+  this.lShoulderPivot.rotation.x =  0.65;
+  this.lShoulderPivot.rotation.z =  0.55;
+  this.lShoulderPivot.userData = { velX: 0, velZ: 0 };
+  var lUpperArm = makeBox(8, 18, 8, this.suitMat);
+  lUpperArm.position.set(0, -9, 0);
+  this.lShoulderPivot.add(lUpperArm);
+  this.lElbowPivot = new THREE.Object3D();
+  this.lElbowPivot.position.set(0, -18, 0);
+  this.lElbowPivot.rotation.x =  0.10;
+  this.lElbowPivot.rotation.z =  0.20;
+  this.lElbowPivot.userData = { velX: 0, velZ: 0 };
+  var lForearm = makeBox(7, 14, 7, this.suitMat);
+  lForearm.position.set(0, -7, 0);
+  this.lElbowPivot.add(lForearm);
+  this.lShoulderPivot.add(this.lElbowPivot);
+  this.mesh.add(this.lShoulderPivot);
+
+  // Legs
+  this.rHipPivot = new THREE.Object3D();
+  this.rHipPivot.position.set(-8, -9, 0);
+  this.rHipPivot.userData = { velX: 0, velZ: 0 };
+  var rThigh = makeBox(10, 18, 10, this.suitMat);
+  rThigh.position.set(0, -9, 0);
+  this.rHipPivot.add(rThigh);
+  this.rKneePivot = new THREE.Object3D();
+  this.rKneePivot.position.set(0, -18, 0);
+  this.rKneePivot.userData = { velX: 0, velZ: 0 };
+  var rShin = makeBox(9, 16, 9, this.suitMat);
+  rShin.position.set(0, -8, 0);
+  this.rKneePivot.add(rShin);
+  this.rHipPivot.add(this.rKneePivot);
+  this.mesh.add(this.rHipPivot);
+
+  this.lHipPivot = new THREE.Object3D();
+  this.lHipPivot.position.set(8, -9, 0);
+  this.lHipPivot.userData = { velX: 0, velZ: 0 };
+  var lThigh = makeBox(10, 18, 10, this.suitMat);
+  lThigh.position.set(0, -9, 0);
+  this.lHipPivot.add(lThigh);
+  this.lKneePivot = new THREE.Object3D();
+  this.lKneePivot.position.set(0, -18, 0);
+  this.lKneePivot.userData = { velX: 0, velZ: 0 };
+  var lShin = makeBox(9, 16, 9, this.suitMat);
+  lShin.position.set(0, -8, 0);
+  this.lKneePivot.add(lShin);
+  this.lHipPivot.add(this.lKneePivot);
+  this.mesh.add(this.lHipPivot);
+
+  this.joints = [
+    { pivot: this.rShoulderPivot, stiffX: 0.06, stiffZ: 0.06, dampX: 0.90, dampZ: 0.90, limX: 1.0, limZ: 1.0 },
+    { pivot: this.lShoulderPivot, stiffX: 0.06, stiffZ: 0.06, dampX: 0.90, dampZ: 0.90, limX: 1.0, limZ: 1.0 },
+    { pivot: this.rElbowPivot,    stiffX: 0.05, stiffZ: 0.04, dampX: 0.93, dampZ: 0.93, limX: 1.6, limZ: 1.0 },
+    { pivot: this.lElbowPivot,    stiffX: 0.05, stiffZ: 0.04, dampX: 0.93, dampZ: 0.93, limX: 1.6, limZ: 1.0 },
+    { pivot: this.rHipPivot,      stiffX: 0.18, stiffZ: 0.14, dampX: 0.68, dampZ: 0.68, limX: 1.4, limZ: 0.28 },
+    { pivot: this.rKneePivot,     stiffX: 0.15, stiffZ: 0.11, dampX: 0.68, dampZ: 0.68, limX: 1.5, limZ: 0.14 },
+    { pivot: this.lHipPivot,      stiffX: 0.18, stiffZ: 0.14, dampX: 0.68, dampZ: 0.68, limX: 1.4, limZ: 0.28 },
+    { pivot: this.lKneePivot,     stiffX: 0.15, stiffZ: 0.11, dampX: 0.68, dampZ: 0.68, limX: 1.5, limZ: 0.14 },
+  ];
+
+  this.armDrift = [
+    { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.009+Math.random()*0.006, speedZ: 0.007+Math.random()*0.005, ampX: 0.16, ampZ: 0.20 },
+    { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.009+Math.random()*0.006, speedZ: 0.007+Math.random()*0.005, ampX: 0.16, ampZ: 0.20 },
+    { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.011+Math.random()*0.007, speedZ: 0.009+Math.random()*0.006, ampX: 0.10, ampZ: 0.12 },
+    { phaseX: Math.random()*Math.PI*2, phaseZ: Math.random()*Math.PI*2, speedX: 0.011+Math.random()*0.007, speedZ: 0.009+Math.random()*0.006, ampX: 0.10, ampZ: 0.12 },
+  ];
+  this.animTime = 0;
+}
+
+RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
+  dx = dx || 0; dy = dy || 0;
+  this.animTime += 0.08;
+
+  // ── Scroll forces ────────────────────────────────────────────────────────
+  var reverseForce = Math.max(0, -reverseLerp) / 2.2;
+  var forwardForce = Math.max(0,  reverseLerp) / 1.2;
+  var inertiaPitch = forwardForce * 0.40 - reverseForce * 0.35;
+  var armTrail     = forwardForce * 0.75 - reverseForce * 0.65;
+  var sideDrift    = forwardForce * 0.50 - reverseForce * 0.50;
+  var scrollIntensity = Math.min(1, Math.max(forwardForce, reverseForce) * 1.6);
+
+  // ── 1. Body ───────────────────────────────────────────────────────────────
+  var altFactor = Math.max(0, Math.min(1, (this.mesh.position.y - 25) / 150));
+  var poseLow  = Math.max(0, 1 - altFactor / 0.38);
+  var poseHigh = Math.max(0, (altFactor - 0.62) / 0.38);
+
+  var targetBodyX = (-1.05 + altFactor * 0.80) + inertiaPitch;
+  var leanZ = -accelX * 0.8;
+
+  this.baseRotZ += (leanZ       - this.baseRotZ) * 0.10;
+  this.baseRotX += (targetBodyX - this.baseRotX) * 0.06;
+
+  this.mesh.rotation.z = this.baseRotZ + this.flipZ;
+  this.mesh.rotation.x = this.baseRotX + this.flipX;
+
+  // Facing: always try to face the butterfly (cursor)
+  var bfAngle;
+  if (typeof dx !== 'undefined' && dx !== null) {
+    var facingBias = Math.max(-1, Math.min(1, dx / 120));
+    bfAngle = Math.PI * 0.75 - facingBias * Math.PI * 0.55;
+  } else {
+    bfAngle = Math.PI * 0.75;
+  }
+  this.mesh.rotation.y += (bfAngle - this.mesh.rotation.y) * 0.06;
+
+  // ── 2. Thruster flames ──────────────────────────────────────────────────
+  var baseScale   = 0.6 + Math.random() * 0.4;
+  var thrustBoost = Math.max(0, accelY * 2.5);
+  this.lFlame.scale.set(1, baseScale + thrustBoost, 0.5);
+  this.rFlame.scale.set(1, baseScale + thrustBoost, 0.5);
+
+  // ── 3. Drift phases ─────────────────────────────────────────────────────
+  for (var ad = 0; ad < this.armDrift.length; ad++) {
+    this.armDrift[ad].phaseX += this.armDrift[ad].speedX;
+    this.armDrift[ad].phaseZ += this.armDrift[ad].speedZ;
+  }
+  var dRS = this.armDrift[0], dLS = this.armDrift[1],
+      dRE = this.armDrift[2], dLE = this.armDrift[3];
+
+  // ── 4. Limb poses ────────────────────────────────────────────────────────
+  var distFromCenter  = Math.sqrt(mouse.x * mouse.x + mouse.y * mouse.y);
+  var centerProximity = Math.max(0, 1 - distFromCenter / Math.SQRT2);
+
+  var bfDist  = (this.butterflyDist !== undefined) ? this.butterflyDist : 0;
+  var bfDx    = (this.butterflyDx   !== undefined) ? this.butterflyDx   : 0;
+  var bfDy    = (this.butterflyDy   !== undefined) ? this.butterflyDy   : 0;
+  var bfLen   = Math.max(1, bfDist);
+  var bfNx    = bfDx / bfLen;
+  var bfNy    = bfDy / bfLen;
+  var reachUrgency = Math.min(1, bfDist / 80);
+
+  var bodySpeed = Math.sqrt((typeof accelX === 'number' ? accelX : 0) * (typeof accelX === 'number' ? accelX : 0) +
+                            (typeof accelY === 'number' ? accelY : 0) * (typeof accelY === 'number' ? accelY : 0));
+  var momentumLimiter = Math.max(0.25, 1.0 - bodySpeed * 18);
+
+  // reachFade: soft recovery — disabled externally on spins/hits
+  this.reachFade = Math.min(1.0, this.reachFade + 0.018);
+  var reach = this.reachFade;
+
+  var armReach = 0.65 - centerProximity * 2.2;
+  var supermanPull = poseLow * 0.75;
+
+  var butterflyReachX = -bfNy * reachUrgency * 1.2 * momentumLimiter * reach;
+  var butterflyReachZ = -bfNx * reachUrgency * 0.6 * momentumLimiter * reach;
+
+  var shoulderZ = 0.55 + poseLow * (-0.43) + poseHigh * 0.30;
+  var elbowZ    = 0.20 + poseLow * (-0.10) + poseHigh * 0.50;
+
+  this.joints[0].restX = armReach - supermanPull + butterflyReachX + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
+  this.joints[0].restZ = (-shoulderZ + butterflyReachZ) + Math.sin(dRS.phaseZ) * dRS.ampZ - sideDrift;
+  this.joints[1].restX = armReach - supermanPull + butterflyReachX + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
+  this.joints[1].restZ = ( shoulderZ - butterflyReachZ) + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
+  this.joints[2].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
+  this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.5) + Math.sin(dRE.phaseZ) * dRE.ampZ - sideDrift * 0.75;
+  this.joints[3].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
+  this.joints[3].restZ = ( elbowZ - butterflyReachZ * 0.5) + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
+
+  // During scroll: elbows target neutral hang (no bend, no lock) — spring stays fully active
+  if (scrollIntensity > 0) {
+    this.joints[2].restX = 0.10;
+    this.joints[3].restX = 0.10;
+  }
+
+  // Leg Z spread: tight enough to never cross
+  var legZ    = 0.10 + poseLow * (-0.04) + poseHigh * 0.16;
+  var legBack = poseLow * 0.28;
+
+  // ── 5. Solve all joints ─────────────────────────────────────────────────
+  for (var i = 0; i < this.joints.length; i++) {
+    var j = this.joints[i], p = j.pivot, ud = p.userData;
+
+    if (i >= 4) {
+      var legTrail = forwardForce * 0.55 - reverseForce * 0.55;
+      var isHip    = (i === 4 || i === 6);
+      var hipFold  = reverseForce * 1.05;
+      var kneeLock = Math.min(1, reverseForce * 1.2);
+      var idleAnim = Math.sin(this.animTime * 0.9 + i) * 0.12 * (1 - kneeLock);
+
+      if (isHip) {
+        j.restX = (0.08 - legBack - hipFold) + idleAnim + legTrail;
+      } else {
+        j.restX = (0.08 - legBack + idleAnim + legTrail) * (1 - kneeLock);
+      }
+      // Hip Z: outward splay — rHip(4) negative, lHip(6) positive; knees mirror
+      j.restZ = (i === 4 ? -legZ : i === 6 ? legZ : i === 5 ? -legZ : legZ)
+        + Math.sin(this.animTime * 0.7 + i) * 0.08 * (1 - kneeLock * 0.6)
+        + (i === 4 || i === 5 ? -sideDrift : sideDrift) * 0.25;
+    }
+
+    var errX = j.restX - p.rotation.x;
+    var errZ = j.restZ - p.rotation.z;
+    ud.velX = ud.velX * j.dampX + errX * j.stiffX;
+    ud.velZ = ud.velZ * j.dampZ + errZ * j.stiffZ;
+    // Elbows: never bend backward
+    var minX = (i === 2 || i === 3) ? 0 : -j.limX;
+    p.rotation.x = Math.max(minX, Math.min(j.limX, p.rotation.x + ud.velX));
+    // Shoulders: asymmetric Z clamp — hard wall at body midline to prevent torso crossing
+    var minZ = -j.limZ, maxZ = j.limZ;
+    if (i === 0) maxZ =  0.15; // rShoulder: can't sweep too far inward (positive Z = toward chest)
+    if (i === 1) minZ = -0.15; // lShoulder: can't sweep too far inward (negative Z = toward chest)
+    p.rotation.z = Math.max(minZ, Math.min(maxZ, p.rotation.z + ud.velZ));
+  }
+
+  // ── 6. Head ──────────────────────────────────────────────────────────────
+  var headLookZ = -leanZ * 0.5 + Math.sin(this.animTime * 0.8) * 0.05
+    - bfNx * reachUrgency * 0.3 * momentumLimiter * reach;
+  var headLookX = (-forwardForce * 0.30 + reverseForce * 0.35)
+    - bfNy * reachUrgency * 0.25 * momentumLimiter * reach;
+  this.head.rotation.z += (headLookZ - this.head.rotation.z) * 0.12;
+  this.head.rotation.x += (headLookX - this.head.rotation.x) * 0.10;
+};
+
+RagdollHuman.prototype.hitReaction = function() {
+  this.reachFade = 0;
+  for (var i = 0; i < this.joints.length; i++) {
+    this.joints[i].pivot.userData.velX += (Math.random() - 0.5) * 3.5;
+    this.joints[i].pivot.userData.velZ += (Math.random() - 0.5) * (i >= 4 ? 1.0 : 3.5);
+  }
+  gsap.to(this, { flipX: this.flipX + (Math.random()-0.5)*Math.PI*2, duration: 0.8, ease: "power2.out" });
+  gsap.to(this.mesh.rotation, { y: this.mesh.rotation.y + (Math.random()-0.5)*Math.PI*3, duration: 0.8, ease: "power2.out" });
+  gsap.to(this, { flipZ: this.flipZ + (Math.random()-0.5)*Math.PI*2, duration: 0.8, ease: "power2.out" });
+  this.baseRotZ += (Math.random() - 0.5) * 0.8;
+  this.baseRotX += (Math.random() - 0.5) * 0.6;
+};
+
+// ─── Companion Dog ─────────────────────────────────────────────────────────
+// White, small, short-legged ruffian. Has its own physics/agency — orbits the
+// astronaut with attention-seeking randomized behavior. Totally impervious to
+// the game (no damage, no tumble, no status changes). Full ragdoll limbs.
+var companionPoodle = null;
+
+function CompanionPoodle() {
+  this.animT = 0;
+
+  // ── Own position/velocity (independent physics) ──
+  this.px = 0; this.py = 100;  // world position
+  this.vx = 0; this.vy = 0;    // velocity
+
+  // ── Attention / behavior state ──
+  this.behaviorTimer  = 0;      // frames until next behavior switch
+  this.behavior       = 'orbit';// 'orbit' | 'zoom' | 'stare' | 'circle'
+  this.orbitAngle     = 0.8;    // current angle around astronaut
+  this.orbitRadius    = 38;     // desired orbit radius
+  this.orbitDir       = 1;      // +1 or -1
+  this.zoomTargetX    = 0;
+  this.zoomTargetY    = 100;
+  this.attentionYaw   = 0;      // desired body yaw to face astronaut
+  this.bodyYaw        = 0;      // smoothed yaw
+
+  // ── Ragdoll joint velocities ──
+  // Each joint: angVx, angVz (angular vel on x and z axes)
+  this._jv = {
+    neck:  { vx:0, vz:0 },
+    tail1: { vx:0, vz:0 },
+    tail2: { vx:0, vz:0 },
+    tail3: { vx:0, vz:0 },
+    earL:  { vx:0, vz:0 },
+    earR:  { vx:0, vz:0 },
+    flUp:  { vx:0, vz:0 }, flKn: { vx:0, vz:0 },
+    frUp:  { vx:0, vz:0 }, frKn: { vx:0, vz:0 },
+    blUp:  { vx:0, vz:0 }, blKn: { vx:0, vz:0 },
+    brUp:  { vx:0, vz:0 }, brKn: { vx:0, vz:0 },
+  };
+
+  // ── Materials — all white, black nose/eyes ──
+  var fur  = new THREE.MeshPhongMaterial({ color: 0xf4f0e8, flatShading: true });
+  var furS = new THREE.MeshPhongMaterial({ color: 0xdedad0, flatShading: true }); // slight shadow tone
+  var blk  = new THREE.MeshPhongMaterial({ color: 0x111111, flatShading: true });
+  var pink = new THREE.MeshPhongMaterial({ color: 0xf0909a, flatShading: true });
+  var nose = new THREE.MeshPhongMaterial({ color: 0x1a0a0a, flatShading: true });
+
+  // Wolfgang — slightly larger than original, scale 0.20 vs humanoid's 0.25
+  this.mesh = new THREE.Object3D();
+  this.mesh.name = 'wolfgang';
+  this.mesh.scale.setScalar(0.20);
+
+  this.body = new THREE.Object3D();
+  this.mesh.add(this.body);
+
+  // ── Torso ──
+  var torsoGeom = new THREE.BoxGeometry(16, 11, 24);
+  this.torso = new THREE.Mesh(torsoGeom, fur);
+  this.torso.castShadow = true;
+  this.body.add(this.torso);
+
+  // ── Tail — 3 segments, shorter and waggier ──
+  // Segment 1 (base) — thick, pivots at rump
+  this.tail1Pivot = new THREE.Object3D();
+  this.tail1Pivot.position.set(0, 3, -13);
+  this.tail1Pivot.rotation.x = -0.9; // points up and back at rest
+  this.torso.add(this.tail1Pivot);
+
+  var t1g = new THREE.BoxGeometry(6, 6, 10); // was 16 — shorter
+  var t1m = new THREE.Mesh(t1g, fur);
+  t1m.position.z = 5; // was 8
+  this.tail1Pivot.add(t1m);
+
+  // Segment 2 — mid, thinner
+  this.tail2Pivot = new THREE.Object3D();
+  this.tail2Pivot.position.z = 10; // was 16
+  this.tail1Pivot.add(this.tail2Pivot);
+
+  var t2g = new THREE.BoxGeometry(5, 5, 9); // was 14
+  var t2m = new THREE.Mesh(t2g, furS);
+  t2m.position.z = 4.5; // was 7
+  this.tail2Pivot.add(t2m);
+
+  // Segment 3 — tip, wispy
+  this.tail3Pivot = new THREE.Object3D();
+  this.tail3Pivot.position.z = 9; // was 14
+  this.tail2Pivot.add(this.tail3Pivot);
+
+  var t3g = new THREE.BoxGeometry(4, 4, 7); // was 11
+  var t3m = new THREE.Mesh(t3g, fur);
+  t3m.position.z = 3.5; // was 5.5
+  this.tail3Pivot.add(t3m);
+
+  // ── Neck + Head ──
+  this.neckPivot = new THREE.Object3D();
+  this.neckPivot.position.set(0, 4, 12);
+  this.neckPivot.rotation.x = 0.5;
+  this.torso.add(this.neckPivot);
+
+  var nkG = new THREE.BoxGeometry(8, 8, 10);
+  var nkM = new THREE.Mesh(nkG, fur);
+  nkM.position.z = 5;
+  this.neckPivot.add(nkM);
+
+  this.headNode = new THREE.Object3D();
+  this.headNode.position.z = 10;
+  this.neckPivot.add(this.headNode);
+
+  var hdG = new THREE.BoxGeometry(14, 12, 14);
+  this.head = new THREE.Mesh(hdG, fur);
+  this.head.castShadow = true;
+  this.headNode.add(this.head);
+
+  // Muzzle
+  var mzG = new THREE.BoxGeometry(10, 7, 10);
+  var muzzle = new THREE.Mesh(mzG, furS);
+  muzzle.position.set(0, -2, 11);
+  this.head.add(muzzle);
+
+  // Nose
+  var nsM = new THREE.Mesh(new THREE.BoxGeometry(5, 3.5, 2.5), nose);
+  nsM.position.set(0, 1.5, 5);
+  muzzle.add(nsM);
+
+  // Eyes — small beady, very forward-set, intense focus
+  var eyG = new THREE.BoxGeometry(2.5, 4, 4);
+  this.eyeL = new THREE.Mesh(eyG, new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true }));
+  this.eyeL.position.set(6, 2, 6);
+  this.head.add(this.eyeL);
+  var irL = new THREE.Mesh(new THREE.BoxGeometry(1, 2.5, 2.5), blk);
+  irL.position.set(1.5, 0.3, 1.5);
+  this.eyeL.add(irL);
+
+  this.eyeR = this.eyeL.clone();
+  this.eyeR.position.x = -6;
+  this.eyeR.children[0].position.x = -1.5;
+  this.head.add(this.eyeR);
+
+  // Ears — short floppy triangular, pivot at crown
+  this.earLPivot = new THREE.Object3D();
+  this.earLPivot.position.set(7, 5, 1);
+  this.earLPivot.rotation.z = 0.15; // slight outward tilt at rest
+  this.head.add(this.earLPivot);
+
+  var erG = new THREE.BoxGeometry(7, 10, 4);
+  var erL = new THREE.Mesh(erG, furS);
+  erL.position.set(0, -5, 0); // hangs below pivot
+  this.earLPivot.add(erL);
+
+  this.earRPivot = new THREE.Object3D();
+  this.earRPivot.position.set(-7, 5, 1);
+  this.earRPivot.rotation.z = -0.15;
+  this.head.add(this.earRPivot);
+
+  var erR = erL.clone();
+  this.earRPivot.add(erR);
+
+  // ── Bubble helmet — clear astronaut dome ──
+  // Outer shell: large transparent sphere, slight blue tint
+  var helmetGeom = new THREE.SphereGeometry(15.5, 16, 12);
+  var helmetMat = new THREE.MeshPhongMaterial({
+    color: 0xaaddff,
+    transparent: true,
+    opacity: 0.18,
+    shininess: 120,
+    specular: 0xffffff,
+    side: THREE.FrontSide,
+    depthWrite: false,
+  });
+  var helmetSphere = new THREE.Mesh(helmetGeom, helmetMat);
+  helmetSphere.position.set(0, -1, 2);
+  this.headNode.add(helmetSphere);
+
+  // Inner shell: slightly smaller, gives the bubble depth/thickness illusion
+  var helmetInnerMat = new THREE.MeshPhongMaterial({
+    color: 0xcceeff,
+    transparent: true,
+    opacity: 0.07,
+    shininess: 60,
+    specular: 0xffffff,
+    side: THREE.BackSide,
+    depthWrite: false,
+  });
+  var helmetInner = new THREE.Mesh(new THREE.SphereGeometry(14.5, 16, 12), helmetInnerMat);
+  helmetInner.position.set(0, -1, 2);
+  this.headNode.add(helmetInner);
+
+  // Glint — a small bright highlight sphere at upper-left of dome
+  var glintMat = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.55,
+    depthWrite: false,
+  });
+  var glint = new THREE.Mesh(new THREE.SphereGeometry(2.2, 8, 8), glintMat);
+  glint.position.set(5, 9, 9);
+  this.headNode.add(glint);
+
+  // ── Legs — SHORT (upper 9, lower 8 units), two-segment ragdoll, comedic splay ──
+  var _t = this;
+  function makeLeg(bx, bz, front, splayZ) {
+    var upPivot = new THREE.Object3D();
+    upPivot.position.set(bx, -5, bz);
+    upPivot.rotation.z = splayZ; // resting outward splay
+    _t.body.add(upPivot);
+
+    var upMesh = new THREE.Mesh(new THREE.BoxGeometry(5, 9, 5), fur);
+    upMesh.position.y = -4.5;
+    upPivot.add(upMesh);
+
+    var knPivot = new THREE.Object3D();
+    knPivot.position.y = -9;
+    knPivot.rotation.x = front ? 0.25 : -0.35;
+    upPivot.add(knPivot);
+
+    var loMesh = new THREE.Mesh(new THREE.BoxGeometry(4, 8, 4), furS);
+    loMesh.position.y = -4;
+    knPivot.add(loMesh);
+
+    var pawMesh = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 7), fur);
+    pawMesh.position.set(0, -8, front ? 1.5 : -1.5);
+    knPivot.add(pawMesh);
+
+    return { up: upPivot, kn: knPivot };
+  }
+
+  // splayZ: negative = left leg splays left, positive = right leg splays right
+  this.legFL = makeLeg(-7,  11, true,  -0.38);
+  this.legFR = makeLeg( 7,  11, true,   0.38);
+  this.legBL = makeLeg(-7, -11, false, -0.38);
+  this.legBR = makeLeg( 7, -11, false,  0.38);
+
+  this.mesh.traverse(function(o) {
+    if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; }
+  });
+
+  // Pick a random starting behavior timer
+  this.behaviorTimer = Math.floor(Math.random() * 120) + 60;
+}
+
+// ── Spring-damp helper: apply angular velocity, spring toward rest, clamp ──
+function _jSpring(jv, axis, curr, restAngle, stiff, damp, drive, lo, hi) {
+  jv[axis] = (jv[axis] + drive) * damp - (curr - restAngle) * stiff;
+  return Math.max(lo, Math.min(hi, curr + jv[axis]));
+}
+
+CompanionPoodle.prototype.update = function(hx, hy) {
+  this.animT += 0.08;
+  var t = this.animT;
+
+  // ── Behavior state machine ──────────────────────────────────────────────
+  this.behaviorTimer--;
+  if (this.behaviorTimer <= 0) {
+    var roll = Math.random();
+    if (roll < 0.45)      { this.behavior = 'orbit';  this.orbitDir = Math.random() < 0.5 ? 1 : -1; this.behaviorTimer = 180 + Math.floor(Math.random() * 240); }
+    else if (roll < 0.65) { this.behavior = 'zoom';   this.behaviorTimer = 60  + Math.floor(Math.random() * 80);
+                             // Pick a wild offset target near the astronaut
+                             this.zoomTargetX = hx + (Math.random() - 0.5) * 80;
+                             this.zoomTargetY = hy + (Math.random() - 0.5) * 60; }
+    else if (roll < 0.82) { this.behavior = 'stare';  this.behaviorTimer = 90  + Math.floor(Math.random() * 120); }
+    else                  { this.behavior = 'circle'; this.orbitDir = Math.random() < 0.5 ? 1 : -1; this.behaviorTimer = 100 + Math.floor(Math.random() * 140); }
+  }
+
+  // ── Position / velocity ─────────────────────────────────────────────────
+  var targetX, targetY, pull;
+
+  if (this.behavior === 'orbit') {
+    // Orbit the astronaut at a comfortable radius — attention but not clinging
+    this.orbitAngle += 0.018 * this.orbitDir;
+    targetX = hx + Math.cos(this.orbitAngle) * this.orbitRadius;
+    targetY = hy + Math.sin(this.orbitAngle) * this.orbitRadius * 0.55;
+    pull = 0.055;
+  } else if (this.behavior === 'zoom') {
+    // Dart to a random spot near astronaut — excited burst
+    targetX = this.zoomTargetX;
+    targetY = this.zoomTargetY;
+    pull = 0.12;
+  } else if (this.behavior === 'stare') {
+    // Hover relatively still nearby, just gazing at astronaut
+    targetX = hx + 32 + Math.sin(t * 0.3) * 8;
+    targetY = hy - 10 + Math.cos(t * 0.25) * 6;
+    pull = 0.03;
+  } else { // circle — tight fast circles around the astronaut
+    this.orbitAngle += 0.038 * this.orbitDir;
+    targetX = hx + Math.cos(this.orbitAngle) * 22;
+    targetY = hy + Math.sin(this.orbitAngle) * 14;
+    pull = 0.09;
+  }
+
+  // Soft spring toward target
+  this.vx += (targetX - this.px) * pull * 0.15;
+  this.vy += (targetY - this.py) * pull * 0.15;
+
+  // Drag
+  this.vx *= 0.86;
+  this.vy *= 0.86;
+
+  // Clamp speed
+  var spd = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+  var maxSpd = (this.behavior === 'zoom') ? 12 : (this.behavior === 'circle') ? 8 : 5;
+  if (spd > maxSpd) { this.vx *= maxSpd / spd; this.vy *= maxSpd / spd; }
+
+  this.px += this.vx;
+  this.py += this.vy;
+
+  // World bounds — same soft walls as astronaut
+  if (this.px < -115) this.vx += (-115 - this.px) * 0.08;
+  if (this.px >  115) this.vx += ( 115 - this.px) * 0.08;
+  if (this.py <  18)  this.vy += (  18 - this.py) * 0.10;
+  if (this.py >  175) this.vy += ( 175 - this.py) * 0.10;
+
+  this.mesh.position.set(this.px, this.py, 16);
+
+  // ── Body orientation — always tries to face the astronaut ──────────────
+  var toAstX = hx - this.px;
+  var toAstY = hy - this.py;
+  var toAstDist = Math.sqrt(toAstX * toAstX + toAstY * toAstY) || 1;
+
+  // Yaw: atan2 in the XZ plane (we use X and the scene depth offset)
+  // In this game X is lateral, Z is depth — dog faces +Z by default
+  // We want body to rotate toward astronaut on Y axis
+  var desiredYaw = Math.atan2(toAstX, 1) + Math.PI * 0.5;
+  // Velocity-based yaw for movement direction
+  if (spd > 0.5) desiredYaw = Math.atan2(this.vx, 0.5) + Math.PI * 0.55;
+
+  this.bodyYaw += (desiredYaw - this.bodyYaw) * 0.10;
+  this.mesh.rotation.y = this.bodyYaw;
+
+  // Gentle body tilt based on velocity
+  this.mesh.rotation.x = this.vy * -0.018;
+  this.mesh.rotation.z = this.vx * -0.022;
+
+  // ── Run cycle speed driven by actual speed ──────────────────────────────
+  var runSpd = Math.min(1, spd / 8);
+  var runT   = t * (1.5 + runSpd * 2.5); // faster stride when moving fast
+
+  // Body bob
+  this.body.position.y = Math.sin(runT * 2) * 2 * runSpd;
+
+  // Eyes blink
+  var blink = (Math.sin(t * 0.11) > 0.96) ? 0.05 : 1;
+  this.eyeL.scale.y = blink;
+  this.eyeR.scale.y = blink;
+
+  // ── Ragdoll ─────────────────────────────────────────────────────────────
+  // Impulse sources: velocity change (acceleration), and run cycle
+  var accelX = this.vx - (this._pvx || 0);
+  var accelY = this.vy - (this._pvy || 0);
+  this._pvx = this.vx; this._pvy = this.vy;
+
+  var jv = this._jv;
+  var D = 0.75, S = 0.12; // global damp and stiffness defaults
+
+  // Neck — pitches with accelY (lurch when accelerating), tilts with accelX
+  jv.neck.vx = (jv.neck.vx + accelY * 1.8) * D - (this.neckPivot.rotation.x - 0.5) * S;
+  jv.neck.vz = (jv.neck.vz - accelX * 1.2) * D - (this.neckPivot.rotation.z)       * (S * 0.7);
+  // Stare behavior: head tilts charmingly toward astronaut
+  var stareTilt = (this.behavior === 'stare') ? Math.sin(t * 0.4) * 0.35 : 0;
+  jv.neck.vz += stareTilt * 0.04;
+  this.neckPivot.rotation.x = Math.max(-0.2, Math.min(1.3, this.neckPivot.rotation.x + jv.neck.vx));
+  this.neckPivot.rotation.z = Math.max(-0.6, Math.min(0.6, this.neckPivot.rotation.z + jv.neck.vz));
+
+  // Ears — swing outward with lateral accel, flap back with speed
+  var earDriveZ = accelX * 2.2;
+  var earDriveX = -runSpd * 0.8 + accelY * 0.6;
+  jv.earL.vz = (jv.earL.vz + earDriveZ) * 0.68 - this.earLPivot.rotation.z * 0.20;
+  jv.earR.vz = (jv.earR.vz - earDriveZ) * 0.68 - this.earRPivot.rotation.z * 0.20;
+  jv.earL.vx = (jv.earL.vx + earDriveX) * 0.70 - this.earLPivot.rotation.x * 0.18;
+  jv.earR.vx = (jv.earR.vx + earDriveX) * 0.70 - this.earRPivot.rotation.x * 0.18;
+  this.earLPivot.rotation.z = Math.max(-0.8, Math.min(0.8, this.earLPivot.rotation.z + jv.earL.vz));
+  this.earRPivot.rotation.z = Math.max(-0.8, Math.min(0.8, this.earRPivot.rotation.z + jv.earR.vz));
+  this.earLPivot.rotation.x = Math.max(-0.7, Math.min(0.5, this.earLPivot.rotation.x + jv.earL.vx));
+  this.earRPivot.rotation.x = Math.max(-0.7, Math.min(0.5, this.earRPivot.rotation.x + jv.earR.vx));
+
+  // Tail — 3 segments, whips enthusiastically; wag speed by behavior
+  var wagFreq  = this.behavior === 'stare' ? 6.0 : this.behavior === 'circle' ? 11 : 8.5; // faster
+  var wagAmp   = this.behavior === 'stare' ? 2.0 : 1.6; // bigger swing
+  var wagPhase = Math.sin(t * wagFreq) * wagAmp;
+
+  // Seg 1: base — driven by wag + accel, less damping = freer swing
+  jv.tail1.vx = (jv.tail1.vx + accelX * 2.5) * 0.78 - (this.tail1Pivot.rotation.x - (-0.8)) * 0.08;
+  jv.tail1.vz = (jv.tail1.vz + wagPhase * 0.10 + accelY * 1.5) * 0.75 - this.tail1Pivot.rotation.z * 0.09;
+  this.tail1Pivot.rotation.x = Math.max(-1.6, Math.min(0.3, this.tail1Pivot.rotation.x + jv.tail1.vx));
+  this.tail1Pivot.rotation.z = Math.max(-1.8, Math.min(1.8, this.tail1Pivot.rotation.z + jv.tail1.vz));
+
+  // Seg 2: mid — lags behind seg 1, amplifies the wag
+  jv.tail2.vx = (jv.tail2.vx + accelX * 1.8) * 0.70 - (this.tail2Pivot.rotation.x) * 0.07;
+  jv.tail2.vz = (jv.tail2.vz + wagPhase * 0.16) * 0.68 - this.tail2Pivot.rotation.z * 0.08;
+  this.tail2Pivot.rotation.x = Math.max(-0.8, Math.min(0.8, this.tail2Pivot.rotation.x + jv.tail2.vx));
+  this.tail2Pivot.rotation.z = Math.max(-1.6, Math.min(1.6, this.tail2Pivot.rotation.z + jv.tail2.vz));
+
+  // Seg 3: tip — most exaggerated, barely damped
+  jv.tail3.vz = (jv.tail3.vz + wagPhase * 0.22) * 0.63 - this.tail3Pivot.rotation.z * 0.07;
+  jv.tail3.vx = (jv.tail3.vx + accelX * 1.2) * 0.65 - this.tail3Pivot.rotation.x * 0.07;
+  this.tail3Pivot.rotation.z = Math.max(-1.4, Math.min(1.4, this.tail3Pivot.rotation.z + jv.tail3.vz));
+  this.tail3Pivot.rotation.x = Math.max(-0.8, Math.min(0.8, this.tail3Pivot.rotation.x + jv.tail3.vx));
+
+  // ── Legs — alternating stride + ragdoll sway ──────────────────────────
+  var stride = runSpd * 0.9;
+
+  // Scroll signal — same global reverseLerp the astronaut uses
+  var _rl = (typeof reverseLerp !== 'undefined' ? reverseLerp : 0);
+  var scrollFwd = Math.max(0,  _rl);
+  var scrollRev = Math.max(0, -_rl);
+  // scrollDrive: negative = forward lean (legs trail back), positive = backpedal (legs trail forward)
+  var scrollDrive = scrollRev * 0.9 - scrollFwd * 0.7;
+  // strideSign: +1 forward, -1 reverse — reverses the alternating leg cycle
+  var strideSign = (_rl < -0.05) ? -1 : 1;
+
+  // Upper legs: stride cycle flips with scroll direction
+  var strF =  Math.sin(runT) * stride * strideSign;
+  var strB = -Math.sin(runT) * stride * strideSign;
+
+  // Ragdoll kick from accel + scroll on upper legs
+  jv.flUp.vx = (jv.flUp.vx + strF * 0.05 - accelY * 0.8 - scrollDrive * 0.55) * D - this.legFL.up.rotation.x * S;
+  jv.frUp.vx = (jv.frUp.vx - strF * 0.05 - accelY * 0.8 - scrollDrive * 0.55) * D - this.legFR.up.rotation.x * S;
+  jv.blUp.vx = (jv.blUp.vx + strB * 0.05 - accelY * 0.7 - scrollDrive * 0.45) * D - this.legBL.up.rotation.x * S;
+  jv.brUp.vx = (jv.brUp.vx - strB * 0.05 - accelY * 0.7 - scrollDrive * 0.45) * D - this.legBR.up.rotation.x * S;
+
+  // Lateral sway from accelX — also flip when reversing so sway stays intuitive
+  var latKick = accelX * 0.6 * strideSign;
+  jv.flUp.vz = (jv.flUp.vz + latKick) * D - this.legFL.up.rotation.z * S;
+  jv.frUp.vz = (jv.frUp.vz + latKick) * D - this.legFR.up.rotation.z * S;
+  jv.blUp.vz = (jv.blUp.vz + latKick * 0.8) * D - this.legBL.up.rotation.z * S;
+  jv.brUp.vz = (jv.brUp.vz + latKick * 0.8) * D - this.legBR.up.rotation.z * S;
+
+  this.legFL.up.rotation.x = Math.max(-0.9, Math.min(1.0, this.legFL.up.rotation.x + jv.flUp.vx));
+  this.legFR.up.rotation.x = Math.max(-0.9, Math.min(1.0, this.legFR.up.rotation.x + jv.frUp.vx));
+  this.legBL.up.rotation.x = Math.max(-1.0, Math.min(0.9, this.legBL.up.rotation.x + jv.blUp.vx));
+  this.legBR.up.rotation.x = Math.max(-1.0, Math.min(0.9, this.legBR.up.rotation.x + jv.brUp.vx));
+
+  this.legFL.up.rotation.z = Math.max(-0.85, Math.min(0.20, this.legFL.up.rotation.z + jv.flUp.vz));
+  this.legFR.up.rotation.z = Math.max(-0.20, Math.min(0.85, this.legFR.up.rotation.z + jv.frUp.vz));
+  this.legBL.up.rotation.z = Math.max(-0.85, Math.min(0.20, this.legBL.up.rotation.z + jv.blUp.vz));
+  this.legBR.up.rotation.z = Math.max(-0.20, Math.min(0.85, this.legBR.up.rotation.z + jv.brUp.vz));
+
+  // Knees — rest bend flips with direction:
+  // Forward: front knees tuck up, back knees kick back. Reverse: opposite.
+  var knFrontRest =  0.40 + scrollDrive * 0.35 * strideSign;
+  var knBackRest  = -0.45 - scrollDrive * 0.30 * strideSign;
+
+  jv.flKn.vx = (jv.flKn.vx + jv.flUp.vx * 0.55) * 0.72 - (this.legFL.kn.rotation.x - knFrontRest) * 0.14;
+  jv.frKn.vx = (jv.frKn.vx + jv.frUp.vx * 0.55) * 0.72 - (this.legFR.kn.rotation.x - knFrontRest) * 0.14;
+  jv.blKn.vx = (jv.blKn.vx + jv.blUp.vx * 0.55) * 0.72 - (this.legBL.kn.rotation.x - knBackRest)  * 0.14;
+  jv.brKn.vx = (jv.brKn.vx + jv.brUp.vx * 0.55) * 0.72 - (this.legBR.kn.rotation.x - knBackRest)  * 0.14;
+
+  this.legFL.kn.rotation.x = Math.max(0.10, Math.min(1.1,  this.legFL.kn.rotation.x + jv.flKn.vx));
+  this.legFR.kn.rotation.x = Math.max(0.10, Math.min(1.1,  this.legFR.kn.rotation.x + jv.frKn.vx));
+  this.legBL.kn.rotation.x = Math.max(-1.1, Math.min(-0.10, this.legBL.kn.rotation.x + jv.blKn.vx));
+  this.legBR.kn.rotation.x = Math.max(-1.1, Math.min(-0.10, this.legBR.kn.rotation.x + jv.brKn.vx));
+};
+
+// ─── Orbs (tiered enemy system) ────────────────────────────────────────────
+var ORB_DEFS = {
+  blue:  { color: 0x4499ff, emissive: 0x001133, oxygenCost: 1.0,  size: 8,  hitStr: 'light'       },
+  red:   { color: 0xf23030, emissive: 0x220000, oxygenCost: 2.5,  size: 9,  hitStr: 'heavy'       },
+  black: { color: 0x111118, emissive: 0x000000, oxygenCost: 99,   size: 10, hitStr: 'singularity' }
+};
+
+function Orb(type) {
+  var def = ORB_DEFS[type] || ORB_DEFS.blue;
+  this.orbType = type;
+  this.mat = new THREE.MeshPhongMaterial({
+    color: def.color, emissive: def.emissive,
+    shininess: type === 'black' ? 0 : 20, flatShading: true
+  });
+  this.mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(def.size, 1), this.mat);
+  this.mesh.castShadow = true;
+}
+
+function OrbsHolder() {
+  this.mesh = new THREE.Object3D();
+  this.inUse = [];
+  this.pools = { blue: [], red: [], black: [] };
+  this.speed = 2.0;
+}
+OrbsHolder.prototype.spawn = function(type) {
+  var pool = this.pools[type];
+  var e = pool.length ? pool.pop() : new Orb(type);
+  e.mesh.position.set(380 + Math.random()*100, 25 + Math.random()*150, 0);
+  e.mesh.scale.setScalar(1 + Math.random()*0.5);
+  this.mesh.add(e.mesh); this.inUse.push(e);
+};
+OrbsHolder.prototype.update = function() {
+  for (var i = this.inUse.length-1; i >= 0; i--) {
+    var e = this.inUse[i];
+    e.mesh.position.x -= this.speed * sceneSpeed;
+    e.mesh.rotation.x += 0.07 * sceneSpeed; e.mesh.rotation.z += 0.05 * sceneSpeed;
+    if (e.mesh.position.x < -300) {
+      this.pools[e.orbType].push(e);
+      this.mesh.remove(e.mesh);
+      this.inUse.splice(i, 1);
+    }
+  }
+};
+
+// ─── Oxygen Canister ───────────────────────────────────────────────────────
+function OxygenCanister() {
+  var mat = new THREE.MeshPhongMaterial({ color: 0x00e5ff, emissive: 0x003344, shininess: 60, flatShading: true });
+  var group = new THREE.Object3D();
+  // Tank body
+  var tank = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 16, 8), mat);
+  // Caps
+  var capMat = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true });
+  var capT = new THREE.Mesh(new THREE.SphereGeometry(4, 6, 4), capMat);
+  capT.position.y = 8; tank.add(capT);
+  var capB = new THREE.Mesh(new THREE.SphereGeometry(4, 6, 4), capMat);
+  capB.position.y = -8; tank.add(capB);
+  // Valve
+  var valve = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 4, 6), capMat);
+  valve.position.y = 12; tank.add(valve);
+  group.add(tank);
+  this.mesh = group;
+  this.mesh.castShadow = true;
+}
+
+function CanistersHolder() {
+  this.mesh = new THREE.Object3D(); this.inUse = []; this.pool = []; this.speed = 2.0;
+}
+CanistersHolder.prototype.spawn = function() {
+  var c = this.pool.length ? this.pool.pop() : new OxygenCanister();
+  c.mesh.position.set(380 + Math.random()*100, 30 + Math.random()*140, 0);
+  c.mesh.rotation.set(Math.random()*Math.PI, 0, Math.random()*0.5);
+  this.mesh.add(c.mesh); this.inUse.push(c);
+};
+CanistersHolder.prototype.update = function() {
+  for (var i = this.inUse.length-1; i >= 0; i--) {
+    var c = this.inUse[i];
+    c.mesh.position.x -= this.speed * sceneSpeed;
+    c.mesh.rotation.y += 0.04 * sceneSpeed;
+    if (c.mesh.position.x < -300) {
+      if (STATUS === 'playing') stats.canistersMissed++;
+      this.pool.push(c); this.mesh.remove(c.mesh); this.inUse.splice(i,1);
+    }
+  }
+};
+
+// ─── Mystery Box ───────────────────────────────────────────────────────────
+function MysteryBox() {
+  this.mesh = new THREE.Object3D();
+  this.t = 0;
+  this.colorPhase = Math.random() * Math.PI * 2;
+  var mat = new THREE.MeshPhongMaterial({ color: 0xffcc00, emissive: 0x221100, flatShading: true });
+  this.mat = mat;
+  var body = makeBox(14, 14, 14, mat);
+  body.castShadow = true;
+  // Question mark vibe — cross stripe
+  var stripeMat = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true });
+  var stripeH = makeBox(16, 2, 2, stripeMat); this.mesh.add(stripeH);
+  var stripeV = makeBox(2, 16, 2, stripeMat); this.mesh.add(stripeV);
+  this.mesh.add(body);
+}
+
+// Mystery box color palette — vivid cycling colors
+var MYSTERY_COLORS = [0xff2244, 0xff8800, 0xffee00, 0x44ff44, 0x00ffcc, 0x4488ff, 0xcc44ff, 0xff44aa];
+MysteryBox.prototype.update = function(speed) {
+  this.t += 0.03 * sceneSpeed;
+  this.colorPhase += 0.11 * sceneSpeed; // rapid hue cycle
+  var ci = Math.floor(this.colorPhase) % MYSTERY_COLORS.length;
+  var ci2 = (ci + 1) % MYSTERY_COLORS.length;
+  var blend = this.colorPhase - Math.floor(this.colorPhase);
+  var c1 = new THREE.Color(MYSTERY_COLORS[ci]);
+  var c2 = new THREE.Color(MYSTERY_COLORS[ci2]);
+  this.mat.color.copy(c1).lerp(c2, blend);
+  this.mat.emissive.copy(this.mat.color).multiplyScalar(0.15);
+  this.mesh.position.x -= speed * sceneSpeed;
+  this.mesh.rotation.x += 0.02 * sceneSpeed;
+  this.mesh.rotation.y += 0.025 * sceneSpeed;
+  this.mesh.rotation.z += 0.015 * sceneSpeed;
+  this.mesh.position.z = Math.sin(this.t) * 8;
+};
+
+function MysteryBoxHolder() {
+  this.mesh = new THREE.Object3D(); this.inUse = []; this.pool = []; this.speed = 2.0;
+}
+MysteryBoxHolder.prototype.spawn = function() {
+  var b = this.pool.length ? this.pool.pop() : new MysteryBox();
+  b.mesh.position.set(400 + Math.random()*100, 35 + Math.random()*130, 0);
+  b.mesh.scale.setScalar(0.9 + Math.random()*0.3);
+  b.t = Math.random() * Math.PI * 2;
+  this.mesh.add(b.mesh); this.inUse.push(b);
+};
+MysteryBoxHolder.prototype.update = function() {
+  for (var i = this.inUse.length-1; i >= 0; i--) {
+    var b = this.inUse[i];
+    b.update(this.speed);
+    if (b.mesh.position.x < -320) {
+      if (STATUS === 'playing') stats.boxesMissed++;
+      this.pool.push(b); this.mesh.remove(b.mesh); this.inUse.splice(i,1);
+    }
+  }
+};
+
+// ─── Bursts ────────────────────────────────────────────────────────────────
+var activeBursts = [];
+function Burst(color, n) {
+  this.mesh = new THREE.Object3D(); this.parts = [];
+  var g = new THREE.TetrahedronGeometry(3, 0);
+  var m = new THREE.MeshPhongMaterial({ color: color, flatShading: true });
+  for (var i = 0; i < (n||8); i++) {
+    var p = new THREE.Mesh(g, m);
+    var angle = (Math.PI*2*i)/n;
+    p.userData = {
+      vx: Math.cos(angle)*(1.5+Math.random()),
+      vy: Math.sin(angle)*(1.5+Math.random()),
+      vr: Math.random()*0.3
+    };
+    this.mesh.add(p); this.parts.push(p);
+  }
+  scene.add(this.mesh); this.life = 30; activeBursts.push(this);
+}
+function updateBursts() {
+  for (var i = activeBursts.length-1; i >= 0; i--) {
+    var b = activeBursts[i]; b.life--;
+    for (var j = 0; j < b.parts.length; j++) {
+      b.parts[j].position.x += b.parts[j].userData.vx;
+      b.parts[j].position.y += b.parts[j].userData.vy;
+      b.parts[j].rotation.x += b.parts[j].userData.vr;
+    }
+    b.mesh.scale.setScalar(b.life/30);
+    if (b.life <= 0) { scene.remove(b.mesh); activeBursts.splice(i,1); }
+  }
+}
+
+// ─── Moondust Trail ────────────────────────────────────────────────────────
+var smokeParticles = [];
+var smokePool = [];
+var DUST_COLORS = [0x68c3c0, 0x4a3b69, 0x2b596b, 0x444455, 0x556677];
+
+function SmokeParticle() {
+  var g = new THREE.IcosahedronGeometry(1, 0);
+  g.applyMatrix4(new THREE.Matrix4().makeScale(1, 0.55 + Math.random()*0.3, 0.4 + Math.random()*0.3));
+  var col = DUST_COLORS[Math.floor(Math.random()*DUST_COLORS.length)];
+  var m = new THREE.MeshPhongMaterial({ color: col, flatShading: true, transparent: true, opacity: 0.0 });
+  this.mesh = new THREE.Mesh(g, m);
+  this.mesh.castShadow = false;
+  scene.add(this.mesh);
+}
+
+function spawnSmoke(x, y, z, velX, velY) {
+  var p = smokePool.length ? smokePool.pop() : new SmokeParticle();
+  var spread = 4;
+  p.mesh.position.set(
+    x + (Math.random()-0.5)*spread,
+    y + (Math.random()-0.5)*spread,
+    z + (Math.random()-0.5)*4
+  );
+  var baseSize = 0.8 + Math.random()*1.5;
+  p.mesh.scale.setScalar(baseSize);
+  p.mesh.rotation.set(Math.random()*Math.PI*2, Math.random()*Math.PI*2, Math.random()*Math.PI*2);
+  p.mesh.material.opacity = 0.15 + Math.random()*0.15;
+  p.mesh.material.color.setHex(DUST_COLORS[Math.floor(Math.random()*DUST_COLORS.length)]);
+  p.mesh.visible = true;
+  p.vx = velX * 0.18 + (Math.random()-0.5)*0.8;
+  p.vy = velY * 0.10 + (Math.random()-0.5)*0.6 + 0.15;
+  p.vz = (Math.random()-0.5)*0.6;
+  p.vr = (Math.random()-0.5)*0.08;
+  p.life = 1.0;
+  p.decay = 0.03 + Math.random()*0.02;
+  p.growRate = 0.02 + Math.random()*0.03;
+  p.baseSize = baseSize;
+  smokeParticles.push(p);
+}
+
+function updateSmoke() {
+  for (var i = smokeParticles.length-1; i >= 0; i--) {
+    var p = smokeParticles[i];
+    p.life -= p.decay;
+    if (p.life <= 0) {
+      p.mesh.visible = false;
+      smokePool.push(p);
+      smokeParticles.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.x += p.vx;
+    p.mesh.position.y += p.vy;
+    p.mesh.position.z += p.vz;
+    p.vx *= 0.95; p.vy *= 0.95;
+    p.mesh.rotation.x += p.vr;
+    p.mesh.rotation.z += p.vr * 0.7;
+    var s = p.baseSize * (1 + (1 - p.life) * p.growRate * 20);
+    p.mesh.scale.setScalar(s);
+    p.mesh.material.opacity = p.life * 0.25;
+  }
+}
+
+// ─── Jetpack Air Puffs ─────────────────────────────────────────────────────
+// Flat torus rings that billow out opposite to thrust direction — cosmetic only
+var airPuffs = [];
+var airPuffPool = [];
+
+function AirPuff() {
+  // Thin flat ring — torusGeometry(radius, tube, radialSegs, tubularSegs)
+  var g = new THREE.TorusGeometry(5, 1.2, 5, 12);
+  var m = new THREE.MeshBasicMaterial({ color: 0x88ddff, transparent: true, opacity: 0, depthWrite: false });
+  this.mesh = new THREE.Mesh(g, m);
+  this.mesh.visible = false;
+  scene.add(this.mesh);
+}
+
+// _wp reused in spawnAirPuffs to avoid GC
+
+function spawnAirPuffs(vx, vy, bfDx, bfDy) {
+  if (!humanoid) return;
+
+  // Fire more aggressively — always firing, weighted by cursor pull
+  var cursorPull = Math.sqrt(bfDx * bfDx + bfDy * bfDy);
+  var chance = 0.15 + Math.min(0.35, cursorPull * 0.003);
+  if (Math.random() > chance) return;
+
+  // Pick one nozzle at random
+  var wp = new THREE.Vector3();
+  (Math.random() < 0.5 ? humanoid.lThruster : humanoid.rThruster).getWorldPosition(wp);
+
+  // Drift away from where the cursor is pulling — opposite the reach direction
+  var bfLen = Math.max(1, cursorPull);
+  var ejVx = -(bfDx / bfLen) * (0.4 + Math.random() * 0.5);
+  var ejVy = -(bfDy / bfLen) * (0.4 + Math.random() * 0.5) - 0.6;
+  var ejVz = (Math.random() - 0.5) * 0.5;
+
+  var p = airPuffPool.length ? airPuffPool.pop() : new AirPuff();
+  p.mesh.position.set(
+    wp.x + (Math.random() - 0.5) * 4,
+    wp.y - 5 + (Math.random() - 0.5) * 4,
+    wp.z + (Math.random() - 0.5) * 4
+  );
+  p.mesh.rotation.set(
+    Math.PI * 0.5 + (Math.random() - 0.5) * 0.6,
+    (Math.random() - 0.5) * 0.5,
+    (Math.random() - 0.5) * 0.5
+  );
+  p.mesh.scale.setScalar(0.25 + Math.random() * 0.15);
+  p.mesh.material.opacity = 0;
+  p.mesh.material.color.setHex(Math.random() < 0.25 ? 0xffffff : 0x88ddff);
+  p.mesh.visible = true;
+  p.vx = ejVx; p.vy = ejVy; p.vz = ejVz;
+  p.life = 1.0;
+  p.decay = 0.018 + Math.random() * 0.014;  // slower fade — more time to appreciate it
+  p.peakOpacity = 0.45 + Math.random() * 0.20;
+  p.growRate = 0.10 + Math.random() * 0.06;
+  airPuffs.push(p);
+}
+
+function updateAirPuffs() {
+  for (var i = airPuffs.length - 1; i >= 0; i--) {
+    var p = airPuffs[i];
+    p.life -= p.decay;
+    if (p.life <= 0) {
+      p.mesh.visible = false;
+      airPuffPool.push(p);
+      airPuffs.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.x += p.vx;
+    p.mesh.position.y += p.vy;
+    p.mesh.position.z += p.vz;
+    p.vx *= 0.92; p.vy *= 0.94;
+    // Ring expands as it dissipates
+    var s = (0.18 + (1 - p.life) * p.growRate * 14);
+    p.mesh.scale.setScalar(s);
+    // Fade in quickly, then fade out
+    var lifePhase = p.life;
+    p.mesh.material.opacity = lifePhase > 0.7
+      ? p.peakOpacity * ((1 - lifePhase) / 0.3)   // fade in
+      : p.peakOpacity * (lifePhase / 0.7);          // fade out
+    // Slow rotation as ring expands
+    p.mesh.rotation.z += 0.015;
+  }
+}
+
+// ─── Snow Spray (Tundra world) ─────────────────────────────────────────────
+var snowParticles = [];
+var snowPool = [];
+
+function SnowFlake() {
+  var g = new THREE.OctahedronGeometry(1.2, 0);
+  g.applyMatrix4(new THREE.Matrix4().makeScale(1, 0.35, 1));
+  var m = new THREE.MeshBasicMaterial({
+    color: 0xffffff, transparent: true, opacity: 0,
+    depthWrite: false, blending: THREE.AdditiveBlending
+  });
+  this.mesh = new THREE.Mesh(g, m);
+  this.mesh.visible = false;
+  scene.add(this.mesh);
+}
+
+function spawnSnowSpray(x, y, z, velX, velY, speed) {
+  var count = Math.floor(2 + speed * 18);
+  for (var i = 0; i < count; i++) {
+    var p = snowPool.length ? snowPool.pop() : new SnowFlake();
+    // Pick a color from this world's dust palette
+    var wDust = WORLDS[currentWorld] ? WORLDS[currentWorld].dustColors : [0xffffff];
+    p.mesh.material.color.setHex(wDust[Math.floor(Math.random() * wDust.length)]);
+    var sideDir = (Math.random() > 0.5 ? 1 : -1);
+    p.mesh.position.set(
+      x + (Math.random() - 0.5) * 6,
+      y - 18 + (Math.random() - 0.5) * 4,
+      z + (Math.random() - 0.5) * 8
+    );
+    p.mesh.rotation.set(
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2
+    );
+    var spd = 0.6 + Math.random() * 1.4;
+    p.vx = velX * -0.12 + sideDir * (0.8 + Math.random() * 1.6) * spd;
+    p.vy = Math.abs(velY) * 0.08 + (0.3 + Math.random() * 0.8) * spd;
+    p.vz = (Math.random() - 0.5) * 1.2 * spd;
+    p.vr = (Math.random() - 0.5) * 0.12;
+    p.life = 1.0;
+    p.decay = 0.022 + Math.random() * 0.028;
+    p.baseScale = 0.4 + Math.random() * 0.9;
+    p.mesh.scale.setScalar(p.baseScale);
+    p.mesh.material.opacity = 0.0;
+    p.peakOpacity = 0.55 + Math.random() * 0.35;
+    p.mesh.visible = true;
+    snowParticles.push(p);
+  }
+}
+
+function updateSnowSpray() {
+  for (var i = snowParticles.length - 1; i >= 0; i--) {
+    var p = snowParticles[i];
+    p.life -= p.decay;
+    if (p.life <= 0) {
+      p.mesh.visible = false;
+      snowPool.push(p);
+      snowParticles.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.x += p.vx;
+    p.mesh.position.y += p.vy;
+    p.mesh.position.z += p.vz;
+    p.vx *= 0.91; p.vy *= 0.88;
+    p.mesh.rotation.x += p.vr;
+    p.mesh.rotation.z += p.vr * 0.6;
+    var s = p.baseScale * (1 + (1 - p.life) * 1.4);
+    p.mesh.scale.setScalar(s);
+    p.mesh.material.opacity = p.life > 0.75
+      ? p.peakOpacity * ((1 - p.life) / 0.25)
+      : p.peakOpacity * (p.life / 0.75);
+  }
+}
+
+// ─── Comet tail sparkles ───────────────────────────────────────────────────
+var cometSparkles = [];
+var cometSparklePool = [];
+
+function CometSparkle() {
+  var g = new THREE.TetrahedronGeometry(2, 0);
+  var m = new THREE.MeshBasicMaterial({ color: 0xffdd44, transparent: true, opacity: 0 });
+  this.mesh = new THREE.Mesh(g, m);
+  scene.add(this.mesh);
+}
+
+function spawnCometSparkle(x, y) {
+  var p = cometSparklePool.length ? cometSparklePool.pop() : new CometSparkle();
+  p.mesh.position.set(x + (Math.random()-0.5)*12, y + (Math.random()-0.5)*12, (Math.random()-0.5)*10);
+  p.mesh.material.opacity = 0.8 + Math.random()*0.2;
+  p.mesh.visible = true;
+  p.vx = (Math.random()-0.5)*1.5;
+  p.vy = (Math.random()-0.5)*1.5;
+  p.life = 1.0;
+  p.decay = 0.06 + Math.random()*0.04;
+  cometSparkles.push(p);
+}
+
+function updateCometSparkles() {
+  for (var i = cometSparkles.length-1; i >= 0; i--) {
+    var p = cometSparkles[i];
+    p.life -= p.decay;
+    if (p.life <= 0) {
+      p.mesh.visible = false;
+      cometSparklePool.push(p);
+      cometSparkles.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.x += p.vx;
+    p.mesh.position.y += p.vy;
+    p.mesh.material.opacity = p.life * 0.9;
+  }
+}
+
+// ─── Atmosphere & Reentry Fire ─────────────────────────────────────────────
+var heatFactor = 0.0;
+var wasInAtmosphere = false;
+var ATMOSPHERE_Y = 34;
+var _inWolfieZone = false; // true when humanoid is in lower zone, following wolfie
+
+var fireParticles = [];
+var firePool = [];
+
+function FireParticle() {
+  var g = new THREE.TetrahedronGeometry(2.2, 0);
+  var m = new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+  this.mesh = new THREE.Mesh(g, m);
+  scene.add(this.mesh);
+}
+
+function spawnFire(x, y) {
+  var p = firePool.length ? firePool.pop() : new FireParticle();
+  p.mesh.position.set(x + (Math.random()-0.5)*8, y + (Math.random()-0.5)*5, (Math.random()-0.5)*8);
+  p.mesh.rotation.set(Math.random()*Math.PI*2, Math.random()*Math.PI*2, Math.random()*Math.PI*2);
+  var heat = Math.random();
+  p.mesh.material.color.setRGB(1.0, 0.15 + heat * 0.7, heat < 0.35 ? 0 : (heat - 0.35) * 0.3);
+  p.mesh.material.opacity = 0.65 + Math.random() * 0.35;
+  p.mesh.visible = true;
+  p.vx = (Math.random()-0.5) * 1.2;
+  p.vy = 0.4 + Math.random() * 1.0;
+  p.vz = (Math.random()-0.5) * 0.8;
+  p.life = 1.0;
+  p.decay = 0.055 + Math.random() * 0.055;
+  p.baseScale = 0.5 + Math.random() * 0.8;
+  fireParticles.push(p);
+}
+
+function updateFire() {
+  for (var i = fireParticles.length-1; i >= 0; i--) {
+    var p = fireParticles[i];
+    p.life -= p.decay;
+    if (p.life <= 0) {
+      p.mesh.visible = false;
+      firePool.push(p);
+      fireParticles.splice(i, 1);
+      continue;
+    }
+    p.mesh.position.x += p.vx;
+    p.mesh.position.y += p.vy;
+    p.mesh.position.z += p.vz;
+    p.vx *= 0.94; p.vy *= 0.96;
+    p.mesh.material.opacity = p.life * 0.85;
+    p.mesh.scale.setScalar(p.baseScale * (1 + (1 - p.life) * 1.8));
+    p.mesh.rotation.z += 0.06;
+  }
+}
+
+// Atmosphere visual — layered glowing cylinders around the planet
+var atmosphereGroup;
+function createAtmosphere() {
+  atmosphereGroup = new THREE.Object3D();
+  var g1 = new THREE.CylinderGeometry(615, 615, 80, 48, 1, true);
+  g1.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
+  atmosphereGroup.add(new THREE.Mesh(g1, new THREE.MeshBasicMaterial({
+    color: 0x00ccff, transparent: true, opacity: 0.055,
+    side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
+  })));
+  var g2 = new THREE.CylinderGeometry(606, 606, 32, 48, 1, true);
+  g2.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
+  atmosphereGroup.add(new THREE.Mesh(g2, new THREE.MeshBasicMaterial({
+    color: 0x44ffdd, transparent: true, opacity: 0.10,
+    side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
+  })));
+  var g3 = new THREE.CylinderGeometry(630, 630, 200, 48, 1, true);
+  g3.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
+  atmosphereGroup.add(new THREE.Mesh(g3, new THREE.MeshBasicMaterial({
+    color: 0x2233aa, transparent: true, opacity: 0.04,
+    side: THREE.FrontSide, depthWrite: false, blending: THREE.AdditiveBlending
+  })));
+  atmosphereGroup.position.set(0, -600, 0);
+  scene.add(atmosphereGroup);
+}
+
+// Red orbital line at ATMOSPHERE_Y + warm haze fill below it
+var atmosRingMesh, atmosRingGlow;
+function createAtmosphereRing() {
+  var lineGeom = new THREE.CylinderGeometry(500, 500, 1.8, 80, 1, true);
+  atmosRingMesh = new THREE.Mesh(lineGeom, new THREE.MeshBasicMaterial({
+    color: 0xff1800, transparent: true, opacity: 0.55,
+    side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending
+  }));
+  atmosRingMesh.position.y = ATMOSPHERE_Y;
+  scene.add(atmosRingMesh);
+
+  var haloGeom = new THREE.CylinderGeometry(502, 502, 14, 80, 1, true);
+  atmosRingGlow = new THREE.Mesh(haloGeom, new THREE.MeshBasicMaterial({
+    color: 0xff3300, transparent: true, opacity: 0.13,
+    side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending
+  }));
+  atmosRingGlow.position.y = ATMOSPHERE_Y;
+  scene.add(atmosRingGlow);
+
+  // Warm haze fill below the line
+  var zoneH = ATMOSPHERE_Y - 22;
+  var hazeGeom = new THREE.CylinderGeometry(488, 488, zoneH, 72, 1, true);
+  var haze = new THREE.Mesh(hazeGeom, new THREE.MeshBasicMaterial({
+    color: 0xff2200, transparent: true, opacity: 0.028,
+    side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
+  }));
+  haze.position.y = 22 + zoneH * 0.5;
+  scene.add(haze);
+
+  var innerGeom = new THREE.CylinderGeometry(486, 486, zoneH * 0.5, 72, 1, true);
+  var inner = new THREE.Mesh(innerGeom, new THREE.MeshBasicMaterial({
+    color: 0xff4400, transparent: true, opacity: 0.025,
+    side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
+  }));
+  inner.position.y = ATMOSPHERE_Y - zoneH * 0.25;
+  scene.add(inner);
+}
+
+// ─── Game state ────────────────────────────────────────────────────────────
+var STATUS = 'waiting'; // waiting | playing | tumbling | void | gameover
+var oxygen = 10, MAX_O = 10;
+var survivalFrames = 0;
+var distance = 0, frame = 0;
+var spawnInt = 72, BASE_SPD = 2.0;
+var speedTick = 0;
+var SPEED_TICK_INTERVAL = 1800;
+
+// Void / heartbeat state
+var heartbeatTaps = 0, HEARTBEAT_REQUIRED = 20;
+var voidIdleFrames = 0, VOID_IDLE_MAX = 360;
+
+// Comet state
+var cometActive = false, cometTimer = 0, COMET_DURATION = 480;
+
+// Invincibility
+var invincibleFrames = 0;
+
+// Structural integrity — separate resource from oxygen
+var structuralStress = 0.0; // 0–1; forced tumble at 1.0
+var wasInRiskZone = false;  // tracks oxygen < 30% transitions
+
+// Altitude zone thresholds (world-space y: range ~25–175)
+var HIGH_ORBIT_Y = 130, LOW_ORBIT_Y = 70;
+
+// Ambient flip timer — occasional idle acrobatics
+var nextFlipFrame = 0;
+var starActive = false, starEl = null;
+var starX = 0, starY = 0, starAngle = 0, starProgress = 0;
+var nextStarFrame = 900 + Math.floor(Math.random() * 1800);
+
+// Sol + stats
+var solNumber = 0;
+var stats = {};
+function resetStats() {
+  stats = {
+    canistersCollected: 0, canistersMissed: 0,
+    boxesMissed: 0,
+    blueOrbHits: 0, redOrbHits: 0, blackOrbHits: 0,
+    shootingStarHits: 0,
+    boxTumbles: 0, boxSlings: 0, boxComets: 0,
+    tumbleRecoveries: 0, voidRevives: 0,
+    riskZoneEntries: 0, safeZoneFrames: 0,
+    peakStructuralStress: 0,
+    altitudeSum: 0, altitudeFrames: 0
+  };
+}
+resetStats();
+
+// Rocketman boost
+var rocketmanPending = false;
+var rocketmanActive  = false;
+var rocketmanTimer   = 0;
+var ROCKETMAN_DURATION = 1800; // 30 seconds
+
+var mouse = { x: 0, y: 0 };
+// Butterfly physics: the cursor is the butterfly, astronaut chases with inertia
+var butterfly = { vx: 0, vy: 0 };
+var sea, sky, humanoid, orbHolder, canHolder, boxHolder;
+var voidLight;
+
+// AFK detection — open menu after 45s of no interaction while playing
+var _lastInteractionTime = Date.now();
+var AFK_MS = 45000;
+function _bumpInteraction() { _lastInteractionTime = Date.now(); }
+
+// ─── Sequential spin presets ───────────────────────────────────────────────
+var spinPresetIdx = 0;
+var PI = Math.PI;
+var SPIN_PRESETS = [
+  { x:  PI*2,    z:  0,        dur: 0.70, ease: "power2.inOut", jx:  3.5, jz:  0.5 }, // clean frontflip
+  { x: -PI*2,    z:  0,        dur: 0.70, ease: "power2.inOut", jx: -3.5, jz:  0.5 }, // clean backflip
+  { x:  0,       z:  PI*2,     dur: 0.75, ease: "power2.inOut", jx:  0.5, jz:  3.5 }, // barrel roll right
+  { x:  0,       z: -PI*2,     dur: 0.75, ease: "power2.inOut", jx:  0.5, jz: -3.5 }, // barrel roll left
+  { x:  PI*1.5,  z:  PI*1.0,   dur: 0.90, ease: "power1.inOut", jx:  2.5, jz:  2.0 }, // diagonal tumble
+  { x: -PI*1.5,  z: -PI*1.0,   dur: 0.90, ease: "power1.inOut", jx: -2.5, jz: -2.0 }, // reverse diagonal
+  { x:  PI*3,    z:  0,        dur: 1.10, ease: "power2.inOut", jx:  4.0, jz:  0.5 }, // 1.5 frontflip
+  { x:  PI*2.5,  z:  PI*1.5,   dur: 1.00, ease: "power1.inOut", jx:  3.0, jz:  2.5 }, // corkscrew
+];
+
+// ─── Toast (delegates to top-center banner system defined below in HUD JS) ──
+var MAX_TOASTS = 5;
+function showToast(msg, type) {
+  // Banner is created by the HUD-section showToast defined later in the file;
+  // but since JS is sequential we define a single version here that works for all callers.
+  var area = document.getElementById('toast-banner-area');
+  if (!area) return;
+  var el = document.createElement('div');
+  el.className = 'toast-banner';
+  el.textContent = msg;
+  area.appendChild(el);
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() { el.classList.add('in'); });
+  });
+  setTimeout(function() {
+    el.classList.remove('in');
+    el.classList.add('out');
+    setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 300);
+  }, 2400);
+  // cap at 3 stacked
+  var all = area.querySelectorAll('.toast-banner');
+  if (all.length > 3) {
+    var oldest = all[0];
+    oldest.classList.remove('in');
+    oldest.classList.add('out');
+    setTimeout(function() { if (oldest.parentNode) oldest.parentNode.removeChild(oldest); }, 300);
+  }
+}
+
+// ─── Wind Streaks ──────────────────────────────────────────────────────────
+var windPool = [], windActive = [], windLayer;
+
+function initWindStreaks() {
+  windLayer = document.getElementById('wind-layer');
+  for (var i = 0; i < 24; i++) {
+    var el = document.createElement('div');
+    el.style.cssText = 'position:absolute;height:1px;border-radius:1px;opacity:0;pointer-events:none;';
+    windLayer.appendChild(el);
+    windPool.push({ el: el });
+  }
+}
+
+function spawnWindStreak(intensity, forward) {
+  if (!windPool.length) return;
+  var p = windPool.pop();
+  var w = Math.round(25 + Math.random() * 90 * intensity);
+  var y = Math.random() * HEIGHT;
+  // Forward: streaks fly right-to-left (scene scrolls right); reverse: left-to-right
+  var startX = forward ? WIDTH + w : -w;
+  var endX   = forward ? -w : WIDTH + w;
+  var spd    = 180 + intensity * 700;
+  var alpha  = 0.10 + intensity * 0.28;
+  var col    = forward
+    ? 'rgba(160,220,255,' + alpha + ')'
+    : 'rgba(255,160,80,'  + alpha + ')';
+  var grad   = forward
+    ? 'linear-gradient(to left, transparent,' + col + ',transparent)'
+    : 'linear-gradient(to right,transparent,' + col + ',transparent)';
+  var el = p.el;
+  el.style.width   = w + 'px';
+  el.style.top     = y + 'px';
+  el.style.left    = startX + 'px';
+  el.style.background = grad;
+  el.style.opacity = '1';
+  p.startX   = startX;
+  p.endX     = endX;
+  p.duration = Math.abs(endX - startX) / spd * 1000;
+  p.startTime = Date.now();
+  windActive.push(p);
+}
+
+function updateWindStreaks(intensity, forward) {
+  // Spawn
+  if (intensity > 0.05 && Math.random() < intensity * 0.55) {
+    spawnWindStreak(intensity, forward);
+  }
+  // Update active
+  var now = Date.now();
+  for (var i = windActive.length - 1; i >= 0; i--) {
+    var p = windActive[i];
+    var t = (now - p.startTime) / p.duration;
+    if (t >= 1) {
+      p.el.style.opacity = '0';
+      windPool.push(p);
+      windActive.splice(i, 1);
+    } else {
+      p.el.style.left = Math.round(p.startX + (p.endX - p.startX) * t) + 'px';
+    }
+  }
+}
+
+function buildWorld() {
+  sea = new Sea(); sea.mesh.position.y = -600; scene.add(sea.mesh);
+  sky = new Sky(); sky.mesh.position.y = -600; scene.add(sky.mesh);
+  humanoid = new RagdollHuman();
+  humanoid.mesh.scale.setScalar(0.25);
+  humanoid.mesh.position.set(0, 100, 0);
+  scene.add(humanoid.mesh);
+  companionPoodle = new CompanionPoodle();
+  companionPoodle.mesh.position.set(28, 88, 18);
+  scene.add(companionPoodle.mesh);
+  orbHolder  = new OrbsHolder();      scene.add(orbHolder.mesh);
+  canHolder  = new CanistersHolder(); scene.add(canHolder.mesh);
+  boxHolder  = new MysteryBoxHolder();scene.add(boxHolder.mesh);
+  starEl = document.getElementById('shooting-star');
+  voidLight = new THREE.PointLight(0xffffff, 0, 0);
+  voidLight.position.set(0, 130, 180);
+  scene.add(voidLight);
+  createAtmosphere();
+  createAtmosphereRing();
+  // ── Reflective surface — sits at the planet floor (y=22) ──
+  var ICE_Y = 22;
+  iceUniforms = {
+    tReflect:     { value: mirrorRT.texture },
+    tintColor:    { value: new THREE.Color(0x68c3c0) }, // cosmos teal default
+    reflectPower: { value: 0.38 },
+    time:         { value: 0.0 },
+  };
+  var iceMat = new THREE.ShaderMaterial({
+    uniforms: iceUniforms,
+    vertexShader: [
+      'varying vec2 vUv;',
+      'varying vec4 vMirrorCoord;',
+      'void main(){',
+      '  vUv=uv;',
+      '  vec4 wp=modelMatrix*vec4(position,1.0);',
+      '  vec4 cp=projectionMatrix*viewMatrix*wp;',
+      '  vMirrorCoord=cp;',
+      '  gl_Position=cp;',
+      '}',
+    ].join('\n'),
+    fragmentShader: [
+      'uniform sampler2D tReflect;',
+      'uniform vec3 tintColor;',
+      'uniform float reflectPower;',
+      'uniform float time;',
+      'varying vec2 vUv;',
+      'varying vec4 vMirrorCoord;',
+      // Subtle scratch/ripple pattern
+      'float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}',
+      'float scratch(vec2 uv){',
+      '  float s=0.0;',
+      '  for(int i=0;i<8;i++){',
+      '    float fi=float(i);',
+      '    vec2 dir=normalize(vec2(hash(vec2(fi,0.))*2.-1.,hash(vec2(fi,1.))*2.-1.));',
+      '    vec2 ori=vec2(hash(vec2(fi,2.))*6.-3.,hash(vec2(fi,3.))*6.-3.);',
+      '    float d=abs(dot(uv-ori,dir));',
+      '    float proj=dot(uv-ori,dir);',
+      '    float len=0.15+hash(vec2(fi,4.))*0.55;',
+      '    s+=(1.-smoothstep(0.,0.004,d))*step(0.,proj)*step(proj,len)*0.45;',
+      '  }',
+      '  return clamp(s,0.,1.);',
+      '}',
+      'void main(){',
+      '  vec2 ndc=(vMirrorCoord.xy/vMirrorCoord.w)*0.5+0.5;',
+      '  float wave=sin(vUv.x*55.+time*0.6)*0.0018+sin(vUv.y*45.+time*0.85)*0.0014;',
+      '  vec2 reflUV=vec2(ndc.x+wave,1.0-ndc.y+wave*0.5);',
+      '  vec4 refl=texture2D(tReflect,clamp(reflUV,0.001,0.999));',
+      '  float df=1.-smoothstep(0.,1.,length(vUv-0.5)*1.4);',
+      '  vec3 base=mix(vec3(0.03,0.04,0.06),tintColor*0.45,df*0.6);',
+      '  float sc=scratch(vUv*2.2+vec2(time*0.0004,0.));',
+      '  vec3 scrCol=tintColor*sc*0.12;',
+      '  vec2 tc=vUv-0.5;',
+      '  float spec=pow(max(0.,1.-length(tc)*2.0),3.)*0.10;',
+      '  vec3 col=mix(base,refl.rgb,reflectPower)+scrCol+spec;',
+      '  gl_FragColor=vec4(col,0.88);',
+      '}',
+    ].join('\n'),
+    transparent: true,
+    depthWrite: false,
+    side: THREE.FrontSide,
+  });
+  var iceGeom = new THREE.CylinderGeometry(600, 600, 800, 40, 10);
+  iceGeom.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+  iceMesh = new THREE.Mesh(iceGeom, iceMat);
+  iceMesh.position.y = -600;
+  iceMesh.receiveShadow = true;
+  scene.add(iceMesh);
+  // Seed wave data for reflective surface
+  var _ip = iceGeom.attributes.position;
+  iceMesh.waveData = [];
+  for (var _wi = 0; _wi < _ip.count; _wi++) {
+    iceMesh.waveData.push({
+      x: _ip.getX(_wi), y: _ip.getY(_wi), z: _ip.getZ(_wi),
+      ang: Math.random() * Math.PI * 2,
+      amp: 5 + Math.random() * 15,
+      speed: 0.016 + Math.random() * 0.032,
+    });
+  }
+  // Pre-warm pools
+  for (var i = 0; i < 6; i++) {
+    orbHolder.pools.blue.push(new Orb('blue'));
+    orbHolder.pools.red.push(new Orb('red'));
+    orbHolder.pools.black.push(new Orb('black'));
+    canHolder.pool.push(new OxygenCanister());
+    boxHolder.pool.push(new MysteryBox());
+  }
+}
+
+// ─── UI refresh ────────────────────────────────────────────────────────────
+function refreshUI() {
+  var pct = Math.max(0, oxygen / MAX_O);
+  document.getElementById('oxy-rail').style.transform = 'scaleX(' + pct + ')';
+
+  // Oxygen bar color: cyan (full) → purple (mid) → crimson (low)
+  var barColor, bgFrom, bgTo;
+  if (pct > 0.5) {
+    var t = (1 - pct) * 2; // 0→1 as oxygen goes 100%→50%
+    var r = Math.floor(t * 150);
+    var g = Math.floor(229 - t * 229);
+    var b = Math.floor(255 - t * 55);
+    barColor = 'rgb(' + r + ',' + g + ',' + b + ')';
+    bgFrom = 'rgb(2,1,17)';
+    bgTo = 'rgb(' + Math.floor(13 + t*20) + ',' + Math.floor(8 + t*5) + ',' + Math.floor(32 + t*20) + ')';
+  } else if (pct > 0.15) {
+    var t2 = (pct - 0.15) / 0.35; // 1→0 as oxygen goes 50%→15%
+    barColor = 'rgb(' + Math.floor(150 + (1-t2)*100) + ',0,' + Math.floor(200 - (1-t2)*170) + ')';
+    bgFrom = 'rgb(' + Math.floor(t2*2 + (1-t2)*15) + ',0,' + Math.floor(t2*17 + (1-t2)*5) + ')';
+    bgTo = 'rgb(' + Math.floor(t2*32 + (1-t2)*30) + ',' + Math.floor(t2*13) + ',' + Math.floor(t2*52 + (1-t2)*10) + ')';
+  } else {
+    barColor = '#cc1133';
+    bgFrom = 'rgb(10,0,2)';
+    bgTo = 'rgb(20,0,5)';
+  }
+  document.getElementById('oxy-rail').style.background = barColor;
+  if (STATUS !== 'void') {
+    var W = WORLDS[currentWorld];
+    if (W && oxygen / MAX_O > 0.85) {
+      // Use world's native bg when oxygen is healthy
+      document.getElementById('world').style.background = 'linear-gradient(180deg,' + W.bgFrom + ' 0%,' + W.bgTo + ' 100%)';
+    } else {
+      document.getElementById('world').style.background = 'linear-gradient(180deg,' + bgFrom + ' 0%,' + bgTo + ' 100%)';
+    }
+  }
+
+  // Survival timer
+  var secs = Math.floor(survivalFrames / 60);
+  var mins = Math.floor(secs / 60);
+  secs = secs % 60;
+  var tStr = mins + ':' + (secs < 10 ? '0' : '') + secs;
+  document.getElementById('timer').textContent = tStr;
+}
+
+function norm(v, vmin, vmax, tmin, tmax) {
+  var nv = Math.max(Math.min(v, vmax), vmin);
+  return tmin + ((nv-vmin)/(vmax-vmin))*(tmax-tmin);
+}
+
+// ─── Input ─────────────────────────────────────────────────────────────────
+document.addEventListener('mousemove', function(e) {
+  mouse.x = -1 + (e.clientX / WIDTH) * 2;
+  mouse.y =  1 - (e.clientY / HEIGHT) * 2;
+  _bumpInteraction();
+  var cursorEl = document.getElementById('cursor');
+  if (cursorEl) { cursorEl.style.left = e.clientX+'px'; cursorEl.style.top = e.clientY+'px'; }
+});
+
+var touchState = {
+  active: false, id: null,
+  startX: 0, startY: 0, lastX: 0, lastY: 0,
+  hasMoved: false, twoFinger: false, twoStartY: 0
+};
+
+function handleHeartbeatTap() {
+  if (STATUS !== 'void') return;
+  heartbeatTaps++;
+  voidIdleFrames = 0;
+  var pct = heartbeatTaps / HEARTBEAT_REQUIRED;
+  document.getElementById('hb-bar').style.width = Math.min(100, pct * 100) + '%';
+  // Color lerps from crimson to blue
+  var r = Math.floor(204 * (1 - pct));
+  var b = Math.floor(255 * pct);
+  document.getElementById('hb-bar').style.background = 'rgb(' + r + ',0,' + b + ')';
+  // Suit pulses
+  humanoid.suitMat.color.setRGB(0.8 + r/255*0.2, 0.8 - (1-pct)*0.4, 0.8 + b/255*0.2);
+  if (heartbeatTaps >= HEARTBEAT_REQUIRED) {
+    exitVoid();
+  }
+}
+
+document.addEventListener('touchstart', function(e) {
+  // Let buttons, links, inputs handle their own events
+  var tag = e.target.tagName;
+  if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
+  // Don't swallow touches on HUD elements
+  var topHud = document.getElementById('top-hud');
+  var botHud = document.getElementById('bottom-hud');
+  if (topHud && topHud.contains(e.target)) return;
+  if (botHud && botHud.contains(e.target)) return;
+  // Don't interfere with screen overlays while waiting or showing gameover
+  if (STATUS === 'waiting' || STATUS === 'gameover') return;
+  _bumpInteraction();
+
+  e.preventDefault();
+  if (STATUS === 'void') { handleHeartbeatTap(); return; }
+  if (STATUS === 'tumbling') {
+    if (tumble.bounces >= 1) {
+      tumble.liftProgress = 1.0;
+      gsap.fromTo('#comet-flash', { opacity: 0.2 }, { opacity: 0, duration: 0.4 });
+    }
+    return;
+  }
+  if (e.touches.length === 2) {
+    touchState.twoFinger = true;
+    touchState.twoStartY = (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
+    return;
+  }
+  var t = e.touches[0];
+  touchState.active = true; touchState.id = t.identifier;
+  touchState.startX = t.clientX; touchState.startY = t.clientY;
+  touchState.lastX = t.clientX; touchState.lastY = t.clientY;
+  touchState.hasMoved = false; touchState.twoFinger = false;
+  mouse.x = -1 + (t.clientX / WIDTH) * 2;
+  mouse.y =  1 - (t.clientY / HEIGHT) * 2;
+}, { passive: false });
+
+document.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+  if (e.touches.length === 2 && touchState.twoFinger) {
+    var midY = (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
+    var delta = touchState.twoStartY - midY;
+    touchState.twoStartY = midY;
+    reverseLerp += delta * 0.004;
+    reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.8, reverseLerp));
+    return;
+  }
+  if (!touchState.active) return;
+  var t = null;
+  for (var i = 0; i < e.touches.length; i++) {
+    if (e.touches[i].identifier === touchState.id) { t = e.touches[i]; break; }
+  }
+  if (!t) return;
+  var dx = t.clientX - touchState.startX, dy = t.clientY - touchState.startY;
+  if (Math.sqrt(dx*dx + dy*dy) > 6) touchState.hasMoved = true;
+  touchState.lastX = t.clientX; touchState.lastY = t.clientY;
+  mouse.x = -1 + (t.clientX / WIDTH) * 2;
+  mouse.y =  1 - (t.clientY / HEIGHT) * 2;
+}, { passive: false });
+
+document.addEventListener('touchend', function(e) {
+  var tag = e.target.tagName;
+  if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
+  // Don't swallow touches on HUD elements
+  var topHud2 = document.getElementById('top-hud');
+  var botHud2 = document.getElementById('bottom-hud');
+  if (topHud2 && topHud2.contains(e.target)) return;
+  if (botHud2 && botHud2.contains(e.target)) return;
+  if (STATUS === 'waiting' || STATUS === 'gameover') return;
+  e.preventDefault();
+  touchState.twoFinger = false;
+
+  // Long-press guard — must be checked BEFORE anything else, regardless of touchState.active
+  if (longPressFired) {
+    longPressFired = false;
+    touchState.active = false;
+    touchState.id = null;
+    return;
+  }
+
+  if (!touchState.active) return;
+  if (!touchState.hasMoved && STATUS === 'playing') {
+    humanoid.reachFade = 0;
+    gsap.to(humanoid, {
+      flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 3.5,
+      flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 3.5,
+      duration: 0.65, ease: "power2.inOut"
+    });
+    for (var si = 0; si < humanoid.joints.length; si++) {
+      humanoid.joints[si].pivot.userData.velX += (Math.random() - 0.5) * 4;
+      humanoid.joints[si].pivot.userData.velZ += (Math.random() - 0.5) * 4;
+    }
+  }
+  touchState.active = false; touchState.id = null;
+}, { passive: false });
+
+var reverseLerp = 0.0;
+var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -4.0;
+
+window.addEventListener('wheel', function(e) {
+  reverseLerp += e.deltaY * 0.0016;
+  reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.8, reverseLerp));
+}, { passive: true });
+
+window.addEventListener('pointerdown', function(e) {
+  if (STATUS === 'void') { handleHeartbeatTap(); return; }
+  if (STATUS === 'tumbling') {
+    if (tumble.bounces >= 1) {
+      tumble.liftProgress = 1.0;
+      gsap.fromTo('#comet-flash', { opacity: 0.2 }, { opacity: 0, duration: 0.4 });
+    }
+    return;
+  }
+  if (STATUS !== 'playing') return;
+  if (e.pointerType === 'touch') return;
+
+  if (e.button === 0) {
+    humanoid.reachFade = 0;
+    var rFlipX = (Math.random() * 2 - 1) * Math.PI * (2 + Math.random() * 2);
+    var rFlipZ = (Math.random() * 2 - 1) * Math.PI * (Math.random() * 1.5);
+    var rDur   = 0.55 + Math.random() * 0.65;
+    gsap.to(humanoid, {
+      flipX: humanoid.flipX + rFlipX,
+      flipZ: humanoid.flipZ + rFlipZ,
+      duration: rDur, ease: 'power2.inOut'
+    });
+    for (var si = 0; si < humanoid.joints.length; si++) {
+      humanoid.joints[si].pivot.userData.velX += (Math.random() - 0.5) * 8;
+      humanoid.joints[si].pivot.userData.velZ += (Math.random() - 0.5) * 8;
+    }
+  } else if (e.button === 2) {
+    // Right click: reset to default soaring pose
+    gsap.to(humanoid, { flipX: 0, flipZ: 0, duration: 0.5, ease: "power3.out" });
+    humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
+  }
+});
+window.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+window.addEventListener('keydown', function(e) {
+  if (STATUS === 'void') { handleHeartbeatTap(); return; }
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (STATUS === 'playing' || STATUS === 'tumbling' || STATUS === 'paused') {
+      pauseActive ? resumeGame() : pauseGame();
+    }
+    return;
+  }
+  if (e.code === 'Escape' && pauseActive) { resumeGame(); return; }
+});
+
+// ─── Pause ─────────────────────────────────────────────────────────────────
+function buildDispatchTable() {
+  var secs   = Math.floor(survivalFrames / 60);
+  var mins   = Math.floor(secs / 60); secs = secs % 60;
+  var timeStr = mins > 0 ? mins + 'm ' + secs + 's' : secs + 's';
+  var avgAlt = stats.altitudeFrames ? stats.altitudeSum / stats.altitudeFrames : 100;
+  var altLabel = avgAlt > HIGH_ORBIT_Y ? 'high orbit' : avgAlt < LOW_ORBIT_Y ? 'low orbit' : 'operational';
+  var totalOpp = stats.canistersCollected + stats.canistersMissed;
+  var capture  = totalOpp > 0 ? Math.round(stats.canistersCollected / totalOpp * 100) : 0;
+  var peakPct  = Math.round(stats.peakStructuralStress * 100);
+  var total    = stats.blueOrbHits + stats.redOrbHits + stats.blackOrbHits +
+                 stats.shootingStarHits + stats.boxTumbles + stats.boxSlings;
+
+  function row(l, v) {
+    return '<tr><td>' + l + '</td><td class="dispatch-val">' + v + '</td></tr>';
+  }
+  function div() { return '<tr><td colspan="2"><hr class="dispatch-divider"/></td></tr>'; }
+
+  var suffix = _gameOverPending
+    ? '<p style="font-size:0.85em;color:rgba(255,200,60,0.6);letter-spacing:1.5px;margin-top:12px;">boost armed for sol ' + (solNumber + 1) + '</p>'
+    : '';
+
+  return '<table class="dispatch-table">' +
+    row('sol',       solNumber) +
+    row('elapsed',   timeStr) +
+    row('altitude',  altLabel) +
+    div() +
+    row('o₂ captured', stats.canistersCollected + ' / ' + totalOpp) +
+    row('capture',   capture + '%') +
+    div() +
+    row('setbacks',  total + ' ×') +
+    row('structural', peakPct + '%') +
+    div() +
+    row('recoveries', stats.tumbleRecoveries + ' ×') +
+    row('revivals',   stats.voidRevives + ' ×') +
+  '</table>' + suffix;
+}
+
+var frameFrozen = false;
+
+function openMenu() {
+  if (STATUS === 'waiting' || STATUS === 'void' || STATUS === 'tumbling') return;
+  pauseActive = true;
+  frameFrozen = false;
+  document.getElementById('pause-dispatch-content').innerHTML = buildDispatchTable();
+  document.getElementById('pause-overlay').classList.add('visible');
+  document.getElementById('world-fg').style.display = 'block';
+  
+  
+  updateHintLabel();
+}
+
+function closeMenu() {
+  pauseActive = false;
+  frameFrozen = false;
+  _bumpInteraction();
+  document.getElementById('pause-overlay').classList.remove('visible');
+  document.getElementById('world-fg').style.display = 'none';
+
+  // Reset resume button label always
+  var resumeBtn = document.getElementById('btn-pause-resume');
+  if (resumeBtn) resumeBtn.textContent = 'spacebar to space-out';
+
+  if (_gameOverPending) {
+    _gameOverPending = false;
+    startGame();
+    return;
+  }
+  updateHintLabel();
+}
+
+// Legacy aliases used elsewhere
+function pauseGame()  { openMenu(); }
+function resumeGame() { closeMenu(); }
+
+document.getElementById('btn-pause-resume').addEventListener('click', resumeGame);
+
+// ─── Game Events ───────────────────────────────────────────────────────────
+function startGame() {
+  solNumber++;
+  resetStats();
+  STATUS = 'playing';
+  oxygen = MAX_O; survivalFrames = 0;
+  distance = 0; frame = 0;
+  spawnInt = 55;
+  speedTick = SPEED_TICK_INTERVAL;
+  orbHolder.speed = canHolder.speed = boxHolder.speed = BASE_SPD;
+  orbHolder.inUse.forEach(function(e) { orbHolder.mesh.remove(e.mesh); }); orbHolder.inUse = [];
+  canHolder.inUse.forEach(function(c) { canHolder.mesh.remove(c.mesh); }); canHolder.inUse = [];
+  boxHolder.inUse.forEach(function(b) { boxHolder.mesh.remove(b.mesh); }); boxHolder.inUse = [];
+  humanoid.flipX = 0; humanoid.flipZ = 0;
+  humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
+  humanoid.singularity = false;
+  humanoid.slingVx = 0; humanoid.slingVy = 0; humanoid.slingFrames = 0;
+  humanoid.suitMat.color.setHex(0xffffff);
+  humanoid.flameMat.color.setHex(0x00ffff);
+  humanoid.mesh.scale.setScalar(0.25);
+  directionState = 1; MAGNETIC_FORWARD = 1.0; reverseLerp = 0;
+  sceneSpeed = 1.0;
+  butterfly.vx = 0; butterfly.vy = 0;
+  var dirBtn = document.getElementById('btn-hud-dir');
+  if (dirBtn) { dirBtn.textContent = 'forward \u2192'; dirBtn.classList.remove('active'); }
+  pauseActive = false; frameFrozen = false;
+  document.getElementById('pause-overlay').classList.remove('visible');
+  document.getElementById('world-fg').style.display = 'none';
+  cometActive = false; cometTimer = 0;
+  structuralStress = 0.0; wasInRiskZone = false;
+  heatFactor = 0.0; wasInAtmosphere = false;
+  spinPresetIdx = 0;
+  heartbeatTaps = 0; voidIdleFrames = 0;
+  starActive = false;
+  nextFlipFrame = frame + 180 + Math.floor(Math.random() * 300);
+  nextStarFrame = frame + 900 + Math.floor(Math.random() * 1800);
+  document.getElementById('void-overlay').classList.remove('active');
+  document.getElementById('heartbeat-prompt').classList.remove('visible');
+  document.getElementById('hb-bar').style.width = '0%';
+  document.getElementById('lift-hint').classList.remove('visible');
+  document.getElementById('world').style.background = 'linear-gradient(180deg,#020111 0%,#0d0820 100%)';
+  // Apply current world colors
+  applyWorld(currentWorld);
+  // Clear toasts
+  var toastArea = document.getElementById('toast-banner-area');
+  if (toastArea) toastArea.innerHTML = '';
+  // Restore scene
+  if (sea) { sea.mesh.visible = true; sky.mesh.visible = true; }
+  if (orbHolder) { orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true; }
+  if (voidLight) voidLight.intensity = 0;
+
+  // Rocketman boost from previous sol
+  if (rocketmanPending && solNumber > 1) {
+    rocketmanActive = true;
+    rocketmanTimer  = ROCKETMAN_DURATION;
+    rocketmanPending = false;
+    invincibleFrames = ROCKETMAN_DURATION;
+    document.getElementById('rocket-bar').style.display = 'block';
+    document.getElementById('rocket-bar').style.transform = 'scaleX(1)';
+    showToast('rocketman — ' + Math.round(ROCKETMAN_DURATION/60) + 's', 'rocket');
+  } else {
+    rocketmanActive = false; rocketmanTimer = 0;
+    document.getElementById('rocket-bar').style.display = 'none';
+    invincibleFrames = 120;
+  }
+
+  refreshUI();
+  stopQuoteRotation();
+  updateHintLabel();
+  document.getElementById('world-fg').style.display = 'none';
+  document.getElementById('screen-welcome').classList.remove('visible');
+  // Reset welcome screen opacity for next visit
+  var _ws = document.getElementById('screen-welcome');
+  if (_ws) _ws.style.opacity = '';
+  _welcomeStarted = false;
+  _welcomeMouseOriginX = null; _welcomeMouseOriginY = null;
+}
+
+var tumble = { surfaceY: 22, velX: 0, velY: 0, bounces: 0, spinX: 0, spinY: 0, spinZ: 0, liftProgress: 0, frames: 0 };
+var TUMBLE_TIMEOUT = 420; // 7 seconds — then session ends
+
+function doTumble() {
+  if (STATUS === 'void' || humanoid.singularity) return;
+  STATUS = 'tumbling';
+  humanoid.reachFade = 0;
+  tumble.velX = -(orbHolder.speed*0.6 + Math.random()*3);
+  tumble.velY = 4 + Math.random()*3;
+  tumble.bounces = 0; tumble.liftProgress = 0; tumble.frames = 0;
+  tumble.spinX = (Math.random()-0.5)*0.28;
+  tumble.spinY = (Math.random()-0.5)*0.22;
+  tumble.spinZ = (Math.random()<0.5 ? 1 : -1) * (0.12 + Math.random()*0.2);
+  for (var i = 0; i < humanoid.joints.length; i++) {
+    humanoid.joints[i].pivot.userData.velX += (Math.random()-0.5)*6;
+    humanoid.joints[i].pivot.userData.velZ += (Math.random()-0.5) * (i >= 4 ? 1.5 : 6);
+  }
+  gsap.fromTo('#hit-flash', { opacity: 0.8 }, { opacity: 0, duration: 0.6 });
+}
+
+function doSingularity() {
+  invincibleFrames = 600;
+  humanoid.singularity = true;
+
+  // Phase 1: magnetic crush — scale down as if consumed
+  gsap.to(humanoid.mesh.scale, {
+    x: 0.04, y: 0.04, z: 0.04, duration: 0.45, ease: "power3.in",
+    onComplete: function() {
+
+      // Phase 2: shoot across scene 3 times before settling
+      var shotsLeft = 3;
+      function fireShot() {
+        // Pick a random offscreen edge
+        var edge = Math.floor(Math.random() * 4);
+        var toX, toY, fromX, fromY;
+        if (edge === 0)      { fromX = -340; fromY = 55 + Math.random()*90; toX =  220 + Math.random()*80; toY = 55 + Math.random()*90; }
+        else if (edge === 1) { fromX =  340; fromY = 55 + Math.random()*90; toX = -220 - Math.random()*80; toY = 55 + Math.random()*90; }
+        else if (edge === 2) { fromX = (Math.random()-0.5)*160; fromY =  300; toX = (Math.random()-0.5)*160; toY = -80; }
+        else                 { fromX = (Math.random()-0.5)*160; fromY = -100; toX = (Math.random()-0.5)*160; toY =  240; }
+
+        humanoid.mesh.position.set(fromX, fromY, 0);
+        humanoid.flipX = (Math.random()-0.5) * Math.PI * 4;
+        humanoid.flipZ = (Math.random()-0.5) * Math.PI * 4;
+
+        // Flash visible briefly as you shoot through
+        gsap.to(humanoid.mesh.scale, { x: 0.20, y: 0.20, z: 0.20, duration: 0.08, ease: "power2.out" });
+        new Burst(0x6622aa, 10).mesh.position.copy(humanoid.mesh.position);
+
+        gsap.to(humanoid.mesh.position, {
+          x: toX, y: toY, duration: 0.28, ease: "none",
+          onComplete: function() {
+            // Shrink again between shots
+            if (shotsLeft > 0) {
+              gsap.to(humanoid.mesh.scale, { x: 0.04, y: 0.04, z: 0.04, duration: 0.10, ease: "power2.in",
+                onComplete: function() {
+                  shotsLeft--;
+                  fireShot();
+                }
+              });
+            } else {
+              // Phase 3: settle — drift back toward center
+              var cx = (Math.random()-0.5)*60, cy = 70 + Math.random()*70;
+              humanoid.mesh.position.set(toX, toY, 0);
+              humanoid.flipX = 0; humanoid.flipZ = 0;
+              gsap.to(humanoid.mesh.scale, { x: 0.25, y: 0.25, z: 0.25, duration: 0.5, ease: "power2.out" });
+              gsap.to(humanoid.mesh.position, { x: cx, y: cy, duration: 0.7, ease: "power2.out",
+                onComplete: function() { humanoid.singularity = false; }
+              });
+            }
+          }
+        });
+      }
+      fireShot();
+    }
+  });
+  new Burst(0x220033, 18).mesh.position.copy(humanoid.mesh.position);
+}
+
+function doOrbitalSling() {
+  // Mystery box: flung sideways out of frame, return from opposite side
+  var dir = Math.random() < 0.5 ? 1 : -1;
+  invincibleFrames = 180;
+  gsap.to(humanoid.mesh.position, {
+    x: dir * 450,
+    duration: 0.55, ease: "power2.in",
+    onComplete: function() {
+      humanoid.mesh.position.x = -dir * 320;
+      humanoid.mesh.position.y = 50 + Math.random() * 100;
+      humanoid.flipX = 0; humanoid.flipZ = 0;
+      gsap.to(humanoid.mesh.position, { x: 0, duration: 0.5, ease: "power2.out" });
+    }
+  });
+  gsap.fromTo('#hit-flash', { opacity: 0.5 }, { opacity: 0, duration: 0.4 });
+}
+
+function doVoid() {
+  STATUS = 'void';
+  heartbeatTaps = 0; voidIdleFrames = 0;
+  // Hide everything except the astronaut — darkness is the scene itself
+  sea.mesh.visible = false;
+  sky.mesh.visible = false;
+  orbHolder.mesh.visible = false;
+  canHolder.mesh.visible = false;
+  boxHolder.mesh.visible = false;
+  document.getElementById('world').style.background = '#000';
+  document.getElementById('world').style.transition = 'background 0.8s ease';
+  // Bright front fill so the astronaut reads like a portrait against void
+  voidLight.intensity = 2.2;
+  document.getElementById('void-overlay').classList.add('active');
+  setTimeout(function() {
+    document.getElementById('heartbeat-prompt').classList.add('visible');
+  }, 700);
+  document.getElementById('hb-bar').style.width = '0%';
+  document.getElementById('hb-bar').style.background = '#cc1133';
+  humanoid.suitMat.color.setHex(0xcc1133);
+  humanoid.mesh.position.set(0, 100, 0);
+}
+
+function exitVoid() {
+  pauseActive = false; frameFrozen = false;
+  document.getElementById('pause-overlay').classList.remove('visible');
+  document.getElementById('world-fg').style.display = 'none';
+  stats.voidRevives++;
+  showToast('heartbeat restored', 'void');
+  STATUS = 'playing';
+  // Restore scene
+  sea.mesh.visible = true;
+  sky.mesh.visible = true;
+  orbHolder.mesh.visible = true;
+  canHolder.mesh.visible = true;
+  boxHolder.mesh.visible = true;
+  voidLight.intensity = 0;
+  document.getElementById('void-overlay').classList.remove('active');
+  document.getElementById('heartbeat-prompt').classList.remove('visible');
+  humanoid.suitMat.color.setHex(0xffffff);
+  refreshUI();
+  gsap.fromTo('#comet-flash', { opacity: 0.4 }, { opacity: 0, duration: 1.0 });
+}
+
+
+var _gameOverPending = false; // when true, closing/resuming the menu starts next sol
+
+function doGameOver() {
+  rocketmanPending = true;
+  _gameOverPending = true;
+
+  var totalSecs = Math.floor(survivalFrames / 60);
+
+  // Restore scene visuals
+  if (sea)      { sea.mesh.visible = true; sky.mesh.visible = true; }
+  if (orbHolder){ orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true; }
+  if (voidLight) voidLight.intensity = 0;
+  document.getElementById('void-overlay').classList.remove('active');
+  document.getElementById('heartbeat-prompt').classList.remove('visible');
+  document.getElementById('world-fg').style.display = 'none';
+
+  // Short session grace — silent restart, no menu
+  if (totalSecs < 30) {
+    _gameOverPending = false;
+    var pill = document.getElementById('top-hud');
+    pill.classList.add('luminous');
+    setTimeout(function() {
+      pill.classList.remove('luminous');
+      startGame();
+    }, 1500);
+    return;
+  }
+
+  // Set status to playing so openMenu() isn't blocked, then open it
+  STATUS = 'playing';
+
+  // Update the resume button label to signal "next sol"
+  var resumeBtn = document.getElementById('btn-pause-resume');
+  if (resumeBtn) resumeBtn.textContent = 'next sol →';
+
+  // Rebuild dispatch with end-of-sol context
+  document.getElementById('pause-dispatch-content').innerHTML = buildDispatchTable();
+  document.getElementById('pause-overlay').classList.add('visible');
+  document.getElementById('world-fg').style.display = 'block';
+  pauseActive = true;
+  updateHintLabel();
+}
+
+// ─── Shooting Star ─────────────────────────────────────────────────────────
+function launchShootingStar() {
+  if (starActive) return;
+  starActive = true;
+  // Angle: mostly downward-right or downward-left
+  var goLeft = Math.random() < 0.5;
+  var startX = goLeft ? WIDTH * 0.9 : WIDTH * 0.1;
+  var startY = Math.random() * HEIGHT * 0.4;
+  starAngle = goLeft ? (200 + Math.random()*40) : (330 + Math.random()*40);
+  starProgress = 0;
+  starEl.style.transform = 'translate(' + startX + 'px,' + startY + 'px) rotate(' + starAngle + 'deg)';
+  starEl.style.opacity = '0';
+  gsap.timeline()
+    .to(starEl, { opacity: 1, duration: 0.1 })
+    .to(starEl, {
+      opacity: 0, duration: 0.6, ease: "power1.in",
+      onUpdate: function() {
+        var progress = this.progress();
+        var dist = progress * (WIDTH * 0.7);
+        var rad = (starAngle - 90) * Math.PI / 180;
+        var nx = parseFloat(startX) + Math.cos(rad) * dist;
+        var ny = parseFloat(startY) + Math.sin(rad) * dist;
+        starEl.style.transform = 'translate(' + nx + 'px,' + ny + 'px) rotate(' + starAngle + 'deg)';
+        // Check proximity to astronaut in world coords
+        var worldX = norm(nx / WIDTH * 2 - 1, -1, 1, -100, 100);
+        var worldY = norm(1 - ny / HEIGHT * 2, -1, 1, 25, 175);
+        var hx = humanoid.mesh.position.x, hy = humanoid.mesh.position.y;
+        var dist2 = Math.sqrt((worldX-hx)*(worldX-hx)+(worldY-hy)*(worldY-hy));
+        if (dist2 < 25 && STATUS === 'playing' && invincibleFrames <= 0) {
+          invincibleFrames = 60;
+          stats.shootingStarHits++;
+          showToast('external event — uncontrolled', 'star');
+          doTumble();
+          gsap.fromTo('#hit-flash', { opacity: 0.9 }, { opacity: 0, duration: 0.8 });
+        }
+      },
+      onComplete: function() { starActive = false; }
+    });
+}
+
+// ─── Collisions ────────────────────────────────────────────────────────────
+var _pWorld = new THREE.Vector3(), _eWorld = new THREE.Vector3();
+
+function checkCollisions() {
+  if (STATUS !== 'playing') return;
+  humanoid.mesh.getWorldPosition(_pWorld);
+
+  // Orbs
+  for (var i = orbHolder.inUse.length-1; i >= 0; i--) {
+    var en = orbHolder.inUse[i];
+    en.mesh.getWorldPosition(_eWorld);
+    if (_pWorld.distanceTo(_eWorld) < 8) {
+      var def = ORB_DEFS[en.orbType];
+      new Burst(def.color, 10).mesh.position.copy(_eWorld);
+      orbHolder.pools[en.orbType].push(en);
+      orbHolder.mesh.remove(en.mesh);
+      orbHolder.inUse.splice(i, 1);
+
+      if (invincibleFrames > 0) {
+        // Rocketman: obstacles still burst visually but cause no harm
+        new Burst(0xffdd00, 12).mesh.position.copy(_eWorld);
+        continue;
+      }
+
+      if (en.orbType === 'black') {
+        stats.blackOrbHits++;
+        showToast('removed from pipeline', 'black');
+        doSingularity();
+        return;
+      }
+
+      oxygen -= def.oxygenCost;
+      if (def.hitStr === 'heavy') {
+        // Red orb: bouncy hit, no tumble, no ragdoll snap — just a solid knock
+        stats.redOrbHits++;
+        structuralStress += 0.18;
+        showToast('not moving forward', 'red');
+        gsap.fromTo('#hit-flash', { opacity: 0.7 }, { opacity: 0, duration: 0.5 });
+        // Bounce velocity impulse — pushes away, no spin
+        butterfly.vx += (humanoid.mesh.position.x - _eWorld.x) * 0.12;
+        butterfly.vy += (humanoid.mesh.position.y - _eWorld.y) * 0.12 + 1.5;
+        // Small joint rattle but NO flipX/Z change
+        for (var ri = 0; ri < humanoid.joints.length; ri++) {
+          humanoid.joints[ri].pivot.userData.velX += (Math.random() - 0.5) * 1.5;
+          humanoid.joints[ri].pivot.userData.velZ += (Math.random() - 0.5) * (ri >= 4 ? 0.5 : 1.5);
+        }
+      } else {
+        // Blue orb: moderate rotation effect
+        stats.blueOrbHits++;
+        structuralStress += 0.10;
+        showToast('processed by filter', 'blue');
+        gsap.fromTo('#hit-flash', { opacity: 0.35 }, { opacity: 0, duration: 0.3 });
+        // Moderate rotation — visible but not catastrophic
+        humanoid.reachFade = Math.min(humanoid.reachFade, 0.4);
+        gsap.to(humanoid, {
+          flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 1.2,
+          flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 0.8,
+          duration: 0.6, ease: "power2.out"
+        });
+        for (var bi = 0; bi < humanoid.joints.length; bi++) {
+          humanoid.joints[bi].pivot.userData.velX += (Math.random() - 0.5) * 2.0;
+          humanoid.joints[bi].pivot.userData.velZ += (Math.random() - 0.5) * (bi >= 4 ? 0.6 : 2.0);
+        }
+      }
+
+      // Structural threshold — too many hits regardless of oxygen
+      structuralStress = Math.min(1.0, structuralStress);
+      stats.peakStructuralStress = Math.max(stats.peakStructuralStress, structuralStress);
+      if (structuralStress >= 0.8 && structuralStress < 1.0) {
+        showToast('structural integrity — critical', 'black');
+      }
+      if (structuralStress >= 1.0) {
+        structuralStress = 0.6; // partial reset on forced tumble
+        doTumble(); return;
+      }
+
+      if (oxygen <= 0) {
+        oxygen = 0;
+        doVoid();
+        refreshUI();
+        return;
+      }
+      refreshUI();
+    }
+  }
+
+  // Oxygen canisters
+  for (var j = canHolder.inUse.length-1; j >= 0; j--) {
+    var cn = canHolder.inUse[j];
+    cn.mesh.getWorldPosition(_eWorld);
+    if (_pWorld.distanceTo(_eWorld) < 12) {
+      new Burst(0x00e5ff, 8).mesh.position.copy(_eWorld);
+      canHolder.pool.push(cn); canHolder.mesh.remove(cn.mesh); canHolder.inUse.splice(j,1);
+
+      var restore = (cometActive || rocketmanActive) ? 2.0 : 1.5;
+      oxygen = Math.min(MAX_O, oxygen + restore);
+      stats.canistersCollected++;
+      showToast('oxygen + ' + restore.toFixed(1), 'oxy');
+      gsap.fromTo('#comet-flash', { opacity: cometActive ? 0.4 : 0.2 }, { opacity: 0, duration: 0.3 });
+      refreshUI();
+    }
+  }
+
+  // Mystery boxes
+  for (var k = boxHolder.inUse.length-1; k >= 0; k--) {
+    var bx = boxHolder.inUse[k];
+    bx.mesh.getWorldPosition(_eWorld);
+    if (_pWorld.distanceTo(_eWorld) < 14) {
+      boxHolder.pool.push(bx); boxHolder.mesh.remove(bx.mesh); boxHolder.inUse.splice(k,1);
+
+      // Roll the dice: 60% bad tumble, 25% orbital sling, 15% comet tail
+      var roll = Math.random();
+      if (roll < 0.60) {
+        stats.boxTumbles++;
+        showToast('unforeseen complication', 'box');
+        doTumble();
+      } else if (roll < 0.85) {
+        stats.boxSlings++;
+        showToast('pulled from orbit', 'box');
+        doOrbitalSling();
+      } else {
+        stats.boxComets++;
+        showToast('rare windfall — active', 'rocket');
+        cometActive = true;
+        cometTimer = COMET_DURATION;
+        humanoid.flameMat.color.setHex(0xffdd00);
+        gsap.fromTo('#comet-flash', { opacity: 0.6 }, { opacity: 0, duration: 0.8 });
+      }
+      return;
+    }
+  }
+}
+
+// ─── Mirror pre-pass — renders reflected scene into mirrorRT ──────────────────
+var _mirrorElapsed = 0;
+function doMirrorPass() {
+  if (!mirrorRT || !iceMesh) return;
+  var ICE_Y = -600;
+  var camY = camera.position.y;
+  var reflY = ICE_Y - (camY - ICE_Y);
+  mirrorCam.position.set(camera.position.x, reflY, camera.position.z);
+  mirrorCam.rotation.set(-camera.rotation.x, camera.rotation.y, camera.rotation.z, camera.rotation.order);
+  mirrorCam.updateProjectionMatrix();
+  iceMesh.visible = false;
+  renderer.setRenderTarget(mirrorRT);
+  renderer.setClearColor(0x020111, 1);
+  renderer.clear();
+  renderer.render(scene, mirrorCam);
+  renderer.setRenderTarget(null);
+  renderer.setClearColor(0x000000, 0);
+  iceMesh.visible = true;
+}
+
+// ─── Main Loop ─────────────────────────────────────────────────────────────
+var sceneSpeed = 1.0; // kept for object update calls; driven by currentRotSpeed below
+function loop() {
+  requestAnimationFrame(loop);
+  frame++;
+
+  // Magnetic snap: reverseLerp drifts back toward 0 each frame; scroll wheel pushes it away
+  reverseLerp += (0 - reverseLerp) * MAGNETIC_STRENGTH;
+  targetRotSpeed = MAGNETIC_FORWARD + reverseLerp;
+  currentRotSpeed += (targetRotSpeed - currentRotSpeed) * 0.05;
+  sceneSpeed = currentRotSpeed;
+
+  sea.mesh.rotation.z += 0.005 * currentRotSpeed;
+  sky.mesh.rotation.z += 0.002 * currentRotSpeed;
+  sea.moveWaves();
+  // Sync reflective cylinder: match sea rotation + animate its own waves
+  if (iceMesh) {
+    iceMesh.rotation.z = sea.mesh.rotation.z;
+    if (iceMesh.waveData) {
+      var _ipos = iceMesh.geometry.attributes.position;
+      for (var _ii = 0, _id; _ii < iceMesh.waveData.length; _ii++) {
+        _id = iceMesh.waveData[_ii];
+        _ipos.setX(_ii, _id.x + Math.cos(_id.ang) * _id.amp);
+        _ipos.setY(_ii, _id.y + Math.sin(_id.ang) * _id.amp);
+        _id.ang += _id.speed;
+      }
+      _ipos.needsUpdate = true;
+      iceMesh.geometry.computeVertexNormals();
+    }
+  }
+  if (iceUniforms) iceUniforms.time.value += 0.016;
+  if (atmosphereGroup) atmosphereGroup.rotation.z = sea.mesh.rotation.z * 0.3;
+  if (atmosRingMesh) {
+    var distToLine = humanoid ? Math.abs(humanoid.mesh.position.y - ATMOSPHERE_Y) : 999;
+    var proximity = Math.max(0, 1 - distToLine / 30);
+    var pulse = 0.42 + Math.sin(Date.now() * 0.0018) * 0.13 + proximity * 0.35;
+    atmosRingMesh.material.opacity = Math.min(0.9, pulse);
+    atmosRingGlow.material.opacity = Math.min(0.3, pulse * 0.22 + proximity * 0.12);
+  }
+
+  var cycle = (sea.mesh.rotation.z / Math.PI) % planetColors.length;
+  var idx1 = Math.floor(Math.abs(cycle)), idx2 = (idx1+1) % planetColors.length;
+  var c1 = new THREE.Color(planetColors[idx1]), c2 = new THREE.Color(planetColors[idx2]);
+  if (currentWorld === 'tundra') {
+    sea.mesh.material.color.setHex(0xa8d8f0); // lock to ice blue
+  } else {
+    sea.mesh.material.color.copy(c1).lerp(c2, Math.abs(cycle) - idx1);
+  }
+
+  if (STATUS === 'playing') {
+    // Safety net — ensure scene is always visible during play
+    if (!sea.mesh.visible) sea.mesh.visible = true;
+    if (!sky.mesh.visible) sky.mesh.visible = true;
+    if (!orbHolder.mesh.visible) orbHolder.mesh.visible = true;
+    if (!canHolder.mesh.visible) canHolder.mesh.visible = true;
+    if (!boxHolder.mesh.visible) boxHolder.mesh.visible = true;
+    if (pauseActive) {
+      // Menu open — astronaut floats above overlay via fg renderer
+      humanoid.flipX += (0 - humanoid.flipX) * 0.004;
+      humanoid.flipZ += (0 - humanoid.flipZ) * 0.004;
+      var tx = norm(mouse.x, -1, 1, -100, 100), ty = norm(mouse.y, -1, 1, 25, 175);
+      var headOffY_P = 8.5 * Math.cos(humanoid.baseRotX);
+      var bfDxP = tx - humanoid.mesh.position.x, bfDyP = ty - (humanoid.mesh.position.y + headOffY_P);
+      var bfDistP = Math.max(1, Math.sqrt(bfDxP*bfDxP + bfDyP*bfDyP));
+      butterfly.vx += (bfDxP / bfDistP) * Math.min(bfDistP * 0.08, 4) * 0.12;
+      butterfly.vy += (bfDyP / bfDistP) * Math.min(bfDistP * 0.08, 4) * 0.12;
+      butterfly.vx *= 0.85; butterfly.vy *= 0.85;
+      humanoid.mesh.position.x += butterfly.vx;
+      humanoid.mesh.position.y += butterfly.vy;
+      humanoid.butterflyDx = bfDxP; humanoid.butterflyDy = bfDyP; humanoid.butterflyDist = bfDistP;
+      humanoid.update(butterfly.vx*0.003, butterfly.vy*0.003, orbHolder.speed, bfDxP, bfDyP);
+      updateBursts();
+      if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
+      if (cometSparkles.length) updateCometSparkles();
+      if (airPuffs.length) updateAirPuffs();
+      doMirrorPass();
+      renderer.render(scene, camera);
+      sea.mesh.visible = false; sky.mesh.visible = false;
+      orbHolder.mesh.visible = false; canHolder.mesh.visible = false; boxHolder.mesh.visible = false;
+      fgRenderer.render(scene, camera);
+      sea.mesh.visible = true; sky.mesh.visible = true;
+      orbHolder.mesh.visible = true; canHolder.mesh.visible = true; boxHolder.mesh.visible = true;
+      return;
+    }
+    if (frameFrozen) {
+      // World frozen — astronaut drifts freely with butterfly physics, nothing else ticks
+      humanoid.flipX += (0 - humanoid.flipX) * 0.004;
+      humanoid.flipZ += (0 - humanoid.flipZ) * 0.004;
+      var ftx = norm(mouse.x, -1, 1, -100, 100), fty = norm(mouse.y, -1, 1, 25, 175);
+      var headOffY_F = 8.5 * Math.cos(humanoid.baseRotX);
+      var bfDxF = ftx - humanoid.mesh.position.x, bfDyF = fty - (humanoid.mesh.position.y + headOffY_F);
+      var bfDistF = Math.max(1, Math.sqrt(bfDxF*bfDxF + bfDyF*bfDyF));
+      butterfly.vx += (bfDxF / bfDistF) * Math.min(bfDistF * 0.08, 4) * 0.10;
+      butterfly.vy += (bfDyF / bfDistF) * Math.min(bfDistF * 0.08, 4) * 0.10;
+      butterfly.vx *= 0.88; butterfly.vy *= 0.88;
+      humanoid.mesh.position.x += butterfly.vx;
+      humanoid.mesh.position.y += butterfly.vy;
+      humanoid.butterflyDx = bfDxF; humanoid.butterflyDy = bfDyF; humanoid.butterflyDist = bfDistF;
+      humanoid.update(butterfly.vx*0.002, butterfly.vy*0.002, 0, bfDxF, bfDyF);
+      updateBursts();
+      if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
+      if (smokeParticles.length) updateSmoke();
+      if (cometSparkles.length) updateCometSparkles();
+      if (airPuffs.length) updateAirPuffs();
+      if (snowParticles.length) updateSnowSpray();
+      doMirrorPass();
+      renderer.render(scene, camera);
+      return;
+    }
+    survivalFrames++;
+    if (invincibleFrames > 0) invincibleFrames--;
+
+    // AFK check — auto-open spacebar menu after inactivity
+    if (!pauseActive && (Date.now() - _lastInteractionTime) > AFK_MS) {
+      _lastInteractionTime = Date.now(); // reset so it doesn't re-fire immediately on close
+      openMenu();
+    }
+
+    // Sling recovery — move toward center
+    if (humanoid.slingFrames > 0) {
+      humanoid.mesh.position.x += humanoid.slingVx;
+      humanoid.mesh.position.y += humanoid.slingVy;
+      humanoid.slingVx *= 0.88;
+      humanoid.slingVy *= 0.88;
+      humanoid.slingFrames--;
+    }
+
+    // Passive oxygen drain — very slow tamagotchi hunger
+    if (frame % 2400 === 0 && oxygen > 0 && !cometActive) {
+      oxygen -= 0.5;
+      if (oxygen <= 0) { oxygen = 0; doVoid(); } else { refreshUI(); }
+    }
+
+    // Speed ramp — invisible, gradual
+    speedTick--;
+    if (speedTick <= 0) {
+      speedTick = SPEED_TICK_INTERVAL;
+      var newSpd = orbHolder.speed + 0.3;
+      orbHolder.speed = canHolder.speed = boxHolder.speed = newSpd;
+      spawnInt = Math.max(22, spawnInt - 3);
+    }
+
+    // Jetpack air puffs — occasional, cursor-influenced
+    if (!humanoid.singularity) {
+      spawnAirPuffs(butterfly.vx, butterfly.vy, bfDx, bfDy);
+    }
+
+    // Comet tail
+    if (cometActive) {
+      cometTimer--;
+      if (frame % 3 === 0) spawnCometSparkle(humanoid.mesh.position.x, humanoid.mesh.position.y);
+      if (cometTimer <= 0) {
+        cometActive = false;
+        if (!rocketmanActive) humanoid.flameMat.color.setHex(0x00ffff);
+      }
+    }
+
+    // Rocketman — supernova boost
+    if (rocketmanActive) {
+      rocketmanTimer--;
+      invincibleFrames = 10; // perpetually invincible while active
+
+      // Rainbow suit cycling
+      var rt = Date.now() * 0.004;
+      humanoid.suitMat.color.setRGB(
+        Math.sin(rt)         * 0.5 + 0.5,
+        Math.sin(rt + 2.094) * 0.5 + 0.5,
+        Math.sin(rt + 4.189) * 0.5 + 0.5
+      );
+      // Gold flame
+      humanoid.flameMat.color.setRGB(1, 0.85 + Math.random()*0.15, 0);
+      // Dense sparkle trail — more than comet
+      if (frame % 2 === 0) {
+        spawnCometSparkle(humanoid.mesh.position.x, humanoid.mesh.position.y);
+        spawnCometSparkle(humanoid.mesh.position.x, humanoid.mesh.position.y);
+      }
+      // Subtle scale pulse
+      var scalePulse = 0.25 + Math.sin(Date.now() * 0.008) * 0.012;
+      humanoid.mesh.scale.setScalar(scalePulse);
+
+      // Rocket bar countdown
+      var rocketPct = rocketmanTimer / ROCKETMAN_DURATION;
+      document.getElementById('rocket-bar').style.transform = 'scaleX(' + rocketPct + ')';
+
+      // Warn when nearly done
+      if (rocketmanTimer === 180) showToast('rocketman — 3s remaining', 'rocket');
+
+      if (rocketmanTimer <= 0) {
+        rocketmanActive = false;
+        humanoid.suitMat.color.setHex(0xffffff);
+        humanoid.flameMat.color.setHex(0x00ffff);
+        humanoid.mesh.scale.setScalar(0.25);
+        document.getElementById('rocket-bar').style.display = 'none';
+        showToast('boost expired', 'blue');
+      }
+    }
+
+    if (cometSparkles.length) updateCometSparkles();
+
+    // Shooting star
+    if (frame >= nextStarFrame && !starActive) {
+      launchShootingStar();
+      nextStarFrame = frame + 1200 + Math.floor(Math.random() * 1800);
+    }
+
+    // ── Butterfly physics — astronaut chases the cursor like a butterfly ──
+    // The cursor is the butterfly: astronaut always wants to reach for it,
+    // but velocity/inertia/momentum/mass physics can override arm strength.
+    if (!humanoid.singularity) {
+      var bfTx = norm(mouse.x, -1, 1, -100, 100);
+      var bfTy = norm(mouse.y, -1, 1, 25, 175);
+
+      // Pull from the head/face — the string attaches at the top of the helmet,
+      // not the body center. Head is at local y=34, scaled 0.25 = ~8.5 world units
+      // above the mesh origin, tilted forward with baseRotX.
+      var headOffsetY = 8.5 * Math.cos(humanoid.baseRotX);
+      var headOffsetX = 8.5 * Math.sin(humanoid.baseRotX) * -Math.sin(humanoid.mesh.rotation.y);
+      var anchorX = humanoid.mesh.position.x + headOffsetX;
+      var anchorY = humanoid.mesh.position.y + headOffsetY;
+
+      // Vector from head anchor to butterfly (cursor)
+      var bfDx = bfTx - anchorX;
+      var bfDy = bfTy - anchorY;
+      var bfDist = Math.sqrt(bfDx * bfDx + bfDy * bfDy);
+
+      // Desire force: astronaut wants to reach toward the butterfly.
+      // Strength falls off with distance (can't reach infinitely far),
+      // and weakens when moving fast (physics limits arm strength).
+      var speed2d = Math.sqrt(butterfly.vx * butterfly.vx + butterfly.vy * butterfly.vy);
+      var armStrength = 0.018; // base reach desire per frame
+      var momentumResistance = Math.min(1.0, speed2d / 18); // 0=still, 1=very fast
+      var effectiveArm = armStrength * (1.0 - momentumResistance * 0.72);
+
+      // Apply desire: accelerate toward butterfly (capped by arm strength)
+      if (bfDist > 0.5) {
+        butterfly.vx += (bfDx / bfDist) * Math.min(bfDist * 0.12, 6.0) * effectiveArm * 9;
+        butterfly.vy += (bfDy / bfDist) * Math.min(bfDist * 0.12, 6.0) * effectiveArm * 9;
+      }
+
+      // Inertia / drag — space has near-zero friction, but suit thrusters provide some control
+      // Drag increases at higher speeds (thruster saturation)
+      var drag = 0.88 - Math.min(0.12, speed2d * 0.004);
+      butterfly.vx *= drag;
+      butterfly.vy *= drag;
+
+      // Mass-limited velocity cap: heavier suit means slower top speed
+      var MAX_SPEED = 9.5;
+      if (speed2d > MAX_SPEED) {
+        butterfly.vx *= MAX_SPEED / speed2d;
+        butterfly.vy *= MAX_SPEED / speed2d;
+      }
+
+      // ── Ambient air turbulence — velocity imparts a whisper of rotation ──────
+      // Proportional to speed so it only manifests when actually moving fast
+      if (!humanoid.singularity && invincibleFrames <= 0) {
+        var _airSpd = Math.sqrt(butterfly.vx * butterfly.vx + butterfly.vy * butterfly.vy);
+        if (_airSpd > 1.5) {
+          var _airNudge = _airSpd * 0.00018;
+          humanoid.flipX += butterfly.vy * _airNudge;
+          humanoid.flipZ -= butterfly.vx * _airNudge;
+        }
+      }
+
+      // Integrate position
+      humanoid.mesh.position.x += butterfly.vx;
+      humanoid.mesh.position.y += butterfly.vy;
+
+      // World bounds — soft wall (spring back gently)
+      if (humanoid.mesh.position.x < -110) { butterfly.vx += (-110 - humanoid.mesh.position.x) * 0.08; }
+      if (humanoid.mesh.position.x >  110) { butterfly.vx += ( 110 - humanoid.mesh.position.x) * 0.08; }
+      if (humanoid.mesh.position.y <  20)  { butterfly.vy += (  20 - humanoid.mesh.position.y) * 0.10; }
+      if (humanoid.mesh.position.y >  178) { butterfly.vy += ( 178 - humanoid.mesh.position.y) * 0.10; }
+
+      // Pass velocity as acceleration signals to ragdoll update,
+      // and butterfly offset (reaching direction) to arm posing
+      humanoid.update(butterfly.vx * 0.003, butterfly.vy * 0.003, orbHolder.speed, bfDx, bfDy);
+      humanoid.butterflyDx = bfDx;
+      humanoid.butterflyDy = bfDy;
+      humanoid.butterflyDist = bfDist;
+      // ── Ambient acrobatics — cursor pull direction chooses the flip ───────
+      if (frame >= nextFlipFrame && invincibleFrames < 60) {
+        // Normalise cursor offset to [-1,1] on each axis
+        var flipNx = Math.max(-1, Math.min(1, bfDx / 100));
+        var flipNy = Math.max(-1, Math.min(1, bfDy / 100));
+        var flipDeltaX, flipDeltaZ, flipDur, fjx, fjz;
+
+        // Vertical pull almost always wins — cursor above → frontflip, below → backflip
+        // Barrel roll only fires when cursor is very strongly lateral AND barely vertical
+        if (Math.abs(flipNy) >= Math.abs(flipNx) * 1.4 || Math.abs(flipNx) < 0.35) {
+          // Front/back flip
+          flipDeltaX = Math.PI * 2 * (flipNy >= 0 ? 1 : -1);
+          flipDeltaZ = flipNx * 0.18;           // tiny roll tint from lateral, not a cartwheel
+          flipDur    = 0.60 + Math.random() * 0.25;
+          fjx = flipDeltaX > 0 ? 3.2 : -3.2;
+          fjz = flipNx * 0.8;
+        } else {
+          // Hard lateral with almost no vertical — still lead with a flip, roll is secondary
+          flipDeltaX = Math.PI * 2 * (flipNy >= 0 ? 1 : -1);
+          flipDeltaZ = Math.PI * (flipNx >= 0 ? 1 : -1); // half roll, not a full cartwheel
+          flipDur    = 0.80 + Math.random() * 0.2;
+          fjx = flipDeltaX > 0 ? 2.8 : -2.8;
+          fjz = flipDeltaZ > 0 ? 2.0 : -2.0;
+        }
+
+        gsap.to(humanoid, {
+          flipX: humanoid.flipX + flipDeltaX,
+          flipZ: humanoid.flipZ + flipDeltaZ,
+          duration: flipDur, ease: 'power2.inOut'
+        });
+        for (var fji = 0; fji < humanoid.joints.length; fji++) {
+          humanoid.joints[fji].pivot.userData.velX += fjx * (0.7 + Math.random() * 0.4);
+          humanoid.joints[fji].pivot.userData.velZ += fjz * (0.7 + Math.random() * 0.4);
+        }
+
+        // Gap shortens the faster the cursor is pulling
+        var flipGap = 260 + Math.floor(Math.random() * 420) - Math.floor(bfDist * 1.2);
+        nextFlipFrame = frame + Math.max(140, flipGap);
+      }
+    } else {
+      humanoid.update(0, 0, orbHolder.speed, 0, 0);
+    }
+
+    // Companion poodle trails the astronaut every frame during play
+    if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
+
+    // Altitude tracking + zone effects
+    var altY = humanoid.mesh.position.y;
+    stats.altitudeSum   += altY;
+    stats.altitudeFrames++;
+
+    if (altY > HIGH_ORBIT_Y) {
+      structuralStress = Math.max(0, structuralStress - 0.0015);
+    } else if (altY < LOW_ORBIT_Y) {
+      structuralStress = Math.min(1.0, structuralStress + 0.00015);
+    }
+    stats.peakStructuralStress = Math.max(stats.peakStructuralStress, structuralStress);
+
+    // ── Atmosphere reentry ────────────────────────────────────────────────
+    var inAtmos = (altY < ATMOSPHERE_Y) && !humanoid.singularity;
+    // ── Wolfie lower-zone follow ─────────────────────────────────────────
+    var wasInWolfieZone = _inWolfieZone;
+    _inWolfieZone = inAtmos;
+    if (!wasInWolfieZone && _inWolfieZone) showToast('following wolfie');
+    else if (wasInWolfieZone && !_inWolfieZone) showToast('back in orbit');
+    if (_inWolfieZone && companionPoodle) {
+      // Astronaut drifts toward wolfie — wolfie becomes the anchor
+      var wpx = companionPoodle.px, wpy = companionPoodle.py;
+      humanoid.mesh.position.x += (wpx - humanoid.mesh.position.x) * 0.04;
+      humanoid.mesh.position.y += (wpy - humanoid.mesh.position.y) * 0.04;
+    }
+    heatFactor += ((inAtmos ? 1.0 : 0.0) - heatFactor) * (inAtmos ? 0.025 : 0.012);
+    heatFactor = Math.max(0, Math.min(1, heatFactor));
+    if (!wasInAtmosphere && inAtmos) { wasInAtmosphere = true; showToast('atmospheric entry'); }
+    else if (wasInAtmosphere && !inAtmos) { wasInAtmosphere = false; }
+    if (heatFactor > 0.01 && !rocketmanActive) {
+      var h = heatFactor;
+      humanoid.suitMat.color.setRGB(1.0, Math.max(0.05, 1.0 - h * 0.78), Math.max(0, 1.0 - h * 1.1));
+      var fScale = 1.0 + h * 3.5;
+      humanoid.lFlame.scale.set(fScale, fScale * (0.6 + Math.random() * 0.5), fScale * 0.6);
+      humanoid.rFlame.scale.set(fScale, fScale * (0.6 + Math.random() * 0.5), fScale * 0.6);
+      if (!cometActive) humanoid.flameMat.color.setRGB(1.0, 0.35 + (1-h) * 0.65, 0);
+      var fireBudget = Math.floor(h * 4) + (frame % 2 === 0 ? 1 : 0);
+      for (var fi = 0; fi < fireBudget; fi++) spawnFire(humanoid.mesh.position.x, humanoid.mesh.position.y);
+      if (h > 0.6) structuralStress = Math.min(1.0, structuralStress + 0.0006 * h);
+    } else if (!rocketmanActive && heatFactor < 0.01) {
+      humanoid.suitMat.color.setHex(0xffffff);
+      if (!cometActive) humanoid.flameMat.color.setHex(0x00ffff);
+    }
+    if (fireParticles.length) updateFire();
+
+    // Stress bar
+    var stressEl = document.getElementById('stress-bar');
+    stressEl.style.transform = 'scaleX(' + structuralStress + ')';
+    stressEl.className = structuralStress >= 0.75 ? 'critical' : '';
+
+    // Risk zone tracking
+    var inRiskNow = (oxygen / MAX_O) < 0.3;
+    if (inRiskNow && !wasInRiskZone) stats.riskZoneEntries++;
+    wasInRiskZone = inRiskNow;
+    if ((oxygen / MAX_O) > 0.6) stats.safeZoneFrames++;
+
+    // Spawn — density and mix shift by altitude zone; suppressed while manual mode has stopped the scene
+    var altSpawnMult = altY > HIGH_ORBIT_Y ? 1.7 : altY < LOW_ORBIT_Y ? 0.62 : 1.0;
+    var effectiveSpawn = Math.round(spawnInt * altSpawnMult);
+    if (Math.abs(sceneSpeed) > 0.15 && frame % Math.max(12, effectiveSpawn) === 0) {
+      var r = Math.random();
+      if (altY > HIGH_ORBIT_Y) {
+        // High orbit: thin, mostly canisters
+        if      (r < 0.12) orbHolder.spawn('blue');
+        else if (r < 0.18) orbHolder.spawn('red');
+        else if (r < 0.19) orbHolder.spawn('black');
+        else if (r < 0.92) canHolder.spawn();
+        else               boxHolder.spawn();
+      } else if (altY < LOW_ORBIT_Y) {
+        // Low orbit: dense, heavier enemy mix, more boxes
+        if      (r < 0.38) orbHolder.spawn('blue');
+        else if (r < 0.57) orbHolder.spawn('red');
+        else if (r < 0.62) orbHolder.spawn('black');
+        else if (r < 0.82) canHolder.spawn();
+        else               boxHolder.spawn();
+      } else {
+        // Operational: default ratios
+        if      (r < 0.33) orbHolder.spawn('blue');
+        else if (r < 0.50) orbHolder.spawn('red');
+        else if (r < 0.54) orbHolder.spawn('black');
+        else if (r < 0.84) canHolder.spawn();
+        else               boxHolder.spawn();
+      }
+    }
+
+    orbHolder.update(); canHolder.update(); boxHolder.update();
+
+    // ── Black hole magnetic pull ──────────────────────────────────────────────
+    // Black orbs exert a strong gravity well before actual collision
+    if (!humanoid.singularity) {
+      for (var _bhi = 0; _bhi < orbHolder.inUse.length; _bhi++) {
+        var _bh = orbHolder.inUse[_bhi];
+        if (_bh.orbType !== 'black') continue;
+        _bh.mesh.getWorldPosition(_eWorld);
+        humanoid.mesh.getWorldPosition(_pWorld);
+        var _bhDx = _eWorld.x - _pWorld.x, _bhDy = _eWorld.y - _pWorld.y;
+        var _bhDist = Math.sqrt(_bhDx*_bhDx + _bhDy*_bhDy);
+        if (_bhDist < 120 && _bhDist > 9) {
+          // Inverse square pull, capped so it can't crush velocity instantly
+          var _bhStr = Math.min(2.2, 1800 / (_bhDist * _bhDist));
+          butterfly.vx += (_bhDx / _bhDist) * _bhStr;
+          butterfly.vy += (_bhDy / _bhDist) * _bhStr;
+          // Pulse the black orb emissive so the player can see the pull
+          var _bhPulse = 0.08 + Math.sin(Date.now() * 0.006 + _bhi) * 0.06;
+          _bh.mat.emissive.setRGB(_bhPulse * 0.4, 0, _bhPulse * 0.8);
+        }
+      }
+    }
+
+    updateBursts(); checkCollisions();
+    if (smokeParticles.length) updateSmoke();
+    if (airPuffs.length) updateAirPuffs();
+    if (snowParticles.length) updateSnowSpray();
+
+    // Particle spray — spawn when moving in any world
+    if (!humanoid.singularity && STATUS === 'playing') {
+      var snowSpeed = Math.sqrt(butterfly.vx * butterfly.vx + butterfly.vy * butterfly.vy);
+      if (snowSpeed > 0.4 && frame % 2 === 0) {
+        spawnSnowSpray(
+          humanoid.mesh.position.x,
+          humanoid.mesh.position.y,
+          humanoid.mesh.position.z,
+          butterfly.vx, butterfly.vy, snowSpeed / 9.5
+        );
+      }
+    }
+    // Wind streaks — intensity kicks in above baseline scene speed
+    var windIntensity = Math.min(1, Math.max(0, (Math.abs(sceneSpeed) - 0.6) / 1.8));
+    if (windIntensity > 0) updateWindStreaks(windIntensity, sceneSpeed > 0);
+
+    if (frame % 10 === 0) refreshUI();
+
+  } else if (STATUS === 'void') {
+    // Void — astronaut locked to center, suit pulses
+    humanoid.mesh.position.set(0, 100, 0);
+    humanoid.update(0, 0, 0, 0, 0);
+    if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
+
+    // Idle timer — if they stop tapping, game over
+    voidIdleFrames++;
+    if (voidIdleFrames >= VOID_IDLE_MAX) {
+      doGameOver();
+      return;
+    }
+
+    // Pulse suit red as they approach timeout
+    var urgency = voidIdleFrames / VOID_IDLE_MAX;
+    var pulseSpeed = 2 + urgency * 6;
+    var pulse = 0.5 + Math.sin(Date.now() * 0.001 * pulseSpeed) * 0.5;
+    var tapPct = heartbeatTaps / HEARTBEAT_REQUIRED;
+    var rr = 0.8 + (1 - tapPct) * 0.2;
+    var bb = tapPct * 0.8;
+    humanoid.suitMat.color.setRGB(rr * (0.5 + pulse * 0.5), 0, bb * (0.5 + pulse * 0.5));
+
+    updateBursts();
+
+  } else if (STATUS === 'tumbling') {
+    tumble.frames++;
+    if (tumble.frames >= TUMBLE_TIMEOUT) {
+      doGameOver(); return;
+    }
+    var GRAVITY = -0.12, FRICTION = 0.96, BOUNCE_DAMP = 0.72, SURFACE_Y = tumble.surfaceY;
+    tumble.velY += GRAVITY;
+    humanoid.mesh.position.y += tumble.velY;
+    humanoid.mesh.position.x += tumble.velX;
+    if (humanoid.mesh.position.x < -130) { humanoid.mesh.position.x = -130; tumble.velX *= -0.4; }
+    if (humanoid.mesh.position.x >  130) { humanoid.mesh.position.x =  130; tumble.velX *= -0.4; }
+    if (humanoid.mesh.position.y <= SURFACE_Y) {
+      humanoid.mesh.position.y = SURFACE_Y;
+      var impactSpeed = Math.abs(tumble.velY);
+      tumble.velY = impactSpeed * BOUNCE_DAMP;
+      tumble.velX *= FRICTION;
+      tumble.bounces++;
+      var spinScale = Math.max(0.5, 1.2 - tumble.bounces*0.08);
+      tumble.spinX = (Math.random()-0.5)*0.32*spinScale;
+      tumble.spinY = (Math.random()-0.5)*0.25*spinScale;
+      tumble.spinZ = (Math.random()<0.5?1:-1)*(0.15+Math.random()*0.22)*spinScale;
+      var splatStr = Math.min(6, impactSpeed*0.5);
+      for (var bi = 0; bi < humanoid.joints.length; bi++) {
+        humanoid.joints[bi].pivot.userData.velX += (Math.random()-0.5)*splatStr;
+        humanoid.joints[bi].pivot.userData.velZ += (Math.random()-0.5)*splatStr;
+      }
+      if (tumble.velY < 2.2) tumble.velY = 2.2 + Math.random()*2.5;
+    }
+    humanoid.flipX += tumble.spinX;
+    humanoid.flipZ += tumble.spinZ;
+    humanoid.mesh.rotation.y += tumble.spinY;
+    humanoid.update(tumble.velX*0.004, tumble.velY*0.003, 0, 0, 0);
+    if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
+    var sx = humanoid.mesh.position.x, sy = humanoid.mesh.position.y;
+    var numSmoke = 2 + (frame % 3 === 0 ? 1 : 0);
+    for (var si = 0; si < numSmoke; si++) spawnSmoke(sx, sy, 0, tumble.velX, tumble.velY);
+    updateSmoke();
+    var liftHint = document.getElementById('lift-hint');
+    if (liftHint) liftHint.classList.toggle('visible', tumble.bounces >= 1);
+    if (tumble.liftProgress >= 1.0) {
+      STATUS = 'playing';
+      stats.tumbleRecoveries++;
+      oxygen = Math.max(1, oxygen);
+      invincibleFrames = 90;
+      refreshUI();
+      tumble.liftProgress = 0; tumble.velX = 0; tumble.velY = 0;
+      humanoid.flipX = 0; humanoid.flipZ = 0;
+      humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
+      gsap.to(humanoid.mesh.rotation, { y: Math.PI * 0.25, duration: 0.6, ease: "power3.out" });
+      if (liftHint) liftHint.classList.remove('visible');
+    }
+    updateBursts();
+    if (smokeParticles.length) updateSmoke();
+    if (cometSparkles.length) updateCometSparkles();
+
+  } else {
+    // waiting — float above the welcome text, rendered on top of the overlay
+    humanoid.mesh.position.x = 0;
+    humanoid.mesh.position.y = 152 + Math.sin(Date.now()*0.001)*5;
+    humanoid.update(0, 0, 0, 0, 0);
+    if (companionPoodle) companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
+    doMirrorPass();
+    renderer.render(scene, camera);
+    // Punch astronaut through the screen overlay using the fg layer (z-index 70)
+    document.getElementById('world-fg').style.display = 'block';
+    sea.mesh.visible = false; sky.mesh.visible = false;
+    fgRenderer.render(scene, camera);
+    sea.mesh.visible = true; sky.mesh.visible = true;
+    return;
+  }
+
+  doMirrorPass();
+  renderer.render(scene, camera);
+}
+
+// ─── Welcome nudge copy (device-aware) ────────────────────────────────────────
+(function() {
+  var nudge = document.getElementById('welcome-nudge');
+  if (!nudge) return;
+  var mobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  nudge.textContent = mobile ? 'touch anywhere' : 'move to begin';
+})();
+
+// ─── Any interaction on welcome screen starts the game ────────────────────────
+var _welcomeStarted = false;
+function welcomeStart(e) {
+  if (_welcomeStarted) return;
+  if (STATUS !== 'waiting') return;
+  // Allow the menu button, links etc. to still work normally
+  if (e && e.target) {
+    var tag = e.target.tagName;
+    if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
+    var overlay = document.getElementById('pause-overlay');
+    if (overlay && overlay.contains(e.target)) return;
+  }
+  _welcomeStarted = true;
+  // Brief fade-out of the welcome screen, then launch
+  var ws = document.getElementById('screen-welcome');
+  if (ws) {
+    ws.style.transition = 'opacity 0.35s ease';
+    ws.style.opacity = '0';
+  }
+  setTimeout(function() {
+    _welcomeStarted = false; // reset for next visit to welcome screen
+    startGame();
+  }, 320);
+}
+
+var _welcomeMouseMoved = false;
+var _welcomeMouseOriginX = null, _welcomeMouseOriginY = null;
+document.addEventListener('mousemove', function(e) {
+  if (STATUS !== 'waiting') return;
+  if (_welcomeStarted) return;
+  // Capture the first position as origin — don't fire until moved 8px+ from it
+  if (_welcomeMouseOriginX === null) { _welcomeMouseOriginX = e.clientX; _welcomeMouseOriginY = e.clientY; return; }
+  var dx = e.clientX - _welcomeMouseOriginX, dy = e.clientY - _welcomeMouseOriginY;
+  if (Math.sqrt(dx*dx + dy*dy) > 8) welcomeStart(e);
+}, { passive: true });
+
+document.addEventListener('mousedown', function(e) { welcomeStart(e); });
+document.addEventListener('touchstart', function(e) { welcomeStart(e); }, { passive: true });
+document.addEventListener('keydown',    function(e) {
+  if (e.code === 'Space' || e.code === 'Enter' || e.code === 'ArrowUp' || e.code === 'ArrowDown') {
+    welcomeStart(e);
+  }
+});
+
+// ─── HUD visibility ──────────────────────────────────────────────────────────
+var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+function updateHintLabel() {
+  var active = STATUS === 'playing' || STATUS === 'tumbling';
+  var topHud = document.getElementById('top-hud');
+  var botHud = document.getElementById('bottom-hud');
+  if (topHud) topHud.classList.toggle('visible', active);
+  if (botHud) {
+    // Always show bottom HUD on mobile while playing; on desktop too (no harm)
+    var showBot = !pauseActive && active;
+    botHud.style.display = showBot ? 'flex' : 'none';
+    botHud.classList.toggle('visible', showBot);
+  }
+}
+
+// ─── Wordmark → home (reset to start screen) ─────────────────────────────────
+function goHome() {
+  directionState = 1; MAGNETIC_FORWARD = 1.0; reverseLerp = 0;
+  frameFrozen = false;
+  var dirBtn = document.getElementById('btn-hud-dir');
+  if (dirBtn) { dirBtn.textContent = 'forward \u2192'; dirBtn.classList.remove('active'); }
+  if (STATUS === 'playing' || STATUS === 'tumbling' || STATUS === 'void') {
+    doGameOver();
+    return;
+  }
+  // already on welcome — just show welcome
+  var _wsEl2 = document.getElementById('screen-welcome');
+  if (_wsEl2) { _wsEl2.style.opacity = ''; _wsEl2.classList.add('visible'); }
+  _welcomeStarted = false;
+  _welcomeMouseOriginX = null; _welcomeMouseOriginY = null;
+  STATUS = 'waiting';
+  startQuoteRotation();
+  updateHintLabel();
+}
+
+var _goHomeCooldown = false;
+document.getElementById('hud-wordmark').addEventListener('click', function(e) {
+  if (e.pointerType === 'touch') return;
+  if (STATUS === 'playing' || STATUS === 'tumbling') { openMenu(); return; }
+  location.reload();
+});
+document.getElementById('hud-wordmark').addEventListener('touchend', function(e) {
+  e.stopPropagation(); e.preventDefault();
+  if (_goHomeCooldown) return;
+  _goHomeCooldown = true;
+  setTimeout(function() { _goHomeCooldown = false; }, 600);
+  if (STATUS === 'playing' || STATUS === 'tumbling') { openMenu(); return; }
+  location.reload();
+}, { passive: false });
+
+// ─── Bottom HUD buttons ───────────────────────────────────────────────────────
+
+// Direction state: 1 = forward, -1 = reverse
+var directionState = 1;
+
+function setDirection(dir) {
+  if (STATUS !== 'playing') return;
+  directionState = dir;
+  var dirBtn = document.getElementById('btn-hud-dir');
+  if (dir === -1) {
+    reverseLerp = REVERSE_LIMIT * 0.75;
+    MAGNETIC_FORWARD = -0.6;
+    if (dirBtn) { dirBtn.textContent = 'back \u2190'; dirBtn.classList.add('active'); }
+    showToast('reversing');
+  } else {
+    reverseLerp = 0;
+    MAGNETIC_FORWARD = 1.0;
+    if (dirBtn) { dirBtn.textContent = 'forward \u2192'; dirBtn.classList.remove('active'); }
+    showToast('forward');
+  }
+}
+
+function wireBtn(id, fn) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('click', fn);
+  el.addEventListener('touchend', function(e) { e.stopPropagation(); e.preventDefault(); fn(); }, { passive: false });
+}
+
+wireBtn('btn-hud-dir', function() { setDirection(directionState === 1 ? -1 : 1); });
+
+
+// ─── Long-press on mobile → reset character orientation ──────────────────────
+var longPressTimer = null;
+var longPressFired = false;
+var LONG_PRESS_MS  = 600;
+
+document.addEventListener('touchstart', function(e) {
+  if (STATUS !== 'playing') return;
+  if (pauseActive) return;
+  if (e.touches.length !== 1) { clearTimeout(longPressTimer); longPressFired = false; return; }
+  var topHud = document.getElementById('top-hud');
+  var botHud = document.getElementById('bottom-hud');
+  if (topHud && topHud.contains(e.target)) return;
+  if (botHud && botHud.contains(e.target)) return;
+  longPressFired = false;
+  clearTimeout(longPressTimer);
+  // Capture which touch we're watching
+  var _lpTouch = e.touches[0];
+  longPressTimer = setTimeout(function() {
+    longPressFired = true;
+
+    // Defuse touchState RIGHT NOW so touchend has nothing to act on
+    touchState.active = false;
+    touchState.id = null;
+    touchState.hasMoved = false;
+
+    // Anchor mouse to the held position so butterfly doesn't snap on lift
+    if (_lpTouch) {
+      mouse.x = -1 + (_lpTouch.clientX / WIDTH)  * 2;
+      mouse.y =  1 - (_lpTouch.clientY / HEIGHT) * 2;
+    }
+    // Drain butterfly velocity — prevents the position snap on touchend
+    butterfly.vx = 0; butterfly.vy = 0;
+
+    // Kill only flip tweens on humanoid (not mesh position/scale tweens)
+    if (typeof gsap !== 'undefined') {
+      gsap.killTweensOf(humanoid, 'flipX');
+      gsap.killTweensOf(humanoid, 'flipZ');
+    }
+    humanoid.flipX = 0; humanoid.flipZ = 0;
+    humanoid.baseRotX = -0.55; humanoid.baseRotZ = 0;
+
+    // Drain joint velocities so nothing snaps next frame
+    for (var _lpi = 0; _lpi < humanoid.joints.length; _lpi++) {
+      humanoid.joints[_lpi].pivot.userData.velX = 0;
+      humanoid.joints[_lpi].pivot.userData.velZ = 0;
+    }
+    showToast('orientation reset');
+  }, LONG_PRESS_MS);
+}, { passive: false });
+
+document.addEventListener('touchend',  function() { clearTimeout(longPressTimer); }, { passive: true });
+document.addEventListener('touchmove', function() { clearTimeout(longPressTimer); longPressFired = false; }, { passive: true });
+
+// Close button (× — reliable on mobile)
+var closeBtn = document.getElementById('btn-menu-close');
+if (closeBtn) {
+  closeBtn.addEventListener('click', function(e) { e.stopPropagation(); closeMenu(); });
+  closeBtn.addEventListener('touchend', function(e) {
+    e.stopPropagation(); e.preventDefault(); closeMenu();
+  }, { passive: false });
+}
+
+// Tap / touch backdrop to dismiss
+var overlayEl = document.getElementById('pause-overlay');
+overlayEl.addEventListener('click', function(e) {
+  if (e.target === this) closeMenu();
+});
+overlayEl.addEventListener('touchend', function(e) {
+  if (e.target === this) { e.preventDefault(); closeMenu(); }
+}, { passive: false });
+
+// ─── Welcome quotes ────────────────────────────────────────────────────────
+var QUOTES = [
+  { text: "Bad news comes, don't you worry even when it lands.\nGood news will work its way to all them plans.",
+    attr: "Modest Mouse — Float On" },
+  { text: "You are not lost. You are here.",
+    attr: "anonymous" },
+  { text: "We shall not cease from exploration, and the end of all our exploring will be to arrive where we started.",
+    attr: "T.S. Eliot" },
+  { text: "Not all those who wander are lost.",
+    attr: "J.R.R. Tolkien" },
+  { text: "The most important thing is this: to be able at any moment to sacrifice what we are for what we could become.",
+    attr: "Charles Du Bos" },
+  { text: "You can't go back and change the beginning, but you can start where you are and change the ending.",
+    attr: "C.S. Lewis" },
+  { text: "Stars are not small or gentle. They are writhing and dying and burning. They are not hopeful. And yet.",
+    attr: "Ellie Wiesel" },
+  { text: "Somewhere, something incredible is waiting to be known.",
+    attr: "Sharon Begley" },
+  { text: "Keep your face always toward the sunshine, and shadows will fall behind you.",
+    attr: "Walt Whitman" },
+  { text: "To navigate is to live twice: once in the planning, once in the going.",
+    attr: "anonymous" },
+  { text: "The cure for anything is salt water — sweat, tears, or the sea.",
+    attr: "Isak Dinesen" },
+  { text: "It is not the destination, it is the motion.",
+    attr: "Bob Dylan" },
+  { text: "We are all just walking each other home.",
+    attr: "Ram Dass" },
+  { text: "The real voyage of discovery consists not in seeking new landscapes, but in having new eyes.",
+    attr: "Marcel Proust" },
+  { text: "Even the darkest night will end and the sun will rise.",
+    attr: "Victor Hugo" },
+  { text: "In the void, learn to float.",
+    attr: "neverever.land" },
+  { text: "You don't have to see the whole staircase. Just take the first step.",
+    attr: "Martin Luther King Jr." },
+  { text: "I am not afraid of storms, for I am learning how to sail my ship.",
+    attr: "Louisa May Alcott" },
+];
+
+var _quoteIdx = Math.floor(Math.random() * QUOTES.length);
+function rotateQuote() {
+  var qEl = document.getElementById('welcome-quote');
+  var aEl = document.getElementById('welcome-attribution');
+  if (!qEl || !aEl) return;
+  qEl.style.opacity = '0'; aEl.style.opacity = '0';
+  setTimeout(function() {
+    _quoteIdx = (_quoteIdx + 1) % QUOTES.length;
+    var q = QUOTES[_quoteIdx];
+    qEl.textContent = '\u201c' + q.text + '\u201d';
+    aEl.textContent = '— ' + q.attr;
+    qEl.style.opacity = '1'; aEl.style.opacity = '1';
+  }, 650);
+}
+var _quoteInterval = null;
+function startQuoteRotation() {
+  var q = QUOTES[_quoteIdx];
+  var qEl = document.getElementById('welcome-quote');
+  var aEl = document.getElementById('welcome-attribution');
+  if (qEl) qEl.textContent = '\u201c' + q.text + '\u201d';
+  if (aEl) aEl.textContent = '— ' + q.attr;
+  if (qEl) qEl.style.opacity = '1';
+  if (aEl) aEl.style.opacity = '1';
+  clearInterval(_quoteInterval);
+  _quoteInterval = setInterval(rotateQuote, 5000);
+}
+function stopQuoteRotation() { clearInterval(_quoteInterval); }
+
+window.addEventListener('load', function() {
+  var hintEl = document.getElementById('hint-label');
+  isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  createScene(); createLights(); buildWorld();
+  applyWorld('cosmos');
+  initWindStreaks();
+  refreshUI(); loop();
+  document.getElementById('screen-welcome').classList.add('visible');
+  startQuoteRotation();
+  STATUS = 'waiting';
+
+  // Wire world selector pills
+  document.querySelectorAll('.hud-world-btn').forEach(function(pill) {
+    function onSelect(e) {
+      e.stopPropagation();
+      var w = pill.dataset.world;
+      if (w === currentWorld) return;
+      applyWorld(w);
+      // Update quote flavor
+      var flavorQuotes = {
+        cosmos: null,
+        tundra: null,
+      };
+      var pool = flavorQuotes[w];
+      if (pool) {
+        var q = pool[Math.floor(Math.random() * pool.length)];
+        var qEl = document.getElementById('welcome-quote');
+        var aEl = document.getElementById('welcome-attribution');
+        if (qEl) { qEl.style.opacity='0'; setTimeout(function(){ qEl.textContent='\u201c'+q.text+'\u201d'; qEl.style.opacity='1'; }, 300); }
+        if (aEl) { aEl.style.opacity='0'; setTimeout(function(){ aEl.textContent='\u2014 '+q.attr; aEl.style.opacity='1'; }, 300); }
+      }
+    }
+    pill.addEventListener('click', onSelect);
+    pill.addEventListener('touchend', function(e) { e.preventDefault(); onSelect(e); }, { passive: false });
+  });
+});
+
+
+
+
+
+
+// ════════════════════════════════════════════════════════════════════
+// INK EFFECT — Canvas 2D overlay applied to ALL scenes
+// Draws animated ink splat trails + edge vignette tinted per world
+// ════════════════════════════════════════════════════════════════════
+
+(function() {
+  var _ic = document.getElementById('ink-overlay');
+  var _ictx = _ic.getContext('2d');
+
+  function inkResize() {
+    _ic.width  = window.innerWidth;
+    _ic.height = window.innerHeight;
+  }
+  inkResize();
+  window.addEventListener('resize', inkResize);
+
+  // Per-world ink palette: [edgeColor, splatColor, edgeOpacity, splatOpacity]
+  var INK_WORLDS = {
+    cosmos:   { edge: '20,10,60',      splat: '100,195,220',  eOp: 0.38, sOp: 0.30, grain: 0.060 },
+    tundra:   { edge: '160,215,255',   splat: '210,240,255',  eOp: 0.38, sOp: 0.30, grain: 0.060 },
+  };
+
+  // Ink splats — persistent drip marks that slowly fade
+  var inkSplats = [];
+  var MAX_SPLATS = 40;
+  var inkFrame = 0;
+  var lastHumanoidX = 0, lastHumanoidY = 0;
+
+  function spawnInkSplat(wx, wy, palette) {
+    if (inkSplats.length >= MAX_SPLATS) inkSplats.shift();
+    inkSplats.push({
+      x: norm(wx, -100, 100, 0, window.innerWidth),
+      y: norm(wy, 25, 175, window.innerHeight * 0.92, window.innerHeight * 0.08),
+      r: 8 + Math.random() * 28,
+      alpha: 0.12 + Math.random() * 0.18,
+      life: 1.0,
+      decay: 0.003 + Math.random() * 0.004,
+      drips: Math.floor(Math.random() * 3),
+      dripLen: 10 + Math.random() * 28,
+      dripAngle: Math.PI * 0.3 + Math.random() * Math.PI * 1.4,
+      palette: palette,
+    });
+  }
+
+  function drawInkTick() {
+    inkFrame++;
+    var W = window.innerWidth, H = window.innerHeight;
+    if (_ic.width !== W || _ic.height !== H) inkResize();
+
+    _ictx.clearRect(0, 0, W, H);
+
+    var worldKey = (typeof currentWorld !== 'undefined') ? currentWorld : 'cosmos';
+    var pal = INK_WORLDS[worldKey] || INK_WORLDS.cosmos;
+
+    // ── 1. Vignette edge ink wash ──
+    var vg = _ictx.createRadialGradient(W/2, H/2, H * 0.28, W/2, H/2, Math.max(W, H) * 0.78);
+    vg.addColorStop(0,   'rgba(' + pal.edge + ',0)');
+    vg.addColorStop(0.6, 'rgba(' + pal.edge + ',' + (pal.eOp * 0.4).toFixed(3) + ')');
+    vg.addColorStop(1,   'rgba(' + pal.edge + ',' + pal.eOp.toFixed(3) + ')');
+    _ictx.fillStyle = vg;
+    _ictx.fillRect(0, 0, W, H);
+
+    // ── 2. Ink grain texture (subtle noise) ──
+    if (inkFrame % 2 === 0) {
+      var grainCount = Math.floor(W * H * pal.grain * 0.00008);
+      _ictx.fillStyle = 'rgba(' + pal.splat + ',0.18)';
+      for (var gi = 0; gi < grainCount; gi++) {
+        var gx = Math.random() * W, gy = Math.random() * H;
+        _ictx.fillRect(gx | 0, gy | 0, 1, 1);
+      }
+    }
+
+    // ── 3. Spawn ink splats from astronaut movement ──
+    if (typeof humanoid !== 'undefined' && humanoid && humanoid.mesh && STATUS === 'playing') {
+      var hx = humanoid.mesh.position.x, hy = humanoid.mesh.position.y;
+      var spd2 = Math.sqrt(butterfly.vx * butterfly.vx + butterfly.vy * butterfly.vy);
+      var moved = Math.sqrt((hx - lastHumanoidX) * (hx - lastHumanoidX) + (hy - lastHumanoidY) * (hy - lastHumanoidY));
+      if (moved > 1.2 && inkFrame % 5 === 0) {
+        spawnInkSplat(hx, hy, pal);
+      }
+      // Extra splats on fast movement
+      if (spd2 > 5 && inkFrame % 20 === 0) {
+        spawnInkSplat(hx + (Math.random()-0.5)*12, hy + (Math.random()-0.5)*12, pal);
+      }
+      lastHumanoidX = hx; lastHumanoidY = hy;
+    }
+
+    // ── 4. Draw & age splats ──
+    for (var si = inkSplats.length - 1; si >= 0; si--) {
+      var s = inkSplats[si];
+      s.life -= s.decay;
+      if (s.life <= 0) { inkSplats.splice(si, 1); continue; }
+
+      var a = s.alpha * s.life * pal.sOp / 0.22;
+
+      // Main splat blob
+      var sg = _ictx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r);
+      sg.addColorStop(0,   'rgba(' + s.palette.splat + ',' + (a * 0.9).toFixed(3) + ')');
+      sg.addColorStop(0.5, 'rgba(' + s.palette.splat + ',' + (a * 0.4).toFixed(3) + ')');
+      sg.addColorStop(1,   'rgba(' + s.palette.splat + ',0)');
+      _ictx.fillStyle = sg;
+      _ictx.beginPath();
+      _ictx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      _ictx.fill();
+
+      // Ink drips below splat
+      for (var di2 = 0; di2 < s.drips; di2++) {
+        var dang = s.dripAngle + di2 * 0.5 - 0.25;
+        var dlen = s.dripLen * (0.6 + di2 * 0.3) * s.life;
+        var dw   = (2 + di2) * s.life;
+        var dx1 = s.x + Math.cos(dang) * s.r * 0.6;
+        var dy1 = s.y + Math.sin(dang) * s.r * 0.6;
+        var dx2 = dx1 + Math.cos(dang) * dlen;
+        var dy2 = dy1 + Math.sin(dang) * dlen;
+        var lg = _ictx.createLinearGradient(dx1, dy1, dx2, dy2);
+        lg.addColorStop(0, 'rgba(' + s.palette.splat + ',' + (a * 0.7).toFixed(3) + ')');
+        lg.addColorStop(1, 'rgba(' + s.palette.splat + ',0)');
+        _ictx.strokeStyle = lg;
+        _ictx.lineWidth   = dw;
+        _ictx.lineCap     = 'round';
+        _ictx.beginPath();
+        _ictx.moveTo(dx1, dy1);
+        _ictx.lineTo(dx2, dy2);
+        _ictx.stroke();
+      }
+    }
+
+
+
+    requestAnimationFrame(drawInkTick);
+  }
+
+  // Start after scene is ready
+  window.addEventListener('load', function() {
+    setTimeout(drawInkTick, 800);
+  });
+})();
+
+</script>
+</body>
+</html>
