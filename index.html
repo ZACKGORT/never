@@ -299,7 +299,7 @@ body.is-dragging *{user-select:none;}
 #mob-backdrop.on{display:block;opacity:1;}
 
 /* ─── COMPOSER ─── */
-#composer{flex-shrink:0;padding:8px 16px 14px;background:transparent;position:relative;z-index:10;}
+#composer{flex-shrink:0;padding:8px 16px 14px;padding-bottom:max(14px, calc(env(safe-area-inset-bottom) + 6px));background:transparent;position:relative;z-index:10;}
 .c-card{
   max-width:680px;margin:0 auto;
   background:var(--glass);
@@ -638,6 +638,65 @@ body{background:#020111;}
 .fw-send-btn:hover{opacity:0.84;}
 .fw-send-btn:disabled{opacity:0.4;cursor:not-allowed;}
 
+/* ─── ORB DETAIL WIDGET ─── */
+#orb-detail{
+  position:fixed;z-index:8500;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0.94);
+  width:min(320px,calc(100vw - 40px));
+  background:var(--glass-2);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-b2);border-radius:16px;
+  box-shadow:var(--shadow),0 0 60px rgba(104,195,192,0.12);
+  opacity:0;pointer-events:none;
+  transition:opacity .22s ease,transform .22s cubic-bezier(.34,1.56,.64,1);
+}
+#orb-detail.open{opacity:1;pointer-events:all;transform:translate(-50%,-50%) scale(1);}
+.od-head{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 14px 10px;
+  border-bottom:1px solid var(--glass-b);
+}
+.od-orb-dot{
+  width:10px;height:10px;border-radius:50%;flex-shrink:0;
+  box-shadow:0 0 8px currentColor;
+}
+.od-label{font-family:var(--mono);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-3);flex:1;}
+.od-close{width:20px;height:20px;border:none;background:transparent;cursor:pointer;color:var(--ink-3);font-size:11px;display:flex;align-items:center;justify-content:center;border-radius:3px;transition:all .13s;padding:0;}
+.od-close:hover{background:var(--glass-3);color:var(--ink);}
+.od-body{padding:14px 14px 6px;display:flex;flex-direction:column;gap:10px;}
+.od-task{
+  font-family:var(--serif);font-style:italic;font-size:15px;
+  color:var(--ink);line-height:1.4;letter-spacing:-0.01em;
+}
+.od-divider{height:1px;background:var(--glass-b);margin:2px 0;}
+.od-shimmer-rows{display:flex;flex-direction:column;gap:6px;}
+.od-shimmer{
+  height:8px;border-radius:4px;
+  background:linear-gradient(90deg,var(--glass-3) 25%,rgba(104,195,192,0.09) 50%,var(--glass-3) 75%);
+  background-size:200% 100%;
+  animation:orb-shimmer 1.8s ease-in-out infinite;
+}
+.od-shimmer:nth-child(1){width:88%;}
+.od-shimmer:nth-child(2){width:72%;}
+.od-shimmer:nth-child(3){width:60%;}
+@keyframes orb-shimmer{
+  0%{background-position:200% 0}
+  100%{background-position:-200% 0}
+}
+.od-hint{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--ink-3);padding:2px 0;}
+.od-foot{
+  display:flex;align-items:center;justify-content:flex-end;gap:6px;
+  padding:10px 14px 12px;border-top:1px solid var(--glass-b);margin-top:4px;
+}
+.od-dismiss{font-family:var(--sans);font-size:9px;letter-spacing:0.1em;text-transform:lowercase;color:var(--ink-3);background:transparent;border:1px solid var(--glass-b);border-radius:100px;padding:5px 12px;cursor:pointer;transition:all .14s;}
+.od-dismiss:hover{border-color:var(--glass-b2);color:var(--ink-2);}
+.od-inject{font-family:var(--sans);font-size:9px;letter-spacing:0.12em;text-transform:lowercase;color:#020111;background:var(--teal);border:none;border-radius:100px;padding:5px 14px;cursor:pointer;font-weight:600;transition:opacity .14s;}
+.od-inject:hover{opacity:0.84;}
+/* backdrop */
+#orb-backdrop{position:fixed;inset:0;z-index:8400;background:rgba(0,0,0,0.35);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .2s;}
+#orb-backdrop.on{opacity:1;pointer-events:all;}
+
 /* ─── ACTIVE-LIGHT: composer lifts to white on focus ─── */
 .c-card:focus-within{
   background:#ffffff !important;
@@ -696,27 +755,109 @@ body{background:#020111;}
 .ctx-widget:focus-within .ov-discard{color:#aaa;border-color:rgba(0,0,0,0.10);}
 .ctx-widget:focus-within .ov-discard:hover{color:#333;border-color:rgba(0,0,0,0.20);}
 
-/* ─── FETCH TOAST (persistent) ─── */
+/* ─── ORB STRIP (above composer) ─── */
+#orb-strip{
+  flex-shrink:0;
+  display:none;
+  align-items:center;
+  gap:10px;
+  padding:8px 20px 4px;
+  position:relative;z-index:10;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+#orb-strip::-webkit-scrollbar{display:none;}
+#orb-strip.has-orbs{display:flex;}
+.orb-pip-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  cursor:pointer;flex-shrink:0;
+  opacity:0;transform:translateY(6px);
+  transition:opacity .25s ease,transform .25s ease;
+}
+.orb-pip-wrap.in{opacity:1;transform:translateY(0);}
+.orb-pip-wrap:hover .orb-pip{transform:scale(1.25);filter:brightness(1.3);}
+.orb-pip-wrap:hover .orb-pip-label{color:var(--ink-2);}
+.orb-pip{
+  width:22px;height:22px;border-radius:50%;
+  position:relative;
+  transition:transform .15s ease,filter .15s ease;
+  box-shadow:0 0 10px currentColor;
+}
+.orb-pip::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 35% 32%, rgba(255,255,255,0.55) 0%, transparent 65%);
+}
+.orb-pip-label{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.08em;
+  color:var(--ink-3);white-space:nowrap;max-width:72px;
+  overflow:hidden;text-overflow:ellipsis;text-align:center;
+  transition:color .15s;
+}
+.orb-strip-lbl{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--ink-3);white-space:nowrap;flex-shrink:0;padding-right:4px;
+}
+
+
 #fetch-toast{
   position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-100%);
   z-index:8500;
-  background:var(--glass-2);
+  background:rgba(6,4,22,0.92);
   backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
-  border:1px solid var(--glass-b2);border-bottom-left-radius:10px;border-bottom-right-radius:10px;
-  padding:7px 14px;
+  border:1px solid transparent;
+  border-bottom-left-radius:12px;border-bottom-right-radius:12px;
+  padding:8px 16px 9px;
   display:flex;align-items:center;gap:10px;
-  min-width:260px;max-width:420px;
-  box-shadow:0 4px 24px rgba(0,0,0,0.5);
-  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  min-width:280px;max-width:440px;
+  box-shadow:0 6px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(104,195,192,0.18);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
   cursor:default;
+  /* animated gradient border via background-clip trick */
+  background-clip:padding-box;
+  position:fixed;
+}
+#fetch-toast::before {
+  content:'';
+  position:absolute;inset:-1px;
+  border-radius:inherit;
+  background:linear-gradient(90deg,
+    rgba(104,195,192,0.0) 0%,
+    rgba(104,195,192,0.7) 25%,
+    rgba(160,120,220,0.8) 50%,
+    rgba(104,195,192,0.7) 75%,
+    rgba(104,195,192,0.0) 100%
+  );
+  background-size:200% 100%;
+  animation:toast-border-flow 2.4s linear infinite;
+  z-index:-1;
+  border-radius:inherit;
+}
+@keyframes toast-border-flow{
+  0%{background-position:200% 0}
+  100%{background-position:-200% 0}
 }
 #fetch-toast.visible{transform:translateX(-50%) translateY(0);}
-.ft-paw{font-size:13px;animation:paw-bounce 0.8s infinite alternate ease-in-out;}
-@keyframes paw-bounce{from{transform:translateY(0)}to{transform:translateY(-3px)}}
-.ft-label{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap;}
-.ft-task{font-family:var(--sans);font-size:11px;color:var(--ink-2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ft-status{font-family:var(--mono);font-size:9px;color:var(--teal);letter-spacing:0.08em;white-space:nowrap;animation:status-pulse 1.5s infinite;}
-@keyframes status-pulse{0%,100%{opacity:1}50%{opacity:0.45}}
+.ft-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;
+  box-shadow:0 0 8px var(--teal), 0 0 16px rgba(104,195,192,0.5);
+  animation:ft-dot-pulse 1.1s ease-in-out infinite;
+}
+@keyframes ft-dot-pulse{
+  0%,100%{transform:scale(1);opacity:1}
+  50%{transform:scale(1.55);opacity:0.6}
+}
+.ft-dot.done{
+  animation:none;
+  background:#34d399;
+  box-shadow:0 0 10px #34d399, 0 0 22px rgba(52,211,153,0.5);
+}
+.ft-paw{font-size:14px;animation:paw-bounce 0.7s infinite alternate ease-in-out;}
+@keyframes paw-bounce{from{transform:translateY(0)}to{transform:translateY(-4px)}}
+.ft-label{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(104,195,192,0.7);white-space:nowrap;}
+.ft-task{font-family:var(--sans);font-size:11px;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
+.ft-status{font-family:var(--mono);font-size:9px;color:var(--teal);letter-spacing:0.1em;white-space:nowrap;animation:status-pulse 1.2s ease-in-out infinite;}
+@keyframes status-pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+.ft-status.done-status{animation:none;color:#34d399;font-weight:600;}
 .ft-elapsed{font-family:var(--mono);font-size:9px;color:var(--ink-3);letter-spacing:0.06em;white-space:nowrap;}
 .ft-cancel{
   width:18px;height:18px;border:none;background:transparent;cursor:pointer;
@@ -726,7 +867,7 @@ body{background:#020111;}
   transition:background .12s,color .12s;
 }
 .ft-cancel:hover{background:var(--glass-3);color:var(--ink);}
-[data-theme="light"] #fetch-toast{box-shadow:none;border-color:rgba(0,0,0,0.10);}
+[data-theme="light"] #fetch-toast{background:#fff;color:var(--ink);}
 [data-theme="light"] .ft-cancel:hover{background:rgba(0,0,0,0.06);color:var(--ink);}
 
 /* fetch context menu additions */
@@ -741,10 +882,18 @@ body{background:#020111;}
   transition:opacity .12s ease,transform .12s ease;
 }
 #fetch-ctx-menu.open{opacity:1;pointer-events:all;transform:scale(1) translateY(0);}
+.fetch-recent-label{font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-3);padding:4px 10px 2px;display:block;}
+.fetch-recent-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;cursor:pointer;transition:background .11s;}
+.fetch-recent-item:hover{background:var(--glass-3);}
+.fetch-recent-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);opacity:0.6;flex-shrink:0;}
+.fetch-recent-text{font-family:var(--sans);font-size:11px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}
+.fetch-recent-clear{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--ink-3);padding:3px 10px 5px;cursor:pointer;display:block;transition:color .11s;}
+.fetch-recent-clear:hover{color:var(--ink-2);}
 </style>
 </head>
 <body>
 <div id="ne-bg"></div>
+<div id="orb-hit-flash" style="position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 0.4s ease;"></div>
 <div id="nebula-overlay"></div>
 
 <div id="header">
@@ -864,6 +1013,11 @@ body{background:#020111;}
   <div class="mopt" data-m="claude-haiku-4-5-20251001" onclick="selModel(this)">claude haiku 4.5</div>
 </div>
 
+<!-- ─── ORB STRIP (fetch results, above composer) ─── -->
+<div id="orb-strip">
+  <span class="orb-strip-lbl">results</span>
+</div>
+
 <div id="composer">
   <div class="c-card">
     <div class="intent-bar">
@@ -907,10 +1061,18 @@ body{background:#020111;}
 
 <!-- ─── RIGHT-CLICK CONTEXT MENU ─── -->
 <div id="ctx-menu">
-  <div class="ctx-item" id="ctx-fetch" onclick="openFetchWidget()">
+  <div class="ctx-item" id="ctx-fetch" onclick="openFetchWidget()" oncontextmenu="renderFetchCtxRecents();openFetchCtxMenu(event)">
     <span class="ctx-item-icon">🐾</span>
     <span class="ctx-item-label">play fetch</span>
     <span class="ctx-item-hint">send wolfie</span>
+  </div>
+  <div id="ctx-orb-block" style="display:none;">
+    <div class="ctx-menu-sep"></div>
+    <div class="ctx-item" onclick="jumpToOrb();closeCtxMenu()">
+      <span class="ctx-item-icon" id="ctx-orb-icon">◉</span>
+      <span class="ctx-item-label">jump to result orb</span>
+      <span class="ctx-item-hint">scroll to face</span>
+    </div>
   </div>
   <div class="ctx-menu-sep"></div>
   <div class="ctx-item" onclick="newChat();closeCtxMenu()">
@@ -933,6 +1095,36 @@ body{background:#020111;}
   <div class="ctx-item danger" onclick="cancelFetch()">
     <span class="ctx-item-icon">✕</span>
     <span class="ctx-item-label">cancel fetch</span>
+  </div>
+  <div id="fetch-recents-block" style="display:none;">
+    <div class="ctx-menu-sep"></div>
+    <span class="fetch-recent-label">recently fetched</span>
+    <div id="fetch-recents-list"></div>
+    <span class="fetch-recent-clear" onclick="clearFetchRecents()">clear history</span>
+  </div>
+</div>
+
+<!-- ─── ORB DETAIL WIDGET ─── -->
+<div id="orb-backdrop" onclick="closeOrbDetail()"></div>
+<div id="orb-detail">
+  <div class="od-head">
+    <span class="od-orb-dot" id="od-dot" style="background:#a78bfa;color:#a78bfa;"></span>
+    <span class="od-label">wolfie fetched this</span>
+    <button class="od-close" onclick="closeOrbDetail()">✕</button>
+  </div>
+  <div class="od-body">
+    <div class="od-task" id="od-task-text">—</div>
+    <div class="od-divider"></div>
+    <div class="od-shimmer-rows">
+      <div class="od-shimmer"></div>
+      <div class="od-shimmer"></div>
+      <div class="od-shimmer"></div>
+    </div>
+    <div class="od-hint" id="od-hint">gathering results…</div>
+  </div>
+  <div class="od-foot">
+    <button class="od-dismiss" onclick="dismissOrb()">release orb</button>
+    <button class="od-inject" onclick="injectOrbResult()">inject → chat</button>
   </div>
 </div>
 
@@ -958,8 +1150,8 @@ body{background:#020111;}
 
 <!-- ─── PERSISTENT FETCH TOAST ─── -->
 <div id="fetch-toast" oncontextmenu="openFetchCtxMenu(event)">
+  <span class="ft-dot" id="ft-dot"></span>
   <span class="ft-paw">🐾</span>
-  <span class="ft-label">wolfie</span>
   <span class="ft-task" id="ft-task-text">fetching…</span>
   <span class="ft-status" id="ft-status">on it</span>
   <span class="ft-elapsed" id="ft-elapsed">0s</span>
@@ -967,6 +1159,18 @@ body{background:#020111;}
 </div>
 
 <script>
+// ── Orb vars predeclared so both script blocks can access them ───────────────
+// Second block re-initializes with real THREE objects after THREE.js loads.
+var fetchOrb = null;
+var lastFetchTask = '';
+var orbRaycaster = null;
+var orbMouseNDC = null;
+var activeBursts = [];
+var ORB_COLORS = [0xa78bfa, 0x60a5fa, 0x34d399, 0xfbbf24, 0xf472b6, 0x38bdf8, 0xfb923c];
+var ORB_RADIUS = 280;       // satellite orbit — clear of fog, visible above planet limb
+var ORB_BAND_Y_OFFSET = 650; // sea.y(-600) + 650 = y=50, near lower-center of screen
+// ─────────────────────────────────────────────────────────────────────────────
+
 let apiKey=localStorage.getItem('sc_key')||'';
 let model='claude-sonnet-4-5';
 let intent=null;
@@ -1154,7 +1358,103 @@ function toast(msg,type){const t=document.getElementById('toast');t.textContent=
     if (menuOpen && !menu.contains(e.target)) closeCtxMenu();
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCtxMenu(); });
+
+  // Show/hide the "jump to orb" item based on whether a fetchOrb exists
+  const origOpen = openCtxMenu;
+  document.addEventListener('contextmenu', () => {
+    const block = document.getElementById('ctx-orb-block');
+    if (block) block.style.display = fetchOrb ? '' : 'none';
+  });
 })();
+
+// ─── JUMP TO ORB ─────────────────────────────────────────────────────────────
+// Rotates the planet so the fetch orb sweeps to the front face (angle = 0).
+// Uses the existing scroll/reverseLerp system for a natural feel.
+window.jumpToOrb = function() {
+  if (!fetchOrb || typeof sea === 'undefined' || !sea) return;
+  // Current angle of orb: sea.mesh.rotation.z + fetchOrb.angleOffset
+  // We want cos(angle) = 1, i.e. angle = 0 (mod 2π)
+  // So we need sea.mesh.rotation.z = -fetchOrb.angleOffset (mod 2π)
+  var targetRotZ = -fetchOrb.angleOffset;
+  // Normalise to be within one full rotation of where we are now
+  var curr = sea.mesh.rotation.z;
+  while (targetRotZ < curr - Math.PI) targetRotZ += Math.PI * 2;
+  while (targetRotZ > curr + Math.PI) targetRotZ -= Math.PI * 2;
+  // Animate via gsap if available, else snap
+  if (typeof gsap !== 'undefined') {
+    gsap.to(sea.mesh.rotation, { z: targetRotZ, duration: 1.4, ease: 'power2.inOut' });
+  } else {
+    sea.mesh.rotation.z = targetRotZ;
+  }
+  toast('rotating to orb…', '');
+};
+
+// ─── ORB STRIP (inline result pips above composer) ────────────────────────────
+// Each completed fetch result gets a colored orb pip. Clicking jumps to it in 3D
+// and opens the detail overlay. Orbs accumulate until dismissed.
+var orbStrip = []; // [{ id, color, task, pip }]
+var orbStripIdCounter = 0;
+
+function addOrbToStrip(color, task) {
+  var id = ++orbStripIdCounter;
+  var hex = '#' + color.toString(16).padStart(6, '0');
+  var strip = document.getElementById('orb-strip');
+  if (!strip) return id;
+
+  var wrap = document.createElement('div');
+  wrap.className = 'orb-pip-wrap';
+  wrap.dataset.orbId = id;
+
+  var pip = document.createElement('div');
+  pip.className = 'orb-pip';
+  pip.style.background = hex;
+  pip.style.color = hex;
+  pip.style.boxShadow = '0 0 8px ' + hex + ', 0 0 18px ' + hex + '66';
+
+  var lbl = document.createElement('div');
+  lbl.className = 'orb-pip-label';
+  lbl.textContent = task.length > 18 ? task.slice(0, 16) + '…' : task;
+  lbl.title = task;
+
+  wrap.appendChild(pip);
+  wrap.appendChild(lbl);
+  wrap.onclick = function() { jumpToOrb(); openOrbDetail(); };
+
+  strip.appendChild(wrap);
+  strip.classList.add('has-orbs');
+
+  // Animate in
+  requestAnimationFrame(() => { requestAnimationFrame(() => { wrap.classList.add('in'); }); });
+
+  orbStrip.push({ id, color, task, pip: wrap });
+  return id;
+}
+
+function removeOrbFromStrip(id) {
+  var strip = document.getElementById('orb-strip');
+  var entry = orbStrip.find(o => o.id === id);
+  if (entry && entry.pip) {
+    entry.pip.classList.remove('in');
+    setTimeout(() => { if (entry.pip.parentNode) entry.pip.parentNode.removeChild(entry.pip); }, 280);
+  }
+  orbStrip = orbStrip.filter(o => o.id !== id);
+  if (orbStrip.length === 0 && strip) strip.classList.remove('has-orbs');
+}
+
+
+const FETCH_RECENT_KEY = 'nev_fetch_recent';
+function saveFetchRecent(task) {
+  let r = getFetchRecents();
+  r = [task, ...r.filter(x => x !== task)].slice(0, 6);
+  try { localStorage.setItem(FETCH_RECENT_KEY, JSON.stringify(r)); } catch(e){}
+}
+function getFetchRecents() {
+  try { return JSON.parse(localStorage.getItem(FETCH_RECENT_KEY) || '[]'); } catch(e){ return []; }
+}
+function clearFetchRecents() {
+  try { localStorage.removeItem(FETCH_RECENT_KEY); } catch(e){}
+  if (window.renderFetchCtxRecents) window.renderFetchCtxRecents();
+}
 
 // ─── FETCH WIDGET ────────────────────────────────────────────────────────────
 let fetchState = null; // null | { task, startTime, timer }
@@ -1184,8 +1484,14 @@ window.sendFetch = function() {
 
   closeFetchWidget();
 
-  // Trigger Wolfgang excited orbit + zip-off animation
+  // Trigger Wolfgang blast-off animation immediately
   if (window._wolfiePlayFetch) window._wolfiePlayFetch();
+  lastFetchTask = task;
+  saveFetchRecent(task);
+
+  // Spawn the fetch orb in the planet's orbit immediately —
+  // visible as a background layer while wolfie is out fetching
+  if (window.spawnFetchOrb) window.spawnFetchOrb(task);
 
   // Start fetch state
   const startTime = Date.now();
@@ -1221,19 +1527,43 @@ function completeFetch(task) {
   // Wolfie trots back
   if (window._wolfieReturn) window._wolfieReturn();
 
-  document.getElementById('ft-status').textContent = 'done ✓';
-  document.getElementById('ft-status').style.animation = 'none';
-  document.getElementById('ft-status').style.color = 'var(--teal)';
+  // Add a pip to the inline orb strip above the composer
+  if (fetchOrb) {
+    var stripId = addOrbToStrip(fetchOrb.color, task);
+    fetchOrb._stripId = stripId;
+  }
+
+  // Pulse the orb bright to signal wolfie's return
+  if (fetchOrb && fetchOrb.light) {
+    fetchOrb.light.intensity = 6.0;
+    setTimeout(function() { if (fetchOrb && fetchOrb.light) fetchOrb.light.intensity = 1.8; }, 600);
+  }
+
+  // Get orb color for the done flash
+  var orbHex = fetchOrb ? ('#' + fetchOrb.color.toString(16).padStart(6,'0')) : '#34d399';
+
+  // Switch toast to "done" state: stop animation, flash with orb color
+  var dot = document.getElementById('ft-dot');
+  var statusEl = document.getElementById('ft-status');
+  var toastEl = document.getElementById('fetch-toast');
+  if (dot) { dot.classList.add('done'); dot.style.background = orbHex; dot.style.boxShadow = '0 0 10px '+orbHex+', 0 0 22px '+orbHex+'88'; }
+  if (statusEl) { statusEl.textContent = 'done ✓'; statusEl.classList.add('done-status'); statusEl.style.color = orbHex; statusEl.style.animation = 'none'; }
+  if (toastEl) {
+    toastEl.style.setProperty('--orb-color', orbHex);
+    // Replace the flowing border with an orb-colored glow
+    toastEl.style.boxShadow = '0 6px 32px rgba(0,0,0,0.6), 0 0 0 1px '+orbHex+'88, 0 0 24px '+orbHex+'44';
+  }
 
   // Dismiss toast after 3s
   setTimeout(() => {
     document.getElementById('fetch-toast').classList.remove('visible');
     setTimeout(() => {
-      document.getElementById('ft-status').style.animation = '';
-      document.getElementById('ft-status').style.color = '';
+      if (dot) { dot.classList.remove('done'); dot.style.background = ''; dot.style.boxShadow = ''; }
+      if (statusEl) { statusEl.textContent = 'on it'; statusEl.classList.remove('done-status'); statusEl.style.animation = ''; statusEl.style.color = ''; }
+      if (toastEl) { toastEl.style.boxShadow = ''; }
     }, 400);
     fetchState = null;
-    toast('wolfie is back · results incoming', 'ok');
+    toast('wolfie is back · orb orbiting the planet', 'ok');
   }, 3000);
 }
 
@@ -1312,10 +1642,36 @@ window.modifyFetch = function() {
   const menu = document.getElementById('fetch-ctx-menu');
   let open = false;
 
+  window.renderFetchCtxRecents = function() {
+    const recents = (function(){
+      try { return JSON.parse(localStorage.getItem('nev_fetch_recent') || '[]'); } catch(e){ return []; }
+    })();
+    const block = document.getElementById('fetch-recents-block');
+    const list  = document.getElementById('fetch-recents-list');
+    if (!recents.length) { block.style.display = 'none'; return; }
+    block.style.display = 'block';
+    list.innerHTML = recents.map(function(r) {
+      var safe = r.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+      return '<div class="fetch-recent-item" onclick="refetch(\'' + safe + '\')">' +
+             '<span class="fetch-recent-dot"></span>' +
+             '<span class="fetch-recent-text">' + r.replace(/</g,'&lt;') + '</span>' +
+             '</div>';
+    }).join('');
+  };
+
+  window.refetch = function(task) {
+    closeFetchCtxMenu();
+    // Re-send as a new fetch
+    if (fetchState) { toast('wolfie is already out fetching!', 'err'); return; }
+    document.getElementById('fetch-input').value = task;
+    sendFetch();
+  };
+
   window.openFetchCtxMenu = function(e) {
     e.preventDefault(); e.stopPropagation();
-    const x = Math.min(e.clientX, window.innerWidth  - 190);
-    const y = Math.min(e.clientY, window.innerHeight - 100);
+    window.renderFetchCtxRecents();
+    const x = Math.min(e.clientX, window.innerWidth  - 210);
+    const y = Math.min(e.clientY, window.innerHeight - 220);
     menu.style.left = x + 'px';
     menu.style.top  = y + 'px';
     menu.classList.add('open');
@@ -1398,7 +1754,7 @@ function makeBox(w, h, d, mat) {
 }
 function RagdollHuman() {
   this.mesh = new THREE.Object3D();
-  this.mesh.rotation.y = Math.PI * 0.25;
+  this.mesh.rotation.y = Math.PI * 0.25; // 3/4 turn — faces away/right like wolfie
   this.baseRotX = -0.55;
   this.baseRotZ = 0;
   this.flipX = 0;
@@ -1594,7 +1950,8 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   this.mesh.rotation.z = this.baseRotZ + this.flipZ;
   this.mesh.rotation.x = this.baseRotX + this.flipX;
 
-  // Facing: always try to face the butterfly (cursor)
+  // Facing: always faces away from viewer at 3/4 angle, biased by cursor (matches wolfie)
+  // Low altitude = skydiver (face down = high rotX, yaw sweeps); high = more vertical
   var bfAngle;
   if (typeof dx !== 'undefined' && dx !== null) {
     var facingBias = Math.max(-1, Math.min(1, dx / 120));
@@ -1644,17 +2001,19 @@ RagdollHuman.prototype.update = function(accelX, accelY, speed, dx, dy) {
   var butterflyReachX = -bfNy * reachUrgency * 1.2 * momentumLimiter * reach;
   var butterflyReachZ = -bfNx * reachUrgency * 0.6 * momentumLimiter * reach;
 
-  var shoulderZ = 0.55 + poseLow * (-0.43) + poseHigh * 0.30;
-  var elbowZ    = 0.20 + poseLow * (-0.10) + poseHigh * 0.50;
+  var shoulderZ = 0.65 + poseLow * (-0.30) + poseHigh * 0.40;  // wider splay when flying
+  var elbowZ    = 0.28 + poseLow * (-0.08) + poseHigh * 0.45;
 
-  this.joints[0].restX = armReach - supermanPull + butterflyReachX + Math.sin(dRS.phaseX) * dRS.ampX + armTrail;
+  // Forward-flying ragdoll: arms trail back and spread wide
+  var flyTrail = armTrail * 1.1;
+  this.joints[0].restX = -0.05 - supermanPull + butterflyReachX + Math.sin(dRS.phaseX) * dRS.ampX + flyTrail;
   this.joints[0].restZ = (-shoulderZ + butterflyReachZ) + Math.sin(dRS.phaseZ) * dRS.ampZ - sideDrift;
-  this.joints[1].restX = armReach - supermanPull + butterflyReachX + Math.sin(dLS.phaseX) * dLS.ampX + armTrail;
+  this.joints[1].restX = -0.05 - supermanPull + butterflyReachX + Math.sin(dLS.phaseX) * dLS.ampX + flyTrail;
   this.joints[1].restZ = ( shoulderZ - butterflyReachZ) + Math.sin(dLS.phaseZ) * dLS.ampZ + sideDrift;
-  this.joints[2].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dRE.phaseX) * dRE.ampX + armTrail * 0.6;
-  this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.5) + Math.sin(dRE.phaseZ) * dRE.ampZ - sideDrift * 0.75;
-  this.joints[3].restX = 0.10 + centerProximity * -0.8 + butterflyReachX * 0.65 + Math.sin(dLE.phaseX) * dLE.ampX + armTrail * 0.6;
-  this.joints[3].restZ = ( elbowZ - butterflyReachZ * 0.5) + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.75;
+  this.joints[2].restX = 0.08 + centerProximity * -0.6 + butterflyReachX * 0.55 + Math.sin(dRE.phaseX) * dRE.ampX + flyTrail * 0.5;
+  this.joints[2].restZ = (-elbowZ + butterflyReachZ * 0.4) + Math.sin(dRE.phaseZ) * dRE.ampZ - sideDrift * 0.6;
+  this.joints[3].restX = 0.08 + centerProximity * -0.6 + butterflyReachX * 0.55 + Math.sin(dLE.phaseX) * dLE.ampX + flyTrail * 0.5;
+  this.joints[3].restZ = ( elbowZ - butterflyReachZ * 0.4) + Math.sin(dLE.phaseZ) * dLE.ampZ + sideDrift * 0.6;
 
   // During scroll: elbows target neutral hang (no bend, no lock) — spring stays fully active
   if (scrollIntensity > 0) {
@@ -2246,11 +2605,227 @@ var wolfieOrbitCount = 0;
 var wolfieExitX = 0;
 var wolfieExitVx = 0, wolfieExitVy = 0;
 
+// ─── FETCH ORB ──────────────────────────────────────────────────────────────
+// Vars predeclared in first script block. Initialize THREE-dependent ones here.
+orbRaycaster = new THREE.Raycaster();
+orbMouseNDC = new THREE.Vector2();
+
+// Active burst particles (matches wolfie Burst system)
+var activeBursts = [];
+function OrbBurst(color, pos) {
+  this.mesh = new THREE.Object3D();
+  this.parts = [];
+  var g = new THREE.TetrahedronGeometry(4, 0);
+  var m = new THREE.MeshPhongMaterial({ color: color, flatShading: true, transparent: true });
+  var n = 10;
+  for (var i = 0; i < n; i++) {
+    var p = new THREE.Mesh(g, m.clone());
+    var angle = (Math.PI * 2 * i) / n;
+    var speed = 2.5 + Math.random() * 2.5;
+    p.userData = {
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      vz: (Math.random() - 0.5) * speed,
+      vr: Math.random() * 0.25
+    };
+    this.mesh.add(p);
+    this.parts.push(p);
+  }
+  this.mesh.position.copy(pos);
+  scene.add(this.mesh);
+  this.life = 28;
+  activeBursts.push(this);
+}
+
+function updateBursts() {
+  for (var i = activeBursts.length - 1; i >= 0; i--) {
+    var b = activeBursts[i];
+    b.life--;
+    var frac = b.life / 28;
+    for (var j = 0; j < b.parts.length; j++) {
+      var p = b.parts[j];
+      p.position.x += p.userData.vx;
+      p.position.y += p.userData.vy;
+      p.position.z += p.userData.vz;
+      p.rotation.x += p.userData.vr;
+      p.userData.vx *= 0.92;
+      p.userData.vy *= 0.92;
+      p.userData.vz *= 0.92;
+      p.material.opacity = frac;
+    }
+    if (b.life <= 0) { scene.remove(b.mesh); activeBursts.splice(i, 1); }
+  }
+}
+
+// ORB_COLORS, ORB_RADIUS, ORB_BAND_Y_OFFSET predeclared in first script block.
+// Orb orbits as a satellite above the planet's visible upper limb.
+// Radius 280: at front face (cos=1) sits at z=280, only 80 units from camera — clear, no fog.
+// Y=50: sits near the lower-center of screen, above the planet horizon.
+// co-rotates via sea.mesh.rotation.z so scroll steers it.
+
+function spawnFetchOrb(task) {
+  window.spawnFetchOrb = spawnFetchOrb; // ensure accessible cross-block
+  if (fetchOrb) {
+    scene.remove(fetchOrb.mesh);
+    if (fetchOrb.light) scene.remove(fetchOrb.light);
+    fetchOrb = null;
+  }
+  if (!sea || !scene) return;
+
+  var color = ORB_COLORS[Math.floor(Math.random() * ORB_COLORS.length)];
+
+  // IcosahedronGeometry, flatShading — matches wolfie orb aesthetic
+  var geo = new THREE.IcosahedronGeometry(14, 1);
+  var mat = new THREE.MeshPhongMaterial({
+    color: color,
+    emissive: color,
+    emissiveIntensity: 0.45,
+    shininess: 60,
+    flatShading: true,
+    transparent: true,
+    opacity: 0.92
+  });
+  var mesh = new THREE.Mesh(geo, mat);
+  mesh.name = 'fetchOrb';
+  mesh.castShadow = true;
+
+  // Point light attached to orb — gives it real presence in the scene
+  var light = new THREE.PointLight(color, 1.8, 180);
+  mesh.add(light); // light travels with the mesh
+
+  // Lock angle relative to cylinder rotation so it co-rotates with the planet
+  // angleOffset bakes in the current rotation so it appears fixed on the surface
+  var angleOffset = -sea.mesh.rotation.z + Math.PI * 0.22;
+
+  fetchOrb = { mesh: mesh, light: light, angleOffset: angleOffset, task: task, color: color, hitCooldown: 0 };
+  scene.add(mesh);
+}
+
+// ORB_RADIUS = 280, ORB_BAND_Y_OFFSET = 650 — set in first script block.
+
+function updateOrbPosition() {
+  if (!fetchOrb || !sea) return;
+
+  // Co-rotate: angle locks to cylinder's Z rotation
+  var angle = sea.mesh.rotation.z + fetchOrb.angleOffset;
+  var bob = Math.sin(Date.now() * 0.0009) * 6; // gentle float
+
+  fetchOrb.mesh.position.set(
+    Math.sin(angle) * ORB_RADIUS,
+    sea.mesh.position.y + ORB_BAND_Y_OFFSET + bob,
+    Math.cos(angle) * ORB_RADIUS
+  );
+
+  // Pulse emissive and light intensity together
+  var pulse = 0.38 + 0.28 * Math.sin(Date.now() * 0.0024);
+  fetchOrb.mesh.material.emissiveIntensity = pulse;
+  if (fetchOrb.light) fetchOrb.light.intensity = 1.4 + 0.9 * Math.sin(Date.now() * 0.0024);
+
+  // Slow self-rotation for sparkle
+  fetchOrb.mesh.rotation.y += 0.014;
+  fetchOrb.mesh.rotation.x += 0.008;
+
+  // Collision with astronaut (hit = visual burst only, orb stays — inert)
+  if (fetchOrb.hitCooldown > 0) {
+    fetchOrb.hitCooldown--;
+  } else if (humanoid) {
+    var hx = humanoid.mesh.position.x;
+    var hy = humanoid.mesh.position.y;
+    // Project orb world position to screen-space for 2D distance check
+    // Use a simple 3D distance check but account for scale
+    var orbPos = fetchOrb.mesh.position;
+    // Humanoid is at z≈0, orb at z=ORB_RADIUS*cos(angle) — only collide when orb faces camera
+    var orbScreenZ = Math.cos(angle) * ORB_RADIUS; // positive = toward camera
+    if (orbScreenZ > 220) { // radius=280, so 220 = within ~38° of front face
+      // Project to humanoid 2D space: humanoid x/y is scene coords, orb x/y too
+      var dx = orbPos.x - hx;
+      var dy = orbPos.y - hy;
+      var dist2D = Math.sqrt(dx * dx + dy * dy);
+      if (dist2D < 28) {
+        // Hit flash burst at orb position — inert (orb stays)
+        new OrbBurst(fetchOrb.color, orbPos.clone());
+        // Screen flash
+        var flash = document.getElementById('orb-hit-flash');
+        if (flash) {
+          var hex = '#' + fetchOrb.color.toString(16).padStart(6, '0');
+          flash.style.background = 'radial-gradient(ellipse at center, ' + hex + '55 0%, transparent 70%)';
+          flash.style.opacity = '1';
+          flash.style.transition = 'none';
+          setTimeout(function() { flash.style.transition = 'opacity 0.4s ease'; flash.style.opacity = '0'; }, 40);
+        }
+        // Ragdoll rattle — no despawn, purely visual
+        if (typeof gsap !== 'undefined') {
+          gsap.to(humanoid, {
+            flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 0.8,
+            flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 0.5,
+            duration: 0.45, ease: 'power2.out'
+          });
+        }
+        fetchOrb.hitCooldown = 90; // ~1.5s cooldown before next hit registers
+      }
+    }
+  }
+}
+
+function openOrbDetail() {
+  if (!fetchOrb) return;
+  var hex = '#' + fetchOrb.color.toString(16).padStart(6, '0');
+  var dot = document.getElementById('od-dot');
+  dot.style.background = hex;
+  dot.style.color = hex;
+  dot.style.boxShadow = '0 0 10px ' + hex;
+  document.getElementById('od-task-text').textContent = fetchOrb.task;
+  document.getElementById('od-hint').textContent = 'wolfie returned · ready to inject';
+  document.getElementById('orb-detail').classList.add('open');
+  document.getElementById('orb-backdrop').classList.add('on');
+}
+
+window.closeOrbDetail = function() {
+  document.getElementById('orb-detail').classList.remove('open');
+  document.getElementById('orb-backdrop').classList.remove('on');
+};
+
+window.dismissOrb = function() {
+  closeOrbDetail();
+  if (fetchOrb) {
+    if (fetchOrb._stripId) removeOrbFromStrip(fetchOrb._stripId);
+    if (fetchOrb.light) scene.remove(fetchOrb.light);
+    scene.remove(fetchOrb.mesh);
+    fetchOrb.mesh.geometry.dispose();
+    fetchOrb.mesh.material.dispose();
+    fetchOrb = null;
+  }
+};
+
+window.injectOrbResult = function() {
+  if (!fetchOrb) return;
+  var task = fetchOrb.task;
+  closeOrbDetail();
+  if (fetchOrb._stripId) removeOrbFromStrip(fetchOrb._stripId);
+  if (fetchOrb.light) scene.remove(fetchOrb.light);
+  scene.remove(fetchOrb.mesh);
+  fetchOrb.mesh.geometry.dispose();
+  fetchOrb.mesh.material.dispose();
+  fetchOrb = null;
+  // Pre-fill the composer textarea
+  var ta = document.getElementById('prompt');
+  if (ta) {
+    ta.value = task;
+    ta.dispatchEvent(new Event('input'));
+    ta.focus();
+  }
+  toast('injected into composer', 'ok');
+};
+
 window._wolfiePlayFetch = function() {
   if (!companionPoodle) return;
-  wolfieMode = 'excited';
-  wolfieOrbitCount = 0;
-  wolfieOrbitAngle = companionPoodle.orbitAngle;
+  // Skip excited orbit — blast off immediately
+  wolfieMode = 'departing';
+  wolfieExitX = companionPoodle.px;
+  // Pick a random exit direction and zip diagonally off-screen
+  var goRight = companionPoodle.px >= 0;
+  companionPoodle.vx = goRight ? 22 : -22;
+  companionPoodle.vy = 6 + Math.random() * 6;
 };
 
 window._wolfieReturn = function() {
@@ -2297,7 +2872,6 @@ function init() {
   humanoid = new RagdollHuman();
   humanoid.mesh.scale.setScalar(0.25);
   humanoid.mesh.position.set(0, 100, 0);
-  humanoid.mesh.rotation.y = 0; // start facing camera (+Z)
   scene.add(humanoid.mesh);
   companionPoodle = new CompanionPoodle();
   companionPoodle.px=28; companionPoodle.py=88;
@@ -2306,6 +2880,15 @@ function init() {
   createAtmosphere();
   document.addEventListener('mousemove', function(e){
     mouse.x=-1+(e.clientX/W)*2; mouse.y=1-(e.clientY/H)*2;
+    // Pointer cursor when hovering the fetch orb
+    if (fetchOrb && camera) {
+      orbMouseNDC.set((e.clientX/W)*2-1, -(e.clientY/H)*2+1);
+      orbRaycaster.setFromCamera(orbMouseNDC, camera);
+      var h = orbRaycaster.intersectObject(fetchOrb.mesh, false);
+      document.getElementById('ne-bg').style.cursor = h.length > 0 ? 'pointer' : '';
+    } else {
+      document.getElementById('ne-bg').style.cursor = '';
+    }
   });
   loop();
 }
@@ -2342,41 +2925,17 @@ function loop() {
   humanoid.butterflyDx=bfDx; humanoid.butterflyDy=bfDy; humanoid.butterflyDist=bfDist;
   humanoid.update(butterfly.vx*0.003, butterfly.vy*0.003, 0, bfDx, bfDy);
 
-  // Camera-facing correction: the update() always pushes toward PI*0.75 (facing away).
-  // This stronger counter-pull keeps him turned toward us at equilibrium ~15–20°.
-  humanoid.mesh.rotation.y += (0 - humanoid.mesh.rotation.y) * 0.44;
-
   if (companionPoodle) {
     // ── Wolfie fetch state machine ──────────────────────────────────────────
-    if (wolfieMode === 'excited') {
-      // Force rapid tight circle around astronaut
-      wolfieOrbitAngle += 0.12;
-      var exX = humanoid.mesh.position.x + Math.cos(wolfieOrbitAngle) * 26;
-      var exY = humanoid.mesh.position.y + Math.sin(wolfieOrbitAngle) * 18;
-      companionPoodle.vx += (exX - companionPoodle.px) * 0.18;
-      companionPoodle.vy += (exY - companionPoodle.py) * 0.18;
-      companionPoodle.vx *= 0.78;
-      companionPoodle.vy *= 0.78;
-      companionPoodle.px += companionPoodle.vx;
-      companionPoodle.py += companionPoodle.vy;
-      companionPoodle.mesh.position.set(companionPoodle.px, companionPoodle.py, 16);
-      // Count orbits by angle wraps
-      if (wolfieOrbitAngle > wolfieOrbitCount * Math.PI * 2 + Math.PI * 4.5) {
-        wolfieMode = 'departing';
-        wolfieExitX = companionPoodle.px;
-        companionPoodle.vx = (companionPoodle.px > humanoid.mesh.position.x) ? 18 : -18;
-        companionPoodle.vy = -8;
-      }
-      // Tail wag override — super fast
-      companionPoodle.tail1Pivot.rotation.z = Math.sin(companionPoodle.animT * 22) * 2.2;
-      companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
-    } else if (wolfieMode === 'departing') {
+    if (wolfieMode === 'departing') {
       companionPoodle.vx *= 1.18;
-      companionPoodle.vy *= 0.92;
+      companionPoodle.vy *= 1.08;
       companionPoodle.px += companionPoodle.vx;
       companionPoodle.py += companionPoodle.vy;
       companionPoodle.mesh.position.set(companionPoodle.px, companionPoodle.py, 16);
-      if (Math.abs(companionPoodle.px) > 260 || companionPoodle.py < -80) {
+      // Tail wag super fast while zipping away
+      companionPoodle.tail1Pivot.rotation.z = Math.sin(companionPoodle.animT * 20) * 2.0;
+      if (Math.abs(companionPoodle.px) > 260 || companionPoodle.py > 280 || companionPoodle.py < -80) {
         wolfieMode = 'offscreen';
         companionPoodle.mesh.position.set(9999, 9999, 9999); // hide
       }
@@ -2390,11 +2949,14 @@ function loop() {
         wolfieMode = 'idle';
         companionPoodle.behavior = 'orbit';
         companionPoodle.behaviorTimer = 200;
+        // Orb already orbiting since send — wolfie return just triggers light pulse (done in completeFetch)
       }
     } else {
       companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
     }
   }
+  updateOrbPosition();
+  updateBursts();
   renderer.render(scene, camera);
 }
 
@@ -2411,7 +2973,17 @@ window.addEventListener('wheel', function(e) {
 // ── Left click → random tumble | Right click → reset pose ──────────────────
 window.addEventListener('pointerdown', function(e) {
   if (ambientPaused || !humanoid || typeof gsap === 'undefined') return;
-  if (e.target.closest('#header,#composer,#key-panel,#demo-bar,.ctx-widget,#mpick,#toast,#phil-card,button,input,textarea,select,label')) return;
+  if (e.target.closest('#header,#composer,#key-panel,#demo-bar,.ctx-widget,#mpick,#toast,#phil-card,#orb-detail,#orb-backdrop,button,input,textarea,select,label')) return;
+  // ── Orb raycast ─────────────────────────────────────────────────────────
+  if (e.button === 0 && fetchOrb && camera) {
+    orbMouseNDC.set(
+      (e.clientX / window.innerWidth) * 2 - 1,
+      -(e.clientY / window.innerHeight) * 2 + 1
+    );
+    orbRaycaster.setFromCamera(orbMouseNDC, camera);
+    var hits = orbRaycaster.intersectObject(fetchOrb.mesh, false);
+    if (hits.length > 0) { openOrbDetail(); return; }
+  }
   if (e.button === 0) {
     var rFlipX = (Math.random() * 2 - 1) * Math.PI * (2 + Math.random() * 2);
     var rFlipZ = (Math.random() * 2 - 1) * Math.PI * (Math.random() * 1.5);
