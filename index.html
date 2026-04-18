@@ -643,7 +643,7 @@ body{background:#020111;}
   position:fixed;z-index:8500;
   top:50%;left:50%;
   transform:translate(-50%,-50%) scale(0.94);
-  width:min(320px,calc(100vw - 40px));
+  width:min(360px,calc(100vw - 40px));
   background:var(--glass-2);
   backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
   border:1px solid var(--glass-b2);border-radius:16px;
@@ -807,14 +807,12 @@ body{background:#020111;}
   border:1px solid transparent;
   border-bottom-left-radius:12px;border-bottom-right-radius:12px;
   padding:8px 16px 9px;
-  display:flex;align-items:center;gap:10px;
+  display:flex;align-items:flex-start;flex-direction:column;gap:4px;
   min-width:280px;max-width:440px;
   box-shadow:0 6px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(104,195,192,0.18);
   transition:transform .35s cubic-bezier(.34,1.56,.64,1);
   cursor:default;
-  /* animated gradient border via background-clip trick */
   background-clip:padding-box;
-  position:fixed;
 }
 #fetch-toast::before {
   content:'';
@@ -889,12 +887,525 @@ body{background:#020111;}
 .fetch-recent-text{font-family:var(--sans);font-size:11px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}
 .fetch-recent-clear{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--ink-3);padding:3px 10px 5px;cursor:pointer;display:block;transition:color .11s;}
 .fetch-recent-clear:hover{color:var(--ink-2);}
+
+/* ─── FETCH SOURCE PILLS ─── */
+.fw-sources{display:flex;flex-direction:column;gap:6px;}
+.fw-src-lbl{font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-3);}
+.fw-src-pills{display:flex;flex-wrap:wrap;gap:5px;}
+.fw-src-pill{
+  font-family:var(--sans);font-size:9px;letter-spacing:0.08em;text-transform:lowercase;
+  color:var(--ink-3);border:1px solid var(--glass-b);border-radius:100px;
+  padding:4px 10px;cursor:pointer;background:transparent;
+  transition:all .13s;user-select:none;display:flex;align-items:center;gap:4px;
+}
+.fw-src-pill:hover{border-color:var(--glass-b2);color:var(--ink-2);background:var(--glass-3);}
+.fw-src-pill.sel{background:var(--teal-l);border-color:var(--teal-b);color:var(--teal);}
+.fw-src-pill-icon{font-size:11px;line-height:1;}
+#fetch-widget:focus-within .fw-src-lbl{color:#aaa;}
+#fetch-widget:focus-within .fw-src-pill{color:#888;border-color:rgba(0,0,0,0.10);}
+#fetch-widget:focus-within .fw-src-pill:hover{color:#333;border-color:rgba(0,0,0,0.18);background:#f5f5f5;}
+#fetch-widget:focus-within .fw-src-pill.sel{background:rgba(104,195,192,0.12);border-color:rgba(104,195,192,0.35);color:var(--teal);}
+
+/* ─── AMBIENT RETURN GLOW ─── */
+#wolfie-return-glow{
+  position:fixed;inset:0;z-index:7999;pointer-events:none;
+  opacity:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 55%,
+    rgba(104,195,192,0.18) 0%,
+    rgba(104,195,192,0.07) 40%,
+    transparent 70%);
+  transition:opacity 0.6s ease;
+  mix-blend-mode:screen;
+}
+#wolfie-return-glow.flash{opacity:1;}
+#wolfie-return-glow.fade{opacity:0;transition:opacity 2.2s ease;}
+
+/* ─── TOAST STATUS STEPS ─── */
+.ft-steps{
+  display:flex;flex-direction:column;gap:1px;
+  max-height:0;overflow:hidden;
+  transition:max-height 0.3s ease;
+}
+.ft-steps.open{max-height:80px;}
+.ft-step-row{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:8px;letter-spacing:0.08em;
+  color:rgba(255,255,255,0.35);padding:0 0 2px;
+  animation:fi .2s ease;
+}
+.ft-step-row.active{color:var(--teal);}
+.ft-step-row.done-step{color:rgba(52,211,153,0.55);}
+.ft-step-check{font-size:9px;width:12px;text-align:center;flex-shrink:0;}
+
+/* ─── ORB LANDING PULSE ─── */
+@keyframes orb-land-ring {
+  0%   { transform:translate(-50%,-50%) scale(0.7); opacity:0.9; }
+  100% { transform:translate(-50%,-50%) scale(2.8); opacity:0; }
+}
+.orb-land-ring{
+  position:fixed;z-index:7998;pointer-events:none;
+  border-radius:50%;
+  width:60px;height:60px;
+  border:2px solid var(--teal);
+  opacity:0;
+  animation:orb-land-ring 1.1s cubic-bezier(.2,.8,.6,1) forwards;
+}
+
+/* ─── ORB DETAIL: DEMO RESULT STYLES ─── */
+.od-sources{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:2px;}
+.od-src-badge{
+  font-family:var(--sans);font-size:8px;letter-spacing:0.07em;text-transform:lowercase;
+  padding:2px 8px;border-radius:100px;
+  border:1px solid var(--glass-b2);color:var(--ink-3);
+  display:flex;align-items:center;gap:3px;
+}
+.od-result-rows{display:flex;flex-direction:column;gap:7px;position:relative;}
+.od-result-row{
+  background:rgba(255,255,255,0.03);border:1px solid var(--glass-b);
+  border-radius:8px;padding:9px 11px;
+  display:flex;flex-direction:column;gap:4px;
+}
+.od-result-title{
+  font-family:var(--sans);font-size:11px;font-weight:500;
+  color:var(--ink-2);line-height:1.3;
+}
+.od-result-snippet{
+  font-family:var(--sans);font-size:10px;color:var(--ink-3);
+  line-height:1.55;
+}
+.od-result-src{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.08em;
+  color:var(--teal);opacity:0.6;
+}
+
+/* coming-soon frosted overlay over the results */
+.od-result-row:hover{background:rgba(255,255,255,0.05);border-color:var(--glass-b2);}
+.od-demo-note{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.12em;text-transform:lowercase;
+  color:var(--ink-3);text-align:center;padding:6px 0 2px;
+  border-top:1px solid var(--glass-b);margin-top:4px;
+}
+.od-demo-dot{
+  display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:var(--teal);margin-right:4px;vertical-align:middle;
+  animation:dpulse 2s infinite;
+}
+.od-coming-soon{
+  position:absolute;inset:-4px;
+  background:rgba(6,4,22,0.72);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-radius:10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;
+  border:1px solid var(--glass-b2);
+}
+.od-cs-glyph{font-size:22px;line-height:1;filter:drop-shadow(0 0 8px var(--teal));}
+.od-cs-hed{
+  font-family:var(--serif);font-style:italic;font-size:14px;
+  color:var(--ink);letter-spacing:-0.01em;text-align:center;
+}
+.od-cs-sub{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:lowercase;
+  color:var(--ink-3);text-align:center;
+}
+.od-cs-pill{
+  font-family:var(--sans);font-size:9px;letter-spacing:0.08em;text-transform:lowercase;
+  padding:4px 12px;border-radius:100px;
+  background:var(--teal-l);border:1px solid var(--teal-b);color:var(--teal);
+  margin-top:4px;
+}
+/* ─── ORB STRIP — hidden ─── */
+#orb-strip{display:none!important;}
+
+/* ─── RESULTS WIDGET (floating card) ─── */
+#results-widget-pill{
+  position:fixed;bottom:108px;right:20px;
+  z-index:7990;
+  display:flex;align-items:center;gap:5px;
+  background:rgba(6,4,22,0.90);
+  border:1px solid var(--glass-b2);border-radius:100px;
+  padding:6px 12px;
+  cursor:pointer;
+  backdrop-filter:var(--blur-sm);-webkit-backdrop-filter:var(--blur-sm);
+  font-family:var(--mono);font-size:9px;letter-spacing:0.1em;
+  color:var(--teal);
+  transition:background .15s,opacity .2s,transform .2s;
+  box-shadow:0 0 12px rgba(104,195,192,0.2);
+}
+#results-widget-pill:hover{background:rgba(10,8,32,0.96);}
+
+#results-widget{
+  position:fixed;bottom:108px;right:20px;
+  z-index:7991;
+  width:310px;
+  max-height:72vh;
+  background:rgba(6,4,22,0.94);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-b2);border-radius:14px;
+  box-shadow:var(--shadow),0 0 40px rgba(104,195,192,0.06);
+  display:none;flex-direction:column;
+  overflow:hidden;
+  transform:translateY(8px) scale(0.97);
+  opacity:0;
+  transition:opacity .2s ease,transform .2s ease;
+}
+#results-widget.open{
+  display:flex;opacity:1;transform:translateY(0) scale(1);
+}
+
+.rw-head{
+  display:flex;align-items:center;gap:7px;
+  padding:11px 13px 10px;
+  border-bottom:1px solid var(--glass-b);
+  flex-shrink:0;
+}
+.rw-icon{font-size:11px;color:var(--teal);line-height:1;}
+.rw-orb-dot{
+  width:9px;height:9px;border-radius:50%;flex-shrink:0;
+  box-shadow:0 0 6px currentColor;
+}
+.rw-title{
+  font-family:var(--sans);font-size:9px;letter-spacing:0.18em;text-transform:lowercase;
+  color:var(--ink-2);flex:1;
+}
+.rw-close,.rw-collapse,.rw-back{
+  width:20px;height:20px;border:none;background:transparent;cursor:pointer;
+  color:var(--ink-3);font-size:10px;display:flex;align-items:center;justify-content:center;
+  border-radius:3px;transition:all .13s;padding:0;flex-shrink:0;
+}
+.rw-close:hover,.rw-collapse:hover,.rw-back:hover{background:var(--glass-3);color:var(--ink);}
+.rw-back{font-size:9px;letter-spacing:0.06em;width:auto;padding:0 6px;}
+
+.rw-empty{
+  padding:28px 20px;display:flex;flex-direction:column;align-items:center;
+  gap:8px;text-align:center;
+}
+.rw-empty-glyph{font-size:20px;opacity:0.3;}
+.rw-empty-text{
+  font-family:var(--sans);font-size:10px;letter-spacing:0.1em;text-transform:lowercase;
+  color:var(--ink-3);line-height:1.6;
+}
+
+.rw-list{overflow-y:auto;max-height:calc(72vh - 44px);}
+.rw-row{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:9px 13px;border-bottom:1px solid var(--glass-b);
+  cursor:pointer;transition:background .11s;
+}
+.rw-row:last-child{border-bottom:none;}
+.rw-row:hover{background:rgba(255,255,255,0.025);}
+.rw-row.rw-row-active{background:rgba(104,195,192,0.07);border-left:2px solid var(--teal);}
+.rw-row-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;
+  box-shadow:0 0 5px currentColor;
+}
+.rw-row-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+.rw-row-task{
+  font-family:var(--sans);font-size:10px;color:var(--ink);
+  line-height:1.3;
+}
+.rw-row-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.rw-row-src{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.06em;
+  color:var(--ink-3);
+}
+.rw-row-age{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.04em;
+  color:var(--ink-3);margin-left:auto;flex-shrink:0;
+}
+.rw-row-arrow{color:var(--ink-3);font-size:9px;flex-shrink:0;margin-top:2px;opacity:0.4;}
+
+/* detail view */
+.rw-detail-cards{overflow-y:auto;max-height:calc(72vh - 100px);padding:10px 12px;display:flex;flex-direction:column;gap:8px;}
+.rw-card{
+  background:rgba(255,255,255,0.03);border:1px solid var(--glass-b);
+  border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;
+  transition:background .12s,border-color .12s;
+}
+.rw-card:hover{background:rgba(255,255,255,0.05);border-color:var(--glass-b2);}
+.rw-card-title{font-family:var(--sans);font-size:11px;font-weight:500;color:var(--ink);line-height:1.3;}
+.rw-card-snippet{font-family:var(--sans);font-size:10px;color:var(--ink-3);line-height:1.55;}
+.rw-card-url{font-family:var(--mono);font-size:8px;letter-spacing:0.06em;color:var(--teal);opacity:0.7;}
+.rw-demo-note{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:lowercase;
+  color:var(--ink-3);text-align:center;padding:6px 12px 4px;
+  border-top:1px solid var(--glass-b);flex-shrink:0;
+}
+.rw-demo-dot{
+  display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:var(--teal);margin-right:4px;vertical-align:middle;animation:dpulse 2s infinite;
+}
+.rw-detail-foot{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 12px;border-top:1px solid var(--glass-b);flex-shrink:0;
+}
+.rw-action{
+  font-family:var(--sans);font-size:9px;letter-spacing:0.1em;text-transform:lowercase;
+  padding:5px 12px;border-radius:100px;cursor:pointer;
+  border:1px solid var(--glass-b);color:var(--ink-3);background:transparent;
+  transition:all .12s;white-space:nowrap;
+}
+.rw-action:hover{border-color:var(--glass-b2);color:var(--ink-2);}
+.rw-inject{color:#020111;background:var(--teal);border-color:var(--teal);font-weight:600;}
+.rw-inject:hover{opacity:0.84;}
+.rw-release{color:var(--ic-ink);border-color:var(--ic-b);}
+.rw-release:hover{background:rgba(210,100,140,0.08);}
+
+/* ─── COMPOSER FETCH + UPLOAD BUTTONS ─── */
+.c-fetch-btn{
+  font-family:var(--sans);font-size:9px;letter-spacing:0.1em;text-transform:lowercase;
+  color:var(--teal);border:1px solid var(--teal-b);border-radius:100px;
+  padding:5px 11px;cursor:pointer;background:var(--teal-l);
+  transition:all .14s;white-space:nowrap;margin-left:4px;
+}
+.c-fetch-btn:hover{background:rgba(104,195,192,0.18);}
+.c-upload-btn{
+  font-family:var(--sans);font-size:9px;letter-spacing:0.1em;text-transform:lowercase;
+  color:var(--ink-3);border:1px solid var(--glass-b);border-radius:100px;
+  padding:5px 11px;cursor:pointer;background:transparent;
+  transition:all .14s;white-space:nowrap;margin-left:2px;
+}
+.c-upload-btn:hover{border-color:var(--glass-b2);color:var(--ink-2);}
+
+/* upload coming-soon tooltip */
+.c-upload-btn[data-tooltip]:hover::after{
+  content:attr(data-tooltip);
+  position:absolute;bottom:calc(100% + 8px);left:50%;
+  transform:translateX(-50%);
+  background:rgba(6,4,22,0.96);border:1px solid var(--glass-b2);
+  border-radius:6px;padding:4px 10px;
+  font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:lowercase;
+  color:var(--ink-2);white-space:nowrap;pointer-events:none;z-index:999;
+}
+
+/* light-mode compat for new buttons */
+[data-theme="light"] .c-fetch-btn{color:var(--teal);}
+[data-theme="light"] .c-upload-btn{color:var(--ink-3);}
+[data-theme="light"] #results-widget{background:#fff;border-color:rgba(0,0,0,0.12);}
+[data-theme="light"] .rw-row:hover{background:rgba(0,0,0,0.025);}
+[data-theme="light"] .rw-card{background:rgba(0,0,0,0.02);border-color:rgba(0,0,0,0.08);}
+
+/* ─── RESULTS PANEL (old) — keep classes alive but hide ─── */
+#results-panel-toggle{display:none!important;}
+#results-panel{display:none!important;}
+
+/* ─── RESULTS PANEL ─── */
+#results-panel-toggle{
+  position:fixed;right:0;top:50%;transform:translateY(-50%);
+  z-index:7990;
+  background:rgba(6,4,22,0.88);
+  border:1px solid var(--glass-b2);border-right:none;
+  border-radius:10px 0 0 10px;
+  padding:10px 8px;
+  display:none;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;
+  backdrop-filter:var(--blur-sm);-webkit-backdrop-filter:var(--blur-sm);
+  transition:background .15s,opacity .2s;
+  pointer-events:all;
+}
+#results-panel-toggle.has-orbs{display:flex;}
+#results-panel-toggle:hover{background:rgba(10,8,32,0.96);}
+.rpt-icon{font-size:14px;line-height:1;}
+.rpt-count{
+  font-family:var(--mono);font-size:9px;letter-spacing:0.08em;
+  color:var(--teal);font-weight:600;line-height:1;
+}
+.rpt-label{
+  font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--ink-3);writing-mode:vertical-rl;text-orientation:mixed;
+  transform:rotate(180deg);line-height:1;
+}
+
+#results-panel{
+  position:fixed;right:0;top:0;bottom:0;
+  z-index:7991;
+  width:300px;
+  background:rgba(6,4,22,0.96);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border-left:1px solid var(--glass-b2);
+  transform:translateX(100%);
+  transition:transform .32s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  pointer-events:none;
+}
+#results-panel.open{transform:translateX(0);pointer-events:all;}
+
+.rp-head{
+  display:flex;align-items:center;gap:8px;
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--glass-b);
+  flex-shrink:0;
+}
+.rp-icon{font-size:15px;line-height:1;}
+.rp-title{
+  font-family:var(--sans);font-size:9px;letter-spacing:0.2em;text-transform:lowercase;
+  color:var(--ink-2);flex:1;
+}
+.rp-close{
+  width:20px;height:20px;border:none;background:transparent;cursor:pointer;
+  color:var(--ink-3);font-size:11px;display:flex;align-items:center;justify-content:center;
+  border-radius:3px;transition:all .13s;padding:0;flex-shrink:0;
+}
+.rp-close:hover{background:var(--glass-3);color:var(--ink);}
+
+.rp-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;padding:32px 20px;
+}
+.rp-empty-glyph{font-size:24px;opacity:0.3;}
+.rp-empty-text{
+  font-family:var(--sans);font-size:10px;letter-spacing:0.1em;text-transform:lowercase;
+  color:var(--ink-3);text-align:center;line-height:1.6;
+}
+
+.rp-list{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:8px 0;
+}
+.rp-item{
+  padding:10px 16px;border-bottom:1px solid var(--glass-b);
+  display:flex;flex-direction:column;gap:6px;
+  cursor:default;
+  transition:background .12s;
+  animation:fi .2s ease;
+}
+.rp-item:last-child{border-bottom:none;}
+.rp-item:hover{background:rgba(255,255,255,0.02);}
+.rp-item.active-detail{background:rgba(104,195,192,0.06);border-left:2px solid var(--teal);}
+
+.rp-item-top{display:flex;align-items:center;gap:8px;}
+.rp-orb-dot{
+  width:9px;height:9px;border-radius:50%;flex-shrink:0;
+  box-shadow:0 0 6px currentColor;
+}
+.rp-item-task{
+  font-family:var(--sans);font-size:11px;color:var(--ink);
+  line-height:1.35;flex:1;min-width:0;
+}
+.rp-item-age{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.06em;
+  color:var(--ink-3);flex-shrink:0;
+}
+
+.rp-item-sources{display:flex;flex-wrap:wrap;gap:3px;}
+.rp-src-tag{
+  font-family:var(--sans);font-size:8px;letter-spacing:0.05em;text-transform:lowercase;
+  padding:1px 6px;border-radius:100px;
+  border:1px solid var(--glass-b);color:var(--ink-3);
+  display:inline-flex;align-items:center;gap:2px;
+}
+
+.rp-item-actions{display:flex;align-items:center;gap:5px;margin-top:1px;}
+.rp-action{
+  font-family:var(--sans);font-size:8px;letter-spacing:0.1em;text-transform:lowercase;
+  padding:3px 9px;border-radius:100px;cursor:pointer;
+  border:1px solid var(--glass-b);color:var(--ink-3);background:transparent;
+  transition:all .12s;white-space:nowrap;
+}
+.rp-action:hover{border-color:var(--glass-b2);color:var(--ink-2);}
+.rp-action.rp-jump{color:var(--teal);border-color:var(--teal-b);background:var(--teal-l);}
+.rp-action.rp-jump:hover{opacity:0.8;}
+.rp-action.rp-inject{color:var(--ink-2);}
+.rp-action.rp-remove{color:var(--ic-ink);border-color:var(--ic-b);}
+.rp-action.rp-remove:hover{background:rgba(210,100,140,0.08);}
+.rp-spacer{flex:1;}
+
+.rp-foot{
+  padding:10px 16px;border-top:1px solid var(--glass-b);
+  font-family:var(--mono);font-size:8px;letter-spacing:0.12em;text-transform:lowercase;
+  color:var(--ink-3);text-align:center;flex-shrink:0;
+}
+
+/* ─── ORB RIGHT-CLICK CONTEXT MENU ─── */
+#orb-ctx-menu{
+  position:fixed;z-index:9002;
+  background:var(--glass-2);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-b2);border-radius:10px;
+  padding:5px;min-width:162px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.7);
+  opacity:0;pointer-events:none;transform:scale(0.96) translateY(-4px);
+  transition:opacity .12s ease,transform .12s ease;
+}
+#orb-ctx-menu.open{opacity:1;pointer-events:all;transform:scale(1) translateY(0);}
+.ocm-orb-swatch{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 10px 8px;border-bottom:1px solid var(--glass-b);margin-bottom:3px;
+}
+.ocm-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor;}
+.ocm-task{font-family:var(--sans);font-size:10px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
 </style>
 </head>
 <body>
 <div id="ne-bg"></div>
+<div id="wolfie-return-glow"></div>
 <div id="orb-hit-flash" style="position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 0.4s ease;"></div>
 <div id="nebula-overlay"></div>
+
+<!-- ─── RESULTS WIDGET (floating) ─── -->
+<div id="results-widget">
+  <!-- list view -->
+  <div id="rw-list-view">
+    <div class="rw-head">
+      <span class="rw-icon">◉</span>
+      <span class="rw-title">orbit · <span id="rw-count">0</span> results</span>
+      <button class="rw-collapse" onclick="collapseResultsWidget()" title="minimise">−</button>
+      <button class="rw-close" onclick="closeResultsWidget()">✕</button>
+    </div>
+    <div class="rw-empty" id="rw-empty">
+      <div class="rw-empty-glyph">🐾</div>
+      <div class="rw-empty-text">send wolfie on a fetch<br>results will orbit here</div>
+    </div>
+    <div class="rw-list" id="rw-list"></div>
+  </div>
+  <!-- detail view (shown when orb clicked) -->
+  <div id="rw-detail-view" style="display:none">
+    <div class="rw-head">
+      <span class="rw-orb-dot" id="rw-detail-dot" style="background:#a78bfa;color:#a78bfa"></span>
+      <span class="rw-title" id="rw-detail-title" style="font-size:10px">—</span>
+      <button class="rw-back" onclick="rwShowList()" title="all results">← all</button>
+      <button class="rw-close" onclick="closeResultsWidget()">✕</button>
+    </div>
+    <div class="rw-detail-cards" id="rw-detail-cards"></div>
+    <div class="rw-detail-foot">
+      <button class="rw-action rw-inject" id="rw-inject-btn" onclick="rwInjectActive()">inject → chat</button>
+      <button class="rw-action rw-release" id="rw-release-btn" onclick="rwReleaseActive()">release orb</button>
+    </div>
+  </div>
+</div>
+
+<!-- results widget collapsed pill -->
+<div id="results-widget-pill" onclick="openResultsWidget()" style="display:none">
+  <span>◉</span>
+  <span id="rwp-count">0</span>
+</div>
+
+<!-- ─── ORB RIGHT-CLICK CONTEXT MENU ─── -->
+<div id="orb-ctx-menu">
+  <div class="ocm-orb-swatch">
+    <span class="ocm-dot" id="ocm-dot" style="background:#a78bfa;color:#a78bfa;"></span>
+    <span class="ocm-task" id="ocm-task">—</span>
+  </div>
+  <div class="ctx-item" id="ocm-open" onclick="ocmOpenDetail()">
+    <span class="ctx-item-icon">◎</span>
+    <span class="ctx-item-label">open details</span>
+  </div>
+  <div class="ctx-item" id="ocm-jump" onclick="ocmJump()">
+    <span class="ctx-item-icon">⊙</span>
+    <span class="ctx-item-label">jump to orb</span>
+    <span class="ctx-item-hint">rotate scene</span>
+  </div>
+  <div class="ctx-menu-sep"></div>
+  <div class="ctx-item" id="ocm-inject" onclick="ocmInject()">
+    <span class="ctx-item-icon">↑</span>
+    <span class="ctx-item-label">inject → chat</span>
+  </div>
+  <div class="ctx-menu-sep"></div>
+  <div class="ctx-item danger" id="ocm-remove" onclick="ocmRemove()">
+    <span class="ctx-item-icon">✕</span>
+    <span class="ctx-item-label">release orb</span>
+  </div>
+</div>
 
 <div id="header">
   <div class="brand">
@@ -908,7 +1419,7 @@ body{background:#020111;}
     <div class="hud-sep"></div>
     <button class="hdr-btn" onclick="newChat()">new chat</button>
     <div class="hud-sep"></div>
-    <button class="hdr-btn" id="demo-btn" onclick="toggleDemo()">try demo</button>
+    <button class="hdr-btn demo-on" id="demo-btn" onclick="toggleDemo()">demo on</button>
     <div class="hud-sep"></div>
     <button class="hdr-btn" id="key-badge" onclick="toggleKeyPanel()">api key</button>
   </div>
@@ -1013,10 +1524,7 @@ body{background:#020111;}
   <div class="mopt" data-m="claude-haiku-4-5-20251001" onclick="selModel(this)">claude haiku 4.5</div>
 </div>
 
-<!-- ─── ORB STRIP (fetch results, above composer) ─── -->
-<div id="orb-strip">
-  <span class="orb-strip-lbl">results</span>
-</div>
+
 
 <div id="composer">
   <div class="c-card">
@@ -1044,7 +1552,11 @@ body{background:#020111;}
       </div>
     </div>
     <div class="c-foot">
-      <div class="fl"><button class="ghost" onclick="clearCtx()">clear ctx</button></div>
+      <div class="fl">
+        <button class="ghost" onclick="clearCtx()">clear ctx</button>
+        <button class="c-fetch-btn" onclick="openFetchWidget()" title="send wolfie · play fetch">🐾 fetch</button>
+        <button class="c-upload-btn" onclick="showUploadComingSoon()" title="upload file">↑ upload</button>
+      </div>
       <div class="fr">
         <span class="model-pill" id="mpill" onclick="togglePick()">sonnet 4.5 ∨</span>
         <button class="send-btn" id="sb" onclick="send()" title="send  ⌘↵">↑</button>
@@ -1109,20 +1621,26 @@ body{background:#020111;}
 <div id="orb-detail">
   <div class="od-head">
     <span class="od-orb-dot" id="od-dot" style="background:#a78bfa;color:#a78bfa;"></span>
-    <span class="od-label">wolfie fetched this</span>
+    <span class="od-label" id="od-label">wolfie fetched this</span>
     <button class="od-close" onclick="closeOrbDetail()">✕</button>
   </div>
   <div class="od-body">
     <div class="od-task" id="od-task-text">—</div>
+    <div class="od-sources" id="od-sources"></div>
     <div class="od-divider"></div>
-    <div class="od-shimmer-rows">
-      <div class="od-shimmer"></div>
-      <div class="od-shimmer"></div>
-      <div class="od-shimmer"></div>
+    <div class="od-result-rows" id="od-result-rows">
+      <!-- populated by openOrbDetail() -->
+      <div class="od-coming-soon" id="od-coming-soon">
+        <div class="od-cs-glyph">🐾</div>
+        <div class="od-cs-hed">results incoming</div>
+        <div class="od-cs-sub">search layer · coming soon</div>
+        <div class="od-cs-pill">demo mode</div>
+      </div>
     </div>
-    <div class="od-hint" id="od-hint">gathering results…</div>
+    <div class="od-hint" id="od-hint">tap · inject → chat to pull results into your conversation</div>
   </div>
   <div class="od-foot">
+    <input type="hidden" id="od-detail-orb-id" value="">
     <button class="od-dismiss" onclick="dismissOrb()">release orb</button>
     <button class="od-inject" onclick="injectOrbResult()">inject → chat</button>
   </div>
@@ -1138,6 +1656,18 @@ body{background:#020111;}
   </div>
   <div class="fw-body">
     <span class="fw-label">what should wolfie find?</span>
+    <div class="fw-sources">
+      <span class="fw-src-lbl">search in</span>
+      <div class="fw-src-pills" id="fw-src-pills">
+        <span class="fw-src-pill sel" data-src="web"><span class="fw-src-pill-icon">🌐</span>google</span>
+        <span class="fw-src-pill" data-src="chat"><span class="fw-src-pill-icon">💬</span>chat history</span>
+        <span class="fw-src-pill" data-src="github"><span class="fw-src-pill-icon">⌥</span>github</span>
+        <span class="fw-src-pill" data-src="gmail"><span class="fw-src-pill-icon">✉</span>gmail</span>
+        <span class="fw-src-pill" data-src="calendar"><span class="fw-src-pill-icon">📅</span>calendar</span>
+        <span class="fw-src-pill" data-src="drive"><span class="fw-src-pill-icon">📁</span>drive</span>
+        <span class="fw-src-pill" data-src="notion"><span class="fw-src-pill-icon">◻</span>notion</span>
+      </div>
+    </div>
     <textarea id="fetch-input" placeholder="search the web · check my calendar · find emails about…" rows="3"></textarea>
   </div>
   <div class="fw-foot">
@@ -1150,26 +1680,32 @@ body{background:#020111;}
 
 <!-- ─── PERSISTENT FETCH TOAST ─── -->
 <div id="fetch-toast" oncontextmenu="openFetchCtxMenu(event)">
-  <span class="ft-dot" id="ft-dot"></span>
-  <span class="ft-paw">🐾</span>
-  <span class="ft-task" id="ft-task-text">fetching…</span>
-  <span class="ft-status" id="ft-status">on it</span>
-  <span class="ft-elapsed" id="ft-elapsed">0s</span>
-  <button class="ft-cancel" onclick="cancelFetch()" title="cancel fetch">✕</button>
+  <div style="display:flex;align-items:center;gap:10px;width:100%;">
+    <span class="ft-dot" id="ft-dot"></span>
+    <span class="ft-paw">🐾</span>
+    <span class="ft-task" id="ft-task-text">fetching…</span>
+    <span class="ft-status" id="ft-status">on it</span>
+    <span class="ft-elapsed" id="ft-elapsed">0s</span>
+    <button class="ft-cancel" onclick="cancelFetch()" title="cancel fetch">✕</button>
+  </div>
+  <div class="ft-steps" id="ft-steps"></div>
 </div>
 
 <script>
-// ── Orb vars predeclared so both script blocks can access them ───────────────
-// Second block re-initializes with real THREE objects after THREE.js loads.
-var fetchOrb = null;
-var lastFetchTask = '';
+// ── Orb vars — multi-orb orbit system ────────────────────────────────────────
+// orbitOrbs accumulates permanently; each fetch appends a new orb.
+var orbitOrbs = [];          // [ { id, mesh, light, color, task, angleOffset, sources, elapsed, _stripId } ]
+var activeOrbDetail = null;  // which orb's detail panel is open
+var _activeOcmOrb   = null;  // which orb the right-click context menu targets
+var orbIdCounter    = 0;
+// Legacy alias — completeFetch still references fetchOrb for one-frame pulse after spawn
+var fetchOrb = null;         // points to the most-recently-spawned orb only, cleared after completeFetch
 var orbRaycaster = null;
 var orbMouseNDC = null;
 var activeBursts = [];
 var ORB_COLORS = [0xa78bfa, 0x60a5fa, 0x34d399, 0xfbbf24, 0xf472b6, 0x38bdf8, 0xfb923c];
-var ORB_RADIUS = 280;       // satellite orbit — clear of fog, visible above planet limb
-var ORB_BAND_Y_OFFSET = 650; // sea.y(-600) + 650 = y=50, near lower-center of screen
-// ─────────────────────────────────────────────────────────────────────────────
+var ORB_RADIUS = 280;
+var ORB_BAND_Y_OFFSET = 650;
 
 let apiKey=localStorage.getItem('sc_key')||'';
 let model='claude-sonnet-4-5';
@@ -1282,7 +1818,7 @@ function togglePick(){const p=document.getElementById('mpick'),b=document.getEle
 function selModel(el){model=el.dataset.m;document.querySelectorAll('.mopt').forEach(o=>o.classList.remove('act'));el.classList.add('act');document.getElementById('mpill').textContent=el.textContent+' ∨';document.getElementById('mpick').classList.remove('open');}
 
 // DEMO
-let demoMode=false;
+let demoMode=true;
 const DEMO={
   debug:'Looking at this, the root cause is a **scope issue** — the function is defined inside an IIFE but called from outside it.\n\nHere\'s the fix:\n\n```javascript\n// BEFORE — initOverlay trapped inside IIFE\n(function() {\n  function initOverlay() { ... }\n})();\nwindow.addEventListener(\'DOMContentLoaded\', initOverlay); // undefined\n\n// AFTER — move the listener inside\n(function() {\n  function initOverlay() { ... }\n  window.addEventListener(\'DOMContentLoaded\', initOverlay); // ✓\n})();\n```\n\nThe `reachFade` and `baseRotX` null errors are secondary — they\'re accessed before the DOM is ready.',
   explain:'**Scope** is about where a variable or function is *visible* from.\n\nThree main scopes in JavaScript:\n\n- **Global** — visible everywhere. Avoid these.\n- **Function** — visible only inside the function it\'s declared in.\n- **Block** — visible only inside the `{}` it\'s declared in (`let`/`const` only).\n\n```javascript\nfunction outer() {\n  function inner() { return 42; }\n}\ninner(); // ReferenceError — inner doesn\'t exist out here\n```\n\nIIFEs create their own scope bubble on purpose — a pattern for keeping things private.',
@@ -1291,7 +1827,7 @@ const DEMO={
   create:'```javascript\n// particle field\nconst canvas = document.createElement(\'canvas\');\ndocument.body.appendChild(canvas);\ndocument.body.style.cssText = \'margin:0;background:#020111;overflow:hidden\';\nconst ctx = canvas.getContext(\'2d\');\nlet W,H,pts=[],mouse={x:-999,y:-999};\nfunction resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;}\nresize();addEventListener(\'resize\',resize);\naddEventListener(\'mousemove\',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});\nfor(let i=0;i<120;i++) pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*2+1});\nfunction draw(){\n  ctx.fillStyle=\'rgba(2,1,17,0.18)\';\n  ctx.fillRect(0,0,W,H);\n  pts.forEach(p=>{\n    const dx=mouse.x-p.x,dy=mouse.y-p.y,d=Math.sqrt(dx*dx+dy*dy);\n    if(d<120){p.vx-=dx/d*.4;p.vy-=dy/d*.4;}\n    p.vx*=.98;p.vy*=.98;p.x+=p.vx;p.y+=p.vy;\n    if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;\n    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);\n    ctx.fillStyle=\'hsla(\'+(180+d*.2)+\',60%,65%,0.75)\';\n    ctx.fill();\n  });\n  requestAnimationFrame(draw);\n}\ndraw();\n```\n\nParticles repel from cursor. Background color matches the neverever space dark.',
   default:'That\'s a reasonable question. Here\'s how I\'d think about it:\n\nThe short answer depends on what you\'re optimizing for. Speed points to the first option; correctness over time points to the second.\n\nThe thing most people miss: this decision *looks* like a technical tradeoff but is actually a social one — whoever maintains this in six months is the real stakeholder, and they\'re rarely in the room.\n\nWhat\'s the actual constraint you\'re working against?'
 };
-function toggleDemo(){demoMode=!demoMode;document.getElementById('demo-bar').classList.toggle('on',demoMode);document.getElementById('demo-btn').classList.toggle('demo-on',demoMode);document.getElementById('demo-btn').textContent=demoMode?'demo on':'try demo';if(demoMode)toast('demo mode — no key needed','ok');}
+function toggleDemo(){demoMode=!demoMode;document.getElementById('demo-bar').classList.toggle('on',demoMode);var db=document.getElementById('demo-btn');if(db){db.classList.toggle('demo-on',demoMode);db.textContent=demoMode?'demo on':'try demo';}if(demoMode)toast('demo mode — no key needed','ok');else toast('demo off','');}
 async function simulateStream(bel,text){const words=text.split('');let i=0,full='';return new Promise(resolve=>{function tick(){if(!busy){resolve();return;}const chunk=words.slice(i,i+4).join('');full+=chunk;i+=4;bel.innerHTML=md(full)+'<span class="tcursor"></span>';scrollT();if(i>=words.length){bel.innerHTML=md(full);resolve();}else setTimeout(tick,18+Math.random()*14);}tick();});}
 
 // SEND
@@ -1363,30 +1899,33 @@ function toast(msg,type){const t=document.getElementById('toast');t.textContent=
   const origOpen = openCtxMenu;
   document.addEventListener('contextmenu', () => {
     const block = document.getElementById('ctx-orb-block');
-    if (block) block.style.display = fetchOrb ? '' : 'none';
+    if (block) block.style.display = orbitOrbs.length > 0 ? '' : 'none';
   });
 })();
 
 // ─── JUMP TO ORB ─────────────────────────────────────────────────────────────
-// Rotates the planet so the fetch orb sweeps to the front face (angle = 0).
-// Uses the existing scroll/reverseLerp system for a natural feel.
-window.jumpToOrb = function() {
-  if (!fetchOrb || typeof sea === 'undefined' || !sea) return;
-  // Current angle of orb: sea.mesh.rotation.z + fetchOrb.angleOffset
-  // We want cos(angle) = 1, i.e. angle = 0 (mod 2π)
-  // So we need sea.mesh.rotation.z = -fetchOrb.angleOffset (mod 2π)
-  var targetRotZ = -fetchOrb.angleOffset;
-  // Normalise to be within one full rotation of where we are now
+// jumpToOrbById(id) — rotate planet so that specific orb faces camera.
+// jumpToOrb() — convenience: jump to most-recently-added orb.
+window.jumpToOrbById = function(id) {
+  var orb = orbitOrbs.find(function(o) { return o.id === id; });
+  if (!orb || typeof sea === 'undefined' || !sea) return;
+  var targetRotZ = -orb.angleOffset;
   var curr = sea.mesh.rotation.z;
   while (targetRotZ < curr - Math.PI) targetRotZ += Math.PI * 2;
   while (targetRotZ > curr + Math.PI) targetRotZ -= Math.PI * 2;
-  // Animate via gsap if available, else snap
   if (typeof gsap !== 'undefined') {
     gsap.to(sea.mesh.rotation, { z: targetRotZ, duration: 1.4, ease: 'power2.inOut' });
   } else {
     sea.mesh.rotation.z = targetRotZ;
   }
   toast('rotating to orb…', '');
+};
+
+window.jumpToOrb = function() {
+  if (!orbitOrbs.length) return;
+  // Jump to most recently added
+  var orb = activeOrbDetail || orbitOrbs[orbitOrbs.length - 1];
+  window.jumpToOrbById(orb.id);
 };
 
 // ─── ORB STRIP (inline result pips above composer) ────────────────────────────
@@ -1418,7 +1957,16 @@ function addOrbToStrip(color, task) {
 
   wrap.appendChild(pip);
   wrap.appendChild(lbl);
-  wrap.onclick = function() { jumpToOrb(); openOrbDetail(); };
+  wrap.onclick = function() {
+    // Find orb by strip id and open its detail
+    var entry = orbStrip.find(function(o) { return o.id === id; });
+    if (entry && entry.orbId) {
+      var orb = orbitOrbs.find(function(o) { return o.id === entry.orbId; });
+      if (orb) { window.jumpToOrbById(orb.id); openOrbDetail(orb); }
+    } else {
+      jumpToOrb(); openOrbDetail();
+    }
+  };
 
   strip.appendChild(wrap);
   strip.classList.add('has-orbs');
@@ -1426,7 +1974,7 @@ function addOrbToStrip(color, task) {
   // Animate in
   requestAnimationFrame(() => { requestAnimationFrame(() => { wrap.classList.add('in'); }); });
 
-  orbStrip.push({ id, color, task, pip: wrap });
+  orbStrip.push({ id, color, task, pip: wrap, orbId: null }); // orbId filled by completeFetch
   return id;
 }
 
@@ -1477,11 +2025,28 @@ document.getElementById('fetch-input').addEventListener('keydown', function(e) {
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); sendFetch(); }
 });
 
+// ─── Source pill toggles ────────────────────────────────────────────────────
+(function() {
+  document.getElementById('fw-src-pills').addEventListener('click', function(e) {
+    var pill = e.target.closest('.fw-src-pill');
+    if (!pill) return;
+    pill.classList.toggle('sel');
+    // ensure at least one is always selected
+    var any = document.querySelectorAll('.fw-src-pill.sel').length;
+    if (any === 0) pill.classList.add('sel');
+  });
+})();
+
+function getSelectedSources() {
+  return Array.from(document.querySelectorAll('.fw-src-pill.sel')).map(p => p.dataset.src);
+}
+
 window.sendFetch = function() {
   const input = document.getElementById('fetch-input');
   const task = input.value.trim();
   if (!task) { input.focus(); return; }
 
+  const sources = getSelectedSources();
   closeFetchWidget();
 
   // Trigger Wolfgang blast-off animation immediately
@@ -1495,27 +2060,82 @@ window.sendFetch = function() {
 
   // Start fetch state
   const startTime = Date.now();
-  fetchState = { task, startTime, timer: null };
+  fetchState = { task, sources, startTime, timer: null };
 
-  // Show persistent toast
-  showFetchToast(task);
+  // Show persistent toast with status steps
+  showFetchToast(task, sources);
 
   // Demo: simulate a fetch completing after ~8–14s
   const demoDelay = 8000 + Math.random() * 6000;
   fetchState.timer = setTimeout(() => completeFetch(task), demoDelay);
 };
 
-function showFetchToast(task) {
+// ─── Source label map ────────────────────────────────────────────────────────
+var SOURCE_STEPS = {
+  web:      { icon:'🌐', verbs:['querying the web…','scanning results…','reading pages…'] },
+  chat:     { icon:'💬', verbs:['scanning chat history…','surfacing past threads…'] },
+  github:   { icon:'⌥', verbs:['searching repos…','reading commit history…','checking issues…'] },
+  gmail:    { icon:'✉', verbs:['reading your inbox…','searching threads…'] },
+  calendar: { icon:'📅', verbs:['checking your schedule…','scanning events…'] },
+  drive:    { icon:'📁', verbs:['searching your drive…','scanning documents…'] },
+  notion:   { icon:'◻', verbs:['reading notion…','browsing pages…'] },
+};
+
+function showFetchToast(task, sources) {
   document.getElementById('ft-task-text').textContent = task;
   document.getElementById('ft-status').textContent = 'on it';
   document.getElementById('ft-elapsed').textContent = '0s';
   document.getElementById('fetch-toast').classList.add('visible');
 
+  // Build step sequence from selected sources
+  var steps = [];
+  (sources || ['web']).forEach(function(src) {
+    var def = SOURCE_STEPS[src] || { icon:'◉', verbs:['searching…'] };
+    var verb = def.verbs[Math.floor(Math.random() * def.verbs.length)];
+    steps.push({ src, icon: def.icon, label: verb });
+  });
+  steps.push({ src:'_compile', icon:'✦', label:'compiling results…' });
+
+  // Render step rows (all pending)
+  var stepsEl = document.getElementById('ft-steps');
+  stepsEl.innerHTML = '';
+  steps.forEach(function(s, i) {
+    var row = document.createElement('div');
+    row.className = 'ft-step-row';
+    row.id = 'ft-step-' + i;
+    row.innerHTML = '<span class="ft-step-check">·</span><span>' + s.icon + ' ' + s.label + '</span>';
+    stepsEl.appendChild(row);
+  });
+
+  // After a tick, expand the steps panel
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() { stepsEl.classList.add('open'); });
+  });
+
+  // Progress through steps with timing
+  var stepDelay = 1800;
+  steps.forEach(function(s, i) {
+    setTimeout(function() {
+      if (!fetchState) return;
+      // Mark previous done
+      if (i > 0) {
+        var prev = document.getElementById('ft-step-' + (i - 1));
+        if (prev) { prev.classList.remove('active'); prev.classList.add('done-step'); prev.querySelector('.ft-step-check').textContent = '✓'; }
+      }
+      // Activate current
+      var cur = document.getElementById('ft-step-' + i);
+      if (cur) cur.classList.add('active');
+      // Update top status label
+      var statusEl = document.getElementById('ft-status');
+      if (statusEl) statusEl.textContent = s.label.replace('…', '');
+    }, i * stepDelay + 600);
+  });
+
   // Elapsed timer
   if (fetchState._elapsedInterval) clearInterval(fetchState._elapsedInterval);
-  fetchState._elapsedInterval = setInterval(() => {
+  fetchState._elapsedInterval = setInterval(function() {
     if (!fetchState) return;
-    const s = Math.floor((Date.now() - fetchState.startTime) / 1000);
+    var s = Math.floor((Date.now() - fetchState.startTime) / 1000);
     document.getElementById('ft-elapsed').textContent = s + 's';
   }, 1000);
 }
@@ -1524,46 +2144,109 @@ function completeFetch(task) {
   if (!fetchState) return;
   clearInterval(fetchState._elapsedInterval);
 
+  // Stash metadata onto the most-recently-spawned orb
+  if (fetchOrb) {
+    fetchOrb._sources = fetchState.sources || ['web'];
+    fetchOrb._elapsed = Math.floor((Date.now() - fetchState.startTime) / 1000) + 's';
+    fetchOrb._addedAt = Date.now();
+  }
+
   // Wolfie trots back
   if (window._wolfieReturn) window._wolfieReturn();
 
-  // Add a pip to the inline orb strip above the composer
+  // Mark all toast steps done
+  var stepsEl = document.getElementById('ft-steps');
+  if (stepsEl) {
+    var rows = stepsEl.querySelectorAll('.ft-step-row');
+    rows.forEach(function(r) {
+      r.classList.remove('active');
+      r.classList.add('done-step');
+      var chk = r.querySelector('.ft-step-check');
+      if (chk) chk.textContent = '✓';
+    });
+    setTimeout(function() { stepsEl.classList.remove('open'); }, 800);
+  }
+
+  // Add pip to inline orb strip and wire to orbit orb id
   if (fetchOrb) {
     var stripId = addOrbToStrip(fetchOrb.color, task);
     fetchOrb._stripId = stripId;
+    // Back-fill the orbId into the strip entry so pip can open the right detail
+    var stripEntry = orbStrip.find(function(e) { return e.id === stripId; });
+    if (stripEntry) stripEntry.orbId = fetchOrb.id;
   }
 
-  // Pulse the orb bright to signal wolfie's return
+  // Sync the results panel — add this orb as a card
+  syncResultsPanel();
+
+  // ── AMBIENT ENVIRONMENTAL GLOW ──────────────────────────────────────────────
+  var orbHex = fetchOrb ? ('#' + fetchOrb.color.toString(16).padStart(6,'0')) : '#68c3c0';
+  var glowEl = document.getElementById('wolfie-return-glow');
+  if (glowEl) {
+    glowEl.style.background = 'radial-gradient(ellipse 90% 70% at 50% 55%,' +
+      orbHex + '28 0%,' + orbHex + '0f 40%,transparent 70%)';
+    glowEl.classList.remove('fade');
+    glowEl.classList.add('flash');
+    setTimeout(function() { glowEl.classList.add('fade'); }, 600);
+    setTimeout(function() { glowEl.classList.remove('flash','fade'); }, 2800);
+  }
+
+  var hitFlash = document.getElementById('orb-hit-flash');
+  if (hitFlash) {
+    hitFlash.style.background = 'radial-gradient(ellipse 60% 50% at 50% 55%,' + orbHex + '18 0%,transparent 70%)';
+    hitFlash.style.opacity = '1';
+    setTimeout(function() { hitFlash.style.opacity = '0'; }, 400);
+  }
+
+  // Landing ring at orb screen position
+  if (fetchOrb && fetchOrb.mesh && window._camera) {
+    try {
+      var pos3 = fetchOrb.mesh.position.clone().project(window._camera);
+      var sx = (pos3.x * 0.5 + 0.5) * window.innerWidth;
+      var sy = (-pos3.y * 0.5 + 0.5) * window.innerHeight;
+      var ring = document.createElement('div');
+      ring.className = 'orb-land-ring';
+      ring.style.left = sx + 'px';
+      ring.style.top  = sy + 'px';
+      ring.style.borderColor = orbHex;
+      ring.style.boxShadow = '0 0 12px ' + orbHex;
+      document.body.appendChild(ring);
+      setTimeout(function() { if (ring.parentNode) ring.parentNode.removeChild(ring); }, 1200);
+    } catch(e) {}
+  }
+
+  // Auto-jump to bring this orb to the front face
+  setTimeout(function() {
+    if (window.jumpToOrb) window.jumpToOrb();
+  }, 400);
+
+  // Pulse the orb bright on arrival
   if (fetchOrb && fetchOrb.light) {
     fetchOrb.light.intensity = 6.0;
     setTimeout(function() { if (fetchOrb && fetchOrb.light) fetchOrb.light.intensity = 1.8; }, 600);
   }
 
-  // Get orb color for the done flash
-  var orbHex = fetchOrb ? ('#' + fetchOrb.color.toString(16).padStart(6,'0')) : '#34d399';
-
-  // Switch toast to "done" state: stop animation, flash with orb color
+  // Toast done state
   var dot = document.getElementById('ft-dot');
   var statusEl = document.getElementById('ft-status');
   var toastEl = document.getElementById('fetch-toast');
   if (dot) { dot.classList.add('done'); dot.style.background = orbHex; dot.style.boxShadow = '0 0 10px '+orbHex+', 0 0 22px '+orbHex+'88'; }
   if (statusEl) { statusEl.textContent = 'done ✓'; statusEl.classList.add('done-status'); statusEl.style.color = orbHex; statusEl.style.animation = 'none'; }
-  if (toastEl) {
-    toastEl.style.setProperty('--orb-color', orbHex);
-    // Replace the flowing border with an orb-colored glow
-    toastEl.style.boxShadow = '0 6px 32px rgba(0,0,0,0.6), 0 0 0 1px '+orbHex+'88, 0 0 24px '+orbHex+'44';
-  }
+  if (toastEl) { toastEl.style.boxShadow = '0 6px 32px rgba(0,0,0,0.6), 0 0 0 1px '+orbHex+'88, 0 0 24px '+orbHex+'44'; }
 
-  // Dismiss toast after 3s
-  setTimeout(() => {
+  // Clear the single-orb reference now that it's safely in the array
+  fetchOrb = null;
+
+  setTimeout(function() {
     document.getElementById('fetch-toast').classList.remove('visible');
-    setTimeout(() => {
+    setTimeout(function() {
       if (dot) { dot.classList.remove('done'); dot.style.background = ''; dot.style.boxShadow = ''; }
       if (statusEl) { statusEl.textContent = 'on it'; statusEl.classList.remove('done-status'); statusEl.style.animation = ''; statusEl.style.color = ''; }
       if (toastEl) { toastEl.style.boxShadow = ''; }
+      if (stepsEl) { stepsEl.innerHTML = ''; }
     }, 400);
     fetchState = null;
-    toast('wolfie is back · orb orbiting the planet', 'ok');
+    toast('wolfie is back · orb now in orbit', 'ok');
   }, 3000);
 }
 
@@ -1687,6 +2370,384 @@ window.modifyFetch = function() {
     if (open && !menu.contains(e.target)) closeFetchCtxMenu();
   });
 })();
+
+
+// ─── DEMO RESULTS ────────────────────────────────────────────────────────────
+var DEMO_RESULTS = [
+  { title: 'Overview — key concepts & context',       snippet: 'A summary of the most relevant background on this topic, curated from across your connected sources.', src: 'web' },
+  { title: 'Related threads in your history',         snippet: 'Three prior conversations touch on this directly. The most recent was 4 days ago.', src: 'chat' },
+  { title: 'Linked documents & references',           snippet: 'Two files in your drive appear highly relevant. One was last modified yesterday.', src: 'drive' },
+];
+
+// ─── RESULTS WIDGET ─────────────────────────────────────────────────────────
+var _rwOpen      = false;
+var _rwActive    = null; // currently focused orb in detail view
+
+window.openResultsWidget = function() {
+  _rwOpen = true;
+  var w = document.getElementById('results-widget');
+  var pill = document.getElementById('results-widget-pill');
+  if (w) { w.style.display = 'flex'; requestAnimationFrame(function(){ w.classList.add('open'); }); }
+  if (pill) pill.style.display = 'none';
+};
+
+window.closeResultsWidget = function() {
+  _rwOpen = false;
+  var w = document.getElementById('results-widget');
+  var pill = document.getElementById('results-widget-pill');
+  if (w) { w.classList.remove('open'); setTimeout(function(){ if(!_rwOpen) w.style.display='none'; }, 220); }
+  if (pill && orbitOrbs.length > 0) pill.style.display = 'flex';
+};
+
+window.collapseResultsWidget = function() {
+  closeResultsWidget();
+};
+
+// toggleResultsPanel kept as alias for any legacy calls
+window.toggleResultsPanel = function() {
+  _rwOpen ? window.closeResultsWidget() : window.openResultsWidget();
+};
+
+function rwShowList() {
+  document.getElementById('rw-list-view').style.display = '';
+  document.getElementById('rw-detail-view').style.display = 'none';
+  _rwActive = null;
+  syncResultsWidget();
+}
+
+function rwShowDetail(orb) {
+  _rwActive = orb;
+  var hex = '#' + orb.color.toString(16).padStart(6,'0');
+  // Update header
+  var dot = document.getElementById('rw-detail-dot');
+  var titleEl = document.getElementById('rw-detail-title');
+  if (dot) { dot.style.background = hex; dot.style.color = hex; dot.style.boxShadow = '0 0 6px '+hex; }
+  if (titleEl) titleEl.textContent = orb.task;
+  // Render cards
+  var cards = document.getElementById('rw-detail-cards');
+  if (cards) {
+    var results = (orb._demoResults && orb._demoResults.length) ? orb._demoResults : DEMO_RESULTS;
+    cards.innerHTML = results.map(function(r) {
+      return '<div class="rw-card">' +
+        '<div class="rw-card-title">' + esc(r.title) + '</div>' +
+        '<div class="rw-card-snippet">' + esc(r.snippet) + '</div>' +
+        (r.url ? '<div class="rw-card-url">↗ ' + esc(r.url) + '</div>' : '') +
+      '</div>';
+    }).join('') +
+    '<div class="rw-demo-note"><span class="rw-demo-dot"></span>simulated results · live search coming soon</div>';
+  }
+  document.getElementById('rw-list-view').style.display = 'none';
+  document.getElementById('rw-detail-view').style.display = 'flex';
+  document.getElementById('rw-detail-view').style.flexDirection = 'column';
+  // Ensure widget is open
+  if (!_rwOpen) window.openResultsWidget();
+}
+
+window.rwInjectActive = function() {
+  if (!_rwActive) return;
+  var ta = document.getElementById('prompt');
+  if (ta) { ta.value = _rwActive.task; ta.dispatchEvent(new Event('input')); ta.focus(); }
+  toast('result injected → chat', 'ok');
+};
+
+window.rwReleaseActive = function() {
+  if (!_rwActive) return;
+  var id = _rwActive.id;
+  _rwActive = null;
+  rwShowList();
+  releaseOrb(id);
+};
+
+function syncResultsWidget() {
+  var countEl = document.getElementById('rw-count');
+  var rwpCount = document.getElementById('rwp-count');
+  var emptyEl = document.getElementById('rw-empty');
+  var listEl  = document.getElementById('rw-list');
+  var pill    = document.getElementById('results-widget-pill');
+  if (!countEl) return;
+
+  var n = orbitOrbs.length;
+  countEl.textContent = n;
+  if (rwpCount) rwpCount.textContent = n;
+
+  // Show pill only when widget is closed but there are orbs
+  if (pill) pill.style.display = (!_rwOpen && n > 0) ? 'flex' : 'none';
+
+  if (!listEl) return;
+  if (n === 0) {
+    if (emptyEl) emptyEl.style.display = '';
+    listEl.innerHTML = '';
+    listEl.style.display = 'none';
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+  listEl.style.display = '';
+
+  var srcLabel = { web:'web', chat:'chat', github:'github', gmail:'gmail', calendar:'calendar', drive:'drive', notion:'notion' };
+  listEl.innerHTML = '';
+  orbitOrbs.slice().reverse().forEach(function(orb) {
+    var hex = '#' + orb.color.toString(16).padStart(6,'0');
+    var isActive = _rwActive && _rwActive.id === orb.id;
+    var age = orb._addedAt ? formatAge(Date.now() - orb._addedAt) : '';
+    var srcs = (orb._sources || ['web']).map(function(s){ return srcLabel[s]||s; }).join(' · ');
+    var row = document.createElement('div');
+    row.className = 'rw-row' + (isActive ? ' rw-row-active' : '');
+    row.innerHTML =
+      '<span class="rw-row-dot" style="background:'+hex+';color:'+hex+'"></span>' +
+      '<div class="rw-row-body">' +
+        '<div class="rw-row-task">' + esc(orb.task) + '</div>' +
+        '<div class="rw-row-meta">' +
+          '<span class="rw-row-src">' + esc(srcs) + '</span>' +
+          '<span class="rw-row-age">' + age + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<span class="rw-row-arrow">›</span>';
+    row.onclick = function() {
+      window.jumpToOrbById(orb.id);
+      rwShowDetail(orb);
+    };
+    listEl.appendChild(row);
+  });
+}
+
+function syncResultsPanel() { syncResultsWidget(); } // alias
+
+function formatAge(ms) {
+  var s = Math.floor(ms / 1000);
+  if (s < 60)  return s + 's ago';
+  var m = Math.floor(s / 60);
+  if (m < 60)  return m + 'm ago';
+  return Math.floor(m / 60) + 'h ago';
+}
+
+// ─── RELEASE ORB ──────────────────────────────────────────────────────────────
+function releaseOrb(id) {
+  var idx = orbitOrbs.findIndex(function(o) { return o.id === id; });
+  if (idx === -1) return;
+  var orb = orbitOrbs[idx];
+  if (orb._stripId) removeOrbFromStrip(orb._stripId);
+  if (orb.light  && window._scene3d) window._scene3d.remove(orb.light);
+  if (orb.mesh   && window._scene3d) window._scene3d.remove(orb.mesh);
+  if (orb.mesh)  { try { orb.mesh.geometry.dispose(); orb.mesh.material.dispose(); } catch(e){} }
+  orbitOrbs.splice(idx, 1);
+  syncResultsWidget();
+}
+
+// ─── ORB DETAIL (legacy overlay — now delegates to widget) ───────────────────
+function openOrbDetail(orb) {
+  if (!orb) {
+    if (!orbitOrbs.length) return;
+    orb = orbitOrbs[orbitOrbs.length - 1];
+  }
+  // Focus in widget — open widget in detail view for this orb
+  rwShowDetail(orb);
+  // Also keep legacy overlay for direct click path if widget is already open
+  window.jumpToOrbById(orb.id);
+}
+
+window.closeOrbDetail = function() {
+  // close legacy overlay if open
+  document.getElementById('orb-detail').classList.remove('open');
+  document.getElementById('orb-backdrop').classList.remove('on');
+  syncResultsWidget();
+};
+
+window.dismissOrb = function() {
+  var id = parseInt((document.getElementById('od-detail-orb-id')||{}).value||'0', 10);
+  document.getElementById('orb-detail').classList.remove('open');
+  document.getElementById('orb-backdrop').classList.remove('on');
+  if (id) releaseOrb(id);
+};
+
+window.injectOrbResult = function() {
+  var id = parseInt((document.getElementById('od-detail-orb-id')||{}).value||'0', 10);
+  var orb = orbitOrbs.find(function(o) { return o.id === id; });
+  document.getElementById('orb-detail').classList.remove('open');
+  document.getElementById('orb-backdrop').classList.remove('on');
+  if (!orb) return;
+  var ta = document.getElementById('prompt');
+  if (ta) { ta.value = orb.task; ta.dispatchEvent(new Event('input')); ta.focus(); }
+  toast('result injected → chat', 'ok');
+};
+
+// ─── ORB CONTEXT MENU ─────────────────────────────────────────────────────────
+(function() {
+  var menu = document.getElementById('orb-ctx-menu');
+  if (!menu) return;
+  var _ocOpen = false;
+  window.openOrbCtxMenu = function(e, orb) {
+    e.preventDefault(); e.stopPropagation();
+    _activeOcmOrb = orb;
+    var hex = '#' + orb.color.toString(16).padStart(6,'0');
+    var dotEl = document.getElementById('ocm-dot');
+    var taskEl = document.getElementById('ocm-task');
+    if (dotEl) { dotEl.style.background = hex; dotEl.style.color = hex; dotEl.style.boxShadow = '0 0 6px '+hex; }
+    if (taskEl) taskEl.textContent = orb.task;
+    var x = Math.min(e.clientX, window.innerWidth  - 190);
+    var y = Math.min(e.clientY, window.innerHeight - 220);
+    menu.style.left = x + 'px'; menu.style.top = y + 'px';
+    menu.classList.add('open'); _ocOpen = true;
+  };
+  window.closeOrbCtxMenu = function() { menu.classList.remove('open'); _ocOpen = false; };
+  document.addEventListener('click',   function(e) { if (_ocOpen && !menu.contains(e.target)) window.closeOrbCtxMenu(); });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') window.closeOrbCtxMenu(); });
+})();
+
+window.ocmOpenDetail = function() { if(window.closeOrbCtxMenu)window.closeOrbCtxMenu(); if (_activeOcmOrb) openOrbDetail(_activeOcmOrb); };
+window.ocmJump      = function() { if(window.closeOrbCtxMenu)window.closeOrbCtxMenu(); if (_activeOcmOrb) { window.jumpToOrbById(_activeOcmOrb.id); rwShowDetail(_activeOcmOrb); } };
+window.ocmInject    = function() { if(window.closeOrbCtxMenu)window.closeOrbCtxMenu(); if (_activeOcmOrb) { var ta=document.getElementById('prompt'); if(ta){ta.value=_activeOcmOrb.task;ta.dispatchEvent(new Event('input'));ta.focus();} toast('injected','ok'); } };
+window.ocmRemove    = function() { if(window.closeOrbCtxMenu)window.closeOrbCtxMenu(); if (_activeOcmOrb) releaseOrb(_activeOcmOrb.id); };
+
+// ─── UPLOAD PLACEHOLDER ───────────────────────────────────────────────────────
+window.showUploadComingSoon = function() {
+  toast('file upload · feature coming soon', '');
+};
+
+// ─── PANEL / WIDGET ALIAS (old strip functions) ───────────────────────────────
+window.rpJump   = function(id){ var o=orbitOrbs.find(function(x){return x.id===id;}); if(o){window.jumpToOrbById(id);rwShowDetail(o);} };
+window.rpInject = function(id){ var o=orbitOrbs.find(function(x){return x.id===id;}); if(!o)return; var ta=document.getElementById('prompt'); if(ta){ta.value=o.task;ta.dispatchEvent(new Event('input'));ta.focus();} toast('injected','ok'); };
+window.rpRemove = function(id){ releaseOrb(id); };
+
+
+// ─── SEEDED DEMO ORBS ────────────────────────────────────────────────────────
+// Pre-loaded search results that populate the orbit on page load.
+// Content is self-referencing — this interface, described by itself.
+var SEEDED_ORB_DATA = [
+  {
+    task: 'spatial search interfaces + ambient UX',
+    sources: ['web'],
+    elapsed: '1m 12s',
+    ageMs:  2 * 3600 * 1000,
+    results: [
+      {
+        title: 'The Case for Ambient Information Architecture',
+        snippet: 'A 2024 argument that search results should persist as spatial objects rather than ephemeral ranked lists. The orbit metaphor is cited as an unexplored paradigm.',
+        src: 'web', url: 'arxiv.org'
+      },
+      {
+        title: 'Embodied Cognition and Knowledge Retrieval',
+        snippet: 'MIT Media Lab, 2023. Users navigating spatial information environments show 34% higher recall than list-based equivalents. Suggests position encodes meaning.',
+        src: 'web', url: 'media.mit.edu'
+      },
+      {
+        title: 'Wolfgang and the astronaut — dual-surface UX',
+        snippet: 'Your own design notes. The companion metaphor: one agent reasons out loud (chat), one goes to fetch (search). Both share the same world.',
+        src: 'web', url: 'neverever.land'
+      }
+    ]
+  },
+  {
+    task: 'intent-driven prompting — format constraint audience',
+    sources: ['chat'],
+    elapsed: '47s',
+    ageMs:  45 * 60 * 1000,
+    results: [
+      {
+        title: 'Thread: format · constraint · audience',
+        snippet: 'Yesterday\'s session where you mapped the four intent dimensions. Claude\'s response on constraint-first thinking: "the guardrail that lives in your head and never makes it into the prompt — until now."',
+        src: 'chat', url: 'neverever.land/intent'
+      },
+      {
+        title: 'Session: what does done look like?',
+        snippet: 'The conversation that seeded the quote bar. 14 messages, 3 code artifacts. Key insight: declare the audience before the format, not after.',
+        src: 'chat', url: 'neverever.land/intent'
+      },
+      {
+        title: 'Intent vs. instruction — the taxonomy',
+        snippet: 'A breakdown of why intent declarations change the cognitive mode Claude enters, not just the output format. Write ≠ debug ≠ explain even given identical prompts.',
+        src: 'chat', url: 'neverever.land/intent'
+      }
+    ]
+  },
+  {
+    task: 'neverever.land repo — commits this week',
+    sources: ['github'],
+    elapsed: '2m 04s',
+    ageMs:  3 * 3600 * 1000,
+    results: [
+      {
+        title: 'fetch-v5: multi-orb orbit system',
+        snippet: '4 files changed, +847 −312 lines. Replaces single fetchOrb with orbitOrbs[]. Adds permanent accumulation, results panel, and per-orb right-click context menus.',
+        src: 'github', url: 'github.com'
+      },
+      {
+        title: 'Issue #12: orb raycasting on mobile',
+        snippet: 'Open. Touch events not reliably firing on the 3D canvas layer on iOS Safari. Proposed fix: pointer event delegation through a transparent DOM overlay.',
+        src: 'github', url: 'github.com'
+      },
+      {
+        title: 'wolfie-animation: state machine FSM',
+        snippet: 'idle → excited → departing → offscreen → returning. Tail wag speed correlates with mode. No open issues. Wolfie is, by all accounts, fine.',
+        src: 'github', url: 'github.com'
+      }
+    ]
+  },
+  {
+    task: 'design review thursday — neverever poc',
+    sources: ['calendar', 'gmail'],
+    elapsed: '38s',
+    ageMs:  6 * 3600 * 1000,
+    results: [
+      {
+        title: 'neverever.land proof of concept — design review',
+        snippet: 'Thursday 10am, 45 min. 3 attendees confirmed. Agenda: dual-surface paradigm walkthrough, wolfie fetch demo, roadmap to live search integration.',
+        src: 'calendar', url: 'calendar.google.com'
+      },
+      {
+        title: 'Email: pre-read materials requested',
+        snippet: 'Sent 2h ago. Asking for a short walkthrough video and the interaction spec. Subject: "RE: Thursday — very excited to see the orbit mechanic live."',
+        src: 'gmail', url: 'mail.google.com'
+      },
+      {
+        title: 'Thread: "this is genuinely different"',
+        snippet: 'Stakeholder reply from last week. Two follow-up questions: (1) how do orbs age out? (2) can multiple users share an orbit? Both answered in the v5 spec.',
+        src: 'gmail', url: 'mail.google.com'
+      }
+    ]
+  },
+  {
+    task: 'wolfie fetch — interaction spec + design brief',
+    sources: ['drive', 'notion'],
+    elapsed: '1m 33s',
+    ageMs:  24 * 3600 * 1000,
+    results: [
+      {
+        title: 'neverever.land v2 — interaction brief',
+        snippet: 'Google Doc, 22 pages. Last section: the dual-surface paradigm with annotated wireframes. The astronaut owns reasoning. Wolfgang owns retrieval.',
+        src: 'drive', url: 'drive.google.com'
+      },
+      {
+        title: 'Wolfgang fetch system — design notes',
+        snippet: 'Notion page. The search companion as a filing metaphor: each fetch deposits a result into permanent orbit. The orbit is the memory.',
+        src: 'notion', url: 'notion.so'
+      },
+      {
+        title: 'Intent UI spec v3.1',
+        snippet: 'The widget system for format/constraint/audience declarations. Currently at v3.1 — added the "declare" distinction from "close without declaring." Both are valid. The difference matters.',
+        src: 'drive', url: 'drive.google.com'
+      }
+    ]
+  }
+];
+
+window.seedDemoOrbs = function() {
+  if (!window.spawnFetchOrb || !window._sea) return;
+  SEEDED_ORB_DATA.forEach(function(data) {
+    spawnFetchOrb(data.task);
+    var orb = orbitOrbs[orbitOrbs.length - 1];
+    if (!orb) return;
+    orb._sources  = data.sources;
+    orb._elapsed  = data.elapsed;
+    orb._addedAt  = Date.now() - data.ageMs;
+    orb._demoResults = data.results;
+    fetchOrb = null;
+    var stripId = addOrbToStrip(orb.color, data.task);
+    orb._stripId = stripId;
+    var se = orbStrip.find(function(e) { return e.id === stripId; });
+    if (se) se.orbId = orb.id;
+  });
+  syncResultsPanel();
+};
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
@@ -2664,158 +3725,112 @@ function updateBursts() {
 // co-rotates via sea.mesh.rotation.z so scroll steers it.
 
 function spawnFetchOrb(task) {
-  window.spawnFetchOrb = spawnFetchOrb; // ensure accessible cross-block
-  if (fetchOrb) {
-    scene.remove(fetchOrb.mesh);
-    if (fetchOrb.light) scene.remove(fetchOrb.light);
-    fetchOrb = null;
-  }
+  window.spawnFetchOrb = spawnFetchOrb;
   if (!sea || !scene) return;
 
-  var color = ORB_COLORS[Math.floor(Math.random() * ORB_COLORS.length)];
+  // Expose scene ref for releaseOrb cross-block access
+  if (!window._scene3d) window._scene3d = scene;
 
-  // IcosahedronGeometry, flatShading — matches wolfie orb aesthetic
+  var color = ORB_COLORS[orbIdCounter % ORB_COLORS.length];
+
   var geo = new THREE.IcosahedronGeometry(14, 1);
   var mat = new THREE.MeshPhongMaterial({
-    color: color,
-    emissive: color,
-    emissiveIntensity: 0.45,
-    shininess: 60,
-    flatShading: true,
-    transparent: true,
-    opacity: 0.92
+    color: color, emissive: color,
+    emissiveIntensity: 0.45, shininess: 60,
+    flatShading: true, transparent: true, opacity: 0.92
   });
   var mesh = new THREE.Mesh(geo, mat);
-  mesh.name = 'fetchOrb';
   mesh.castShadow = true;
 
-  // Point light attached to orb — gives it real presence in the scene
   var light = new THREE.PointLight(color, 1.8, 180);
-  mesh.add(light); // light travels with the mesh
+  mesh.add(light);
 
-  // Lock angle relative to cylinder rotation so it co-rotates with the planet
-  // angleOffset bakes in the current rotation so it appears fixed on the surface
-  var angleOffset = -sea.mesh.rotation.z + Math.PI * 0.22;
+  // Space orbs evenly around the orbit — each new one gets a different sector
+  // so a handful of orbs naturally spread without stacking.
+  var baseOffset = -sea.mesh.rotation.z + Math.PI * 0.22;
+  var spread = (Math.PI * 2) / Math.max(6, orbitOrbs.length + 1);
+  var angleOffset = baseOffset + orbitOrbs.length * spread;
 
-  fetchOrb = { mesh: mesh, light: light, angleOffset: angleOffset, task: task, color: color, hitCooldown: 0 };
+  var id = ++orbIdCounter;
+  var orb = {
+    id: id,
+    mesh: mesh, light: light,
+    angleOffset: angleOffset,
+    task: task, color: color,
+    hitCooldown: 0,
+    _sources: null, _elapsed: null, _addedAt: null, _stripId: null
+  };
+  orbitOrbs.push(orb);
+
+  // fetchOrb points to latest for completeFetch pulse
+  fetchOrb = orb;
+
   scene.add(mesh);
 }
 
-// ORB_RADIUS = 280, ORB_BAND_Y_OFFSET = 650 — set in first script block.
+function updateOrbitOrbs() {
+  if (!orbitOrbs.length || !sea) return;
+  var now = Date.now();
 
-function updateOrbPosition() {
-  if (!fetchOrb || !sea) return;
+  for (var oi = 0; oi < orbitOrbs.length; oi++) {
+    var orb = orbitOrbs[oi];
+    if (!orb.mesh) continue;
 
-  // Co-rotate: angle locks to cylinder's Z rotation
-  var angle = sea.mesh.rotation.z + fetchOrb.angleOffset;
-  var bob = Math.sin(Date.now() * 0.0009) * 6; // gentle float
+    // Co-rotate with planet cylinder
+    var angle = sea.mesh.rotation.z + orb.angleOffset;
+    // Each orb bobs at its own phase so they don't sync
+    var bob = Math.sin(now * 0.0009 + oi * 1.37) * 6;
 
-  fetchOrb.mesh.position.set(
-    Math.sin(angle) * ORB_RADIUS,
-    sea.mesh.position.y + ORB_BAND_Y_OFFSET + bob,
-    Math.cos(angle) * ORB_RADIUS
-  );
+    orb.mesh.position.set(
+      Math.sin(angle) * ORB_RADIUS,
+      sea.mesh.position.y + ORB_BAND_Y_OFFSET + bob,
+      Math.cos(angle) * ORB_RADIUS
+    );
 
-  // Pulse emissive and light intensity together
-  var pulse = 0.38 + 0.28 * Math.sin(Date.now() * 0.0024);
-  fetchOrb.mesh.material.emissiveIntensity = pulse;
-  if (fetchOrb.light) fetchOrb.light.intensity = 1.4 + 0.9 * Math.sin(Date.now() * 0.0024);
+    // Pulse emissive — each orb on its own rhythm
+    var pulse = 0.38 + 0.28 * Math.sin(now * 0.0024 + oi * 0.9);
+    orb.mesh.material.emissiveIntensity = pulse;
+    if (orb.light) orb.light.intensity = 1.4 + 0.9 * Math.sin(now * 0.0024 + oi * 0.9);
 
-  // Slow self-rotation for sparkle
-  fetchOrb.mesh.rotation.y += 0.014;
-  fetchOrb.mesh.rotation.x += 0.008;
+    // Slow self-rotation
+    orb.mesh.rotation.y += 0.014;
+    orb.mesh.rotation.x += 0.008;
 
-  // Collision with astronaut (hit = visual burst only, orb stays — inert)
-  if (fetchOrb.hitCooldown > 0) {
-    fetchOrb.hitCooldown--;
-  } else if (humanoid) {
-    var hx = humanoid.mesh.position.x;
-    var hy = humanoid.mesh.position.y;
-    // Project orb world position to screen-space for 2D distance check
-    // Use a simple 3D distance check but account for scale
-    var orbPos = fetchOrb.mesh.position;
-    // Humanoid is at z≈0, orb at z=ORB_RADIUS*cos(angle) — only collide when orb faces camera
-    var orbScreenZ = Math.cos(angle) * ORB_RADIUS; // positive = toward camera
-    if (orbScreenZ > 220) { // radius=280, so 220 = within ~38° of front face
-      // Project to humanoid 2D space: humanoid x/y is scene coords, orb x/y too
-      var dx = orbPos.x - hx;
-      var dy = orbPos.y - hy;
-      var dist2D = Math.sqrt(dx * dx + dy * dy);
-      if (dist2D < 28) {
-        // Hit flash burst at orb position — inert (orb stays)
-        new OrbBurst(fetchOrb.color, orbPos.clone());
-        // Screen flash
-        var flash = document.getElementById('orb-hit-flash');
-        if (flash) {
-          var hex = '#' + fetchOrb.color.toString(16).padStart(6, '0');
-          flash.style.background = 'radial-gradient(ellipse at center, ' + hex + '55 0%, transparent 70%)';
-          flash.style.opacity = '1';
-          flash.style.transition = 'none';
-          setTimeout(function() { flash.style.transition = 'opacity 0.4s ease'; flash.style.opacity = '0'; }, 40);
+    // ── Inert collision with astronaut ─────────────────────────────────────
+    // Orb never despawns — just sparks and gives a gentle ragdoll rattle.
+    if (orb.hitCooldown > 0) {
+      orb.hitCooldown--;
+    } else if (humanoid) {
+      var orbScreenZ = Math.cos(angle) * ORB_RADIUS;
+      if (orbScreenZ > 220) {
+        var orbPos = orb.mesh.position;
+        var dx = orbPos.x - humanoid.mesh.position.x;
+        var dy = orbPos.y - humanoid.mesh.position.y;
+        if (Math.sqrt(dx * dx + dy * dy) < 30) {
+          // Visual burst — orb stays
+          new OrbBurst(orb.color, orbPos.clone());
+          var flash = document.getElementById('orb-hit-flash');
+          if (flash) {
+            var hex = '#' + orb.color.toString(16).padStart(6, '0');
+            flash.style.background = 'radial-gradient(ellipse at center,' + hex + '55 0%,transparent 70%)';
+            flash.style.opacity = '1';
+            flash.style.transition = 'none';
+            setTimeout(function() { flash.style.transition = 'opacity 0.4s ease'; flash.style.opacity = '0'; }, 40);
+          }
+          // Soft ragdoll rattle
+          if (typeof gsap !== 'undefined') {
+            gsap.to(humanoid, {
+              flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 0.7,
+              flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 0.4,
+              duration: 0.45, ease: 'power2.out'
+            });
+          }
+          orb.hitCooldown = 90;
         }
-        // Ragdoll rattle — no despawn, purely visual
-        if (typeof gsap !== 'undefined') {
-          gsap.to(humanoid, {
-            flipX: humanoid.flipX + (Math.random() - 0.5) * Math.PI * 0.8,
-            flipZ: humanoid.flipZ + (Math.random() - 0.5) * Math.PI * 0.5,
-            duration: 0.45, ease: 'power2.out'
-          });
-        }
-        fetchOrb.hitCooldown = 90; // ~1.5s cooldown before next hit registers
       }
     }
   }
 }
-
-function openOrbDetail() {
-  if (!fetchOrb) return;
-  var hex = '#' + fetchOrb.color.toString(16).padStart(6, '0');
-  var dot = document.getElementById('od-dot');
-  dot.style.background = hex;
-  dot.style.color = hex;
-  dot.style.boxShadow = '0 0 10px ' + hex;
-  document.getElementById('od-task-text').textContent = fetchOrb.task;
-  document.getElementById('od-hint').textContent = 'wolfie returned · ready to inject';
-  document.getElementById('orb-detail').classList.add('open');
-  document.getElementById('orb-backdrop').classList.add('on');
-}
-
-window.closeOrbDetail = function() {
-  document.getElementById('orb-detail').classList.remove('open');
-  document.getElementById('orb-backdrop').classList.remove('on');
-};
-
-window.dismissOrb = function() {
-  closeOrbDetail();
-  if (fetchOrb) {
-    if (fetchOrb._stripId) removeOrbFromStrip(fetchOrb._stripId);
-    if (fetchOrb.light) scene.remove(fetchOrb.light);
-    scene.remove(fetchOrb.mesh);
-    fetchOrb.mesh.geometry.dispose();
-    fetchOrb.mesh.material.dispose();
-    fetchOrb = null;
-  }
-};
-
-window.injectOrbResult = function() {
-  if (!fetchOrb) return;
-  var task = fetchOrb.task;
-  closeOrbDetail();
-  if (fetchOrb._stripId) removeOrbFromStrip(fetchOrb._stripId);
-  if (fetchOrb.light) scene.remove(fetchOrb.light);
-  scene.remove(fetchOrb.mesh);
-  fetchOrb.mesh.geometry.dispose();
-  fetchOrb.mesh.material.dispose();
-  fetchOrb = null;
-  // Pre-fill the composer textarea
-  var ta = document.getElementById('prompt');
-  if (ta) {
-    ta.value = task;
-    ta.dispatchEvent(new Event('input'));
-    ta.focus();
-  }
-  toast('injected into composer', 'ok');
-};
 
 window._wolfiePlayFetch = function() {
   if (!companionPoodle) return;
@@ -2848,6 +3863,7 @@ function init() {
   scene.fog = new THREE.Fog(0x0d0820, 80, 800);
   camera = new THREE.PerspectiveCamera(60, W/H, 1, 10000);
   camera.position.set(0, 100, 200);
+  window._camera = camera; // expose for completeFetch ring projection
   renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
   renderer.setSize(W, H);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -2880,16 +3896,21 @@ function init() {
   createAtmosphere();
   document.addEventListener('mousemove', function(e){
     mouse.x=-1+(e.clientX/W)*2; mouse.y=1-(e.clientY/H)*2;
-    // Pointer cursor when hovering the fetch orb
-    if (fetchOrb && camera) {
+    // Pointer cursor when hovering any orb
+    if (orbitOrbs.length > 0 && camera) {
       orbMouseNDC.set((e.clientX/W)*2-1, -(e.clientY/H)*2+1);
       orbRaycaster.setFromCamera(orbMouseNDC, camera);
-      var h = orbRaycaster.intersectObject(fetchOrb.mesh, false);
-      document.getElementById('ne-bg').style.cursor = h.length > 0 ? 'pointer' : '';
+      var meshes = orbitOrbs.map(function(o) { return o.mesh; });
+      var hits = orbRaycaster.intersectObjects(meshes, false);
+      document.getElementById('ne-bg').style.cursor = hits.length > 0 ? 'pointer' : '';
     } else {
       document.getElementById('ne-bg').style.cursor = '';
     }
   });
+  // Seed demo orbs after scene is ready
+  window.spawnFetchOrb = spawnFetchOrb; // expose before seedDemoOrbs checks for it
+  window._sea = sea; // expose sea so seedDemoOrbs can guard against unready scene
+  setTimeout(function() { if (window.seedDemoOrbs) window.seedDemoOrbs(); }, 600);
   loop();
 }
 
@@ -2955,7 +3976,7 @@ function loop() {
       companionPoodle.update(humanoid.mesh.position.x, humanoid.mesh.position.y);
     }
   }
-  updateOrbPosition();
+  updateOrbitOrbs();
   updateBursts();
   renderer.render(scene, camera);
 }
@@ -2973,17 +3994,33 @@ window.addEventListener('wheel', function(e) {
 // ── Left click → random tumble | Right click → reset pose ──────────────────
 window.addEventListener('pointerdown', function(e) {
   if (ambientPaused || !humanoid || typeof gsap === 'undefined') return;
-  if (e.target.closest('#header,#composer,#key-panel,#demo-bar,.ctx-widget,#mpick,#toast,#phil-card,#orb-detail,#orb-backdrop,button,input,textarea,select,label')) return;
-  // ── Orb raycast ─────────────────────────────────────────────────────────
-  if (e.button === 0 && fetchOrb && camera) {
+  if (e.target.closest('#header,#composer,#key-panel,#demo-bar,.ctx-widget,#mpick,#toast,#phil-card,#orb-detail,#orb-backdrop,#results-panel,#results-panel-toggle,#orb-ctx-menu,button,input,textarea,select,label')) return;
+
+  // ── Orb raycast — check all orbs ──────────────────────────────────────────
+  if (orbitOrbs.length > 0 && camera) {
     orbMouseNDC.set(
-      (e.clientX / window.innerWidth) * 2 - 1,
-      -(e.clientY / window.innerHeight) * 2 + 1
+      (e.clientX / window.innerWidth)  *  2 - 1,
+      -(e.clientY / window.innerHeight) *  2 + 1
     );
     orbRaycaster.setFromCamera(orbMouseNDC, camera);
-    var hits = orbRaycaster.intersectObject(fetchOrb.mesh, false);
-    if (hits.length > 0) { openOrbDetail(); return; }
+    var meshes = orbitOrbs.map(function(o) { return o.mesh; });
+    var hits = orbRaycaster.intersectObjects(meshes, false);
+    if (hits.length > 0) {
+      var hitMesh = hits[0].object;
+      var hitOrb  = orbitOrbs.find(function(o) { return o.mesh === hitMesh; });
+      if (hitOrb) {
+        if (e.button === 2) {
+          // Right-click: orb context menu
+          window.openOrbCtxMenu(e, hitOrb);
+        } else {
+          // Left-click: open detail panel
+          openOrbDetail(hitOrb);
+        }
+        return;
+      }
+    }
   }
+
   if (e.button === 0) {
     var rFlipX = (Math.random() * 2 - 1) * Math.PI * (2 + Math.random() * 2);
     var rFlipZ = (Math.random() * 2 - 1) * Math.PI * (Math.random() * 1.5);
