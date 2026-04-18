@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>neverever.land · intent · dark</title>
+<title>neverever.land · intent · by zack.cx</title>
 <meta name="description" content="Shape your intent. Declare your structure. Go chat.">
 <meta name="theme-color" content="#020111">
 <meta property="og:title" content="neverever.land · intent">
-<meta property="og:description" content="Shape {your intent} · declare (your structure) · go chat. — neverever.land">
-<meta property="og:image" content="https://zack.cx/reasonably-og-dark.png">
+<meta property="og:description" content="Shape {your intent} · declare (your structure) · go chat.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:creator" content="@zackgort">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23020111'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%2368c3c0' font-family='serif'%3E%E2%9C%B3%3C/text%3E%3C/svg%3E">
@@ -555,7 +554,7 @@ body{background:#020111;}
 <div id="header">
   <div class="brand">
     <span class="brand-glyph">✳</span>
-    <span class="brand-word">neverever<span style="opacity:0.55;font-weight:400">.land</span></span>
+    <span class="brand-word">neverever.land</span>
     <div class="brand-rule"></div>
     <span class="brand-sub">intent</span>
   </div>
@@ -593,12 +592,12 @@ body{background:#020111;}
     <div id="phil-card">
       <div class="phil-inner">
         <div class="phil-top">
-          <span class="phil-eyebrow">neverever.land</span>
+          <span class="phil-eyebrow">neverever.land · intent</span>
           <button class="phil-close" onclick="dismissPhil()" title="dismiss">✕</button>
         </div>
-        <p class="phil-hed"><em>Shape <span class="mono">{your intent}</span><br>declare <span class="mono">(your structure)</span><br>→ go chat.</em></p>
+        <p class="phil-hed"><em>Shape <span class="mono">{your intent},</span><br>declare <span class="mono">(your structure)</span><br><span class="mono">[intent]</span> →  a prompt for purpose:</em></p>
         <div class="phil-body">
-          <p>"Prompt Intentionality", structured.</p>
+          <p>a thought-experiment by zack.cx</p>
           <div class="phil-dims">
             <div class="phil-dim"><span class="phil-dim-label">intent</span><span class="phil-dim-desc">what kind of work is this — write, debug, explain, analyze, create. sets the cognitive mode Claude enters.</span></div>
             <div class="phil-dim"><span class="phil-dim-label">format</span><span class="phil-dim-desc">how you want it back. inline edits vs. prose vs. a diff are three completely different responses to the same question.</span></div>
@@ -616,7 +615,7 @@ body{background:#020111;}
     <div id="empty">
       <div class="e-glyph">✳</div>
       <div class="e-hed">what are you working through?</div>
-      <div class="e-sub">initiate by intent · declare context · send</div>
+      <div class="e-sub">initiate by intent · declare constraint · send</div>
       <div class="sc-row">
         <div class="sc-chip" onclick="qs('debug')">debug something broken</div>
         <div class="sc-chip" onclick="qs('explain')">explain a concept</div>
@@ -711,7 +710,7 @@ body{background:#020111;}
 <div id="toast"></div>
 
 <script>
-let apiKey=localStorage.getItem('ne_key')||'';
+let apiKey=localStorage.getItem('sc_key')||'';
 let model='claude-sonnet-4-5';
 let intent=null;
 let hist=[];
@@ -734,11 +733,11 @@ const CTX_PH={f:'or describe the exact format you need…',c:'no external libs �
 const CTX_PLACEHOLDERS={f:'inline edits / prose / bullets…',c:'keep X · avoid Y…',a:'beginner / senior / self…'};
 
 // INIT
-var savedTheme = localStorage.getItem('ne_theme') || 'dark';
+var savedTheme = localStorage.getItem('r_theme') || 'dark';
 applyTheme(savedTheme);
 updateKB();
 if(apiKey){document.getElementById('api-key-input').value='•'.repeat(Math.min(apiKey.length,24));document.getElementById('api-key-input').dataset.f='1';}
-if(localStorage.getItem('ne_phil_hide')==='1') document.getElementById('phil-card').classList.add('hidden');
+if(localStorage.getItem('r_phil_hide')==='1') document.getElementById('phil-card').classList.add('hidden');
 document.getElementById('prompt').addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){e.preventDefault();send();}});
 document.getElementById('prompt').addEventListener('input',grow);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')['f','c','a'].forEach(closeWidget);});
@@ -758,11 +757,11 @@ function applyTheme(t){
 }
 function toggleTheme(){
   const t=(document.documentElement.dataset.theme==='dark')?'light':'dark';
-  localStorage.setItem('ne_theme',t);applyTheme(t);
+  localStorage.setItem('r_theme',t);applyTheme(t);
 }
 function toggleKeyPanel(){const p=document.getElementById('key-panel');p.classList.toggle('open');if(p.classList.contains('open'))setTimeout(()=>document.getElementById('api-key-input').focus(),50);}
 function toggleKeyVis(){const i=document.getElementById('api-key-input');i.type=i.type==='password'?'text':'password';}
-function saveKey(){const i=document.getElementById('api-key-input'),v=i.value.trim();if(!v||v.startsWith('•')){toast('paste your key first','err');return;}apiKey=v;localStorage.setItem('ne_key',v);i.type='password';i.value='•'.repeat(Math.min(v.length,24));i.dataset.f='1';updateKB();document.getElementById('key-panel').classList.remove('open');toast('key saved','ok');}
+function saveKey(){const i=document.getElementById('api-key-input'),v=i.value.trim();if(!v||v.startsWith('•')){toast('paste your key first','err');return;}apiKey=v;localStorage.setItem('sc_key',v);i.type='password';i.value='•'.repeat(Math.min(v.length,24));i.dataset.f='1';updateKB();document.getElementById('key-panel').classList.remove('open');toast('key saved','ok');}
 function updateKB(){const b=document.getElementById('key-badge');if(apiKey){b.textContent='key ✓';b.classList.add('key-ok');}else{b.textContent='api key';b.classList.remove('key-ok');}}
 document.getElementById('api-key-input').addEventListener('focus',function(){if(this.dataset.f){this.value=apiKey;this.type='text';}});
 document.getElementById('api-key-input').addEventListener('blur',function(){if(apiKey&&this.value===apiKey){this.type='password';this.value='•'.repeat(Math.min(apiKey.length,24));}});
@@ -866,9 +865,9 @@ function md(t){t=t.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>'<pre><code>'+es
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function grow(){const e=document.getElementById('prompt');e.style.height='auto';e.style.height=Math.min(e.scrollHeight,220)+'px';}
 function scrollT(){document.getElementById('thread').scrollTop=999999;}
-function newChat(){hist=[];const hide=localStorage.getItem('ne_phil_hide')==='1';document.getElementById('ti').innerHTML=`${hide?'':'<div id="phil-card"><div class="phil-inner"><div class="phil-top"><span class="phil-eyebrow">neverever.land</span><button class="phil-close" onclick="dismissPhil()">✕</button></div><p class="phil-hed"><em>Shape <span class="mono">{your intent}</span><br>declare <span class="mono">(your structure)</span><br>→ go chat.</em></p><div class="phil-body"><p>&ldquo;Prompt Intentionality&rdquo;, structured.</p><div class="phil-dims"><div class="phil-dim"><span class="phil-dim-label">intent</span><span class="phil-dim-desc">what kind of work is this — write, debug, explain, analyze, create.</span></div><div class="phil-dim"><span class="phil-dim-label">format</span><span class="phil-dim-desc">how you want it back. inline edits vs. prose vs. a diff are three different responses.</span></div><div class="phil-dim"><span class="phil-dim-label">constraint</span><span class="phil-dim-desc">what Claude can\'t touch. the guardrail that never makes it into the prompt — until now.</span></div><div class="phil-dim"><span class="phil-dim-label">audience</span><span class="phil-dim-desc">who\'s actually reading. changes register, density, assumed knowledge.</span></div></div><p class="phil-note"><em>declare</em> means commit. closing without declaring means you considered it and chose not to constrain.</p></div><div class="phil-foot"><button class="phil-got-it" onclick="dismissPhil()">got it →</button><label class="phil-remember"><input type="checkbox" id="phil-no-show" /> don\'t show again</label></div></div></div>'}<div id="empty"><div class="e-glyph">✳</div><div class="e-hed">what are you working through?</div><div class="e-sub">initiate by intent · declare context · send</div><div class="sc-row"><div class="sc-chip" onclick="qs(\'debug\')">debug something broken</div><div class="sc-chip" onclick="qs(\'explain\')">explain a concept</div><div class="sc-chip" onclick="qs(\'write\')">draft a document</div><div class="sc-chip" onclick="qs(\'analyze\')">analyze a tradeoff</div><div class="sc-chip" onclick="qs(\'create\')">build something new</div></div></div>`;const ta=document.getElementById('prompt');ta.value='';ta.style.height='';}
+function newChat(){hist=[];const hide=localStorage.getItem('r_phil_hide')==='1';document.getElementById('ti').innerHTML=`${hide?'':'<div id="phil-card"><div class="phil-inner"><div class="phil-top"><span class="phil-eyebrow">neverever.land · intent</span><button class="phil-close" onclick="dismissPhil()">✕</button></div><p class="phil-hed"><em>Shape <span class="mono">{your intent}</span><br>declare <span class="mono">(your structure)</span><br>→ go chat.</em></p><div class="phil-body"><p>&ldquo;Prompt Intentionality&rdquo;, structured.</p><div class="phil-dims"><div class="phil-dim"><span class="phil-dim-label">intent</span><span class="phil-dim-desc">what kind of work is this — write, debug, explain, analyze, create.</span></div><div class="phil-dim"><span class="phil-dim-label">format</span><span class="phil-dim-desc">how you want it back. inline edits vs. prose vs. a diff are three different responses.</span></div><div class="phil-dim"><span class="phil-dim-label">constraint</span><span class="phil-dim-desc">what Claude can\'t touch. the guardrail that never makes it into the prompt — until now.</span></div><div class="phil-dim"><span class="phil-dim-label">audience</span><span class="phil-dim-desc">who\'s actually reading. changes register, density, assumed knowledge.</span></div></div><p class="phil-note"><em>declare</em> means commit. closing without declaring means you considered it and chose not to constrain.</p></div><div class="phil-foot"><button class="phil-got-it" onclick="dismissPhil()">got it →</button><label class="phil-remember"><input type="checkbox" id="phil-no-show" /> don\'t show again</label></div></div></div>'}<div id="empty"><div class="e-glyph">✳</div><div class="e-hed">what are you working through?</div><div class="e-sub">initiate by intent · declare constraint · send</div><div class="sc-row"><div class="sc-chip" onclick="qs(\'debug\')">debug something broken</div><div class="sc-chip" onclick="qs(\'explain\')">explain a concept</div><div class="sc-chip" onclick="qs(\'write\')">draft a document</div><div class="sc-chip" onclick="qs(\'analyze\')">analyze a tradeoff</div><div class="sc-chip" onclick="qs(\'create\')">build something new</div></div></div>`;const ta=document.getElementById('prompt');ta.value='';ta.style.height='';}
 function qs(i){setI(i);document.getElementById('prompt').focus();}
-function dismissPhil(){const card=document.getElementById('phil-card');if(!card)return;if(document.getElementById('phil-no-show')?.checked)localStorage.setItem('ne_phil_hide','1');card.style.transition='opacity .2s,transform .2s';card.style.opacity='0';card.style.transform='translateY(-6px)';setTimeout(()=>card.classList.add('hidden'),210);}
+function dismissPhil(){const card=document.getElementById('phil-card');if(!card)return;if(document.getElementById('phil-no-show')?.checked)localStorage.setItem('r_phil_hide','1');card.style.transition='opacity .2s,transform .2s';card.style.opacity='0';card.style.transform='translateY(-6px)';setTimeout(()=>card.classList.add('hidden'),210);}
 function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='';t.offsetWidth;if(type)t.classList.add(type);t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
