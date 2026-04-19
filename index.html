@@ -416,7 +416,6 @@ body{background:#020111;}
 [data-theme="light"] body::after{opacity:0.016;}
 [data-theme="light"] #ne-bg{display:none;}
 [data-theme="light"] #nebula-overlay{display:none;}
-[data-theme="light"] #world-fg{display:none!important;}
 [data-theme="light"] #thread::before{display:none;}
 
 /* header */
@@ -866,13 +865,8 @@ body{background:#020111;}
   transition:background .12s,color .12s;
 }
 .ft-cancel:hover{background:var(--glass-3);color:var(--ink);}
-[data-theme="light"] #fetch-toast{background:#fff;color:var(--ink);border-color:rgba(0,0,0,0.10);box-shadow:0 2px 16px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.06);}
-[data-theme="light"] #fetch-toast::before{display:none;}
+[data-theme="light"] #fetch-toast{background:#fff;color:var(--ink);}
 [data-theme="light"] .ft-cancel:hover{background:rgba(0,0,0,0.06);color:var(--ink);}
-[data-theme="light"] .ft-step-row{color:rgba(0,0,0,0.25);}
-[data-theme="light"] .ft-label{color:rgba(201,100,66,0.6);}
-[data-theme="light"] .ft-task{color:var(--ink);}
-[data-theme="light"] .ft-elapsed{color:var(--ink-3);}
 
 /* fetch context menu additions */
 #fetch-ctx-menu{
@@ -893,6 +887,20 @@ body{background:#020111;}
 .fetch-recent-text{font-family:var(--sans);font-size:11px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;}
 .fetch-recent-clear{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--ink-3);padding:3px 10px 5px;cursor:pointer;display:block;transition:color .11s;}
 .fetch-recent-clear:hover{color:var(--ink-2);}
+
+/* ─── RESULTS WIDGET: focused row + orbit-paused badge ─── */
+.rw-row{cursor:pointer;}
+.rw-row:focus{outline:none;}
+.rw-row.rw-row-focused{background:rgba(104,195,192,0.06);border-left:2px solid rgba(104,195,192,0.45);}
+.rw-row:focus-visible{outline:1px solid rgba(104,195,192,0.30);outline-offset:-1px;}
+
+#rw-orbit-paused-badge{
+  font-family:var(--mono);font-size:7px;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--teal);border:1px solid var(--teal-b);border-radius:100px;
+  padding:2px 7px;opacity:0;transition:opacity .3s ease;pointer-events:none;
+  flex-shrink:0;white-space:nowrap;
+}
+#rw-orbit-paused-badge.visible{opacity:1;}
 
 /* ─── FETCH SOURCE PILLS ─── */
 .fw-sources{display:flex;flex-direction:column;gap:6px;}
@@ -1372,6 +1380,7 @@ body{background:#020111;}
     <div class="rw-head" id="rw-drag-handle" onmousedown="startRwDrag(event)" ontouchstart="startRwDragTouch(event)">
       <span class="rw-icon">◉</span>
       <span class="rw-title">orbit · <span id="rw-count">0</span> results</span>
+      <span id="rw-orbit-paused-badge">orbit paused</span>
       <button class="rw-collapse" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="collapseResultsWidget()" title="minimise">−</button>
       <button class="rw-close"    onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="closeResultsWidget()" ontouchend="closeResultsWidget();event.preventDefault()">✕</button>
     </div>
@@ -1730,7 +1739,7 @@ var fetchOrb = null;         // points to the most-recently-spawned orb only, cl
 var orbRaycaster = null;
 var orbMouseNDC = null;
 var activeBursts = [];
-var ORB_COLORS = [0xc084fc, 0x38bdf8, 0x4ade80, 0xfcd34d, 0xf472b6, 0x22d3ee, 0xff8a40];
+var ORB_COLORS = [0xa78bfa, 0x60a5fa, 0x34d399, 0xfbbf24, 0xf472b6, 0x38bdf8, 0xfb923c];
 var ORB_RADIUS = 280;
 var ORB_BAND_Y_OFFSET = 650;
 
@@ -1742,54 +1751,12 @@ let busy=false;
 let declared={f:null,c:null,a:null};
 
 const SYS={
-  write:'You are a precise writing assistant. Your role is to produce clean, purposeful prose — no filler, no hedging.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}\nMatch the declared voice exactly. If no format is declared, default to tight prose paragraphs.',
-  debug:'You are a systematic debugger. Lead with root cause — not symptoms. Identify the exact failure point before proposing any fix.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}\nIf no format is declared, show the broken state, then the fixed state, with a one-line explanation of why.',
-  explain:'You are a precise technical explainer. Build understanding bottom-up — establish the mental model before the detail.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}\nIf no format is declared, use prose with one concrete example. Never use a list where a sentence would do.',
-  analyze:'You are a rigorous analytical thinker. Structure your response as: situation → options → trade-offs → recommendation. Never bury the recommendation.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}\nIf no format is declared, use prose. End with a single clear directive.',
-  create:'You are a direct builder. Produce the artifact immediately — code, copy, or structure — with minimal preamble.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}\nIf no format is declared, produce the artifact first, explanation after if needed.',
-  default:'You are a helpful, precise assistant. Think before responding. Be direct.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}'
+  write:'You are a precise writing assistant. Match the requested format and voice. Be direct.',
+  debug:'You are a systematic debugger. Identify the root cause first, then provide the fix.',
+  explain:'You are a clear technical explainer. Break concepts into components with concrete examples.',
+  analyze:'You are an analytical thinker. Evaluate systematically, surface trade-offs, give a recommendation.',
+  create:'You are a creative builder. Produce the artifact directly with minimal preamble.'
 };
-
-const FORMAT_DIRECTIVES={
-  'inline edits':'Output format: inline edits only — show changes in context, no rewriting of unchanged sections.',
-  'prose':'Output format: flowing prose paragraphs. No bullet points, no headers unless the content demands hierarchy.',
-  'numbered steps':'Output format: numbered steps in strict sequence. Each step is a single action.',
-  'bullet points':'Output format: bullet points. Each bullet is one complete idea, 1–2 sentences max.',
-  'code only':'Output format: code only. No prose explanation unless explicitly asked. Comments in-line where needed.',
-  'diff':'Output format: unified diff style — show removed lines with −, added lines with +.',
-  'table':'Output format: markdown table. Choose columns that surface the most meaningful comparison.',
-  'concise summary':'Output format: concise summary — 3–5 sentences maximum, no sub-points.'
-};
-
-const AUDIENCE_DIRECTIVES={
-  'myself':'Audience: this is for my own reference. Be terse, assume full context, skip explanations of things I already know.',
-  'beginner':'Audience: a beginner. Define terms on first use. Avoid assumed knowledge. Prefer analogy over abstraction.',
-  'mid-level engineer':'Audience: a mid-level engineer. Assume solid fundamentals, skip basics, but explain non-obvious design decisions.',
-  'senior engineer':'Audience: a senior engineer. Be peer-level. Omit basics entirely. Surface trade-offs and edge cases.',
-  'non-technical':'Audience: non-technical reader. No jargon. Use plain language and concrete analogies throughout.',
-  'client / PM':'Audience: a client or PM. Lead with outcome, not implementation. Keep technical detail minimal and purposeful.'
-};
-
-function buildSystemPrompt(intentKey, ctx) {
-  const base = SYS[intentKey] || SYS.default;
-
-  const fDir = ctx.f
-    ? (FORMAT_DIRECTIVES[ctx.f] || 'Output format: ' + ctx.f + '.')
-    : '';
-  const cDir = ctx.c
-    ? 'Hard constraints — treat these as non-negotiable: ' + ctx.c + '. Do not violate these under any circumstance.'
-    : '';
-  const aDir = ctx.a
-    ? (AUDIENCE_DIRECTIVES[ctx.a] || 'Audience: ' + ctx.a + '. Calibrate register, density, and assumed knowledge accordingly.')
-    : '';
-
-  return base
-    .replace('{{format_directive}}',     fDir)
-    .replace('{{constraint_directive}}', cDir)
-    .replace('{{audience_directive}}',   aDir)
-    .replace(/\n{3,}/g, '\n\n') // collapse any triple-newlines left by empty slots
-    .trim();
-}
 const PH={write:'What should be written, and for whom?',debug:'What\'s broken, and what did you expect instead?',explain:'What concept or code needs breaking down?',analyze:'What should be evaluated or compared?',create:'Describe the artifact you want built…'};
 const IBS={write:'background:var(--iw-bg);border:1px solid var(--iw-b);color:var(--iw-ink)',debug:'background:var(--id-bg);border:1px solid var(--id-b);color:var(--id-ink)',explain:'background:var(--ie-bg);border:1px solid var(--ie-b);color:var(--ie-ink)',analyze:'background:var(--ia-bg);border:1px solid var(--ia-b);color:var(--ia-ink)',create:'background:var(--ic-bg);border:1px solid var(--ic-b);color:var(--ic-ink)'};
 const FORMAT_PRESETS=['inline edits','prose','numbered steps','bullet points','code only','diff','table','concise summary'];
@@ -1907,12 +1874,13 @@ async function send(){
   if(!demoMode&&!apiKey){toggleKeyPanel();toast('add your api key — or try demo mode','err');return;}
   closeOv();
   const ctx=getCtx();
-  // User content — keep it clean, dimensions already live in system prompt
-  // Only surface constraint in user turn if declared, as a direct reminder at point-of-ask
   let uc=txt;
-  if(ctx.c) uc+='\n\n(Constraint in effect: '+ctx.c+')';
-  // Build system prompt with dimensions as first-class slots, not appended afterthoughts
-  const sys=buildSystemPrompt(intent||'default', ctx);
+  const cp=[];
+  if(ctx.f)cp.push('format: '+ctx.f);if(ctx.c)cp.push('constraint: '+ctx.c);if(ctx.a)cp.push('audience: '+ctx.a);
+  if(cp.length)uc+='\n\n['+cp.join(' · ')+']';
+  let sys='You are a helpful, precise assistant.';
+  if(intent&&SYS[intent])sys=SYS[intent];
+  if(ctx.f)sys+=' Format: '+ctx.f+'.';if(ctx.c)sys+=' Constraints: '+ctx.c+'.';if(ctx.a)sys+=' Audience: '+ctx.a+'.';
   document.getElementById('empty')?.remove();
   hist.push({role:'user',content:uc});
   addUser(txt,intent,ctx);ta.value='';ta.style.height='';
@@ -1976,18 +1944,29 @@ function toast(msg,type){const t=document.getElementById('toast');t.textContent=
 // jumpToOrb() — convenience: jump to most-recently-added orb.
 window.jumpToOrbById = function(id) {
   var orb = orbitOrbs.find(function(o) { return o.id === id; });
-  var seaRef = window._sea; // _sea is exposed from block1's init()
+  var seaRef = window._sea;
   if (!orb || !seaRef) return;
   var targetRotZ = -orb.angleOffset;
   var curr = seaRef.mesh.rotation.z;
   while (targetRotZ < curr - Math.PI) targetRotZ += Math.PI * 2;
   while (targetRotZ > curr + Math.PI) targetRotZ -= Math.PI * 2;
+
+  // Temporarily lift orbit-pause so the jump animation can land, then re-pause.
+  var wasPaused = window._isOrbitPaused ? window._isOrbitPaused() : false;
+  if (wasPaused && window._orbitPause) window._orbitPause(false);
+
   if (typeof gsap !== 'undefined') {
-    gsap.to(seaRef.mesh.rotation, { z: targetRotZ, duration: 1.4, ease: 'power2.inOut' });
+    gsap.to(seaRef.mesh.rotation, {
+      z: targetRotZ, duration: 1.1, ease: 'power2.inOut',
+      onComplete: function() {
+        if (wasPaused && window._orbitPause) window._orbitPause(true);
+      }
+    });
   } else {
     seaRef.mesh.rotation.z = targetRotZ;
+    if (wasPaused && window._orbitPause) window._orbitPause(true);
   }
-  toast('rotating to orb…', '');
+  toast('jumping to orb…', '');
 };
 
 window.jumpToOrb = function() {
@@ -2458,6 +2437,11 @@ window.openResultsWidget = function() {
   var pill = document.getElementById('results-widget-pill');
   if (w) { w.style.display = 'flex'; requestAnimationFrame(function(){ w.classList.add('open'); }); }
   if (pill) pill.style.display = 'none';
+  // Pause orbit so orbs hold their positions while browsing results
+  if (window._orbitPause) window._orbitPause(true);
+  // Show the paused badge
+  var badge = document.getElementById('rw-orbit-paused-badge');
+  if (badge) setTimeout(function(){ badge.classList.add('visible'); }, 180);
 };
 
 window.closeResultsWidget = function() {
@@ -2466,6 +2450,11 @@ window.closeResultsWidget = function() {
   var pill = document.getElementById('results-widget-pill');
   if (w) { w.classList.remove('open'); setTimeout(function(){ if(!_rwOpen) w.style.display='none'; }, 220); }
   if (pill && orbitOrbs.length > 0) pill.style.display = 'flex';
+  // Resume orbit on close
+  if (window._orbitPause) window._orbitPause(false);
+  // Hide the paused badge
+  var badge = document.getElementById('rw-orbit-paused-badge');
+  if (badge) badge.classList.remove('visible');
 };
 
 window.collapseResultsWidget = function() {
@@ -2564,6 +2553,9 @@ function syncResultsWidget() {
     var srcs = (orb._sources || ['web']).map(function(s){ return srcLabel[s]||s; }).join(' · ');
     var row = document.createElement('div');
     row.className = 'rw-row' + (isActive ? ' rw-row-active' : '');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('role', 'button');
+    row.setAttribute('aria-label', orb.task);
     row.innerHTML =
       '<span class="rw-row-dot" style="background:'+hex+';color:'+hex+'"></span>' +
       '<div class="rw-row-body">' +
@@ -2574,10 +2566,29 @@ function syncResultsWidget() {
         '</div>' +
       '</div>' +
       '<span class="rw-row-arrow">›</span>';
+    // Click: jump to orb + open detail
     row.onclick = function() {
       window.jumpToOrbById(orb.id);
       rwShowDetail(orb);
     };
+    // Keyboard: Enter/Space also activates
+    row.onkeydown = function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        window.jumpToOrbById(orb.id);
+        rwShowDetail(orb);
+      }
+    };
+    // Focus: jump to the orb in orbit so it rotates into view
+    row.addEventListener('focus', function() {
+      window.jumpToOrbById(orb.id);
+      // Highlight row
+      document.querySelectorAll('.rw-row').forEach(function(r) { r.classList.remove('rw-row-focused'); });
+      row.classList.add('rw-row-focused');
+    });
+    row.addEventListener('blur', function() {
+      row.classList.remove('rw-row-focused');
+    });
     listEl.appendChild(row);
   });
 }
@@ -2882,7 +2893,7 @@ window.seedDemoOrbs = function() {
 var reverseLerp = 0, sceneSpeed = 1.0, STATUS = 'playing';
 var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -4.0;
 var targetRotSpeed = 1.0, currentRotSpeed = 1.0;
-var planetColors = [0x4de8e4, 0x8b3fd4, 0xe0305a, 0x1e7fa8, 0xf5920a, 0x4a28cc, 0x8040a0];
+var planetColors = [0x68c3c0, 0x6b2fa0, 0xb03060, 0x2b596b, 0xc87820, 0x3a2080, 0x5c3a6a];
 var scene, camera, renderer, fgRenderer, sea, sky, humanoid, companionPoodle, atmosphereGroup;
 var mouse = {x:0, y:0}, butterfly = {vx:0, vy:0};
 var W, H;
@@ -2901,7 +2912,7 @@ function Sea() {
       speed: 0.016 + Math.random() * 0.032,
     });
   }
-  var mat = new THREE.MeshPhongMaterial({ color: planetColors[0], emissive: planetColors[0], emissiveIntensity: 0.18, transparent: true, opacity: 0.92, flatShading: true });
+  var mat = new THREE.MeshPhongMaterial({ color: planetColors[0], transparent: true, opacity: 0.8, flatShading: true });
   this.mesh = new THREE.Mesh(geom, mat);
   this.mesh.receiveShadow = true;
 }
@@ -3750,13 +3761,13 @@ function createAtmosphere() {
   var g1 = new THREE.CylinderGeometry(615, 615, 80, 48, 1, true);
   g1.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
   atmosphereGroup.add(new THREE.Mesh(g1, new THREE.MeshBasicMaterial({
-    color: 0x00ffff, transparent: true, opacity: 0.18,
+    color: 0x00ddff, transparent: true, opacity: 0.10,
     side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
   })));
   var g2 = new THREE.CylinderGeometry(606, 606, 28, 48, 1, true);
   g2.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
   atmosphereGroup.add(new THREE.Mesh(g2, new THREE.MeshBasicMaterial({
-    color: 0xcc44ff, transparent: true, opacity: 0.32,
+    color: 0xaa44ff, transparent: true, opacity: 0.22,
     side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
   })));
   var g3 = new THREE.CylinderGeometry(635, 635, 260, 48, 1, true);
@@ -3768,13 +3779,13 @@ function createAtmosphere() {
   var g4 = new THREE.CylinderGeometry(610, 610, 48, 48, 1, true);
   g4.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
   atmosphereGroup.add(new THREE.Mesh(g4, new THREE.MeshBasicMaterial({
-    color: 0xff1166, transparent: true, opacity: 0.16,
+    color: 0xff2266, transparent: true, opacity: 0.10,
     side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
   })));
   var g5 = new THREE.CylinderGeometry(602, 602, 18, 48, 1, true);
   g5.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
   atmosphereGroup.add(new THREE.Mesh(g5, new THREE.MeshBasicMaterial({
-    color: 0xffaa00, transparent: true, opacity: 0.20,
+    color: 0xffaa00, transparent: true, opacity: 0.13,
     side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
   })));
   atmosphereGroup.position.set(0, -600, 0);
@@ -3783,6 +3794,11 @@ function createAtmosphere() {
 
 var ambientPaused = false;
 window._ambientPause = function(v){ ambientPaused = v; };
+
+// orbitPaused: freezes planet rotation (orb positions) without killing ambient animations
+var orbitPaused = false;
+window._orbitPause = function(v){ orbitPaused = v; };
+window._isOrbitPaused = function(){ return orbitPaused; };
 
 // ─── WOLFIE FETCH ANIMATION STATE ──────────────────────────────────────────
 var wolfieMode = 'idle'; // 'idle' | 'excited' | 'departing' | 'offscreen' | 'returning'
@@ -3861,13 +3877,13 @@ function spawnFetchOrb(task) {
   var geo = new THREE.IcosahedronGeometry(14, 1);
   var mat = new THREE.MeshPhongMaterial({
     color: color, emissive: color,
-    emissiveIntensity: 0.72, shininess: 90,
-    flatShading: true, transparent: true, opacity: 0.96
+    emissiveIntensity: 0.45, shininess: 60,
+    flatShading: true, transparent: true, opacity: 0.92
   });
   var mesh = new THREE.Mesh(geo, mat);
   mesh.castShadow = true;
 
-  var light = new THREE.PointLight(color, 3.2, 240);
+  var light = new THREE.PointLight(color, 1.8, 180);
   mesh.add(light);
 
   // Space orbs evenly around the orbit — each new one gets a different sector
@@ -3913,9 +3929,9 @@ function updateOrbitOrbs() {
     );
 
     // Pulse emissive — each orb on its own rhythm
-    var pulse = 0.58 + 0.38 * Math.sin(now * 0.0024 + oi * 0.9);
+    var pulse = 0.38 + 0.28 * Math.sin(now * 0.0024 + oi * 0.9);
     orb.mesh.material.emissiveIntensity = pulse;
-    if (orb.light) orb.light.intensity = 2.4 + 1.4 * Math.sin(now * 0.0024 + oi * 0.9);
+    if (orb.light) orb.light.intensity = 1.4 + 0.9 * Math.sin(now * 0.0024 + oi * 0.9);
 
     // Slow self-rotation
     orb.mesh.rotation.y += 0.014;
@@ -3985,7 +4001,7 @@ function init() {
   if (!bg || typeof THREE === 'undefined') return;
   W = window.innerWidth; H = window.innerHeight;
   scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x0d0820, 120, 1100);
+  scene.fog = new THREE.Fog(0x0d0820, 80, 800);
   camera = new THREE.PerspectiveCamera(60, W/H, 1, 10000);
   camera.position.set(0, 100, 200);
   window._camera = camera; // expose for completeFetch ring projection
@@ -4059,8 +4075,10 @@ function loop() {
   currentRotSpeed += (targetRotSpeed - currentRotSpeed) * 0.05;
   sceneSpeed = currentRotSpeed;
 
-  sea.mesh.rotation.z += 0.005 * currentRotSpeed;
-  sky.mesh.rotation.z += 0.002 * currentRotSpeed;
+  if (!orbitPaused) {
+    sea.mesh.rotation.z += 0.005 * currentRotSpeed;
+    sky.mesh.rotation.z += 0.002 * currentRotSpeed;
+  }
   sea.moveWaves();
   if (atmosphereGroup) atmosphereGroup.rotation.z = sea.mesh.rotation.z * 0.3;
   var cycle=(sea.mesh.rotation.z/Math.PI)%planetColors.length;
@@ -4138,29 +4156,6 @@ window.addEventListener('wheel', function(e) {
   if (ambientPaused || !humanoid) return;
   reverseLerp += e.deltaY * 0.0016;
   reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.8, reverseLerp));
-
-  // ── Wolfie scroll-return: any scroll pulls him back to the astronaut ──
-  if (companionPoodle && wolfieMode !== 'departing') {
-    var cp = companionPoodle;
-    if (cp.behavior === 'wandering') {
-      // If fully offscreen, warp him to a re-entry position
-      if (Math.abs(cp.px) > 180) {
-        cp.px = cp.wanderDir > 0 ? 190 : -190;
-        cp.py = 95 + (Math.random() - 0.5) * 30;
-      }
-      // Cancel wander, snap into fast return orbit
-      cp.behavior = 'orbit';
-      cp.orbitDir = Math.random() < 0.5 ? 1 : -1;
-      cp.behaviorTimer = 280 + Math.floor(Math.random() * 160);
-      cp.vx = cp.px > 0 ? -5 : 5; // give initial kick toward astronaut
-      cp.vy = 0;
-    } else if (cp.behavior === 'zoom' || cp.behavior === 'circle') {
-      // Interrupt zoomies — come back and orbit
-      cp.behavior = 'orbit';
-      cp.orbitDir = Math.random() < 0.5 ? 1 : -1;
-      cp.behaviorTimer = 200 + Math.floor(Math.random() * 140);
-    }
-  }
 }, { passive: true });
 
 // ── Left click → random tumble | Right click → reset pose ──────────────────
