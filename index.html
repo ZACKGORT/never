@@ -1742,12 +1742,54 @@ let busy=false;
 let declared={f:null,c:null,a:null};
 
 const SYS={
-  write:'You are a precise writing assistant. Match the requested format and voice. Be direct.',
-  debug:'You are a systematic debugger. Identify the root cause first, then provide the fix.',
-  explain:'You are a clear technical explainer. Break concepts into components with concrete examples.',
-  analyze:'You are an analytical thinker. Evaluate systematically, surface trade-offs, give a recommendation.',
-  create:'You are a creative builder. Produce the artifact directly with minimal preamble.'
+  write:'You are a precise writing assistant. Your role is to produce clean, purposeful prose — no filler, no hedging.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}\nMatch the declared voice exactly. If no format is declared, default to tight prose paragraphs.',
+  debug:'You are a systematic debugger. Lead with root cause — not symptoms. Identify the exact failure point before proposing any fix.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}\nIf no format is declared, show the broken state, then the fixed state, with a one-line explanation of why.',
+  explain:'You are a precise technical explainer. Build understanding bottom-up — establish the mental model before the detail.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}\nIf no format is declared, use prose with one concrete example. Never use a list where a sentence would do.',
+  analyze:'You are a rigorous analytical thinker. Structure your response as: situation → options → trade-offs → recommendation. Never bury the recommendation.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}\nIf no format is declared, use prose. End with a single clear directive.',
+  create:'You are a direct builder. Produce the artifact immediately — code, copy, or structure — with minimal preamble.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}\nIf no format is declared, produce the artifact first, explanation after if needed.',
+  default:'You are a helpful, precise assistant. Think before responding. Be direct.\n{{format_directive}}\n{{constraint_directive}}\n{{audience_directive}}'
 };
+
+const FORMAT_DIRECTIVES={
+  'inline edits':'Output format: inline edits only — show changes in context, no rewriting of unchanged sections.',
+  'prose':'Output format: flowing prose paragraphs. No bullet points, no headers unless the content demands hierarchy.',
+  'numbered steps':'Output format: numbered steps in strict sequence. Each step is a single action.',
+  'bullet points':'Output format: bullet points. Each bullet is one complete idea, 1–2 sentences max.',
+  'code only':'Output format: code only. No prose explanation unless explicitly asked. Comments in-line where needed.',
+  'diff':'Output format: unified diff style — show removed lines with −, added lines with +.',
+  'table':'Output format: markdown table. Choose columns that surface the most meaningful comparison.',
+  'concise summary':'Output format: concise summary — 3–5 sentences maximum, no sub-points.'
+};
+
+const AUDIENCE_DIRECTIVES={
+  'myself':'Audience: this is for my own reference. Be terse, assume full context, skip explanations of things I already know.',
+  'beginner':'Audience: a beginner. Define terms on first use. Avoid assumed knowledge. Prefer analogy over abstraction.',
+  'mid-level engineer':'Audience: a mid-level engineer. Assume solid fundamentals, skip basics, but explain non-obvious design decisions.',
+  'senior engineer':'Audience: a senior engineer. Be peer-level. Omit basics entirely. Surface trade-offs and edge cases.',
+  'non-technical':'Audience: non-technical reader. No jargon. Use plain language and concrete analogies throughout.',
+  'client / PM':'Audience: a client or PM. Lead with outcome, not implementation. Keep technical detail minimal and purposeful.'
+};
+
+function buildSystemPrompt(intentKey, ctx) {
+  const base = SYS[intentKey] || SYS.default;
+
+  const fDir = ctx.f
+    ? (FORMAT_DIRECTIVES[ctx.f] || 'Output format: ' + ctx.f + '.')
+    : '';
+  const cDir = ctx.c
+    ? 'Hard constraints — treat these as non-negotiable: ' + ctx.c + '. Do not violate these under any circumstance.'
+    : '';
+  const aDir = ctx.a
+    ? (AUDIENCE_DIRECTIVES[ctx.a] || 'Audience: ' + ctx.a + '. Calibrate register, density, and assumed knowledge accordingly.')
+    : '';
+
+  return base
+    .replace('{{format_directive}}',     fDir)
+    .replace('{{constraint_directive}}', cDir)
+    .replace('{{audience_directive}}',   aDir)
+    .replace(/\n{3,}/g, '\n\n') // collapse any triple-newlines left by empty slots
+    .trim();
+}
 const PH={write:'What should be written, and for whom?',debug:'What\'s broken, and what did you expect instead?',explain:'What concept or code needs breaking down?',analyze:'What should be evaluated or compared?',create:'Describe the artifact you want built…'};
 const IBS={write:'background:var(--iw-bg);border:1px solid var(--iw-b);color:var(--iw-ink)',debug:'background:var(--id-bg);border:1px solid var(--id-b);color:var(--id-ink)',explain:'background:var(--ie-bg);border:1px solid var(--ie-b);color:var(--ie-ink)',analyze:'background:var(--ia-bg);border:1px solid var(--ia-b);color:var(--ia-ink)',create:'background:var(--ic-bg);border:1px solid var(--ic-b);color:var(--ic-ink)'};
 const FORMAT_PRESETS=['inline edits','prose','numbered steps','bullet points','code only','diff','table','concise summary'];
@@ -1865,13 +1907,12 @@ async function send(){
   if(!demoMode&&!apiKey){toggleKeyPanel();toast('add your api key — or try demo mode','err');return;}
   closeOv();
   const ctx=getCtx();
+  // User content — keep it clean, dimensions already live in system prompt
+  // Only surface constraint in user turn if declared, as a direct reminder at point-of-ask
   let uc=txt;
-  const cp=[];
-  if(ctx.f)cp.push('format: '+ctx.f);if(ctx.c)cp.push('constraint: '+ctx.c);if(ctx.a)cp.push('audience: '+ctx.a);
-  if(cp.length)uc+='\n\n['+cp.join(' · ')+']';
-  let sys='You are a helpful, precise assistant.';
-  if(intent&&SYS[intent])sys=SYS[intent];
-  if(ctx.f)sys+=' Format: '+ctx.f+'.';if(ctx.c)sys+=' Constraints: '+ctx.c+'.';if(ctx.a)sys+=' Audience: '+ctx.a+'.';
+  if(ctx.c) uc+='\n\n(Constraint in effect: '+ctx.c+')';
+  // Build system prompt with dimensions as first-class slots, not appended afterthoughts
+  const sys=buildSystemPrompt(intent||'default', ctx);
   document.getElementById('empty')?.remove();
   hist.push({role:'user',content:uc});
   addUser(txt,intent,ctx);ta.value='';ta.style.height='';
