@@ -1019,38 +1019,45 @@ body{background:#020111;}
 
 /* ─── RESULTS WIDGET (floating card) ─── */
 #results-widget-pill{
-  position:fixed;bottom:108px;right:20px;
+  position:fixed;bottom:198px;left:50%;transform:translateX(-50%);
   z-index:7990;
   display:flex;align-items:center;gap:5px;
   background:rgba(6,4,22,0.90);
   border:1px solid var(--glass-b2);border-radius:100px;
-  padding:6px 12px;
+  padding:6px 14px;
   cursor:pointer;
   backdrop-filter:var(--blur-sm);-webkit-backdrop-filter:var(--blur-sm);
   font-family:var(--mono);font-size:9px;letter-spacing:0.1em;
   color:var(--teal);
-  transition:background .15s,opacity .2s,transform .2s;
+  transition:background .15s;
   box-shadow:0 0 12px rgba(104,195,192,0.2);
+  white-space:nowrap;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
 }
 #results-widget-pill:hover{background:rgba(10,8,32,0.96);}
 
 #results-widget{
-  position:fixed;bottom:108px;right:20px;
+  position:fixed;bottom:235px;left:50%;
   z-index:7991;
-  width:310px;
-  max-height:72vh;
-  background:rgba(6,4,22,0.94);
+  width:min(340px,calc(100vw - 32px));
+  max-height:60vh;
+  background:rgba(6,4,22,0.96);
   backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
   border:1px solid var(--glass-b2);border-radius:14px;
   box-shadow:var(--shadow),0 0 40px rgba(104,195,192,0.06);
   display:none;flex-direction:column;
   overflow:hidden;
-  transform:translateY(8px) scale(0.97);
+  transform:translateX(-50%) translateY(12px) scale(0.97);
+  transform-origin:bottom center;
   opacity:0;
-  transition:opacity .2s ease,transform .2s ease;
+  pointer-events:none;
+  transition:opacity .22s ease,transform .22s cubic-bezier(.34,1.56,.64,1);
 }
 #results-widget.open{
-  display:flex;opacity:1;transform:translateY(0) scale(1);
+  display:flex;opacity:1;
+  transform:translateX(-50%) translateY(0) scale(1);
+  pointer-events:all;
 }
 
 .rw-head{
@@ -1141,12 +1148,18 @@ body{background:#020111;}
 .rw-detail-foot{
   display:flex;align-items:center;gap:6px;
   padding:9px 12px;border-top:1px solid var(--glass-b);flex-shrink:0;
+  pointer-events:all;
 }
 .rw-action{
   font-family:var(--sans);font-size:9px;letter-spacing:0.1em;text-transform:lowercase;
-  padding:5px 12px;border-radius:100px;cursor:pointer;
+  padding:8px 16px;border-radius:100px;cursor:pointer;
   border:1px solid var(--glass-b);color:var(--ink-3);background:transparent;
   transition:all .12s;white-space:nowrap;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;-webkit-user-select:none;
+  pointer-events:all;
+  min-height:36px;
 }
 .rw-action:hover{border-color:var(--glass-b2);color:var(--ink-2);}
 .rw-inject{color:#020111;background:var(--teal);border-color:var(--teal);font-weight:600;}
@@ -1372,8 +1385,12 @@ body{background:#020111;}
     </div>
     <div class="rw-detail-cards" id="rw-detail-cards"></div>
     <div class="rw-detail-foot">
-      <button class="rw-action rw-inject"  id="rw-inject-btn"  onclick="rwInjectActive()">inject → chat</button>
-      <button class="rw-action rw-release" id="rw-release-btn" onclick="rwReleaseActive()">release orb</button>
+      <button class="rw-action rw-inject"  id="rw-inject-btn"
+        onclick="rwInjectActive()"
+        ontouchend="rwInjectActive();event.stopPropagation();event.preventDefault()">inject → chat</button>
+      <button class="rw-action rw-release" id="rw-release-btn"
+        onclick="rwReleaseActive()"
+        ontouchend="rwReleaseActive();event.stopPropagation();event.preventDefault()">release orb</button>
     </div>
   </div>
 </div>
@@ -2448,15 +2465,18 @@ function rwShowDetail(orb) {
   if (!_rwOpen) window.openResultsWidget();
 }
 
+var _rwActionFired = false;
+function _rwGuard() { if (_rwActionFired) return true; _rwActionFired = true; setTimeout(function(){ _rwActionFired=false; }, 350); return false; }
+
 window.rwInjectActive = function() {
-  if (!_rwActive) return;
+  if (_rwGuard() || !_rwActive) return;
   var ta = document.getElementById('prompt');
   if (ta) { ta.value = _rwActive.task; ta.dispatchEvent(new Event('input')); ta.focus(); }
   toast('result injected → chat', 'ok');
 };
 
 window.rwReleaseActive = function() {
-  if (!_rwActive) return;
+  if (_rwGuard() || !_rwActive) return;
   var id = _rwActive.id;
   _rwActive = null;
   rwShowList();
@@ -2619,6 +2639,8 @@ window.showUploadComingSoon = function() {
     var rect = el.getBoundingClientRect();
     el.style.bottom = 'auto'; el.style.right = 'auto';
     el.style.left = rect.left + 'px'; el.style.top = rect.top + 'px';
+    // Remove centering transform so drag uses raw top/left
+    el.style.transform = 'none';
     el.style.transition = 'opacity .2s ease';
     rw = { startX: cx, startY: cy, origX: rect.left, origY: rect.top };
     document.body.classList.add('is-dragging');
@@ -3930,6 +3952,7 @@ function init() {
   fgRenderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
   fgRenderer.setSize(W, H);
   fgRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  fgRenderer.domElement.style.pointerEvents = 'none'; // critical: don't eat taps on UI above
   if (fgEl) fgEl.appendChild(fgRenderer.domElement);
 
   window.addEventListener('resize', function(){
