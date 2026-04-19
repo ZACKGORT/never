@@ -1058,7 +1058,10 @@ body{background:#020111;}
   padding:11px 13px 10px;
   border-bottom:1px solid var(--glass-b);
   flex-shrink:0;
+  cursor:grab;
+  user-select:none;
 }
+.rw-head:active{cursor:grabbing;}
 .rw-icon{font-size:11px;color:var(--teal);line-height:1;}
 .rw-orb-dot{
   width:9px;height:9px;border-radius:50%;flex-shrink:0;
@@ -1346,11 +1349,11 @@ body{background:#020111;}
 <div id="results-widget">
   <!-- list view -->
   <div id="rw-list-view">
-    <div class="rw-head">
+    <div class="rw-head" id="rw-drag-handle" onmousedown="startRwDrag(event)" ontouchstart="startRwDragTouch(event)">
       <span class="rw-icon">◉</span>
       <span class="rw-title">orbit · <span id="rw-count">0</span> results</span>
-      <button class="rw-collapse" onclick="collapseResultsWidget()" title="minimise">−</button>
-      <button class="rw-close" onclick="closeResultsWidget()">✕</button>
+      <button class="rw-collapse" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="collapseResultsWidget()" title="minimise">−</button>
+      <button class="rw-close"    onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="closeResultsWidget()" ontouchend="closeResultsWidget();event.preventDefault()">✕</button>
     </div>
     <div class="rw-empty" id="rw-empty">
       <div class="rw-empty-glyph">🐾</div>
@@ -1360,15 +1363,15 @@ body{background:#020111;}
   </div>
   <!-- detail view (shown when orb clicked) -->
   <div id="rw-detail-view" style="display:none">
-    <div class="rw-head">
+    <div class="rw-head" id="rw-drag-handle-detail" onmousedown="startRwDrag(event)" ontouchstart="startRwDragTouch(event)">
       <span class="rw-orb-dot" id="rw-detail-dot" style="background:#a78bfa;color:#a78bfa"></span>
       <span class="rw-title" id="rw-detail-title" style="font-size:10px">—</span>
-      <button class="rw-back" onclick="rwShowList()" title="all results">← all</button>
-      <button class="rw-close" onclick="closeResultsWidget()">✕</button>
+      <button class="rw-back"  onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="rwShowList()" ontouchend="rwShowList();event.preventDefault()" title="all results">← all</button>
+      <button class="rw-close" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="closeResultsWidget()" ontouchend="closeResultsWidget();event.preventDefault()">✕</button>
     </div>
     <div class="rw-detail-cards" id="rw-detail-cards"></div>
     <div class="rw-detail-foot">
-      <button class="rw-action rw-inject" id="rw-inject-btn" onclick="rwInjectActive()">inject → chat</button>
+      <button class="rw-action rw-inject"  id="rw-inject-btn"  onclick="rwInjectActive()">inject → chat</button>
       <button class="rw-action rw-release" id="rw-release-btn" onclick="rwReleaseActive()">release orb</button>
     </div>
   </div>
@@ -1874,7 +1877,7 @@ function toast(msg,type){const t=document.getElementById('toast');t.textContent=
 
   function openCtxMenu(e) {
     // Don't fire on UI elements
-    if (e.target.closest('#header,#composer,#key-panel,#demo-bar,.ctx-widget,#mpick,#toast,#fetch-widget,#fetch-toast,#fetch-ctx-menu,button,input,textarea,select,label')) return;
+    if (e.target.closest('#header,#composer,#key-panel,#demo-bar,.ctx-widget,#mpick,#toast,#fetch-widget,#fetch-toast,#fetch-ctx-menu,#results-widget,#results-widget-pill,#orb-ctx-menu,button,input,textarea,select,label')) return;
     e.preventDefault();
     const x = Math.min(e.clientX, window.innerWidth  - 190);
     const y = Math.min(e.clientY, window.innerHeight - 160);
@@ -1908,15 +1911,16 @@ function toast(msg,type){const t=document.getElementById('toast');t.textContent=
 // jumpToOrb() — convenience: jump to most-recently-added orb.
 window.jumpToOrbById = function(id) {
   var orb = orbitOrbs.find(function(o) { return o.id === id; });
-  if (!orb || typeof sea === 'undefined' || !sea) return;
+  var seaRef = window._sea; // _sea is exposed from block1's init()
+  if (!orb || !seaRef) return;
   var targetRotZ = -orb.angleOffset;
-  var curr = sea.mesh.rotation.z;
+  var curr = seaRef.mesh.rotation.z;
   while (targetRotZ < curr - Math.PI) targetRotZ += Math.PI * 2;
   while (targetRotZ > curr + Math.PI) targetRotZ -= Math.PI * 2;
   if (typeof gsap !== 'undefined') {
-    gsap.to(sea.mesh.rotation, { z: targetRotZ, duration: 1.4, ease: 'power2.inOut' });
+    gsap.to(seaRef.mesh.rotation, { z: targetRotZ, duration: 1.4, ease: 'power2.inOut' });
   } else {
-    sea.mesh.rotation.z = targetRotZ;
+    seaRef.mesh.rotation.z = targetRotZ;
   }
   toast('rotating to orb…', '');
 };
@@ -2602,6 +2606,57 @@ window.ocmRemove    = function() { if(window.closeOrbCtxMenu)window.closeOrbCtxM
 window.showUploadComingSoon = function() {
   toast('file upload · feature coming soon', '');
 };
+
+// ─── RESULTS WIDGET DRAG ─────────────────────────────────────────────────────
+(function() {
+  var rw = null; // active drag state
+
+  function getWidget() { return document.getElementById('results-widget'); }
+
+  function rwDragStart(cx, cy) {
+    var el = getWidget(); if (!el) return;
+    var rect = el.getBoundingClientRect();
+    el.style.bottom = 'auto'; el.style.right = 'auto';
+    el.style.left = rect.left + 'px'; el.style.top = rect.top + 'px';
+    el.style.transition = 'opacity .2s ease';
+    rw = { startX: cx, startY: cy, origX: rect.left, origY: rect.top };
+    document.body.classList.add('is-dragging');
+  }
+
+  function rwDragMove(cx, cy) {
+    if (!rw) return;
+    var el = getWidget(); if (!el) return;
+    var nx = Math.max(0, Math.min(window.innerWidth  - el.offsetWidth,  rw.origX + cx - rw.startX));
+    var ny = Math.max(0, Math.min(window.innerHeight - el.offsetHeight, rw.origY + cy - rw.startY));
+    el.style.left = nx + 'px'; el.style.top = ny + 'px';
+  }
+
+  function rwDragEnd() {
+    if (!rw) return;
+    var el = getWidget();
+    if (el) el.style.transition = 'opacity .2s ease, transform .2s ease';
+    document.body.classList.remove('is-dragging');
+    rw = null;
+  }
+
+  window.startRwDrag = function(e) {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    rwDragStart(e.clientX, e.clientY);
+  };
+
+  window.startRwDragTouch = function(e) {
+    if (e.target.tagName === 'BUTTON') return; // let buttons handle their own touch
+    e.preventDefault();
+    var t = e.touches[0];
+    rwDragStart(t.clientX, t.clientY);
+  };
+
+  document.addEventListener('mousemove',  function(e) { if (rw) rwDragMove(e.clientX, e.clientY); });
+  document.addEventListener('mouseup',    rwDragEnd);
+  document.addEventListener('touchmove',  function(e) { if (rw) { rwDragMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); } }, { passive: false });
+  document.addEventListener('touchend',   rwDragEnd);
+})();
 
 // ─── PANEL / WIDGET ALIAS (old strip functions) ───────────────────────────────
 window.rpJump   = function(id){ var o=orbitOrbs.find(function(x){return x.id===id;}); if(o){window.jumpToOrbById(id);rwShowDetail(o);} };
@@ -3910,6 +3965,7 @@ function init() {
   // Seed demo orbs after scene is ready
   window.spawnFetchOrb = spawnFetchOrb; // expose before seedDemoOrbs checks for it
   window._sea = sea; // expose sea so seedDemoOrbs can guard against unready scene
+  window._gsap = typeof gsap !== 'undefined' ? gsap : null; // expose for block0 animations
   setTimeout(function() { if (window.seedDemoOrbs) window.seedDemoOrbs(); }, 600);
   loop();
 }
@@ -3994,7 +4050,7 @@ window.addEventListener('wheel', function(e) {
 // ── Left click → random tumble | Right click → reset pose ──────────────────
 window.addEventListener('pointerdown', function(e) {
   if (ambientPaused || !humanoid || typeof gsap === 'undefined') return;
-  if (e.target.closest('#header,#composer,#key-panel,#demo-bar,.ctx-widget,#mpick,#toast,#phil-card,#orb-detail,#orb-backdrop,#results-panel,#results-panel-toggle,#orb-ctx-menu,button,input,textarea,select,label')) return;
+  if (e.target.closest('#header,#composer,#key-panel,#demo-bar,.ctx-widget,#mpick,#toast,#phil-card,#orb-detail,#orb-backdrop,#results-widget,#results-widget-pill,#orb-ctx-menu,button,input,textarea,select,label')) return;
 
   // ── Orb raycast — check all orbs ──────────────────────────────────────────
   if (orbitOrbs.length > 0 && camera) {
@@ -4085,7 +4141,7 @@ var SPINS = [
 ];
 document.addEventListener('click', function(e) {
   if (ambientPaused || !humanoid || typeof gsap === 'undefined') return;
-  if (e.target.closest('#header,#composer,#key-panel,#demo-bar,.ctx-widget,#mpick,#toast,#phil-card,button,input,textarea,select,label')) return;
+  if (e.target.closest('#header,#composer,#key-panel,#demo-bar,.ctx-widget,#mpick,#toast,#phil-card,#results-widget,#results-widget-pill,button,input,textarea,select,label')) return;
   var sp = SPINS[spinIdx % SPINS.length]; spinIdx++;
   gsap.to(humanoid, {flipX: humanoid.flipX + sp.fx, flipZ: humanoid.flipZ + sp.fz, duration: sp.dur, ease: sp.ease});
 });
