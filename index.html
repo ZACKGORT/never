@@ -416,6 +416,7 @@ body{background:#020111;}
 [data-theme="light"] body::after{opacity:0.016;}
 [data-theme="light"] #ne-bg{display:none;}
 [data-theme="light"] #nebula-overlay{display:none;}
+[data-theme="light"] #world-fg{display:none!important;}
 [data-theme="light"] #thread::before{display:none;}
 
 /* header */
@@ -865,8 +866,13 @@ body{background:#020111;}
   transition:background .12s,color .12s;
 }
 .ft-cancel:hover{background:var(--glass-3);color:var(--ink);}
-[data-theme="light"] #fetch-toast{background:#fff;color:var(--ink);}
+[data-theme="light"] #fetch-toast{background:#fff;color:var(--ink);border-color:rgba(0,0,0,0.10);box-shadow:0 2px 16px rgba(0,0,0,0.08),0 1px 4px rgba(0,0,0,0.06);}
+[data-theme="light"] #fetch-toast::before{display:none;}
 [data-theme="light"] .ft-cancel:hover{background:rgba(0,0,0,0.06);color:var(--ink);}
+[data-theme="light"] .ft-step-row{color:rgba(0,0,0,0.25);}
+[data-theme="light"] .ft-label{color:rgba(201,100,66,0.6);}
+[data-theme="light"] .ft-task{color:var(--ink);}
+[data-theme="light"] .ft-elapsed{color:var(--ink-3);}
 
 /* fetch context menu additions */
 #fetch-ctx-menu{
@@ -1724,7 +1730,7 @@ var fetchOrb = null;         // points to the most-recently-spawned orb only, cl
 var orbRaycaster = null;
 var orbMouseNDC = null;
 var activeBursts = [];
-var ORB_COLORS = [0xa78bfa, 0x60a5fa, 0x34d399, 0xfbbf24, 0xf472b6, 0x38bdf8, 0xfb923c];
+var ORB_COLORS = [0xc084fc, 0x38bdf8, 0x4ade80, 0xfcd34d, 0xf472b6, 0x22d3ee, 0xff8a40];
 var ORB_RADIUS = 280;
 var ORB_BAND_Y_OFFSET = 650;
 
@@ -2835,7 +2841,7 @@ window.seedDemoOrbs = function() {
 var reverseLerp = 0, sceneSpeed = 1.0, STATUS = 'playing';
 var MAGNETIC_FORWARD = 1.0, MAGNETIC_STRENGTH = 0.018, REVERSE_LIMIT = -4.0;
 var targetRotSpeed = 1.0, currentRotSpeed = 1.0;
-var planetColors = [0x68c3c0, 0x6b2fa0, 0xb03060, 0x2b596b, 0xc87820, 0x3a2080, 0x5c3a6a];
+var planetColors = [0x4de8e4, 0x8b3fd4, 0xe0305a, 0x1e7fa8, 0xf5920a, 0x4a28cc, 0x8040a0];
 var scene, camera, renderer, fgRenderer, sea, sky, humanoid, companionPoodle, atmosphereGroup;
 var mouse = {x:0, y:0}, butterfly = {vx:0, vy:0};
 var W, H;
@@ -2854,7 +2860,7 @@ function Sea() {
       speed: 0.016 + Math.random() * 0.032,
     });
   }
-  var mat = new THREE.MeshPhongMaterial({ color: planetColors[0], transparent: true, opacity: 0.8, flatShading: true });
+  var mat = new THREE.MeshPhongMaterial({ color: planetColors[0], emissive: planetColors[0], emissiveIntensity: 0.18, transparent: true, opacity: 0.92, flatShading: true });
   this.mesh = new THREE.Mesh(geom, mat);
   this.mesh.receiveShadow = true;
 }
@@ -3703,13 +3709,13 @@ function createAtmosphere() {
   var g1 = new THREE.CylinderGeometry(615, 615, 80, 48, 1, true);
   g1.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
   atmosphereGroup.add(new THREE.Mesh(g1, new THREE.MeshBasicMaterial({
-    color: 0x00ddff, transparent: true, opacity: 0.10,
+    color: 0x00ffff, transparent: true, opacity: 0.18,
     side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
   })));
   var g2 = new THREE.CylinderGeometry(606, 606, 28, 48, 1, true);
   g2.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
   atmosphereGroup.add(new THREE.Mesh(g2, new THREE.MeshBasicMaterial({
-    color: 0xaa44ff, transparent: true, opacity: 0.22,
+    color: 0xcc44ff, transparent: true, opacity: 0.32,
     side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
   })));
   var g3 = new THREE.CylinderGeometry(635, 635, 260, 48, 1, true);
@@ -3721,13 +3727,13 @@ function createAtmosphere() {
   var g4 = new THREE.CylinderGeometry(610, 610, 48, 48, 1, true);
   g4.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
   atmosphereGroup.add(new THREE.Mesh(g4, new THREE.MeshBasicMaterial({
-    color: 0xff2266, transparent: true, opacity: 0.10,
+    color: 0xff1166, transparent: true, opacity: 0.16,
     side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
   })));
   var g5 = new THREE.CylinderGeometry(602, 602, 18, 48, 1, true);
   g5.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI * 0.5));
   atmosphereGroup.add(new THREE.Mesh(g5, new THREE.MeshBasicMaterial({
-    color: 0xffaa00, transparent: true, opacity: 0.13,
+    color: 0xffaa00, transparent: true, opacity: 0.20,
     side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending
   })));
   atmosphereGroup.position.set(0, -600, 0);
@@ -3814,13 +3820,13 @@ function spawnFetchOrb(task) {
   var geo = new THREE.IcosahedronGeometry(14, 1);
   var mat = new THREE.MeshPhongMaterial({
     color: color, emissive: color,
-    emissiveIntensity: 0.45, shininess: 60,
-    flatShading: true, transparent: true, opacity: 0.92
+    emissiveIntensity: 0.72, shininess: 90,
+    flatShading: true, transparent: true, opacity: 0.96
   });
   var mesh = new THREE.Mesh(geo, mat);
   mesh.castShadow = true;
 
-  var light = new THREE.PointLight(color, 1.8, 180);
+  var light = new THREE.PointLight(color, 3.2, 240);
   mesh.add(light);
 
   // Space orbs evenly around the orbit — each new one gets a different sector
@@ -3866,9 +3872,9 @@ function updateOrbitOrbs() {
     );
 
     // Pulse emissive — each orb on its own rhythm
-    var pulse = 0.38 + 0.28 * Math.sin(now * 0.0024 + oi * 0.9);
+    var pulse = 0.58 + 0.38 * Math.sin(now * 0.0024 + oi * 0.9);
     orb.mesh.material.emissiveIntensity = pulse;
-    if (orb.light) orb.light.intensity = 1.4 + 0.9 * Math.sin(now * 0.0024 + oi * 0.9);
+    if (orb.light) orb.light.intensity = 2.4 + 1.4 * Math.sin(now * 0.0024 + oi * 0.9);
 
     // Slow self-rotation
     orb.mesh.rotation.y += 0.014;
@@ -3938,7 +3944,7 @@ function init() {
   if (!bg || typeof THREE === 'undefined') return;
   W = window.innerWidth; H = window.innerHeight;
   scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x0d0820, 80, 800);
+  scene.fog = new THREE.Fog(0x0d0820, 120, 1100);
   camera = new THREE.PerspectiveCamera(60, W/H, 1, 10000);
   camera.position.set(0, 100, 200);
   window._camera = camera; // expose for completeFetch ring projection
@@ -4091,6 +4097,29 @@ window.addEventListener('wheel', function(e) {
   if (ambientPaused || !humanoid) return;
   reverseLerp += e.deltaY * 0.0016;
   reverseLerp = Math.max(REVERSE_LIMIT, Math.min(1.8, reverseLerp));
+
+  // ── Wolfie scroll-return: any scroll pulls him back to the astronaut ──
+  if (companionPoodle && wolfieMode !== 'departing') {
+    var cp = companionPoodle;
+    if (cp.behavior === 'wandering') {
+      // If fully offscreen, warp him to a re-entry position
+      if (Math.abs(cp.px) > 180) {
+        cp.px = cp.wanderDir > 0 ? 190 : -190;
+        cp.py = 95 + (Math.random() - 0.5) * 30;
+      }
+      // Cancel wander, snap into fast return orbit
+      cp.behavior = 'orbit';
+      cp.orbitDir = Math.random() < 0.5 ? 1 : -1;
+      cp.behaviorTimer = 280 + Math.floor(Math.random() * 160);
+      cp.vx = cp.px > 0 ? -5 : 5; // give initial kick toward astronaut
+      cp.vy = 0;
+    } else if (cp.behavior === 'zoom' || cp.behavior === 'circle') {
+      // Interrupt zoomies — come back and orbit
+      cp.behavior = 'orbit';
+      cp.orbitDir = Math.random() < 0.5 ? 1 : -1;
+      cp.behaviorTimer = 200 + Math.floor(Math.random() * 140);
+    }
+  }
 }, { passive: true });
 
 // ── Left click → random tumble | Right click → reset pose ──────────────────
