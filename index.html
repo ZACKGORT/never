@@ -929,7 +929,127 @@ body{background:#020111;}
 }
 #rw-orbit-paused-badge.visible{opacity:1;}
 
-/* ─── FETCH SOURCE PILLS ─── */
+/* ─── NOTES WIDGET ─────────────────────────────────────────────────────────── */
+#notes-widget-pill{
+  position:fixed;bottom:198px;right:16px;
+  z-index:8100;
+  display:none;align-items:center;gap:5px;
+  background:rgba(6,4,22,0.92);
+  border:1px solid var(--glass-b2);border-radius:100px;
+  padding:7px 14px;cursor:pointer;
+  backdrop-filter:var(--blur-sm);-webkit-backdrop-filter:var(--blur-sm);
+  font-family:var(--mono);font-size:9px;letter-spacing:0.1em;
+  color:var(--ink-2);
+  transition:background .15s;
+  white-space:nowrap;
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  min-height:36px;
+}
+#notes-widget-pill:hover{background:rgba(10,8,32,0.96);}
+#notes-widget-pill .nwp-icon{color:var(--teal);font-size:10px;}
+
+#notes-widget{
+  position:fixed;bottom:235px;right:24px;
+  z-index:7991;
+  width:min(320px,calc(100vw - 32px));
+  background:rgba(6,4,22,0.96);
+  backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
+  border:1px solid var(--glass-b2);border-radius:14px;
+  box-shadow:var(--shadow),0 0 40px rgba(104,195,192,0.04);
+  display:none;flex-direction:column;
+  overflow:hidden;
+  transform:translateY(12px) scale(0.97);
+  transform-origin:bottom right;
+  opacity:0;pointer-events:none;
+  transition:opacity .22s ease,transform .22s cubic-bezier(.34,1.56,.64,1);
+}
+#notes-widget.open{
+  opacity:1;
+  transform:translateY(0) scale(1);
+  pointer-events:all;
+}
+
+#nw-head{
+  display:flex;align-items:center;gap:7px;
+  padding:11px 13px 10px;
+  border-bottom:1px solid var(--glass-b);
+  flex-shrink:0;cursor:grab;user-select:none;
+}
+#nw-head:active{cursor:grabbing;}
+.nw-icon{font-size:10px;color:var(--ink-3);line-height:1;}
+#nw-title{
+  font-family:var(--sans);font-size:9px;letter-spacing:0.18em;text-transform:lowercase;
+  color:var(--ink-2);flex:1;
+}
+#nw-toolbar{display:flex;align-items:center;gap:2px;flex-shrink:0;}
+.nw-tool{
+  width:22px;height:22px;border:none;background:transparent;cursor:pointer;
+  color:var(--ink-3);font-size:9px;display:flex;align-items:center;justify-content:center;
+  border-radius:3px;transition:all .13s;padding:0;flex-shrink:0;
+  font-family:var(--mono);letter-spacing:0;
+}
+.nw-tool:hover{background:var(--glass-3);color:var(--ink);}
+.nw-tool.active{color:var(--teal);background:rgba(104,195,192,0.08);}
+.nw-close,.nw-collapse{
+  width:20px;height:20px;border:none;background:transparent;cursor:pointer;
+  color:var(--ink-3);font-size:10px;display:flex;align-items:center;justify-content:center;
+  border-radius:3px;transition:all .13s;padding:0;flex-shrink:0;
+}
+.nw-close:hover,.nw-collapse:hover{background:var(--glass-3);color:var(--ink);}
+
+#nw-editor-wrap{
+  flex:1;padding:12px 14px;overflow-y:auto;
+  min-height:120px;max-height:calc(60vh - 90px);
+}
+#nw-editor{
+  font-family:var(--sans);font-size:12px;line-height:1.65;
+  color:var(--ink);outline:none;min-height:80px;
+  caret-color:var(--teal);
+}
+#nw-editor:empty::before{
+  content:attr(data-placeholder);
+  color:var(--ink-3);pointer-events:none;
+  font-style:italic;font-size:11px;
+}
+#nw-editor ol{
+  padding-left:1.4em;margin:4px 0;
+  list-style:decimal;
+}
+#nw-editor li{margin:2px 0;line-height:1.6;}
+#nw-editor p{margin:0;padding:2px 0;}
+
+#nw-foot{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 12px;border-top:1px solid var(--glass-b);flex-shrink:0;
+}
+#nw-char-count{
+  font-family:var(--mono);font-size:8px;letter-spacing:0.06em;
+  color:var(--ink-3);flex:1;
+}
+#nw-clear-btn{
+  font-family:var(--sans);font-size:9px;letter-spacing:0.1em;text-transform:lowercase;
+  padding:7px 12px;border-radius:100px;cursor:pointer;
+  border:1px solid var(--glass-b);color:var(--ink-3);background:transparent;
+  transition:all .12s;white-space:nowrap;
+}
+#nw-clear-btn:hover{border-color:var(--glass-b2);color:var(--ink-2);}
+#nw-inject-btn{
+  font-family:var(--sans);font-size:9px;letter-spacing:0.1em;text-transform:lowercase;
+  padding:7px 16px;border-radius:100px;cursor:pointer;
+  color:#020111;background:var(--teal);border:1px solid var(--teal);font-weight:600;
+  transition:all .12s;white-space:nowrap;
+}
+#nw-inject-btn:hover{opacity:0.84;}
+#nw-inject-btn:disabled{opacity:0.3;cursor:default;}
+
+/* light mode */
+[data-theme="light"] #notes-widget{background:#fff;border-color:rgba(0,0,0,0.10);}
+[data-theme="light"] #notes-widget-pill{background:#fff;border-color:rgba(0,0,0,0.12);color:var(--ink-3);}
+[data-theme="light"] #nw-head{border-bottom-color:rgba(0,0,0,0.07);}
+[data-theme="light"] #nw-foot{border-top-color:rgba(0,0,0,0.07);}
+[data-theme="light"] #nw-editor{color:var(--ink);}
+
+
 .fw-sources{display:flex;flex-direction:column;gap:6px;}
 .fw-src-lbl{font-family:var(--mono);font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-3);}
 .fw-src-pills{display:flex;flex-wrap:wrap;gap:5px;}
@@ -1216,6 +1336,21 @@ body{background:#020111;}
   transition:all .14s;white-space:nowrap;margin-left:4px;
 }
 .c-fetch-btn:hover{background:rgba(104,195,192,0.18);}
+.c-notes-btn{
+  font-family:var(--sans);font-size:9px;letter-spacing:0.1em;text-transform:lowercase;
+  color:var(--ink-3);border:1px solid var(--glass-b);border-radius:100px;
+  padding:5px 11px;cursor:pointer;background:transparent;
+  transition:all .14s;white-space:nowrap;margin-left:2px;
+}
+.c-notes-btn:hover{border-color:var(--glass-b2);color:var(--ink-2);}
+[data-theme="light"] .c-notes-btn{color:var(--ink-3);}
+
+/* action bar — sits between intent pills and textarea */
+.c-action-bar{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px 0;
+  flex-wrap:wrap;
+}
 .c-upload-btn{
   font-family:var(--sans);font-size:9px;letter-spacing:0.1em;text-transform:lowercase;
   color:var(--ink-3);border:1px solid var(--glass-b);border-radius:100px;
@@ -1443,6 +1578,36 @@ body{background:#020111;}
   <span id="rwp-count">0</span>
 </div>
 
+<!-- ─── NOTES WIDGET ─── -->
+<div id="notes-widget">
+  <div id="nw-head" onmousedown="startNwDrag(event)" ontouchstart="startNwDragTouch(event)">
+    <span class="nw-icon">✦</span>
+    <span id="nw-title">notes</span>
+    <div id="nw-toolbar">
+      <button class="nw-tool" id="nw-ol-btn" title="ordered list" onmousedown="event.stopPropagation()" onclick="nwToggleList()">1·</button>
+    </div>
+    <button class="nw-collapse" onmousedown="event.stopPropagation()" onclick="collapseNotesWidget()" title="minimise">−</button>
+    <button class="nw-close"    onmousedown="event.stopPropagation()" onclick="closeNotesWidget()">✕</button>
+  </div>
+  <div id="nw-editor-wrap">
+    <div id="nw-editor" contenteditable="true"
+      data-placeholder="ambient thoughts, observations, threads…"
+      oninput="nwOnInput()"
+      onkeydown="nwOnKeydown(event)"></div>
+  </div>
+  <div id="nw-foot">
+    <span id="nw-char-count">empty</span>
+    <button id="nw-clear-btn" onclick="nwClear()" style="display:none">clear</button>
+    <button id="nw-inject-btn" onclick="nwInject()" disabled>inject → chat</button>
+  </div>
+</div>
+
+<!-- notes widget collapsed pill -->
+<div id="notes-widget-pill" onclick="openNotesWidget()" style="display:none">
+  <span class="nwp-icon">✦</span>
+  <span id="nwp-preview">notes</span>
+</div>
+
 <!-- ─── ORB RIGHT-CLICK CONTEXT MENU ─── -->
 <div id="orb-ctx-menu">
   <div class="ocm-orb-swatch">
@@ -1599,6 +1764,11 @@ body{background:#020111;}
       <span class="ic" data-i="analyze" onclick="setI('analyze')">analyze</span>
       <span class="ic" data-i="create"  onclick="setI('create')">create</span>
     </div>
+    <div class="c-action-bar">
+      <button class="c-fetch-btn" onclick="openFetchWidget()" title="send wolfie · play fetch">🐾 fetch</button>
+      <button class="c-notes-btn" onclick="toggleNotesWidget()" title="open notes">✦ notes</button>
+      <button class="c-upload-btn" onclick="showUploadComingSoon()" title="upload file">↑ upload</button>
+    </div>
     <textarea id="prompt" rows="2" placeholder="what do you need?"></textarea>
     <div class="ctx-row">
       <div class="ctx-cell" id="cell-f" onclick="openOv('f')">
@@ -1617,8 +1787,6 @@ body{background:#020111;}
     <div class="c-foot">
       <div class="fl">
         <button class="ghost" onclick="clearCtx()">clear ctx</button>
-        <button class="c-fetch-btn" onclick="openFetchWidget()" title="send wolfie · play fetch">🐾 fetch</button>
-        <button class="c-upload-btn" onclick="showUploadComingSoon()" title="upload file">↑ upload</button>
       </div>
       <div class="fr">
         <span class="model-pill" id="mpill" onclick="togglePick()">sonnet 4.5 ∨</span>
@@ -2524,6 +2692,158 @@ window.collapseResultsWidget = function() {
 window.toggleResultsPanel = function() {
   _rwOpen ? window.closeResultsWidget() : window.openResultsWidget();
 };
+
+// ─── NOTES WIDGET ──────────────────────────────────────────────────────────────
+
+var _nwOpen = false;
+var _nwPos = null; // {x, y} drag offset
+
+window.openNotesWidget = function() {
+  _nwOpen = true;
+  var w = document.getElementById('notes-widget');
+  var pill = document.getElementById('notes-widget-pill');
+  if (w) {
+    w.style.display = 'flex';
+    requestAnimationFrame(function(){ w.classList.add('open'); });
+  }
+  if (pill) pill.style.display = 'none';
+  setTimeout(function(){ var e = document.getElementById('nw-editor'); if(e) e.focus(); }, 240);
+};
+
+window.closeNotesWidget = function() {
+  _nwOpen = false;
+  var w = document.getElementById('notes-widget');
+  var pill = document.getElementById('notes-widget-pill');
+  if (w) { w.classList.remove('open'); setTimeout(function(){ if(!_nwOpen) w.style.display='none'; }, 220); }
+  // show pill only if there's content
+  var ed = document.getElementById('nw-editor');
+  if (pill && ed && ed.innerText.trim().length > 0) pill.style.display = 'flex';
+};
+
+window.collapseNotesWidget = function() { window.closeNotesWidget(); };
+
+// toggle from composer button
+window.toggleNotesWidget = function() {
+  _nwOpen ? window.closeNotesWidget() : window.openNotesWidget();
+};
+
+function nwOnInput() {
+  var ed = document.getElementById('nw-editor');
+  var count = document.getElementById('nw-char-count');
+  var injectBtn = document.getElementById('nw-inject-btn');
+  var clearBtn = document.getElementById('nw-clear-btn');
+  if (!ed) return;
+  var text = ed.innerText.trim();
+  var len = text.length;
+  if (count) count.textContent = len > 0 ? len + ' chars' : 'empty';
+  if (injectBtn) injectBtn.disabled = len === 0;
+  if (clearBtn) clearBtn.style.display = len > 0 ? '' : 'none';
+  // update pill preview
+  var pill = document.getElementById('nwp-preview');
+  if (pill) pill.textContent = len > 0 ? text.slice(0, 18) + (text.length > 18 ? '…' : '') : 'notes';
+}
+
+function nwOnKeydown(e) {
+  // Enter in list mode — let the browser handle li creation naturally
+  // Tab — indent (browser default in contenteditable is fine)
+  // Escape — close
+  if (e.key === 'Escape') { window.closeNotesWidget(); }
+}
+
+function nwToggleList() {
+  var btn = document.getElementById('nw-ol-btn');
+  var ed = document.getElementById('nw-editor');
+  if (!ed) return;
+  ed.focus();
+  var inList = document.queryCommandState('insertOrderedList');
+  document.execCommand('insertOrderedList', false, null);
+  if (btn) btn.classList.toggle('active', !inList);
+}
+
+function nwClear() {
+  var ed = document.getElementById('nw-editor');
+  if (!ed) return;
+  if (!ed.innerText.trim()) return;
+  ed.innerHTML = '';
+  nwOnInput();
+  ed.focus();
+}
+
+function nwInject() {
+  var ed = document.getElementById('nw-editor');
+  if (!ed) return;
+  var text = ed.innerText.trim();
+  if (!text) return;
+  // Append to composer input
+  var ta = document.getElementById('composer-input') || document.querySelector('#composer textarea') || document.querySelector('textarea');
+  if (ta) {
+    var cur = ta.value ? ta.value.trim() : '';
+    ta.value = cur ? cur + '\n\n[note] ' + text : '[note] ' + text;
+    ta.dispatchEvent(new Event('input', {bubbles:true}));
+    ta.focus();
+  } else {
+    // fallback: put in clipboard + toast
+    try { navigator.clipboard.writeText(text); } catch(e) {}
+  }
+  toast('note injected into composer', 'ok');
+  window.closeNotesWidget();
+}
+
+// ── Notes widget drag ──────────────────────────────────────────────────────────
+var _nwDragging = false, _nwDragStartX = 0, _nwDragStartY = 0, _nwOrigR = 0, _nwOrigB = 0;
+
+function startNwDrag(e) {
+  if (e.button !== 0) return;
+  var w = document.getElementById('notes-widget');
+  if (!w) return;
+  _nwDragging = true;
+  _nwDragStartX = e.clientX; _nwDragStartY = e.clientY;
+  var rect = w.getBoundingClientRect();
+  _nwOrigR = window.innerWidth - rect.right;
+  _nwOrigB = window.innerHeight - rect.bottom;
+  document.addEventListener('mousemove', onNwDragMove);
+  document.addEventListener('mouseup', onNwDragEnd);
+  e.preventDefault();
+}
+function startNwDragTouch(e) {
+  var t = e.touches[0];
+  var w = document.getElementById('notes-widget');
+  if (!w) return;
+  _nwDragging = true;
+  _nwDragStartX = t.clientX; _nwDragStartY = t.clientY;
+  var rect = w.getBoundingClientRect();
+  _nwOrigR = window.innerWidth - rect.right;
+  _nwOrigB = window.innerHeight - rect.bottom;
+  document.addEventListener('touchmove', onNwDragMoveT, {passive:false});
+  document.addEventListener('touchend', onNwDragEndT);
+}
+function onNwDragMove(e) {
+  if (!_nwDragging) return;
+  var dx = e.clientX - _nwDragStartX, dy = e.clientY - _nwDragStartY;
+  applyNwDrag(dx, dy);
+}
+function onNwDragMoveT(e) {
+  if (!_nwDragging) return;
+  e.preventDefault();
+  var t = e.touches[0];
+  var dx = t.clientX - _nwDragStartX, dy = t.clientY - _nwDragStartY;
+  applyNwDrag(dx, dy);
+}
+function applyNwDrag(dx, dy) {
+  var w = document.getElementById('notes-widget');
+  if (!w) return;
+  var newR = Math.max(8, _nwOrigR - dx);
+  var newB = Math.max(8, _nwOrigB - dy);
+  newR = Math.min(newR, window.innerWidth - 60);
+  newB = Math.min(newB, window.innerHeight - 60);
+  w.style.right = newR + 'px';
+  w.style.bottom = newB + 'px';
+  w.style.left = 'auto';
+}
+function onNwDragEnd() { _nwDragging = false; document.removeEventListener('mousemove', onNwDragMove); document.removeEventListener('mouseup', onNwDragEnd); }
+function onNwDragEndT() { _nwDragging = false; document.removeEventListener('touchmove', onNwDragMoveT); document.removeEventListener('touchend', onNwDragEndT); }
+
+
 
 function rwShowList() {
   document.getElementById('rw-list-view').style.display = '';
