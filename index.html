@@ -370,7 +370,7 @@ body.is-dragging *{user-select:none;}
   font-family:var(--sans);font-size:10px;letter-spacing:0.12em;text-transform:lowercase;color:var(--ink-2);
   padding:8px 18px;opacity:0;pointer-events:none;
   transition:opacity .2s,transform .2s;z-index:500;white-space:nowrap;
-  box-shadow:var(--shadow);
+  box-shadow:0 4px 16px rgba(0,0,0,0.35),0 1px 4px rgba(0,0,0,0.2);
 }
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 #toast.err{color:var(--ic-ink);background:var(--ic-bg);border-color:var(--ic-b);}
@@ -414,12 +414,28 @@ body{background:#020111;}
 }
 [data-theme="light"] body{background:var(--bg);background-image:none;color:var(--ink);}
 [data-theme="light"] body::after{opacity:0.016;}
-[data-theme="light"] #ne-bg{display:none;}
 [data-theme="light"] #nebula-overlay{display:none;}
 [data-theme="light"] #thread::before{display:none;}
 
 /* header */
-[data-theme="light"] #header,[data-theme="light"] #header:hover{background:#faf8f5;border-bottom-color:rgba(0,0,0,0.07);}
+[data-theme="light"] #header,[data-theme="light"] #header:hover{background:#faf8f5;border-bottom-color:rgba(0,0,0,0.07);backdrop-filter:none;-webkit-backdrop-filter:none;}
+/* ensure Three.js canvases don't bleed through in light mode */
+[data-theme="light"] #ne-bg,
+[data-theme="light"] #world-fg{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  position:fixed !important;
+  left:-99999px !important;
+  top:-99999px !important;
+}
+[data-theme="light"] #ne-bg canvas,
+[data-theme="light"] #world-fg canvas{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+}
 [data-theme="light"] .brand-glyph{color:var(--teal);}
 [data-theme="light"] .brand-word{background:none;-webkit-text-fill-color:var(--ink);color:var(--ink);}
 [data-theme="light"] .brand-rule{background:rgba(0,0,0,0.12);}
@@ -540,7 +556,11 @@ body{background:#020111;}
 
 /* backdrop, toast */
 [data-theme="light"] #mob-backdrop{background:rgba(26,24,21,0.28);backdrop-filter:blur(2px);}
-[data-theme="light"] #toast{backdrop-filter:none;-webkit-backdrop-filter:none;background:#fff;border-color:rgba(0,0,0,0.12);color:var(--ink-2);box-shadow:var(--shadow);}
+/* hide Three.js character layer in light mode */
+[data-theme="light"] #world-fg { display: none !important; }
+
+/* toast: tighter shadow, no upward bleed */
+[data-theme="light"] #toast{backdrop-filter:none;-webkit-backdrop-filter:none;background:#fff;border-color:rgba(0,0,0,0.12);color:var(--ink-2);box-shadow:0 1px 6px rgba(0,0,0,0.10),0 2px 12px rgba(0,0,0,0.07);}
 
 /* scrollbars */
 [data-theme="light"] *{scrollbar-color:rgba(201,100,66,0.2) transparent;}
@@ -799,9 +819,16 @@ body{background:#020111;}
 }
 
 
+/* clip container so fetch-toast shadow never bleeds into viewport when hidden */
+#fetch-toast-clip{
+  position:fixed;top:0;left:0;right:0;
+  height:0;overflow:visible;
+  z-index:8500;pointer-events:none;
+}
 #fetch-toast{
-  position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-100%);
-  z-index:8500;
+  position:absolute;top:0;left:50%;transform:translateX(-50%) translateY(-100%);
+  z-index:1;
+  pointer-events:auto;
   background:rgba(6,4,22,0.92);
   backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);
   border:1px solid transparent;
@@ -809,7 +836,7 @@ body{background:#020111;}
   padding:8px 16px 9px;
   display:flex;align-items:flex-start;flex-direction:column;gap:4px;
   min-width:280px;max-width:440px;
-  box-shadow:0 6px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(104,195,192,0.18);
+  box-shadow:none;
   transition:transform .35s cubic-bezier(.34,1.56,.64,1);
   cursor:default;
   background-clip:padding-box;
@@ -834,7 +861,7 @@ body{background:#020111;}
   0%{background-position:200% 0}
   100%{background-position:-200% 0}
 }
-#fetch-toast.visible{transform:translateX(-50%) translateY(0);}
+#fetch-toast.visible{transform:translateX(-50%) translateY(0);box-shadow:0 4px 24px rgba(0,0,0,0.45), 0 0 0 1px rgba(104,195,192,0.18);}
 .ft-dot{
   width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;
   box-shadow:0 0 8px var(--teal), 0 0 16px rgba(104,195,192,0.5);
@@ -1715,6 +1742,7 @@ body{background:#020111;}
 </div>
 
 <!-- ─── PERSISTENT FETCH TOAST ─── -->
+<div id="fetch-toast-clip">
 <div id="fetch-toast" oncontextmenu="openFetchCtxMenu(event)">
   <div style="display:flex;align-items:center;gap:10px;width:100%;">
     <span class="ft-dot" id="ft-dot"></span>
@@ -1725,6 +1753,7 @@ body{background:#020111;}
     <button class="ft-cancel" onclick="cancelFetch()" title="cancel fetch">✕</button>
   </div>
   <div class="ft-steps" id="ft-steps"></div>
+</div>
 </div>
 
 <script>
@@ -1782,6 +1811,36 @@ function applyTheme(t){
   const btn=document.getElementById('theme-btn');
   if(btn) btn.textContent=t==='dark'?'◐':'◑';
   if(window._ambientPause) window._ambientPause(t==='light');
+  // Clear renderer canvases when switching to light so no dark frame lingers
+  if(t==='light'){
+    if(window._renderer){
+      try{
+        window._renderer.setClearColor(0x000000, 0);
+        window._renderer.clear(true, true, true);
+        // Detach canvas from DOM entirely
+        var c = window._renderer.domElement;
+        if(c && c.parentNode) c.parentNode.removeChild(c);
+      }catch(e){}
+    }
+    if(window._fgRenderer){
+      try{
+        window._fgRenderer.setClearColor(0x000000, 0);
+        window._fgRenderer.clear(true, true, true);
+        var fc = window._fgRenderer.domElement;
+        if(fc && fc.parentNode) fc.parentNode.removeChild(fc);
+      }catch(e){}
+    }
+  } else {
+    // Re-attach canvas when switching back to dark
+    var bg = document.getElementById('ne-bg');
+    var fg = document.getElementById('world-fg');
+    if(window._renderer && bg && !bg.contains(window._renderer.domElement)){
+      bg.appendChild(window._renderer.domElement);
+    }
+    if(window._fgRenderer && fg && !fg.contains(window._fgRenderer.domElement)){
+      fg.appendChild(window._fgRenderer.domElement);
+    }
+  }
   // theme-color meta
   document.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.remove());
   const tc=document.createElement('meta');
@@ -4009,6 +4068,7 @@ function init() {
   renderer.setSize(W, H);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   bg.appendChild(renderer.domElement);
+  window._renderer = renderer;
 
   // Foreground renderer — astronaut + wolfie above phil-card (z-index 5), below composer (z-index 10)
   var fgEl = document.getElementById('world-fg');
@@ -4017,6 +4077,13 @@ function init() {
   fgRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   fgRenderer.domElement.style.pointerEvents = 'none'; // critical: don't eat taps on UI above
   if (fgEl) fgEl.appendChild(fgRenderer.domElement);
+  window._fgRenderer = fgRenderer;
+
+  // If already in light theme at init time, clear immediately
+  if (document.documentElement.dataset.theme === 'light') {
+    renderer.setClearColor(0x000000, 0); renderer.clear(true, true, true);
+    fgRenderer.setClearColor(0x000000, 0); fgRenderer.clear(true, true, true);
+  }
 
   window.addEventListener('resize', function(){
     W=window.innerWidth; H=window.innerHeight;
