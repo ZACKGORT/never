@@ -223,6 +223,86 @@ body::after{
 .tcursor{display:inline-block;width:2px;height:13px;background:var(--teal);vertical-align:text-bottom;animation:blink .85s infinite;margin-left:1px;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
+/* ─── INTENT-TYPED RESPONSE RENDERING ─── */
+
+/* write — document feel, serif headings, full ink */
+.msg-body.intent-write{color:var(--ink);}
+.msg-body.intent-write h3{font-family:var(--serif);font-style:italic;font-size:17px;font-weight:400;color:var(--ink);margin-bottom:0.7em;letter-spacing:-0.01em;}
+.msg-body.intent-write p{line-height:1.82;}
+.msg-body.intent-write hr{border:none;border-top:1px solid var(--glass-b);margin:14px 0;}
+
+/* explain — slightly receded, contemplative */
+.msg-body.intent-explain{color:var(--ink-2);font-size:13.5px;line-height:1.84;}
+.msg-body.intent-explain p{margin-bottom:1em;}
+.msg-body.intent-explain strong{color:var(--ink);}
+
+/* debug — terminal block */
+.msg-body.intent-debug{
+  background:rgba(0,0,0,0.38);border:1px solid var(--glass-b);border-radius:8px;
+  padding:13px 15px;font-family:var(--mono);font-size:11.5px;line-height:1.72;
+  color:rgba(104,195,192,0.88);
+}
+.msg-body.intent-debug .dl-ok   {color:rgba(100,210,120,0.9);}
+.msg-body.intent-debug .dl-err  {color:rgba(210,100,140,0.9);}
+.msg-body.intent-debug .dl-warn {color:rgba(212,160,80,0.9);}
+.msg-body.intent-debug .dl-muted{color:rgba(255,255,255,0.28);}
+.msg-body.intent-debug .dl-def  {color:rgba(104,195,192,0.88);}
+.msg-body.intent-debug div{margin-bottom:1px;}
+/* streaming placeholder inside debug */
+.debug-stream-raw{font-family:var(--mono);font-size:11.5px;color:rgba(104,195,192,0.7);white-space:pre-wrap;word-break:break-all;}
+
+/* analyze — option cards, revealed post-stream */
+.msg-body.intent-analyze{color:var(--ink);}
+.analyze-thinking{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--ink-3);animation:apulse 1.8s infinite;}
+@keyframes apulse{0%,100%{opacity:0.4}50%{opacity:1}}
+.analyze-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;animation:fi .22s ease;}
+@media(max-width:520px){.analyze-cards{grid-template-columns:1fr;}}
+.ac-card{background:rgba(212,160,80,0.05);border:1px solid var(--ia-b);border-radius:9px;padding:12px 14px;transition:border-color .14s,background .14s;}
+.ac-card:hover{background:rgba(212,160,80,0.09);border-color:rgba(212,160,80,0.5);}
+.ac-card.recommended{border-color:var(--ia-ink);background:rgba(212,160,80,0.11);}
+.ac-title{font-size:11px;font-weight:600;color:var(--ia-ink);margin-bottom:5px;letter-spacing:0.04em;}
+.ac-body{font-size:12px;line-height:1.65;color:var(--ink-2);}
+.ac-rec{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;color:var(--ia-ink);margin-top:7px;opacity:0.9;}
+.analyze-prose{font-size:13.5px;line-height:1.78;color:var(--ink);}
+.analyze-prose p{margin-bottom:0.85em;}
+.analyze-prose strong{color:var(--ink);}
+
+/* create — artifact container */
+.msg-body.intent-create{padding:0;}
+.create-frame{
+  border:1px solid var(--glass-b2);border-radius:10px;overflow:hidden;
+  background:rgba(255,255,255,0.025);
+}
+.create-frame-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 12px;border-bottom:1px solid var(--glass-b);
+  background:rgba(210,100,140,0.06);
+}
+.create-frame-label{font-family:var(--mono);font-size:8px;letter-spacing:0.18em;color:var(--ic-ink);opacity:0.8;}
+.create-frame-copy{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--ink-3);background:transparent;border:1px solid var(--glass-b);border-radius:100px;padding:2px 8px;cursor:pointer;transition:all .13s;}
+.create-frame-copy:hover{color:var(--ink-2);border-color:var(--glass-b2);}
+.create-frame-body{padding:14px 15px;font-size:13.5px;line-height:1.78;color:var(--ink);}
+.create-frame-body pre{background:rgba(0,0,0,0.3);border:1px solid var(--glass-b);border-radius:6px;padding:12px 14px;margin:10px 0;overflow-x:auto;}
+.create-frame-body pre code{background:none;border:none;padding:0;color:rgba(210,100,140,0.9);font-size:12px;line-height:1.7;font-family:var(--mono);}
+.create-frame-body code{font-family:var(--mono);font-size:12px;background:rgba(210,100,140,0.08);border:1px solid rgba(210,100,140,0.18);border-radius:3px;padding:1px 6px;color:var(--ic-ink);}
+.create-frame-body p{margin-bottom:0.85em;}
+.create-frame-body p:last-child{margin-bottom:0;}
+.create-stream-raw{padding:14px 15px;font-family:var(--mono);font-size:11.5px;color:rgba(210,100,140,0.7);white-space:pre-wrap;word-break:break-all;min-height:40px;}
+
+/* light theme adjustments */
+[data-theme="light"] .msg-body.intent-debug{background:#f0f0f0;border-color:rgba(0,0,0,0.10);color:#2a6438;}
+[data-theme="light"] .msg-body.intent-debug .dl-ok{color:#2a6438;}
+[data-theme="light"] .msg-body.intent-debug .dl-err{color:#8c2a27;}
+[data-theme="light"] .msg-body.intent-debug .dl-warn{color:#7a5514;}
+[data-theme="light"] .msg-body.intent-debug .dl-muted{color:#a8a49e;}
+[data-theme="light"] .ac-card{background:rgba(212,160,80,0.04);border-color:var(--ia-b);}
+[data-theme="light"] .ac-card.recommended{background:rgba(212,160,80,0.09);}
+[data-theme="light"] .create-frame{background:#fff;border-color:rgba(0,0,0,0.10);}
+[data-theme="light"] .create-frame-head{background:rgba(210,100,140,0.05);border-bottom-color:rgba(0,0,0,0.07);}
+[data-theme="light"] .create-frame-body pre{background:#eeece8;border-color:rgba(0,0,0,0.10);}
+[data-theme="light"] .create-frame-body pre code{color:#8c2a27;}
+[data-theme="light"] .create-frame-body code{background:rgba(210,100,140,0.07);border-color:rgba(210,100,140,0.18);}
+
 /* ─── PHILOSOPHY CARD ─── */
 #phil-card{margin-bottom:28px;animation:fi .32s ease;}
 #phil-card.hidden{display:none;}
@@ -2091,7 +2171,22 @@ const DEMO={
   default:'That\'s a reasonable question. Here\'s how I\'d think about it:\n\nThe short answer depends on what you\'re optimizing for. Speed points to the first option; correctness over time points to the second.\n\nThe thing most people miss: this decision *looks* like a technical tradeoff but is actually a social one — whoever maintains this in six months is the real stakeholder, and they\'re rarely in the room.\n\nWhat\'s the actual constraint you\'re working against?'
 };
 function toggleDemo(){demoMode=!demoMode;document.getElementById('demo-bar').classList.toggle('on',demoMode);var db=document.getElementById('demo-btn');if(db){db.classList.toggle('demo-on',demoMode);db.textContent=demoMode?'demo on':'try demo';}if(demoMode)toast('demo mode — no key needed','ok');else toast('demo off','');}
-async function simulateStream(bel,text){const words=text.split('');let i=0,full='';return new Promise(resolve=>{function tick(){if(!busy){resolve();return;}const chunk=words.slice(i,i+4).join('');full+=chunk;i+=4;bel.innerHTML=md(full)+'<span class="tcursor"></span>';scrollT();if(i>=words.length){bel.innerHTML=md(full);resolve();}else setTimeout(tick,18+Math.random()*14);}tick();});}
+async function simulateStream(streamEl,text,finalize){
+  const words=text.split('');let i=0,full='';
+  return new Promise(resolve=>{
+    function tick(){
+      if(!busy){resolve();return;}
+      const chunk=words.slice(i,i+4).join('');full+=chunk;i+=4;
+      if(streamEl){streamEl.innerHTML=md(full)+'<span class="tcursor"></span>';scrollT();}
+      if(i>=words.length){
+        if(finalize)finalize(full);
+        else if(streamEl)streamEl.innerHTML=md(full);
+        resolve();
+      }else setTimeout(tick,18+Math.random()*14);
+    }
+    tick();
+  });
+}
 
 // SEND
 async function send(){
@@ -2111,16 +2206,175 @@ async function send(){
   document.getElementById('empty')?.remove();
   hist.push({role:'user',content:uc});
   addUser(txt,intent,ctx);ta.value='';ta.style.height='';
-  const bel=addAssistant();busy=true;document.getElementById('sb').disabled=true;
+  const {streamEl,finalize}=addAssistant(intent);busy=true;document.getElementById('sb').disabled=true;
   try{
-    if(demoMode){const response=DEMO[intent]||DEMO.default;await simulateStream(bel,response);hist.push({role:'assistant',content:response});}
-    else{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model,max_tokens:2048,system:sys,stream:true,messages:hist.map(m=>({role:m.role,content:m.content}))})});if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e?.error?.message||'HTTP '+r.status);}const rdr=r.body.getReader(),dec=new TextDecoder();let full='';while(true){const{done,value}=await rdr.read();if(done)break;for(const line of dec.decode(value,{stream:true}).split('\n')){if(!line.startsWith('data: '))continue;const d=line.slice(6).trim();if(d==='[DONE]')break;try{const ev=JSON.parse(d);if(ev.type==='content_block_delta'&&ev.delta?.text){full+=ev.delta.text;bel.innerHTML=md(full)+'<span class="tcursor"></span>';scrollT();}if(ev.type==='message_stop')bel.innerHTML=md(full);}catch(_){}}}bel.innerHTML=md(full);hist.push({role:'assistant',content:full});}
-  }catch(e){bel.innerHTML='<span style="color:var(--ic-ink);font-family:var(--mono);font-size:12px">⚠ '+esc(e.message)+'</span>';hist.pop();toast(e.message.length>90?e.message.slice(0,90)+'…':e.message,'err');}
+    if(demoMode){
+      const response=DEMO[intent]||DEMO.default;
+      await simulateStream(streamEl,response,finalize);
+      hist.push({role:'assistant',content:response});
+    } else {
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model,max_tokens:2048,system:sys,stream:true,messages:hist.map(m=>({role:m.role,content:m.content}))})});
+      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e?.error?.message||'HTTP '+r.status);}
+      const rdr=r.body.getReader(),dec=new TextDecoder();let full='';
+      while(true){
+        const{done,value}=await rdr.read();if(done)break;
+        for(const line of dec.decode(value,{stream:true}).split('\n')){
+          if(!line.startsWith('data: '))continue;
+          const d=line.slice(6).trim();if(d==='[DONE]')break;
+          try{
+            const ev=JSON.parse(d);
+            if(ev.type==='content_block_delta'&&ev.delta?.text){
+              full+=ev.delta.text;
+              if(streamEl){streamEl.innerHTML=md(full)+'<span class="tcursor"></span>';scrollT();}
+            }
+            if(ev.type==='message_stop'){if(finalize)finalize(full);else if(streamEl)streamEl.innerHTML=md(full);}
+          }catch(_){}
+        }
+      }
+      hist.push({role:'assistant',content:full});
+    }
+  }catch(e){
+    const errEl=streamEl||document.querySelector('.msg-a:last-child .ac');
+    if(errEl)errEl.innerHTML='<span style="color:var(--ic-ink);font-family:var(--mono);font-size:12px">⚠ '+esc(e.message)+'</span>';
+    hist.pop();toast(e.message.length>90?e.message.slice(0,90)+'…':e.message,'err');
+  }
   busy=false;document.getElementById('sb').disabled=false;scrollT();
 }
 
 function addUser(txt,intentName,ctx){const ti=document.getElementById('ti'),div=document.createElement('div');div.className='msg msg-u';const tags=[],ib=intentName&&IBS[intentName]?`<span class="i-badge" style="${IBS[intentName]}">${intentName}</span>`:'';if(ctx.f)tags.push('fmt: '+ctx.f);if(ctx.c)tags.push('con: '+ctx.c);if(ctx.a)tags.push('aud: '+ctx.a);div.innerHTML=`<div class="msg-meta">${ib}<span class="role-lbl">you</span></div><div class="msg-bubble"><p>${esc(txt).replace(/\n/g,'<br>')}</p></div>${tags.length?'<div class="msg-ctx">'+tags.map(t=>`<span class="ctx-tag">${t}</span>`).join('')+'</div>':''}`;ti.appendChild(div);scrollT();}
-function addAssistant(){const ti=document.getElementById('ti'),div=document.createElement('div');div.className='msg msg-a';div.innerHTML=`<div class="a-icon">✳</div><div class="a-body"><div class="msg-meta"><span class="role-lbl">claude</span></div><div class="msg-body ac"><span class="tcursor"></span></div></div>`;ti.appendChild(div);scrollT();return div.querySelector('.ac');}
+
+function addAssistant(intentName){
+  const ti=document.getElementById('ti'),div=document.createElement('div');
+  div.className='msg msg-a';
+  let bodyClass='msg-body ac';
+  if(intentName)bodyClass+=' intent-'+intentName;
+
+  // debug: terminal container from the start
+  if(intentName==='debug'){
+    div.innerHTML=`<div class="a-icon" style="background:var(--ia-ink);color:#020111">✳</div><div class="a-body"><div class="msg-meta"><span class="role-lbl">claude</span></div><div class="${bodyClass}"><div class="debug-stream-raw"><span class="tcursor"></span></div></div></div>`;
+    ti.appendChild(div);scrollT();
+    // return the raw stream target + finalize fn
+    const raw=div.querySelector('.debug-stream-raw');
+    const body=div.querySelector('.ac');
+    return {
+      streamEl: raw,
+      finalize: function(full){ body.innerHTML=renderDebugLines(full); }
+    };
+  }
+
+  // analyze: show "analyzing…" during stream, cards after
+  if(intentName==='analyze'){
+    div.innerHTML=`<div class="a-icon" style="background:var(--ia-ink);color:#020111">✳</div><div class="a-body"><div class="msg-meta"><span class="role-lbl">claude</span></div><div class="${bodyClass}"><span class="analyze-thinking">analyzing…</span></div></div>`;
+    ti.appendChild(div);scrollT();
+    const body=div.querySelector('.ac');
+    return {
+      streamEl: null, // buffer only, no live render
+      finalize: function(full){ body.innerHTML=renderAnalyzeCards(full); }
+    };
+  }
+
+  // create: artifact frame container
+  if(intentName==='create'){
+    div.innerHTML=`<div class="a-icon" style="background:var(--ic-ink);color:#020111">✳</div><div class="a-body"><div class="msg-meta"><span class="role-lbl">claude</span></div><div class="${bodyClass}"><div class="create-frame"><div class="create-frame-head"><span class="create-frame-label">output</span><button class="create-frame-copy" onclick="copyCreate(this)">copy</button></div><div class="create-stream-raw"><span class="tcursor"></span></div></div></div></div>`;
+    ti.appendChild(div);scrollT();
+    const raw=div.querySelector('.create-stream-raw');
+    const body=div.querySelector('.ac');
+    return {
+      streamEl: raw,
+      finalize: function(full){
+        const frame=body.querySelector('.create-frame');
+        const head=frame.querySelector('.create-frame-head');
+        head.innerHTML=`<span class="create-frame-label">output</span><button class="create-frame-copy" onclick="copyCreate(this)">copy</button>`;
+        const fb=document.createElement('div');fb.className='create-frame-body';
+        fb.innerHTML=md(full);
+        const old=frame.querySelector('.create-stream-raw');
+        if(old)frame.removeChild(old);
+        frame.appendChild(fb);
+      }
+    };
+  }
+
+  // write / explain / default: prose
+  const iconBg={write:'var(--iw-ink)',explain:'var(--ic-ink)',analyze:'var(--ia-ink)'};
+  const ibg=iconBg[intentName]||'var(--teal)';
+  const iconAttr=`style="background:${ibg};color:#020111"`;
+  div.innerHTML=`<div class="a-icon" ${iconAttr}>✳</div><div class="a-body"><div class="msg-meta"><span class="role-lbl">claude</span></div><div class="${bodyClass}"><span class="tcursor"></span></div></div>`;
+  ti.appendChild(div);scrollT();
+  const body=div.querySelector('.ac');
+  return {
+    streamEl: body,
+    finalize: function(full){ body.innerHTML=md(full); }
+  };
+}
+
+// ─── INTENT RENDERERS ────────────────────────────────────────────────────────
+
+function renderDebugLines(text){
+  // classify each line by leading token
+  return text.split('\n').map(function(line){
+    const s=line.trimStart();
+    let cls='dl-def';
+    if(/^(✓|✔|ok|PASS|resolved|done)/i.test(s))cls='dl-ok';
+    else if(/^(✗|✘|error|fail|ERR|⚠|warning)/i.test(s))cls='dl-err';
+    else if(/^(warn|⚡|note|→|fix)/i.test(s))cls='dl-warn';
+    else if(/^(#|\/\/|--|```)/.test(s)||s==='')cls='dl-muted';
+    else if(/^\$\s/.test(s))cls='dl-muted';
+    return line===''?'<div class="dl-muted"> </div>':`<div class="${cls}">${esc(line)}</div>`;
+  }).join('');
+}
+
+function renderAnalyzeCards(text){
+  // Try to parse Option A / Option B / Recommendation structure
+  // Falls back to prose if structure not found
+  const optionRe=/\*?\*?option\s+([a-z0-9]+)[:\s—–-]+\*?\*?([^\n]*)\n([\s\S]*?)(?=\*?\*?option\s+[a-z0-9]+[:\s—–-]|\*?\*?recommend|\*?\*?conclusion|$)/gi;
+  const recRe=/\*?\*?(recommend(?:ation)?|conclusion)[:\s—–-]+\*?\*?([\s\S]+)/i;
+  const opts=[];
+  let m;
+  const textNorm=text.replace(/\r/g,'');
+  while((m=optionRe.exec(textNorm))!==null){
+    opts.push({label:'Option '+m[1].toUpperCase(),title:m[2].trim(),body:m[3].trim()});
+  }
+  const recMatch=recRe.exec(textNorm);
+  const rec=recMatch?recMatch[2].trim():'';
+
+  // need at least 2 options to do cards
+  if(opts.length>=2){
+    // mark last option as recommended if explicit recommendation found
+    if(rec){
+      const lastLabel=opts[opts.length-1].label.toLowerCase();
+      opts.forEach(function(o){
+        if(rec.toLowerCase().indexOf(o.label.toLowerCase().replace('option ',''))!==-1||
+           rec.toLowerCase().indexOf(o.label.toLowerCase())!==-1)o.recommended=true;
+      });
+      // if none flagged, try to infer from "B" or last
+      if(!opts.some(function(o){return o.recommended;}))opts[opts.length-1].recommended=true;
+    }
+    let html='<div class="analyze-cards">';
+    opts.forEach(function(o){
+      html+=`<div class="ac-card${o.recommended?' recommended':''}">`;
+      html+=`<div class="ac-title">${esc(o.label)}</div>`;
+      html+=`<div class="ac-body">${md(o.body)}</div>`;
+      if(o.recommended)html+=`<div class="ac-rec">✦ recommended</div>`;
+      html+='</div>';
+    });
+    html+='</div>';
+    if(rec){
+      html+=`<div class="analyze-prose" style="margin-top:10px">${md(rec)}</div>`;
+    }
+    return html;
+  }
+  // fallback: render as prose with analyze coloring
+  return `<div class="analyze-prose">${md(text)}</div>`;
+}
+
+window.copyCreate=function(btn){
+  const frame=btn.closest('.create-frame');
+  const body=frame?frame.querySelector('.create-frame-body, .create-stream-raw'):null;
+  if(!body)return;
+  navigator.clipboard.writeText(body.innerText||body.textContent||'').then(function(){
+    btn.textContent='copied ✓';setTimeout(function(){btn.textContent='copy';},1800);
+  }).catch(function(){btn.textContent='copy';});
+};
 function md(t){t=t.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>'<pre><code>'+esc(c.trim())+'</code></pre>');t=t.replace(/`([^`]+)`/g,(_,c)=>'<code>'+esc(c)+'</code>');t=t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');t=t.replace(/^#{1,3}\s+(.+)$/gm,'<h3>$1</h3>');t=t.replace(/^[-*]\s+(.+)$/gm,'<li>$1</li>');t=t.replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>');t=t.replace(/<\/ul>\s*<ul>/g,'');return t.split('\n').map(l=>{const s=l.trim();return s&&!/^<(pre|ul|h3|li)/.test(s)?'<p>'+s+'</p>':s;}).filter(Boolean).join('');}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function grow(){const e=document.getElementById('prompt');e.style.height='auto';e.style.height=Math.min(e.scrollHeight,220)+'px';}
