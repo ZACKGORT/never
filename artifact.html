@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>artifact · neverever.land</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#020111;--glass:rgba(6,4,22,0.82);--glass-2:rgba(8,6,28,0.92);
+  --glass-b:rgba(255,255,255,0.08);--glass-b2:rgba(255,255,255,0.14);--glass-b3:rgba(255,255,255,0.22);
+  --ink:rgba(255,255,255,0.88);--ink-2:rgba(255,255,255,0.52);--ink-3:rgba(255,255,255,0.28);
+  --teal:#68c3c0;--teal-l:rgba(104,195,192,0.08);--teal-b:rgba(104,195,192,0.28);
+  --mono:'DM Mono',monospace;--sans:'Instrument Sans',sans-serif;--serif:'Playfair Display',serif;
+  --amber:rgba(212,160,80,1);--amber-l:rgba(212,160,80,0.08);--amber-b:rgba(212,160,80,0.28);
+  --purple:rgba(160,120,220,1);--purple-l:rgba(160,120,220,0.08);--purple-b:rgba(160,120,220,0.28);
+  --blue:rgba(80,155,200,1);--blue-l:rgba(80,155,200,0.08);--blue-b:rgba(80,155,200,0.28);
+  --pink:rgba(210,100,140,1);--pink-l:rgba(210,100,140,0.08);--pink-b:rgba(210,100,140,0.28);
+}
+html,body{height:100%;background:var(--bg);font-family:var(--sans);color:var(--ink);overflow:hidden;}
+body{
+  background-image:
+    radial-gradient(ellipse at 20% 80%,rgba(180,30,80,0.14) 0%,transparent 55%),
+    radial-gradient(ellipse at 80% 10%,rgba(60,20,140,0.22) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 20%,rgba(40,25,90,0.45) 0%,transparent 65%);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0/180px;
+  opacity:.032;
+}
+
+/* LAYOUT */
+#app{display:grid;grid-template-columns:1fr 300px;grid-template-rows:44px 1fr 108px;height:100vh;}
+#header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--glass-b);background:rgba(2,1,17,0.9);position:relative;z-index:10;}
+#artifact-pane{grid-column:1;grid-row:2;overflow-y:auto;padding:28px 32px;border-right:1px solid var(--glass-b);}
+#thread-pane{grid-column:2;grid-row:2;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+#composer-bar{grid-column:1/-1;grid-row:3;border-top:1px solid var(--glass-b);padding:12px 18px;display:flex;flex-direction:column;gap:8px;background:rgba(2,1,17,0.88);}
+
+/* HEADER */
+.brand{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;color:var(--teal);}
+.hdr-mid{display:flex;align-items:center;gap:8px;}
+#doc-title{font-family:var(--sans);font-size:13px;color:var(--ink-2);background:transparent;border:none;outline:none;letter-spacing:-0.01em;width:260px;}
+#doc-title:focus{color:var(--ink);border-bottom:1px solid var(--teal-b);}
+.version-pill{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--ink-3);border:1px solid var(--glass-b);border-radius:100px;padding:2px 8px;}
+.hdr-right{display:flex;gap:6px;align-items:center;}
+.hdr-btn{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--ink-3);border:1px solid var(--glass-b);border-radius:100px;padding:4px 10px;cursor:pointer;background:transparent;transition:all .14s;}
+.hdr-btn:hover{color:var(--ink);border-color:var(--glass-b2);}
+
+/* NODES */
+.artifact-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:12px;opacity:0.4;}
+.artifact-empty-glyph{font-size:28px;color:var(--teal);}
+.artifact-empty-text{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--ink-3);}
+.node{border:1px solid var(--glass-b);border-radius:10px;margin-bottom:12px;overflow:hidden;transition:border-color .15s,box-shadow .15s;cursor:pointer;}
+.node:hover{border-color:var(--glass-b2);}
+.node.selected{border-color:var(--teal-b);box-shadow:0 0 0 1px var(--teal-b);}
+.node-header{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--glass-b);background:rgba(255,255,255,0.02);}
+.node-intent-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.node-intent-label{font-family:var(--mono);font-size:8px;letter-spacing:0.14em;flex:1;}
+.node-id{font-family:var(--mono);font-size:8px;color:var(--ink-3);}
+.node-actions{display:flex;gap:4px;opacity:0;transition:opacity .13s;}
+.node:hover .node-actions{opacity:1;}
+.node-act{font-family:var(--mono);font-size:8px;letter-spacing:0.08em;color:var(--ink-3);background:transparent;border:1px solid var(--glass-b);border-radius:100px;padding:2px 7px;cursor:pointer;transition:all .12s;}
+.node-act:hover{color:var(--ink-2);border-color:var(--glass-b2);}
+.node-act.danger:hover{color:var(--pink);border-color:var(--pink-b);}
+.node-body{padding:14px;}
+
+/* INTENT: DRAFT */
+.node[data-intent="draft"] .node-intent-dot{background:var(--teal);}
+.node[data-intent="draft"] .node-intent-label{color:var(--teal);}
+.node[data-intent="draft"] .node-body{font-size:13px;line-height:1.78;color:var(--ink);}
+.node[data-intent="draft"] .node-body p{margin-bottom:0.75em;}
+.node[data-intent="draft"] .node-body p:last-child{margin-bottom:0;}
+.node[data-intent="draft"] .node-body h3{font-family:var(--serif);font-style:italic;font-size:16px;margin-bottom:0.6em;color:var(--ink);}
+
+/* INTENT: EXPLAIN */
+.node[data-intent="explain"] .node-intent-dot{background:var(--pink);}
+.node[data-intent="explain"] .node-intent-label{color:var(--pink);}
+.node[data-intent="explain"] .node-body{font-size:13px;line-height:1.78;color:var(--ink-2);}
+.node[data-intent="explain"] .node-body p{margin-bottom:0.75em;}
+.node[data-intent="explain"] .node-body p:last-child{margin-bottom:0;}
+
+/* INTENT: ANALYZE */
+.node[data-intent="analyze"] .node-intent-dot{background:var(--amber);}
+.node[data-intent="analyze"] .node-intent-label{color:var(--amber);}
+.node[data-intent="analyze"] .node-body{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.option-card{background:rgba(212,160,80,0.05);border:1px solid var(--amber-b);border-radius:7px;padding:10px 12px;}
+.option-card.recommended{border-color:var(--amber);background:rgba(212,160,80,0.10);}
+.option-title{font-size:11px;font-weight:600;color:var(--amber);margin-bottom:5px;}
+.option-body{font-size:11px;line-height:1.6;color:var(--ink-2);}
+.option-rec{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--amber);margin-top:6px;}
+
+/* INTENT: BUILD */
+.node[data-intent="build"] .node-intent-dot{background:var(--purple);}
+.node[data-intent="build"] .node-intent-label{color:var(--purple);}
+.node[data-intent="build"] .node-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;}
+.component-card{background:var(--purple-l);border:1px solid var(--purple-b);border-radius:7px;padding:10px 12px;cursor:pointer;transition:all .13s;}
+.component-card:hover{background:rgba(160,120,220,0.14);border-color:var(--purple);}
+.component-name{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--purple);margin-bottom:4px;}
+.component-desc{font-size:11px;line-height:1.5;color:var(--ink-2);}
+
+/* INTENT: DEBUG */
+.node[data-intent="debug"] .node-intent-dot{background:var(--blue);}
+.node[data-intent="debug"] .node-intent-label{color:var(--blue);}
+.node[data-intent="debug"] .node-body{background:rgba(0,0,0,0.4);border-radius:6px;padding:12px;font-family:var(--mono);font-size:11px;line-height:1.7;color:rgba(80,200,180,0.9);}
+.node[data-intent="debug"] .node-body .err{color:rgba(210,100,140,0.9);}
+.node[data-intent="debug"] .node-body .ok{color:rgba(100,200,100,0.9);}
+.node[data-intent="debug"] .node-body .muted{color:var(--ink-3);}
+
+/* THREAD */
+.thread-label{font-family:var(--mono);font-size:8px;letter-spacing:0.18em;color:var(--ink-3);padding-bottom:8px;border-bottom:1px solid var(--glass-b);margin-bottom:2px;}
+.commit{display:flex;flex-direction:column;gap:3px;padding:8px 0;border-bottom:1px solid var(--glass-b);animation:fi .2s ease;}
+.commit:last-child{border-bottom:none;}
+@keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.commit-meta{display:flex;align-items:center;gap:6px;}
+.commit-op{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;border-radius:100px;padding:2px 7px;}
+.commit-op.append{color:var(--teal);border:1px solid var(--teal-b);background:var(--teal-l);}
+.commit-op.replace{color:var(--amber);border:1px solid var(--amber-b);background:var(--amber-l);}
+.commit-op.delete{color:var(--pink);border:1px solid var(--pink-b);background:var(--pink-l);}
+.commit-time{font-family:var(--mono);font-size:8px;color:var(--ink-3);}
+.commit-prompt{font-size:11px;color:var(--ink-2);line-height:1.5;}
+.commit-target{font-family:var(--mono);font-size:9px;color:var(--ink-3);}
+
+/* COMPOSER */
+.intent-row{display:flex;gap:6px;align-items:center;}
+.intent-chip{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;border-radius:100px;padding:4px 10px;cursor:pointer;background:transparent;border:1px solid var(--glass-b);color:var(--ink-3);transition:all .13s;user-select:none;}
+.intent-chip:hover{border-color:var(--glass-b2);color:var(--ink-2);}
+.intent-chip.sel[data-i="explain"]{color:var(--pink);border-color:var(--pink-b);background:var(--pink-l);}
+.intent-chip.sel[data-i="draft"]{color:var(--teal);border-color:var(--teal-b);background:var(--teal-l);}
+.intent-chip.sel[data-i="analyze"]{color:var(--amber);border-color:var(--amber-b);background:var(--amber-l);}
+.intent-chip.sel[data-i="build"]{color:var(--purple);border-color:var(--purple-b);background:var(--purple-l);}
+.intent-chip.sel[data-i="debug"]{color:var(--blue);border-color:var(--blue-b);background:var(--blue-l);}
+.composer-row{display:flex;gap:8px;align-items:flex-end;}
+#prompt-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--glass-b2);border-radius:8px;padding:9px 12px;font-family:var(--sans);font-size:13px;color:var(--ink);outline:none;resize:none;line-height:1.5;height:44px;transition:border-color .15s;}
+#prompt-input:focus{border-color:var(--teal-b);}
+#prompt-input::placeholder{color:var(--ink-3);}
+.target-pill{font-family:var(--mono);font-size:8px;letter-spacing:0.08em;color:var(--teal);background:var(--teal-l);border:1px solid var(--teal-b);border-radius:100px;padding:3px 9px;white-space:nowrap;display:none;align-items:center;gap:5px;}
+.target-pill.show{display:flex;}
+.target-x{cursor:pointer;color:var(--ink-3);font-size:10px;}
+.target-x:hover{color:var(--ink);}
+.send-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;background:var(--teal);color:#020111;border:none;border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:600;transition:opacity .13s;white-space:nowrap;}
+.send-btn:hover{opacity:0.85;}
+
+/* HISTORY */
+#history-overlay{position:fixed;inset:0;z-index:100;background:rgba(2,1,17,0.92);display:none;align-items:center;justify-content:center;}
+#history-overlay.open{display:flex;}
+.history-panel{background:var(--glass-2);border:1px solid var(--glass-b2);border-radius:14px;width:500px;max-height:70vh;overflow-y:auto;padding:20px;}
+.history-title{font-family:var(--mono);font-size:10px;letter-spacing:0.18em;color:var(--ink-2);margin-bottom:16px;}
+.snap{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--glass-b);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .13s;}
+.snap:hover{border-color:var(--glass-b2);background:rgba(255,255,255,0.02);}
+.snap-ver{font-family:var(--mono);font-size:11px;color:var(--teal);}
+.snap-info{flex:1;}
+.snap-prompt{font-size:12px;color:var(--ink-2);}
+.snap-meta{font-family:var(--mono);font-size:9px;color:var(--ink-3);margin-top:2px;}
+.snap-restore{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--ink-3);border:1px solid var(--glass-b);border-radius:100px;padding:3px 8px;cursor:pointer;background:transparent;transition:all .12s;}
+.snap-restore:hover{color:var(--teal);border-color:var(--teal-b);}
+.history-close{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--ink-3);background:transparent;border:1px solid var(--glass-b);border-radius:100px;padding:5px 12px;cursor:pointer;margin-top:12px;transition:all .13s;}
+.history-close:hover{color:var(--ink);border-color:var(--glass-b2);}
+
+*{scrollbar-width:thin;scrollbar-color:rgba(104,195,192,0.15) transparent;}
+::-webkit-scrollbar{width:2px;}
+::-webkit-scrollbar-thumb{background:rgba(104,195,192,0.15);border-radius:1px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="header">
+    <span class="brand">✦ artifact</span>
+    <div class="hdr-mid">
+      <input id="doc-title" value="neverever.land · design brief" spellcheck="false">
+      <span class="version-pill" id="ver-pill">v0</span>
+    </div>
+    <div class="hdr-right">
+      <button class="hdr-btn" id="history-btn">history</button>
+      <button class="hdr-btn" id="clear-btn">clear</button>
+    </div>
+  </div>
+
+  <div id="artifact-pane"><div id="artifact-nodes"></div></div>
+
+  <div id="thread-pane">
+    <div class="thread-label">mutation log</div>
+    <div id="commit-log"></div>
+  </div>
+
+  <div id="composer-bar">
+    <div class="intent-row">
+      <div class="intent-chip sel" data-i="draft">draft</div>
+      <div class="intent-chip" data-i="explain">explain</div>
+      <div class="intent-chip" data-i="analyze">analyze</div>
+      <div class="intent-chip" data-i="build">build</div>
+      <div class="intent-chip" data-i="debug">debug</div>
+      <div style="flex:1;"></div>
+      <div class="target-pill" id="target-pill">
+        <span id="target-label">targeting</span>
+        <span class="target-x" id="target-x">✕</span>
+      </div>
+    </div>
+    <div class="composer-row">
+      <textarea id="prompt-input" placeholder="compose your prompt…" rows="1"></textarea>
+      <button class="send-btn" id="send-btn">send →</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="history-overlay">
+  <div class="history-panel">
+    <div class="history-title">version history</div>
+    <div id="history-list"></div>
+    <button class="history-close" id="history-close">close</button>
+  </div>
+</div>
+
+<script>
+(function(){
+
+var artifact={id:'nw-'+Date.now(),nodes:[],history:[],version:0,activeNode:null};
+var currentIntent='draft';
+var selectedNodeId=null;
+
+var DEMO=[
+  {
+    intent:'draft',
+    prompt:'write the NEVERLAND premise',
+    content:{type:'prose',html:'<h3>NEVERLAND</h3><p>A browser-based survival experience. You are an astronaut — untethered, adrift in a physics environment that is indifferent to your existence. Oxygen depletes. Obstacles drift toward you. You collect orbs to survive.</p><p>But the mechanics carry metaphorical weight. The void is not just a game state — it is a condition. Revival is not a retry — it is a return. Every loop is continuous because the experience does not end; it transforms.</p>'}
+  },
+  {
+    intent:'explain',
+    prompt:'explain the oxygen mechanic and what it means',
+    content:{type:'text',text:'Oxygen is the clock. Not a timer bar in the corner — a felt presence. As it drops, the scene shifts. Movement becomes desperate. The player\'s relationship to every orb changes from optional to essential.\n\nMetaphorically: oxygen is attention, presence, will. The game asks you to stay present or perish — then brings you back to ask again.'}
+  },
+  {
+    intent:'analyze',
+    prompt:'compare loop-end states: death vs transformation',
+    content:{type:'options',options:[
+      {title:'Death state',body:'Loop ends on failure. Player resets. Creates friction, frustration, retry energy. Classic game loop — earned by consequence.',recommended:false},
+      {title:'Transformation',body:'Loop never ends. Void sequence plays — the astronaut dissolves, returns. No retry screen. The experience is continuous. Loss is absorbed, not punished.',recommended:true}
+    ]}
+  },
+  {
+    intent:'build',
+    prompt:'scaffold the core NEVERLAND systems',
+    content:{type:'components',components:[
+      {name:'AstronautRig',desc:'Ragdoll physics body. Tumble on click. Right-click resets pose.'},
+      {name:'OxygenEngine',desc:'Depletes over time. Orb collection restores. Scene reacts to level.'},
+      {name:'OrbSystem',desc:'Tiered spawn. Orbit physics. Mystery box variant. Wolfie fetch trigger.'},
+      {name:'VoidSequence',desc:'Revival animation. Dissolve → return. Continuous loop, no death screen.'},
+      {name:'PauseTestract',desc:'Menu as geometry. Node navigator. Intent-aware escape hatch.'},
+      {name:'WolfieCompanion',desc:'Fetch state machine: idle → departing → offscreen → returning.'},
+    ]}
+  },
+  {
+    intent:'debug',
+    prompt:'check wolfie fetch state machine',
+    content:{type:'terminal',lines:[
+      {t:'muted',v:'$ wolfieMode = "idle"'},
+      {t:'muted',v:'$ triggerFetch(orb) → wolfieMode = "departing"'},
+      {t:'ok',   v:'✓ companionPoodle.vx *= 1.18 — velocity amplified'},
+      {t:'ok',   v:'✓ tail wag rate → sin(animT * 20) * 2.0'},
+      {t:'muted',v:'$ |px| > 260 → wolfieMode = "offscreen"'},
+      {t:'ok',   v:'✓ mesh.position → (9999, 9999, 9999) — hidden'},
+      {t:'muted',v:'$ completeFetch() → wolfieMode = "returning"'},
+      {t:'ok',   v:'✓ distBack < 50 → wolfieMode = "idle"'},
+      {t:'ok',   v:'✓ behavior = "orbit" — wolfie orbits player'},
+      {t:'ok',   v:'✓ light pulse triggered on return'},
+    ]}
+  },
+];
+
+function genId(){return Math.random().toString(36).slice(2,7);}
+function timeStr(){var d=new Date();return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0')+':'+d.getSeconds().toString().padStart(2,'0');}
+function snapshot(){artifact.history.push({version:artifact.version,nodes:JSON.parse(JSON.stringify(artifact.nodes)),timestamp:timeStr()});}
+
+function applyMutation(op,intent,prompt,content,targetId){
+  snapshot();artifact.version++;
+  var node;
+  if(op==='append'||!targetId){
+    node={id:genId(),intent:intent,content:content,version:artifact.version};
+    artifact.nodes.push(node);
+  } else if(op==='replace'&&targetId){
+    var idx=artifact.nodes.findIndex(function(n){return n.id===targetId;});
+    if(idx>-1){artifact.nodes[idx]={id:targetId,intent:intent,content:content,version:artifact.version};node=artifact.nodes[idx];}
+  }
+  logCommit(op,intent,prompt,targetId,artifact.version);
+  document.getElementById('ver-pill').textContent='v'+artifact.version;
+  renderArtifact();
+  selectedNodeId=null;updateTargetPill();
+}
+
+function renderArtifact(){
+  var el=document.getElementById('artifact-nodes');
+  if(artifact.nodes.length===0){
+    el.innerHTML='<div class="artifact-empty"><div class="artifact-empty-glyph">◎</div><div class="artifact-empty-text">declare intent · compose · send</div></div>';
+    return;
+  }
+  el.innerHTML='';
+  artifact.nodes.forEach(function(node){
+    var div=document.createElement('div');
+    div.className='node'+(selectedNodeId===node.id?' selected':'');
+    div.dataset.intent=node.intent;div.dataset.id=node.id;
+    div.innerHTML=nodeHeaderHTML(node)+nodeBodyHTML(node);
+    div.querySelector('.node-header').addEventListener('click',function(e){if(e.target.closest('.node-act'))return;selectNode(node.id);});
+    var rb=div.querySelector('.act-replace');if(rb)rb.addEventListener('click',function(){selectNode(node.id);});
+    var db=div.querySelector('.act-delete');if(db)db.addEventListener('click',function(){deleteNode(node.id);});
+    el.appendChild(div);
+  });
+}
+
+function nodeHeaderHTML(node){
+  return '<div class="node-header"><div class="node-intent-dot"></div><span class="node-intent-label">'+node.intent+'</span><span class="node-id">#'+node.id+' · v'+node.version+'</span><div class="node-actions"><button class="node-act act-replace">target</button><button class="node-act danger act-delete">delete</button></div></div>';
+}
+
+function nodeBodyHTML(node){
+  var c=node.content;var inner='';
+  if(node.intent==='draft'&&c.type==='prose'){
+    inner=c.html;
+  } else if(node.intent==='explain'&&c.type==='text'){
+    inner=c.text.split('\n').map(function(p){return p?'<p>'+p+'</p>':''}).join('');
+  } else if(node.intent==='analyze'&&c.type==='options'){
+    inner=c.options.map(function(o){return '<div class="option-card'+(o.recommended?' recommended':'')+'"><div class="option-title">'+o.title+'</div><div class="option-body">'+o.body+'</div>'+(o.recommended?'<div class="option-rec">✦ recommended</div>':'')+'</div>';}).join('');
+  } else if(node.intent==='build'&&c.type==='components'){
+    inner=c.components.map(function(comp){return '<div class="component-card"><div class="component-name">'+comp.name+'</div><div class="component-desc">'+comp.desc+'</div></div>';}).join('');
+  } else if(node.intent==='debug'&&c.type==='terminal'){
+    inner=c.lines.map(function(l){return '<div class="'+l.t+'">'+l.v+'</div>';}).join('');
+  }
+  return '<div class="node-body">'+inner+'</div>';
+}
+
+function selectNode(id){selectedNodeId=(selectedNodeId===id?null:id);updateTargetPill();renderArtifact();}
+
+function deleteNode(id){
+  snapshot();artifact.version++;
+  artifact.nodes=artifact.nodes.filter(function(n){return n.id!==id;});
+  logCommit('delete','','node deleted',id,artifact.version);
+  document.getElementById('ver-pill').textContent='v'+artifact.version;
+  if(selectedNodeId===id){selectedNodeId=null;updateTargetPill();}
+  renderArtifact();
+}
+
+function updateTargetPill(){
+  var pill=document.getElementById('target-pill');var lbl=document.getElementById('target-label');
+  if(selectedNodeId){pill.classList.add('show');lbl.textContent='→ #'+selectedNodeId;}
+  else{pill.classList.remove('show');}
+}
+
+function logCommit(op,intent,prompt,targetId,ver){
+  var log=document.getElementById('commit-log');var el=document.createElement('div');el.className='commit';
+  el.innerHTML='<div class="commit-meta"><span class="commit-op '+op+'">'+op+'</span><span class="commit-time">'+timeStr()+' · v'+ver+'</span></div><div class="commit-prompt">'+(prompt.length>55?prompt.slice(0,55)+'…':prompt)+'</div>'+(targetId?'<div class="commit-target">→ #'+targetId+'</div>':'');
+  log.appendChild(el);log.scrollTop=log.scrollHeight;
+}
+
+function send(){
+  var input=document.getElementById('prompt-input');var prompt=input.value.trim();if(!prompt)return;
+  var op=selectedNodeId?'replace':'append';var target=selectedNodeId;
+  var content=syntheticContent(currentIntent,prompt);
+  applyMutation(op,currentIntent,prompt,content,target);
+  input.value='';
+}
+
+function syntheticContent(intent,prompt){
+  if(intent==='draft') return{type:'prose',html:'<p>'+prompt+'</p>'};
+  if(intent==='explain') return{type:'text',text:prompt};
+  if(intent==='analyze') return{type:'options',options:[{title:'Option A',body:'First interpretation of: "'+prompt.slice(0,38)+'"',recommended:false},{title:'Option B',body:'Alternative framing. Different trade-offs considered.',recommended:true}]};
+  if(intent==='build'){var ws=prompt.split(' ').slice(0,5);return{type:'components',components:ws.map(function(w){return{name:w.charAt(0).toUpperCase()+w.slice(1),desc:'Component derived from prompt context.'};})}}
+  if(intent==='debug') return{type:'terminal',lines:[{t:'muted',v:'$ '+prompt},{t:'ok',v:'✓ resolved → v'+(artifact.version+1)}]};
+  return{type:'text',text:prompt};
+}
+
+document.querySelectorAll('.intent-chip').forEach(function(chip){
+  chip.addEventListener('click',function(){
+    document.querySelectorAll('.intent-chip').forEach(function(c){c.classList.remove('sel');});
+    chip.classList.add('sel');currentIntent=chip.dataset.i;
+  });
+});
+
+document.getElementById('send-btn').addEventListener('click',send);
+document.getElementById('prompt-input').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+document.getElementById('target-x').addEventListener('click',function(){selectedNodeId=null;updateTargetPill();renderArtifact();});
+
+document.getElementById('clear-btn').addEventListener('click',function(){
+  snapshot();artifact.nodes=[];artifact.version++;selectedNodeId=null;updateTargetPill();
+  document.getElementById('ver-pill').textContent='v'+artifact.version;renderArtifact();
+  logCommit('delete','','document cleared',null,artifact.version);
+});
+
+document.getElementById('history-btn').addEventListener('click',function(){
+  var list=document.getElementById('history-list');list.innerHTML='';
+  if(artifact.history.length===0){
+    list.innerHTML='<div style="font-family:var(--mono);font-size:10px;color:var(--ink-3);padding:12px 0;">no history yet</div>';
+  } else {
+    artifact.history.slice().reverse().forEach(function(snap){
+      var el=document.createElement('div');el.className='snap';
+      el.innerHTML='<span class="snap-ver">v'+snap.version+'</span><div class="snap-info"><div class="snap-prompt">'+snap.nodes.length+' node'+(snap.nodes.length===1?'':'s')+'</div><div class="snap-meta">'+snap.timestamp+'</div></div><button class="snap-restore">restore</button>';
+      el.querySelector('.snap-restore').addEventListener('click',function(){
+        artifact.nodes=JSON.parse(JSON.stringify(snap.nodes));artifact.version=snap.version;
+        selectedNodeId=null;updateTargetPill();
+        document.getElementById('ver-pill').textContent='v'+snap.version;
+        renderArtifact();document.getElementById('history-overlay').classList.remove('open');
+      });
+      list.appendChild(el);
+    });
+  }
+  document.getElementById('history-overlay').classList.add('open');
+});
+
+document.getElementById('history-close').addEventListener('click',function(){
+  document.getElementById('history-overlay').classList.remove('open');
+});
+
+document.getElementById('doc-title').addEventListener('change',function(){artifact.title=this.value;});
+
+var delay=0;
+DEMO.forEach(function(d){
+  setTimeout(function(){applyMutation('append',d.intent,d.prompt,d.content,null);},delay);
+  delay+=200;
+});
+
+})();
+</script>
+</body>
+</html>
