@@ -1,0 +1,3034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>neverever.land</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --paper: #3D6BEF;
+            --panel: #3159D4;
+            --ink: #ffffff;
+            --grey: rgba(255, 255, 255, 0.52);
+            --grey-dim: rgba(255, 255, 255, 0.32);
+            --rule: rgba(255, 255, 255, 0.16);
+            --rule-strong: #ffffff;
+            --unit: 8px;
+            --gutter: calc(var(--unit)*3);
+            --margin: calc(var(--unit)*5);
+            --cols: 12;
+            --radius: 0px;
+            --radius-sm: 0px;
+            --fs-micro: 10px;
+            --fs-body: 15px;
+            --fs-display: 64px;
+            --max-width: 1440px;
+            --font-display: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+            --font-body: 'Inter', 'Helvetica Neue', sans-serif;
+            --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+            --transition: 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        /* ── scale variants ── */
+        body[data-scale="s"] {
+            --fs-body: 12px;
+            --fs-display: 40px;
+        }
+        body[data-scale="m"] {
+            --fs-body: 15px;
+            --fs-display: 54px;
+        }
+        body[data-scale="l"] {
+            --fs-body: 18px;
+            --fs-display: 68px;
+        }
+        body[data-scale="xl"] {
+            --fs-body: 21px;
+            --fs-display: 82px;
+        }
+        body[data-scale="xxl"] {
+            --fs-body: 24px;
+            --fs-display: 96px;
+        }
+        /* ── font variants ── */
+        body[data-font="grotesk"] {
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body[data-font="serif"] {
+            --font-display: 'EB Garamond', serif;
+            --font-body: 'EB Garamond', serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body[data-font="mono"] {
+            --font-display: 'JetBrains Mono', monospace;
+            --font-body: 'JetBrains Mono', monospace;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body[data-font="noto"] {
+            --font-display: 'Noto Sans', sans-serif;
+            --font-body: 'Noto Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body[data-font="atkinson"] {
+            --font-display: 'Atkinson Hyperlegible Next', sans-serif;
+            --font-body: 'Atkinson Hyperlegible Next', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body[data-font="source"] {
+            --font-display: 'Source Sans 3', sans-serif;
+            --font-body: 'Source Sans 3', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body[data-font="roboto"] {
+            --font-display: 'Roboto', sans-serif;
+            --font-body: 'Roboto', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body[data-font="opensans"] {
+            --font-display: 'Open Sans', sans-serif;
+            --font-body: 'Open Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+        body {
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--font-body);
+            font-size: var(--fs-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            transition: font-size 0.2s ease, font-family 0.2s ease;
+        }
+        ::selection {
+            background: var(--ink);
+            color: var(--paper);
+        }
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* scrollbar */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: var(--grey-dim) transparent;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--grey-dim);
+            border-radius: var(--radius-sm);
+        }
+
+        /* utility */
+        .t-micro {
+            font-family: var(--font-mono);
+            font-size: var(--fs-micro);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--grey);
+            line-height: 1.4;
+        }
+        .t-data {
+            font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
+        }
+        .t-display {
+            font-family: var(--font-display);
+            letter-spacing: -0.02em;
+        }
+
+        .btn {
+            font-family: var(--font-mono);
+            font-size: var(--fs-micro);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: transparent;
+            border: 1px solid var(--rule-strong);
+            color: var(--ink);
+            padding: 7px 16px;
+            cursor: pointer;
+            transition: background .2s ease, color .2s ease, border-color .2s ease;
+            border-radius: var(--radius-sm);
+        }
+        .btn:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+        .btn.ghost {
+            border-color: var(--rule);
+            color: var(--grey);
+        }
+        .btn.ghost:hover {
+            background: var(--ink);
+            color: var(--paper);
+            border-color: var(--ink);
+        }
+        .btn.small {
+            padding: 4px 10px;
+            font-size: 8px;
+        }
+        .btn.active {
+            background: var(--ink);
+            color: var(--paper);
+            border-color: var(--ink);
+        }
+
+        /* topbar */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--paper);
+            border-bottom: 1px solid var(--rule);
+            padding: 14px 0;
+        }
+        .topbar .wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 0 var(--margin);
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+        .wordmark {
+            font-family: var(--font-display);
+            font-size: calc(var(--fs-body) * 1.2);
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .wordmark .count {
+            font-family: var(--font-mono);
+            font-size: var(--fs-micro);
+            font-weight: 400;
+            color: var(--grey);
+            letter-spacing: 0.04em;
+        }
+        .save-status {
+            font-family: var(--font-mono);
+            font-size: 8px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--grey-dim);
+            transition: color .2s ease;
+        }
+        .save-status.err {
+            color: #FFB4A8;
+            cursor: pointer;
+        }
+        .save-status.ok {
+            color: var(--grey-dim);
+        }
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .topbar-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--panel);
+            padding: 4px 8px 4px 12px;
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-sm);
+        }
+        .topbar-controls .font-select {
+            background: transparent;
+            border: none;
+            color: var(--ink);
+            font-family: var(--font-body);
+            font-size: 10px;
+            padding: 4px 4px 4px 0;
+            cursor: pointer;
+            outline: none;
+            max-width: 80px;
+        }
+        .topbar-controls .font-select option {
+            background: var(--panel);
+            color: var(--ink);
+        }
+        .topbar-controls .scale-group {
+            display: flex;
+            gap: 2px;
+            border-left: 1px solid var(--rule);
+            padding-left: 8px;
+        }
+        .topbar-controls .scale-group .chip {
+            border: none;
+            padding: 2px 6px;
+            font-size: 9px;
+            color: var(--grey);
+            background: transparent;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-family: var(--font-mono);
+            letter-spacing: 0.04em;
+        }
+        .topbar-controls .scale-group .chip.active {
+            background: var(--ink);
+            color: var(--paper);
+        }
+        .topbar-controls .scale-group .chip:hover {
+            color: var(--ink);
+        }
+
+        /* ── main wrap ── */
+        .wrap {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 var(--margin) 120px;
+            transition: padding 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* composer */
+        .composer {
+            border-bottom: 1px solid var(--rule);
+            padding: 24px 0;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .composer.open {
+            display: flex;
+        }
+        .field-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .field-row .field {
+            flex: 1;
+            min-width: 140px;
+        }
+        label.t-micro {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 8px;
+            letter-spacing: 0.1em;
+        }
+        input[type=text],
+        textarea,
+        select {
+            width: 100%;
+            background: var(--panel);
+            border: 1px solid var(--rule);
+            color: var(--ink);
+            padding: 10px 12px;
+            font-size: calc(var(--fs-body) * 0.9);
+            font-family: var(--font-body);
+            border-radius: var(--radius-sm);
+            resize: vertical;
+            transition: border-color .2s ease;
+        }
+        input[type=text]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--rule-strong);
+        }
+        textarea {
+            min-height: 68px;
+            line-height: 1.6;
+        }
+        .composer-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .new-author-panel {
+            border: 1px dashed var(--rule);
+            padding: 14px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .new-author-panel.open {
+            display: flex;
+        }
+        .kind-radios {
+            display: flex;
+            gap: 16px;
+        }
+        .kind-radios label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            cursor: pointer;
+        }
+
+        /* avatar */
+        .avatar {
+            flex: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 600;
+            border: 1px solid var(--rule-strong);
+            position: relative;
+            text-transform: uppercase;
+            border-radius: var(--radius-sm);
+        }
+        .avatar.sz-xs {
+            width: 20px;
+            height: 20px;
+            font-size: 8px;
+        }
+        .avatar.sz-sm {
+            width: 28px;
+            height: 28px;
+            font-size: 10px;
+        }
+        .avatar.sz-md {
+            width: 44px;
+            height: 44px;
+            font-size: 14px;
+        }
+        .avatar.sz-lg {
+            width: 60px;
+            height: 60px;
+            font-size: 18px;
+        }
+        .avatar.v0 {
+            background: var(--ink);
+            color: var(--paper);
+        }
+        .avatar.v1 {
+            background: transparent;
+            color: var(--ink);
+        }
+        .avatar.v2 {
+            background: var(--grey-dim);
+            color: var(--paper);
+        }
+        .avatar.v3 {
+            background: var(--panel);
+            color: var(--ink);
+            border-color: var(--rule);
+        }
+        .avatar.company::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 6px;
+            height: 6px;
+            background: var(--paper);
+            border: 1px solid var(--rule-strong);
+            border-radius: var(--radius-sm);
+        }
+        .co-badge {
+            font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--grey-dim);
+            border: 1px solid var(--rule);
+            padding: 0 4px;
+            flex: none;
+            letter-spacing: 0.06em;
+        }
+
+        /* ── image thumbnail styles ── */
+        .thumb {
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+            flex: none;
+            line-height: 0;
+        }
+        .thumb img,
+        .thumb video {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .thumb-sm {
+            width: 56px;
+            height: 40px;
+            border: 1px solid var(--rule);
+        }
+        .thumb-md {
+            width: 100%;
+            height: 120px;
+            border: 1px solid var(--rule);
+            margin: 6px 0 4px;
+        }
+        .thumb-lg {
+            border: 1px solid var(--rule);
+            margin: 14px 0 16px;
+            border-radius: var(--radius-sm);
+            max-height: 440px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .thumb-lg img,
+        .thumb-lg video {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 440px;
+            object-fit: cover;
+        }
+        .thumb-grid {
+            width: 100%;
+            height: 140px;
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-sm);
+            margin: 6px 0 4px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.15);
+        }
+        .thumb-grid img,
+        .thumb-grid video {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .thumb-grid video {
+            background: #000;
+        }
+
+        /* list */
+        .list {
+            border-top: 1px solid var(--rule);
+            padding-top: 4px;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 28px 34px 130px 74px 1fr 34px;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--rule);
+            cursor: pointer;
+            transition: background .15s ease;
+        }
+        .row:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .row-idx {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--grey-dim);
+        }
+        .row-author {
+            font-family: var(--font-display);
+            font-size: calc(var(--fs-body) * 0.85);
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            color: var(--ink);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .row-time {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--grey);
+            white-space: nowrap;
+        }
+        .row-text {
+            color: var(--grey);
+            font-size: calc(var(--fs-body) * 0.95);
+            font-weight: 400;
+            white-space: normal;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+        .row-marker {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--grey-dim);
+            text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            justify-content: flex-end;
+        }
+        .row-marker .thumb-sm {
+            width: 40px;
+            height: 30px;
+        }
+
+        .empty {
+            padding: 60px 0;
+            text-align: left;
+        }
+        .empty .t-micro {
+            margin-bottom: 6px;
+        }
+        .empty p {
+            font-family: var(--font-display);
+            font-size: calc(var(--fs-display) * 0.5);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin: 0 0 16px;
+        }
+
+        /* ── GRID MODE — REFINED & AESTHETIC ── */
+        body.grid-mode .wrap {
+            max-width: 100%;
+            padding-left: var(--margin);
+            padding-right: var(--margin);
+        }
+
+        body.grid-mode .list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px 32px;
+            border-top: none;
+            padding-top: 28px;
+        }
+
+        body.grid-mode .row {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 22px 24px 26px;
+            background: var(--panel);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-sm);
+            transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
+            cursor: pointer;
+            gap: 8px;
+            grid-template-columns: none;
+            grid-template-areas: none;
+            position: relative;
+        }
+
+        body.grid-mode .row:hover {
+            transform: translateY(-4px);
+            border-color: var(--rule-strong);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        body.grid-mode .row .row-idx {
+            display: none;
+        }
+
+        body.grid-mode .row .row-avatar {
+            margin-bottom: 6px;
+        }
+        body.grid-mode .row .row-avatar .avatar {
+            width: 48px;
+            height: 48px;
+            font-size: 16px;
+        }
+
+        body.grid-mode .row .row-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px 12px;
+            width: 100%;
+            font-size: calc(var(--fs-body) * 0.75);
+            border-bottom: 1px solid var(--rule);
+            padding-bottom: 12px;
+            margin-bottom: 4px;
+        }
+
+        body.grid-mode .row .row-author {
+            font-family: var(--font-display);
+            font-size: calc(var(--fs-body) * 1.0);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            color: var(--ink);
+            overflow: visible;
+            white-space: normal;
+            text-overflow: clip;
+        }
+
+        body.grid-mode .row .row-time {
+            font-family: var(--font-mono);
+            font-size: calc(var(--fs-body) * 0.7);
+            color: var(--grey);
+            white-space: nowrap;
+        }
+
+        body.grid-mode .row .row-text {
+            font-family: var(--font-display);
+            font-size: calc(var(--fs-display) * 0.3);
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+            width: 100%;
+            margin: 6px 0 10px;
+            padding-right: 4px;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+        }
+
+        body.grid-mode .row .row-marker {
+            font-family: var(--font-mono);
+            font-size: calc(var(--fs-body) * 0.65);
+            color: var(--grey-dim);
+            align-self: flex-start;
+            margin-top: 4px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border-top: 1px solid var(--rule);
+            padding-top: 12px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: flex-start;
+        }
+
+        body.grid-mode .row .thumb-grid {
+            width: 100%;
+            height: 170px;
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-sm);
+            margin: 4px 0 8px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        body.grid-mode .row .thumb-grid img,
+        body.grid-mode .row .thumb-grid video {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        body.grid-mode .row .thumb-grid video {
+            background: #000;
+        }
+
+        /* expanded card in grid mode */
+        body.grid-mode .card {
+            grid-column: 1 / -1;
+            background: var(--panel);
+            padding: 28px 32px 32px;
+            border: 1px solid var(--rule-strong);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0;
+        }
+
+        body.grid-mode .empty {
+            grid-column: 1 / -1;
+            text-align: left;
+            padding: 60px 0;
+        }
+
+        /* responsive grid */
+        @media (max-width: 760px) {
+            body.grid-mode .list {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 20px;
+                padding-left: 0;
+                padding-right: 0;
+            }
+            body.grid-mode .wrap {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            body.grid-mode .row .row-text {
+                font-size: calc(var(--fs-display) * 0.3);
+            }
+            body.grid-mode .card .card-text {
+                font-size: calc(var(--fs-display) * 0.4);
+            }
+            .topbar .wrap,
+            .hud-row {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+            .wrap {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+            .topbar-controls .scale-group .chip {
+                font-size: 8px;
+                padding: 2px 4px;
+            }
+            .topbar-controls .font-select {
+                max-width: 60px;
+                font-size: 9px;
+            }
+            .bento-panel {
+                padding: 24px 20px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            body.grid-mode .list {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            body.grid-mode .row {
+                padding: 16px 18px 20px;
+            }
+            body.grid-mode .row .row-text {
+                font-size: calc(var(--fs-display) * 0.3);
+            }
+            .row {
+                grid-template-columns: 24px 20px 1fr 30px;
+                grid-template-areas: "idx avatar text marker" ". avatar meta marker";
+                row-gap: 2px;
+                align-items: start;
+            }
+            .row-idx {
+                grid-area: idx;
+            }
+            .row-avatar {
+                grid-area: avatar;
+            }
+            .row-text {
+                grid-area: text;
+            }
+            .row-marker {
+                grid-area: marker;
+                justify-content: flex-end;
+            }
+            .row-meta {
+                grid-area: meta;
+                display: flex;
+                gap: 6px;
+                font-size: 10px;
+            }
+            .field-row {
+                flex-direction: column;
+            }
+            .conversation-modal .modal-card {
+                padding: 16px 12px 12px;
+            }
+            .conversation-modal .close-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+            .modal-node-text {
+                margin-left: 12px;
+            }
+            .modal-reply-form {
+                margin-left: 12px;
+                max-width: 100%;
+            }
+            .modal-statement .thumb-lg {
+                max-height: 200px;
+            }
+            .modal-statement .thumb-lg img,
+            .modal-statement .thumb-lg video {
+                max-height: 200px;
+            }
+            body.grid-mode .row .thumb-grid {
+                height: 120px;
+            }
+            .topbar .wrap,
+            .hud-row {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            .wrap {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            .topbar-controls .scale-group .chip {
+                font-size: 7px;
+                padding: 1px 3px;
+            }
+            .topbar-controls .font-select {
+                max-width: 50px;
+                font-size: 8px;
+            }
+            .bento-panel {
+                padding: 16px 12px;
+            }
+            .hud .filter-summary {
+                font-size: calc(var(--fs-body) * 0.7);
+            }
+        }
+
+        /* ── full-viewport conversation modal ── */
+        .conversation-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: rgba(0, 0, 20, 0.75);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+            overflow: hidden;
+        }
+        .conversation-modal.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .conversation-modal .modal-card {
+            width: 100vw;
+            height: 100vh;
+            max-height: 100vh;
+            background: var(--panel);
+            border: none;
+            border-radius: 0;
+            padding: 32px 48px 24px;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: none;
+            transform: scale(1);
+            transition: none;
+            display: flex;
+            flex-direction: column;
+        }
+        .conversation-modal .modal-card::-webkit-scrollbar {
+            width: 4px;
+        }
+        .conversation-modal .modal-card::-webkit-scrollbar-thumb {
+            background: var(--grey-dim);
+            border-radius: var(--radius-sm);
+        }
+        .conversation-modal .close-btn {
+            position: sticky;
+            top: 0;
+            float: right;
+            background: transparent;
+            border: 1px solid var(--rule);
+            color: var(--ink);
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            margin-left: auto;
+            transition: background 0.2s;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        .conversation-modal .close-btn:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+        .conversation-modal #modalContent {
+            flex: 1;
+            max-width: 780px;
+            width: 100%;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+
+        /* modal statement with hero image */
+        .modal-statement {
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--rule);
+        }
+        .modal-statement .card-who {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .modal-statement .card-author-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .modal-statement .card-author {
+            font-family: var(--font-display);
+            font-size: calc(var(--fs-body) * 1.2);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .modal-statement .card-author:hover {
+            opacity: 0.7;
+        }
+        .modal-statement .card-role {
+            font-size: calc(var(--fs-body) * 0.85);
+            color: var(--grey);
+        }
+        .modal-statement .card-time,
+        .modal-statement .card-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--grey);
+        }
+        .modal-statement .card-tag {
+            border: 1px solid var(--rule);
+            padding: 1px 8px;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.04em;
+            font-size: 9px;
+        }
+        .modal-statement .thumb-lg {
+            border: 1px solid var(--rule);
+            margin: 14px 0 16px;
+            border-radius: var(--radius-sm);
+            max-height: 440px;
+            background: rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .modal-statement .thumb-lg img,
+        .modal-statement .thumb-lg video {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 440px;
+            object-fit: cover;
+        }
+        .modal-statement .card-text {
+            font-family: var(--font-display);
+            font-size: calc(var(--fs-display) * 0.45);
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+        }
+
+        /* modal thread */
+        .modal-thread {
+            display: flex;
+            flex-direction: column;
+            margin-top: 8px;
+        }
+        .modal-node {
+            position: relative;
+            padding: 10px 0 10px 18px;
+            border-left: 1px solid var(--rule);
+        }
+        .modal-node-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .modal-node-author {
+            font-family: var(--font-display);
+            font-size: calc(var(--fs-body) * 0.75);
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .modal-node-author:hover {
+            opacity: 0.7;
+        }
+        .modal-node-time {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--grey);
+        }
+        .modal-node-toggle {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--grey-dim);
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0 2px;
+        }
+        .modal-node-toggle:hover {
+            color: var(--ink);
+        }
+        .modal-node-text {
+            font-family: var(--font-body);
+            font-size: calc(var(--fs-body) * 0.95);
+            line-height: 1.6;
+            margin: 6px 0 6px 28px;
+            white-space: pre-wrap;
+            color: var(--grey);
+        }
+        .modal-node-actions {
+            display: flex;
+            gap: 14px;
+            margin-left: 28px;
+        }
+        .modal-node-link {
+            font-family: var(--font-mono);
+            font-size: 8px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--grey);
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: color .2s ease;
+        }
+        .modal-node-link:hover {
+            color: var(--ink);
+        }
+        .modal-node-children {
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-node-collapsed-note {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--grey-dim);
+            font-style: normal;
+        }
+        .modal-reply-form {
+            margin: 8px 0 4px 28px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 480px;
+        }
+        .modal-reply-form select {
+            max-width: 200px;
+        }
+        .modal-reply-trigger {
+            margin: 4px 0 8px 0;
+        }
+        .modal-reply-trigger .modal-node-link {
+            font-size: 9px;
+        }
+
+        /* ── Bento Filter Modal ── */
+        .bento-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .bento-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .bento-panel {
+            background: var(--panel);
+            border: 1px solid var(--rule-strong);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 32px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .bento-overlay.open .bento-panel {
+            transform: scale(1);
+        }
+        .bento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--rule);
+            padding-bottom: 12px;
+        }
+        .bento-header h2 {
+            font-family: var(--font-display);
+            font-size: calc(var(--fs-body) * 1.5);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        .bento-header .close-btn {
+            background: transparent;
+            border: 1px solid var(--rule);
+            color: var(--ink);
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .bento-header .close-btn:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        .bento-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--rule);
+            padding: 16px 18px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .bento-card h4 {
+            font-family: var(--font-mono);
+            font-size: 8px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--grey-dim);
+            margin-bottom: 4px;
+        }
+        .bento-card-full {
+            grid-column: 1 / -1;
+        }
+        .bento-card-half {
+            grid-column: span 2;
+        }
+        .bento-card-quarter {
+            grid-column: span 1;
+        }
+
+        .bento-card .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .bento-card .chip-group .chip {
+            font-size: 9px;
+            padding: 4px 10px;
+            border: 1px solid var(--rule);
+            background: transparent;
+            color: var(--grey);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: var(--font-mono);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .bento-card .chip-group .chip.active {
+            background: var(--ink);
+            color: var(--paper);
+            border-color: var(--ink);
+        }
+        .bento-card .chip-group .chip:hover {
+            border-color: var(--rule-strong);
+            color: var(--ink);
+        }
+        .bento-card input[type="text"] {
+            width: 100%;
+            background: var(--paper);
+            border: 1px solid var(--rule);
+            color: var(--ink);
+            padding: 10px 14px;
+            font-size: calc(var(--fs-body) * 0.9);
+            font-family: var(--font-body);
+            border-radius: var(--radius-sm);
+            transition: border-color .2s ease;
+        }
+        .bento-card input[type="text"]:focus {
+            outline: none;
+            border-color: var(--rule-strong);
+        }
+
+        .bento-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        .bento-actions .btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        /* ── Bottom HUD (Filter Bar) ── */
+        .hud {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 150;
+            background: var(--paper);
+            border-top: 1px solid var(--rule-strong);
+        }
+        .hud-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 8px var(--margin);
+            flex-wrap: wrap;
+        }
+        .hud-label {
+            font-family: var(--font-mono);
+            font-size: 8px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--grey-dim);
+            flex: none;
+        }
+        .hud .filter-summary {
+            font-family: var(--font-body);
+            font-size: calc(var(--fs-body) * 0.85);
+            color: var(--grey);
+            flex: 1;
+            text-align: right;
+        }
+        .hud .filter-count {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 9px;
+            font-weight: 600;
+        }
+
+        /* responsive */
+        @media (max-width: 760px) {
+            .bento-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .bento-card-half {
+                grid-column: span 2;
+            }
+            .bento-card-quarter {
+                grid-column: span 1;
+            }
+        }
+        @media (max-width: 520px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+            .bento-card-half,
+            .bento-card-quarter {
+                grid-column: span 1;
+            }
+        }
+        [hidden] {
+            display: none !important;
+        }
+    </style>
+</head>
+<body data-scale="m" data-font="grotesk">
+    <div class="topbar">
+        <div class="wrap">
+            <div class="wordmark">NEVEREVER.LAND <span class="count t-data" id="topCount"></span> <span class="save-status" id="saveStatus"></span></div>
+            <div class="topbar-actions">
+                <!-- Visual Controls moved to top-right -->
+                <div class="topbar-controls">
+                    <select class="font-select" id="fontSelect">
+                        <option value="grotesk">Grotesk</option>
+                        <option value="serif">Serif</option>
+                        <option value="mono">Mono</option>
+                        <option value="noto">Noto Sans</option>
+                        <option value="atkinson">Atkinson</option>
+                        <option value="source">Source Sans</option>
+                        <option value="roboto">Roboto</option>
+                        <option value="opensans">Open Sans</option>
+                    </select>
+                    <div class="scale-group">
+                        <button class="chip" data-scale="s">S</button>
+                        <button class="chip active" data-scale="m">M</button>
+                        <button class="chip" data-scale="l">L</button>
+                        <button class="chip" data-scale="xl">XL</button>
+                        <button class="chip" data-scale="xxl">XXL</button>
+                    </div>
+                </div>
+                <button class="btn" id="toggleLayoutBtn">Grid</button>
+                <button class="btn" id="newBtn">+ New</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="wrap">
+        <div class="composer" id="composer">
+            <div class="field-row">
+                <div class="field">
+                    <label class="t-micro">Posting as</label>
+                    <select id="c-author-select"></select>
+                </div>
+                <div class="field">
+                    <label class="t-micro">Tag (optional)</label>
+                    <input type="text" id="c-tag" placeholder="OPEN TO WORK / HIRING / BRAND" />
+                </div>
+            </div>
+            <button class="btn ghost small" id="toggleNewAuthor" style="align-self:flex-start;">+ New author</button>
+            <div class="new-author-panel" id="newAuthorPanel">
+                <div class="kind-radios">
+                    <label><input type="radio" name="na-kind" value="person" checked /> Person</label>
+                    <label><input type="radio" name="na-kind" value="company" /> Company / brand</label>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label class="t-micro">Name</label>
+                        <input type="text" id="na-name" placeholder="Maya Chen / Studio North" />
+                    </div>
+                    <div class="field">
+                        <label class="t-micro" id="na-role-label">Role</label>
+                        <input type="text" id="na-role" placeholder="Creative Director" />
+                    </div>
+                </div>
+                <div class="composer-actions">
+                    <button class="btn small" id="na-save">Add author</button>
+                </div>
+            </div>
+            <div class="field">
+                <label class="t-micro">Media URL (optional — image or .mp4)</label>
+                <input type="text" id="c-media" placeholder="https://…" />
+            </div>
+            <div class="field">
+                <label class="t-micro">Statement</label>
+                <textarea id="c-text" placeholder="Open to staff-level product roles."></textarea>
+            </div>
+            <div class="composer-actions">
+                <button class="btn ghost small" id="c-cancel">Cancel</button>
+                <button class="btn small" id="c-post">Post statement</button>
+            </div>
+        </div>
+
+        <div id="listRoot"></div>
+
+        <footer>
+            <div class="t-micro">STATEMENTS PERSIST LOCALLY TO THIS BROWSER SESSION · <a href="#" id="resetLink">RESET DEMO DATA</a></div>
+        </footer>
+    </div>
+
+    <!-- Bottom HUD: Filter Bar -->
+    <div class="hud" id="hud">
+        <div class="hud-row">
+            <button class="btn" id="filterToggleBtn">Filters <span class="filter-count" id="filterCount">0</span></button>
+            <button class="btn ghost" id="hudClear">Clear all</button>
+            <span class="filter-summary" id="activeFilterSummary"></span>
+        </div>
+    </div>
+
+    <!-- Bento Filter Modal -->
+    <div class="bento-overlay" id="bentoOverlay">
+        <div class="bento-panel">
+            <div class="bento-header">
+                <h2>Search & Filter</h2>
+                <button class="close-btn" id="bentoClose">✕</button>
+            </div>
+            <div class="bento-grid">
+                <!-- Search -->
+                <div class="bento-card bento-card-full">
+                    <input type="text" id="bentoSearch" placeholder="Search statements or authors..." />
+                </div>
+                <!-- Tags -->
+                <div class="bento-card bento-card-half" id="bentoTags">
+                    <h4>Tags</h4>
+                    <div class="chip-group"></div>
+                </div>
+                <!-- People -->
+                <div class="bento-card bento-card-half" id="bentoPeople">
+                    <h4>People</h4>
+                    <div class="chip-group"></div>
+                </div>
+                <!-- Companies -->
+                <div class="bento-card bento-card-quarter" id="bentoCompanies">
+                    <h4>Companies</h4>
+                    <div class="chip-group"></div>
+                </div>
+                <!-- Disciplines -->
+                <div class="bento-card bento-card-quarter" id="bentoDisciplines">
+                    <h4>Disciplines</h4>
+                    <div class="chip-group"></div>
+                </div>
+                <!-- Actions -->
+                <div class="bento-card bento-card-quarter bento-actions" id="bentoActions">
+                    <button class="btn" id="bentoClearAll">Clear all</button>
+                    <button class="btn" id="bentoApply">Apply filters</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal-backdrop" id="profileModal" hidden>
+        <div class="profile-card">
+            <button class="modal-close" id="profileClose">✕</button>
+            <div class="profile-top">
+                <div id="profileAvatarSlot"></div>
+                <div>
+                    <div class="profile-name" id="profileName"></div>
+                    <div class="profile-kind t-micro" id="profileKind"></div>
+                </div>
+            </div>
+            <div class="profile-role" id="profileRole"></div>
+            <div class="profile-tagline" id="profileTagline"></div>
+            <div class="profile-stats t-micro" id="profileStats"></div>
+        </div>
+    </div>
+
+    <!-- Conversation Modal -->
+    <div class="conversation-modal" id="conversationModal">
+        <div class="modal-card" id="modalCard">
+            <button class="close-btn" id="modalClose">✕</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const STORAGE_KEY = 'neverever-statements-v3';
+            let statements = [];
+            let authors = [];
+            let replyTargetId = null;
+            let lastAuthorId = null;
+            const collapsed = new Set();
+            const activeTags = new Set();
+            const activeKinds = new Set();
+            const activeDisciplines = new Set();
+            let gridMode = false;
+            let modalStatementId = null;
+            let modalReplyTargetId = null;
+            let searchQuery = '';
+
+            const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+
+            function hash(str) {
+                let h = 0;
+                for (let i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) >>> 0; }
+                return h;
+            }
+
+            function avatarVariant(id) { return 'v' + (hash(id) % 4); }
+
+            function initialsFor(a) {
+                const clean = a.name.replace(/[^A-Za-z ]/g, '');
+                const parts = clean.trim().split(/\s+/).filter(Boolean);
+                if (parts.length === 0) return '?';
+                if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            }
+
+            function authorById(id) { return authors.find(a => a.id === id); }
+
+            // ── seed data with AVIF images ──────────────────────────────
+            function seedAuthors() {
+                return [
+                    { id: 'zack', kind: 'person', discipline: 'DESIGN', name: 'Zack Gort',
+                        role: 'Product / UX Designer', tagline: 'Six years freelance. Multi-hyphenate, single-purpose.' },
+                    { id: 'maya', kind: 'person', discipline: 'DESIGN', name: 'Maya Chen', role: 'Creative Director',
+                        tagline: 'Ex-agency. Building a smaller practice on purpose.' },
+                    { id: 'tom', kind: 'person', discipline: 'ENGINEERING', name: 'Tom Okafor',
+                        role: 'ML Engineer', tagline: 'Infra and eval systems. Open to staff roles.' },
+                    { id: 'ria', kind: 'person', discipline: 'BRAND', name: 'Ria Patel',
+                        role: 'Brand Strategist', tagline: 'Naming, systems, the occasional necessary rebrand.' },
+                    { id: 'dev', kind: 'person', discipline: 'ENGINEERING', name: 'Dev Singh',
+                        role: 'Frontend Engineer', tagline: 'React / Swift, 4 years. Open to work.' },
+                    { id: 'elena', kind: 'person', discipline: 'DESIGN', name: 'Elena Vogt',
+                        role: 'Design Director', tagline: 'Building design systems at scale. Previously Figma, now independent.' },
+                    { id: 'james', kind: 'person', discipline: 'ENGINEERING', name: 'James Kwon',
+                        role: 'Staff Engineer', tagline: 'Distributed systems, consensus protocols, and the occasional hot take.' },
+                    { id: 'sophie', kind: 'person', discipline: 'BRAND', name: 'Sophie Laurent',
+                        role: 'Brand Director', tagline: 'Helping companies find their voice — literally.' },
+                    { id: 'marco', kind: 'person', discipline: 'ENGINEERING', name: 'Marco Rossi',
+                        role: 'VP Engineering', tagline: 'Scaled teams from 5 to 500. Now advising.' },
+                    { id: 'aisha', kind: 'person', discipline: 'DESIGN', name: 'Aisha Okonkwo',
+                        role: 'Product Designer', tagline: 'Fintech, healthtech, and the spaces in between.' },
+                    { id: 'liam', kind: 'person', discipline: 'ENGINEERING', name: 'Liam O\'Brien',
+                        role: 'DevOps Lead', tagline: 'Kubernetes, observability, and keeping things alive.' },
+                    { id: 'nina', kind: 'person', discipline: 'BRAND', name: 'Nina Chen',
+                        role: 'Creative Director', tagline: 'Brand strategy for climate tech.' },
+                    { id: 'peter', kind: 'person', discipline: 'DESIGN', name: 'Peter Malkin',
+                        role: 'Design Lead', tagline: 'UX research + product design. 8 years.' },
+                    { id: 'clara', kind: 'person', discipline: 'ENGINEERING', name: 'Clara Fischer',
+                        role: 'Backend Engineer', tagline: 'Go, Rust, and the occasional Python crime.' },
+                    { id: 'studio-north', kind: 'company', discipline: 'DESIGN', name: 'Studio North',
+                        role: 'Design studio, 12 people', tagline: 'Systems-heavy product design for regulated industries.' },
+                    { id: 'forge-labs', kind: 'company', discipline: 'ENGINEERING', name: 'Forge Labs',
+                        role: 'Inference infra, Series A', tagline: 'Building tooling for model deployment at scale.' },
+                    { id: 'hollow-co', kind: 'company', discipline: 'BRAND', name: 'Hollow & Co',
+                        role: 'Branding agency', tagline: 'Portfolio reviews every Friday. No pitch decks.' },
+                    { id: 'strata', kind: 'company', discipline: 'ENGINEERING', name: 'Strata',
+                        role: 'Cloud infrastructure, Series B', tagline: 'Multi-cloud networking for the rest of us.' },
+                    { id: 'fieldwork', kind: 'company', discipline: 'DESIGN', name: 'Fieldwork',
+                        role: 'Product design consultancy', tagline: 'We work with founders who care about craft.' },
+                    { id: 'catalyst', kind: 'company', discipline: 'BRAND', name: 'Catalyst',
+                        role: 'Brand + comms', tagline: 'For companies that want to say something real.' },
+                    { id: 'nimbus', kind: 'company', discipline: 'ENGINEERING', name: 'Nimbus',
+                        role: 'AI infrastructure, Seed', tagline: 'Building the orchestration layer for ML teams.' },
+                    { id: 'paragon', kind: 'company', discipline: 'DESIGN', name: 'Paragon',
+                        role: 'Design systems, 20 people', tagline: 'We build the foundations for products at scale.' },
+                ];
+            }
+
+            // AVIF image URLs from Unsplash (open source, served as AVIF)
+            const AVIF_IMAGES = [
+                'https://images.unsplash.com/photo-1506744038136-46273834b3fb?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1485550409059-9afb054cada4?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1519681393784-d120267933ba?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1522071820081-009f0129c71c?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1556761175-4b46a572b786?fm=avif&w=800&h=450&fit=crop&q=80',
+            ];
+
+            function getRandomAVIF() {
+                return AVIF_IMAGES[Math.floor(Math.random() * AVIF_IMAGES.length)];
+            }
+
+            function seedStatements(authorsList) {
+                const now = Date.now();
+                const day = 24 * 60 * 60 * 1000;
+                const hr = 60 * 60 * 1000;
+
+                function r(authorId, text, timeOffset, children) {
+                    return { id: uid(), authorId, time: now + timeOffset, text, replies: children || [] };
+                }
+
+                const img1 = getRandomAVIF();
+                const img2 = getRandomAVIF();
+                const img3 = getRandomAVIF();
+                const img4 = getRandomAVIF();
+                const img5 = getRandomAVIF();
+
+                return [{
+                    id: uid(),
+                    authorId: 'zack',
+                    time: now - day * 12 - hr * 3,
+                    tag: 'OPEN TO WORK',
+                    text: 'Six years freelance, shipped 20+ products across fintech, health, and consumer. Looking for staff-level product work — not a title chaser, but I want to build things that matter.',
+                    mediaUrl: img1,
+                    replies: [
+                        r('maya', 'Zack, this is the most honest "open to work" I\'ve seen in a while. What kind of work are you most proud of?',
+                            -day * 12 + hr * 2, [
+                                r('zack',
+                                    'Honestly? A clinical trial dashboard for a rare disease nonprofit. Shipped it for free. It\'s used by 40 hospitals now.',
+                                    -day * 12 + hr * 4, [
+                                        r('maya', 'That\'s the kind of work that actually matters. I\'d love to hear more — DM me.',
+                                            -day * 12 + hr * 5, [])
+                                    ])
+                            ]),
+                        r('tom', 'Staff-level means different things at different places. What\'s your definition?', -day * 12 +
+                            hr * 6, [
+                                r('zack', 'I want to own outcomes, not just outputs. I want to shape the product direction, not just execute on tickets. I want to mentor, not just be the person who does the work.',
+                                    -day * 12 + hr * 8, [
+                                        r('tom', 'That\'s the right definition. I\'ve seen too many "staff" roles that are just senior++ with more meetings.',
+                                            -day * 12 + hr * 9, [
+                                                r('zack', 'Exactly. Titles are cheap. Impact is expensive.', -day * 12 +
+                                                    hr * 10, [])
+                                            ])
+                                    ])
+                            ]),
+                        r('dev', 'Sent you a note about a role at a healthtech startup I know. Check your DMs.', -day * 12 +
+                            hr * 12, [
+                                r('zack', 'Appreciate it Dev — will look today.', -day * 12 + hr * 13, [])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'studio-north',
+                    time: now - day * 10 - hr * 6,
+                    tag: 'HIRING',
+                    text: 'Senior Product Designer. Remote-first. We build systems for regulated industries — healthcare, finance, energy. This is not pixel-pushing. This is governance, scale, and making complex things simple.',
+                    mediaUrl: img2,
+                    replies: [
+                        r('maya', 'What does "systems-heavy" mean here specifically? I\'ve seen that term used for everything from component libraries to full design languages.',
+                            -day * 10 + hr * 2, [
+                                r('studio-north',
+                                    'Great question. We mean: component libraries + the governance around them — versioning, documentation, contribution workflows, and the decision-making framework for when to add to the system. It\'s not just Figma files; it\'s the system around the system.',
+                                    -day * 10 + hr * 4, [
+                                        r('maya', 'That\'s the right answer. I\'ve been building that kind of governance for the past two years. I\'ll send you my portfolio today.',
+                                            -day * 10 + hr * 5, [
+                                                r('studio-north', 'Please do. We\'re reviewing applications on a rolling basis.',
+                                                    -day * 10 + hr * 6, [])
+                                            ])
+                                    ])
+                            ]),
+                        r('ria', 'Do you sponsor visas for this role?', -day * 10 + hr * 7, [
+                            r('studio-north', 'Case by case — if you\'re a strong fit, we\'ll work with you. We\'ve done it before.',
+                                -day * 10 + hr * 8, [
+                                    r('ria', 'Good to know. I\'m applying today.', -day * 10 + hr * 9, [])
+                                ])
+                        ]),
+                        r('elena', 'I\'ve worked with Studio North before — they\'re the real deal. If you\'re a designer who cares about systems, apply.',
+                            -day * 10 + hr * 10, [
+                                r('studio-north', 'Elena! Thank you. That means a lot coming from you.', -day * 10 + hr *
+                                    11, [])
+                            ]),
+                        r('peter', 'What\'s the salary band? I know it varies by location but a ballpark would help.', -day *
+                            10 + hr * 12, [
+                                r('studio-north', '$140-180k + equity, depending on experience and location. We\'re transparent about this.',
+                                    -day * 10 + hr * 13, [
+                                        r('peter', 'Appreciate the transparency. That\'s in the right range.', -day * 10 +
+                                            hr * 14, [])
+                                    ])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'maya',
+                    time: now - day * 9 - hr * 2,
+                    tag: 'CAREER',
+                    text: 'Left my agency job today. No regrets yet — ask me in a month. Six years of building other people\'s visions. Time to build my own.',
+                    mediaUrl: '',
+                    replies: [
+                        r('ria', 'The "yet" is doing a lot of work in that sentence. But honestly, good for you. I left agency life three years ago and never looked back.',
+                            -day * 9 + hr * 1, [
+                                r('maya', 'I keep telling myself that the first month is the hardest. Is that true?', -day *
+                                    9 + hr * 2, [
+                                        r('ria', 'Honestly? The first month is the most freeing. It\'s month three where the doubts creep in. Stay focused.',
+                                            -day * 9 + hr * 3, [
+                                                r('maya', 'Saving this comment. I\'ll come back to it in three months.',
+                                                    -day * 9 + hr * 4, [])
+                                            ])
+                                    ])
+                            ]),
+                        r('zack', 'Welcome to the other side. Freelance isn\'t easier, but it\'s yours.', -day * 9 + hr * 5, [
+                            r('maya', 'Thanks Zack. Any advice for someone who\'s used to having a team?', -day * 9 + hr *
+                                6, [
+                                    r('zack', 'Build your network before you need it. And charge more than you think you\'re worth.',
+                                        -day * 9 + hr * 7, [
+                                            r('maya', 'The second part is the hardest. I\'m working on it.', -day * 9 +
+                                                hr * 8, [])
+                                        ])
+                                ])
+                        ]),
+                        r('sophie', 'I left a brand agency two years ago to go independent. It\'s terrifying and exhilarating. You\'ve got this.',
+                            -day * 9 + hr * 9, [
+                                r('maya', 'Thanks Sophie. Did you have a "oh no what have I done" moment?', -day * 9 + hr *
+                                    10, [
+                                        r('sophie', 'About six weeks in, when a client delayed payment. Have a runway. That\'s my only advice.',
+                                            -day * 9 + hr * 11, [
+                                                r('maya', 'Noted. I\'ve got 12 months of runway. Hoping that\'s enough.',
+                                                    -day * 9 + hr * 12, [])
+                                            ])
+                                    ])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'forge-labs',
+                    time: now - day * 8 - hr * 8,
+                    tag: 'HIRING',
+                    text: 'We\'re building inference tooling for teams shipping models to production. Looking for two ML engineers — one senior, one mid-level. We\'re remote-first, Series A, and we actually care about developer experience.',
+                    mediaUrl: img3,
+                    replies: [
+                        r('tom', 'What\'s the serving stack? I\'ve been burned by companies claiming to be "inference-first" that are just wrapping FastAPI.',
+                            -day * 8 + hr * 2, [
+                                r('forge-labs',
+                                    'Fair question. We\'re building on Triton + a custom scheduler we\'ve been iterating on for 18 months. It\'s not a wrapper — it\'s a full orchestration layer. Happy to share the architecture doc.',
+                                    -day * 8 + hr * 4, [
+                                        r('tom', 'That\'s the answer I was hoping for. I\'ll DM you.', -day * 8 + hr * 5, [
+                                            r('forge-labs', 'Looking forward to it.', -day * 8 + hr * 6, [])
+                                        ])
+                                    ])
+                            ]),
+                        r('clara', 'What\'s the tech stack beyond the inference layer?', -day * 8 + hr * 7, [
+                            r('forge-labs', 'Go for the control plane, Rust for the data path, Python for the model serving glue. We\'re polyglot but intentional about it.',
+                                -day * 8 + hr * 8, [
+                                    r('clara', 'That\'s a smart stack. I\'m applying.', -day * 8 + hr * 9, [])
+                                ])
+                        ]),
+                        r('dev', 'I\'ve got a couple friends who are looking — one senior, one mid. Can I connect you?', -day *
+                            8 + hr * 10, [
+                                r('forge-labs', 'Please do. We\'re moving fast on this hiring round.', -day * 8 + hr * 11, [
+                                    r('dev', 'Sent intros. Check your email.', -day * 8 + hr * 12, [])
+                                ])
+                            ]),
+                        r('marco', 'What\'s the team culture like? I\'ve seen too many ML teams that are pure research with no delivery.',
+                            -day * 8 + hr * 13, [
+                                r('forge-labs', 'We\'re shipping weekly. Research is part of the job, but we\'re builders first. We don\'t do "it works on my machine" — we deploy to production.',
+                                    -day * 8 + hr * 14, [
+                                        r('marco', 'That\'s the right culture. I\'ll send you a note.', -day * 8 + hr * 15,
+                                        [])
+                                    ])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'tom',
+                    time: now - day * 7 - hr * 4,
+                    tag: 'THOUGHTS',
+                    text: 'A staff title means nothing if the team around it is broken. I\'ve seen staff engineers who couldn\'t ship because the culture was toxic. I\'ve seen senior engineers do staff-level work because the team was healthy.',
+                    mediaUrl: '',
+                    replies: [
+                        r('maya', 'Hard agree. Titles are a proxy that people use because evaluating actual leadership is harder. I\'ve worked with "senior" designers who couldn\'t give feedback and "junior" designers who transformed products.',
+                            -day * 7 + hr * 1, [
+                                r('ria', 'Counterpoint — titles still matter for comp benchmarking even if they\'re a bad proxy for skill. The market uses them, so we have to.',
+                                    -day * 7 + hr * 2, [
+                                        r('maya', 'Sure, but that\'s an argument for fixing comp benchmarking, not for titles mattering. We should be paying for impact, not for a label.',
+                                            -day * 7 + hr * 3, [
+                                                r('tom', 'This is the whole thread in miniature. Maya\'s right — we\'ve outsourced our evaluation to a system that doesn\'t work.',
+                                                    -day * 7 + hr * 4, [
+                                                        r('ria', 'I don\'t disagree, but I also have to pay my mortgage. Titles matter for that.',
+                                                            -day * 7 + hr * 5, [
+                                                                r('tom', 'That\'s fair. I\'m not saying titles don\'t matter — I\'m saying they don\'t mean what people think they mean.',
+                                                                    -day * 7 + hr * 6, [])
+                                                            ])
+                                                    ])
+                                            ])
+                                    ])
+                            ]),
+                        r('dev', 'As someone job-hunting right now, titles are unfortunately still the first filter that recruiters use. I wish it weren\'t true.',
+                            -day * 7 + hr * 7, [
+                                r('tom', 'I know. I\'ve been there. The system is broken, but we have to work within it while trying to fix it.',
+                                    -day * 7 + hr * 8, [
+                                        r('dev', 'So how do I get a "staff" title without the years of "senior" first?',
+                                            -day * 7 + hr * 9, [
+                                                r('tom', 'Honestly? Find a company that values impact over tenure. They exist. I found one.',
+                                                    -day * 7 + hr * 10, [])
+                                            ])
+                                    ])
+                            ]),
+                        r('elena', 'I\'ve been a "Design Director" and a "Senior Designer" at different places. The title changed, my work didn\'t. It\'s mostly about the company\'s internal politics.',
+                            -day * 7 + hr * 11, [
+                                r('tom', 'Exactly. The best companies I\'ve worked at had the flattest hierarchies.', -day *
+                                    7 + hr * 12, [])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'ria',
+                    time: now - day * 6 - hr * 10,
+                    tag: 'BRAND',
+                    text: 'Rebranded three companies this year. None of them actually needed it. They needed clarity on their product-market fit, not a new logo. Brand work is often a distraction from the real problem.',
+                    mediaUrl: img4,
+                    replies: [
+                        r('hollow-co', 'This is the whole industry\'s open secret and nobody says it out loud. 80% of rebrands are just "we\'re bored" or "we want to charge more."',
+                            -day * 6 + hr * 2, [
+                                r('ria', 'Say it louder for the agencies in the back. I\'ve been guilty of this too — selling a rebrand when the client needed strategy.',
+                                    -day * 6 + hr * 3, [
+                                        r('hollow-co', 'We would say it louder, but then nobody would hire us. The industry is built on this fiction.',
+                                            -day * 6 + hr * 4, [
+                                                r('ria', 'And yet we keep doing it. I\'m trying to be more honest with clients now.',
+                                                    -day * 6 + hr * 5, [
+                                                        r('hollow-co', 'Same. It\'s harder to sell, but the work is better.',
+                                                            -day * 6 + hr * 6, [])
+                                                    ])
+                                            ])
+                                    ])
+                            ]),
+                        r('sophie', 'I\'ve been saying this for years. Brand is about strategy, not aesthetics. If the strategy isn\'t there, the brand is just decoration.',
+                            -day * 6 + hr * 7, [
+                                r('ria', 'Yes! I\'m stealing that line. "Brand is strategy, not aesthetics."', -day * 6 +
+                                    hr * 8, [
+                                        r('sophie', 'Steal it. It\'s the truth.', -day * 6 + hr * 9, [])
+                                    ])
+                            ]),
+                        r('nina', 'I worked on a rebrand last year that cost $2M. The company went bankrupt six months later. The brand wasn\'t the problem.',
+                            -day * 6 + hr * 10, [
+                                r('ria', 'That\'s the cautionary tale we should all be telling. $2M on a rebrand, zero on product-market fit.',
+                                    -day * 6 + hr * 11, [
+                                        r('nina', 'Exactly. And I was the one who recommended the rebrand. I still think about it.',
+                                            -day * 6 + hr * 12, [
+                                                r('ria', 'We\'ve all been there. The key is to learn from it.', -day *
+                                                    6 + hr * 13, [])
+                                            ])
+                                    ])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'dev',
+                    time: now - day * 5 - hr * 6,
+                    tag: 'OPEN TO WORK',
+                    text: 'Frontend, React / Swift, 4 YOE. Open to work — prefer product over agency, but I\'m flexible. I care about accessibility, performance, and building things that people actually use.',
+                    mediaUrl: '',
+                    replies: [
+                        r('james', 'I\'m hiring for a product role at a climate tech startup. Send me your portfolio.', -day *
+                            5 + hr * 1, [
+                                r('dev', 'Just sent it. Thanks James.', -day * 5 + hr * 2, [])
+                            ]),
+                        r('clara', 'I know a team at a fintech company that\'s looking for React engineers. Want an intro?',
+                            -day * 5 + hr * 3, [
+                                r('dev', 'Yes please! I\'d appreciate that.', -day * 5 + hr * 4, [
+                                    r('clara', 'Done. Check your DMs.', -day * 5 + hr * 5, [])
+                                ])
+                            ]),
+                        r('peter', 'What kind of product do you want to work on? I\'m always curious about what frontend engineers care about.',
+                            -day * 5 + hr * 6, [
+                                r('dev', 'I want to work on something that matters. Climate, health, education. I\'m tired of building things that just sell ads.',
+                                    -day * 5 + hr * 7, [
+                                        r('peter', 'Same. I\'ve been moving my career in that direction too.', -day * 5 +
+                                            hr * 8, [])
+                                    ])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'hollow-co',
+                    time: now - day * 4 - hr * 2,
+                    tag: 'COMMUNITY',
+                    text: 'Portfolio reviews are back. Every Friday, we look at 5 portfolios and give honest feedback — no sugarcoating, no pitch decks. Just real talk about what works and what doesn\'t.',
+                    mediaUrl: img5,
+                    replies: [
+                        r('sophie', 'This is such a great initiative. I\'ve been doing portfolio reviews informally for years and it\'s one of the most valuable things you can do.',
+                            -day * 4 + hr * 1, [
+                                r('hollow-co', 'Thanks Sophie. We\'ve been doing it for 18 months now and the response has been incredible. People are hungry for honest feedback.',
+                                    -day * 4 + hr * 2, [
+                                        r('sophie', 'I can imagine. Where do people sign up?', -day * 4 + hr * 3, [
+                                            r('hollow-co', 'DM us on here or email. We\'re open to anyone.', -day * 4 +
+                                                hr * 4, [])
+                                        ])
+                                    ])
+                            ]),
+                        r('peter', 'I\'ve done one of these reviews — it was genuinely helpful. Not the usual "looks great!" feedback. Real, actionable advice.',
+                            -day * 4 + hr * 5, [
+                                r('hollow-co', 'Peter! Thanks for the shoutout. Your work was great — you just needed to tell the story better. Hope you\'re using the new narrative structure.',
+                                    -day * 4 + hr * 6, [
+                                        r('peter', 'I am! It\'s made a huge difference in how I present my work.', -day *
+                                            4 + hr * 7, [])
+                                    ])
+                            ]),
+                        r('maya', 'I\'m interested. How do I sign up?', -day * 4 + hr * 8, [
+                            r('hollow-co', 'Just DM us — we\'ll get you on the schedule. We have slots for next Friday.',
+                                -day * 4 + hr * 9, [
+                                    r('maya', 'DM sent. Thank you!', -day * 4 + hr * 10, [])
+                                ])
+                        ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'elena',
+                    time: now - day * 3 - hr * 8,
+                    tag: 'THOUGHTS',
+                    text: 'Design systems are not about consistency. They\'re about enabling speed and quality at scale. If your design system is just a library of components, you\'ve built a tool, not a system.',
+                    mediaUrl: '',
+                    replies: [
+                        r('studio-north', 'This is the most important thing to understand about design systems. We\'ve been building systems for 7 years and this is the distinction that separates the good from the great.',
+                            -day * 3 + hr * 2, [
+                                r('elena', 'Exactly. A system is a way of working, not a collection of files. It\'s about the team, the process, and the outcomes.',
+                                    -day * 3 + hr * 3, [
+                                        r('studio-north', 'We should write a manifesto together.', -day * 3 + hr * 4, [
+                                            r('elena', 'I\'m in. Let\'s do it.', -day * 3 + hr * 5, [])
+                                        ])
+                                    ])
+                            ]),
+                        r('maya', 'I\'ve been saying this for years. Most "design systems" are just style guides with extra steps. The real system is the culture around it.',
+                            -day * 3 + hr * 6, [
+                                r('elena', 'Yes! The culture is the hardest part to build. Anyone can make a component library. Building the governance, the contribution model, the decision-making framework — that\'s the system.',
+                                    -day * 3 + hr * 7, [
+                                        r('maya', 'That\'s what I\'m trying to build at my new practice. I\'ll reach out to you about it.',
+                                            -day * 3 + hr * 8, [])
+                                    ])
+                            ]),
+                        r('paragon', 'We\'re hiring for a design systems lead right now. Elena, this is exactly the kind of thinking we need. Let\'s talk.',
+                            -day * 3 + hr * 9, [
+                                r('elena', 'I\'m open to a conversation. DM me and we can set up a time.', -day * 3 + hr *
+                                    10, [])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'james',
+                    time: now - day * 3 - hr * 2,
+                    tag: 'THOUGHTS',
+                    text: 'Distributed systems are hard because we\'re trying to make unreliable things reliable. The best systems are the ones that embrace failure, not the ones that try to prevent it.',
+                    mediaUrl: '',
+                    replies: [
+                        r('tom', 'This is the core insight that separates good engineers from great ones. The best systems I\'ve built had failure as a first-class concern.',
+                            -day * 3 + hr * 1, [
+                                r('james', 'Exactly. I\'ve seen so many systems fail because they assumed everything would work. They didn\'t plan for the network partition, the disk failure, the bad deploy.',
+                                    -day * 3 + hr * 2, [
+                                        r('tom', 'And then the system falls over and everyone acts surprised. "We didn\'t think that could happen." It\'s 2026 — we know it can happen.',
+                                            -day * 3 + hr * 3, [
+                                                r('james', 'The good news is that we have patterns for this now. The bad news is that most teams don\'t use them.',
+                                                    -day * 3 + hr * 4, [])
+                                            ])
+                                    ])
+                            ]),
+                        r('clara', 'I\'ve been building distributed systems for 10 years and this is still the most misunderstood concept. People want to build systems that don\'t fail. That\'s impossible.',
+                            -day * 3 + hr * 5, [
+                                r('james', 'The goal isn\'t to prevent failure. It\'s to handle it gracefully. To make failure boring. That\'s the real engineering challenge.',
+                                    -day * 3 + hr * 6, [
+                                        r('clara', '"Make failure boring" — I\'m using that.', -day * 3 + hr * 7, [])
+                                    ])
+                            ]),
+                        r('marco', 'This is why I love chaos engineering. You inject failure to find the weak points. It\'s the only way to build resilient systems.',
+                            -day * 3 + hr * 8, [
+                                r('james', 'Chaos engineering is the best thing we\'ve done in the last decade. It\'s not just testing — it\'s a philosophy.',
+                                    -day * 3 + hr * 9, [
+                                        r('marco', 'I\'d love to chat more about this. Are you at the conference next week?',
+                                            -day * 3 + hr * 10, [
+                                                r('james', 'I will be. Let\'s grab coffee.', -day * 3 + hr * 11, [])
+                                            ])
+                                    ])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'sophie',
+                    time: now - day * 2 - hr * 12,
+                    tag: 'BRAND',
+                    text: 'Your brand isn\'t your logo, your website, or your tagline. It\'s what people say about you when you\'re not in the room. And that\'s built on trust, not aesthetics.',
+                    mediaUrl: '',
+                    replies: [
+                        r('ria', 'This is the truth. I\'ve worked with companies who had perfect visual identities but zero trust. And companies with "ugly" brands that had incredible reputations.',
+                            -day * 2 + hr * 2, [
+                                r('sophie', 'The visual identity is the easy part. The hard part is doing what you say you\'ll do, being honest, and building real relationships.',
+                                    -day * 2 + hr * 3, [
+                                        r('ria', 'And yet we charge $100k+ for the easy part. The system is backwards.',
+                                            -day * 2 + hr * 4, [
+                                                r('sophie', 'We\'re part of that system. The question is: what are we doing to change it?',
+                                                    -day * 2 + hr * 5, [
+                                                        r('ria', 'I\'ve started telling clients that the brand is the last thing they need. The strategy is the first. It\'s a harder sell but it\'s the right thing to do.',
+                                                            -day * 2 + hr * 6, [])
+                                                    ])
+                                            ])
+                                    ])
+                            ]),
+                        r('nina', 'This is what I tell every client in the first meeting. "Your brand is the promise you make. Your product is the delivery." If the delivery doesn\'t match the promise, the brand doesn\'t matter.',
+                            -day * 2 + hr * 7, [
+                                r('sophie', 'That\'s a great way to frame it. I\'m stealing that.', -day * 2 + hr * 8, [
+                                    r('nina', 'Steal it. It\'s the truth.', -day * 2 + hr * 9, [])
+                                ])
+                            ]),
+                        r('catalyst', 'We built our entire agency around this idea. The brand is the sum of the interactions, not the visual system.',
+                            -day * 2 + hr * 10, [
+                                r('sophie', 'And that\'s why Catalyst is one of the few agencies I actually respect.', -day *
+                                    2 + hr * 11, [
+                                        r('catalyst', 'That means a lot coming from you. Thank you.', -day * 2 + hr * 12,
+                                        [])
+                                    ])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'marco',
+                    time: now - day * 2 - hr * 4,
+                    tag: 'LEADERSHIP',
+                    text: 'Scaling a team from 5 to 500 taught me one thing: leadership is about creating the conditions for others to succeed, not about making all the decisions. If you\'re the smartest person in the room, you\'ve built the wrong room.',
+                    mediaUrl: '',
+                    replies: [
+                        r('james', 'This is the hardest lesson for new managers. You stop being the hero and start being the enabler. It\'s a different skill set entirely.',
+                            -day * 2 + hr * 1, [
+                                r('marco', 'And most companies don\'t train for it. They promote the best individual contributor and then wonder why they struggle as a manager.',
+                                    -day * 2 + hr * 2, [
+                                        r('james', 'We need to fix that. Management is a craft, not a reward.', -day * 2 +
+                                            hr * 3, [])
+                                    ])
+                            ]),
+                        r('elena', 'I\'ve seen this play out so many times. The best designer on the team becomes the design lead and then stops doing design work. It\'s a waste of talent.',
+                            -day * 2 + hr * 4, [
+                                r('marco', 'The IC-to-manager transition is broken. We need more dual-track career paths. Some people don\'t want to manage, and that\'s okay.',
+                                    -day * 2 + hr * 5, [
+                                        r('elena', 'I\'m one of those people. I love designing. I don\'t want to manage. And I\'ve had to fight to stay in the IC track.',
+                                            -day * 2 + hr * 6, [
+                                                r('marco', 'That\'s a fight you shouldn\'t have to have. The system needs to change.',
+                                                    -day * 2 + hr * 7, [])
+                                            ])
+                                    ])
+                            ]),
+                        r('tom', 'I\'ve been a staff engineer who didn\'t want to be an EM. I had to fight for that. The assumption is always "you\'re ready for management." But I\'m not.',
+                            -day * 2 + hr * 8, [
+                                r('marco', 'And that\'s okay. We need more companies that understand that. Staff engineer is a terminal role, not a stepping stone.',
+                                    -day * 2 + hr * 9, [
+                                        r('tom', 'It\'s amazing how rare that perspective is.', -day * 2 + hr * 10, [])
+                                    ])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'aisha',
+                    time: now - day * 1 - hr * 14,
+                    tag: 'OPEN TO WORK',
+                    text: 'Product designer, 7 years. Fintech + healthtech. I care about the details that make products feel human. Looking for a role where I can own the full product experience, not just the UI.',
+                    mediaUrl: '',
+                    replies: [
+                        r('fieldwork', 'We\'re hiring for exactly this. Product designer to own the full experience. Let\'s talk.',
+                            -day * 1 + hr * 2, [
+                                r('aisha', 'I\'d love that. I\'ll send you my portfolio.', -day * 1 + hr * 3, [])
+                            ]),
+                        r('peter', 'Aisha, your work is incredible. I\'ve been following you for years. You\'d be an asset to any team.',
+                            -day * 1 + hr * 4, [
+                                r('aisha', 'Thank you Peter! That means a lot. I\'m hoping to find the right fit this time.',
+                                    -day * 1 + hr * 5, [])
+                            ]),
+                        r('zack', 'I\'ve worked with Aisha before — she\'s the real deal. Hire her if you can.', -day * 1 + hr *
+                            6, [
+                                r('aisha', 'Zack! Thank you for the kind words. We worked on a project together a few years ago and it was one of the best experiences of my career.',
+                                    -day * 1 + hr * 7, [
+                                        r('zack', 'Same. She made me a better designer. I\'d work with her again in a heartbeat.',
+                                            -day * 1 + hr * 8, [])
+                                    ])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'clara',
+                    time: now - hr * 18,
+                    tag: 'THOUGHTS',
+                    text: 'Go is the best programming language for infrastructure work. I\'ll die on this hill. It\'s simple, fast, and the concurrency model actually works. Rust is fine. Go is better for teams.',
+                    mediaUrl: '',
+                    replies: [
+                        r('tom', 'I agree for most infrastructure. But for performance-critical paths, Rust has its place. It\'s not either/or.',
+                            -hr * 16, [
+                                r('clara', 'Fair. But Rust\'s learning curve is brutal for teams that aren\'t already steeped in it. Go lets you ship faster.',
+                                    -hr * 14, [
+                                        r('tom', 'That\'s true. I think the real answer is: use the right tool for the job. But Go is a great default.',
+                                            -hr * 12, [
+                                                r('clara', 'Exactly. It\'s the default for infrastructure for a reason.',
+                                                    -hr * 10, [])
+                                            ])
+                                    ])
+                            ]),
+                        r('james', 'I was a Rust evangelist for years. Then I built a system in Go and shipped it in half the time. Now I\'m a Go convert.',
+                            -hr * 8, [
+                                r('clara', 'Welcome to the light side. We have concurrency that works and compilation that doesn\'t take forever.',
+                                    -hr * 6, [
+                                        r('james', 'The compilation speed alone is worth the switch.', -hr * 4, [])
+                                    ])
+                            ]),
+                        r('forge-labs', 'We\'re building our control plane in Go for exactly this reason. The team can move fast and the performance is good enough.',
+                            -hr * 2, [
+                                r('clara', 'Smart choice. I\'d love to see what you\'re building.', -hr * 1, [
+                                    r('forge-labs', 'We\'re hiring. Want to talk?', -hr * 0.5, [])
+                                ])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'nina',
+                    time: now - hr * 12,
+                    tag: 'COMMUNITY',
+                    text: 'If you\'re in climate tech and you\'re hiring — please post your roles here. I\'m building a community of climate tech talent and there\'s so much demand on both sides.',
+                    mediaUrl: '',
+                    replies: [
+                        r('james', 'We\'re hiring for a staff engineer at a climate tech startup. I\'ll DM you the details.',
+                            -hr * 10, [
+                                r('nina', 'Perfect. I\'ll circulate it in the community.', -hr * 8, [])
+                            ]),
+                        r('sophie', 'I\'m working with several climate tech companies on brand strategy. They\'re all hiring. I\'ll connect you with them.',
+                            -hr * 6, [
+                                r('nina', 'That would be amazing. Thank you Sophie.', -hr * 4, [
+                                    r('sophie', 'Just sent the intro emails. Check your inbox.', -hr * 2, [])
+                                ])
+                            ]),
+                        r('strata', 'We\'re hiring for cloud infrastructure roles. Climate tech is a priority for us. Let\'s chat.',
+                            -hr * 1, [
+                                r('nina', 'Would love to. I\'ll reach out tomorrow.', -hr * 0.5, [])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'liam',
+                    time: now - hr * 8,
+                    tag: 'THOUGHTS',
+                    text: 'Observability isn\'t about dashboards. It\'s about being able to answer questions you didn\'t know you\'d need to ask. If your monitoring is just "is it up or down," you\'re not doing observability.',
+                    mediaUrl: '',
+                    replies: [
+                        r('clara', 'This is the most important concept in infrastructure. The best systems I\'ve worked on had rich telemetry that let us debug anything, anywhere, at any time.',
+                            -hr * 6, [
+                                r('liam', 'Exactly. And the worst systems I\'ve worked on had "good enough" telemetry that became "not enough" at 2 AM on a Saturday.',
+                                    -hr * 4, [
+                                        r('clara', 'I\'ve been there. The "it\'s probably the network" phase of debugging is the worst.',
+                                            -hr * 2, [
+                                                r('liam', 'And it\'s always the network. Or the application. Or the configuration. Or something else. The point is: you need the data to know.',
+                                                    -hr * 1, [])
+                                            ])
+                                    ])
+                            ]),
+                        r('tom', 'We spent 6 months building an observability stack at my last company. It was the best investment we ever made. It paid for itself in the first major incident.',
+                            -hr * 5, [
+                                r('liam', 'That\'s the ROI that nobody budgets for. The cost of not having observability is always higher than the cost of building it.',
+                                    -hr * 3, [
+                                        r('tom', 'It\'s like insurance — nobody wants to pay for it until they need it.',
+                                            -hr * 1, [
+                                                r('liam', 'Exactly. And when you need it, you need it desperately.',
+                                                    -hr * 0.5, [])
+                                            ])
+                                    ])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'peter',
+                    time: now - hr * 4,
+                    tag: 'OPEN TO WORK',
+                    text: 'UX researcher + product designer, 8 years. I\'ve run research for products with millions of users and for startups with none. I\'m looking for a role where research actually drives the product decisions.',
+                    mediaUrl: '',
+                    replies: [
+                        r('aisha', 'Peter, you\'re one of the best researchers I\'ve worked with. Any team would be lucky to have you.',
+                            -hr * 3, [
+                                r('peter', 'Thank you Aisha. That means a lot.', -hr * 2, [])
+                            ]),
+                        r('fieldwork', 'We\'re looking for a design researcher. I\'d love to chat.', -hr * 1, [
+                            r('peter', 'I\'d love that. I\'ll send you my portfolio and research case studies.', -hr * 0.5,
+                            [])
+                        ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'strata',
+                    time: now - hr * 2,
+                    tag: 'HIRING',
+                    text: 'Cloud infrastructure engineer, remote-first. We\'re building multi-cloud networking that actually works. Looking for engineers who understand networking, Kubernetes, and the cloud at a deep level.',
+                    mediaUrl: '',
+                    replies: [
+                        r('liam', 'This is exactly the kind of work I\'ve been doing for the last 4 years. I\'ll DM you my resume.',
+                            -hr * 1, [
+                                r('strata', 'Please do. We\'re moving fast on this round.', -hr * 0.5, [])
+                            ]),
+                        r('forge-labs', 'We\'ve worked with Strata before — they\'re building real infrastructure. If you\'re a networking engineer, this is a good place to be.',
+                            -hr * 0.75, [
+                                r('strata', 'Thanks for the vote of confidence!', -hr * 0.25, [])
+                            ])
+                    ]
+                }, {
+                    id: uid(),
+                    authorId: 'catalyst',
+                    time: now - hr * 1,
+                    tag: 'COMMUNITY',
+                    text: 'Running a free brand strategy workshop next week. 2 hours, 20 people max. We\'ll work on a real brand challenge. First come, first served.',
+                    mediaUrl: '',
+                    replies: [
+                        r('ria', 'I\'m in. I\'ve been wanting to see how Catalyst approaches brand work.', -hr * 0.75, [
+                            r('catalyst', 'You\'re in. We\'ll send you the details.', -hr * 0.5, [])
+                        ]),
+                        r('sophie', 'I\'d love to attend. I\'ve been following Catalyst for a while.', -hr * 0.5, [
+                            r('catalyst', 'We\'d be honored to have you. Sending the invite now.', -hr * 0.25, [])
+                        ])
+                    ]
+                }];
+            }
+
+            // ── storage ────────────────────────────────────────────────
+
+            async function loadData() {
+                try {
+                    const res = await window.storage.get(STORAGE_KEY, false);
+                    if (res && res.value) {
+                        const parsed = JSON.parse(res.value);
+                        authors = parsed.authors || [];
+                        statements = parsed.statements || [];
+                        if (authors.length && statements.length) return;
+                    }
+                } catch (e) { /* no data yet */ }
+                authors = seedAuthors();
+                statements = seedStatements(authors);
+                await saveData();
+            }
+
+            let saveInFlight = false;
+            let pendingRetry = false;
+
+            function setSaveStatus(state) {
+                const el = document.getElementById('saveStatus');
+                if (!el) return;
+                el.classList.remove('err', 'ok');
+                if (state === 'saving') { el.textContent = '· saving…'; } else if (state === 'ok') { el.textContent =
+                        '· saved';
+                    el.classList.add('ok'); } else if (state === 'err') { el.textContent = '· not saved — click to retry';
+                    el.classList.add('err'); } else { el.textContent = ''; }
+            }
+
+            async function saveData(isRetry) {
+                if (saveInFlight) { pendingRetry = true; return; }
+                saveInFlight = true;
+                setSaveStatus('saving');
+                try {
+                    await window.storage.set(STORAGE_KEY, JSON.stringify({ authors, statements }), false);
+                    setSaveStatus('ok');
+                } catch (e) {
+                    console.error('storage save failed', e);
+                    if (!isRetry) {
+                        saveInFlight = false;
+                        await new Promise(r => setTimeout(r, 800));
+                        return saveData(true);
+                    }
+                    setSaveStatus('err');
+                } finally {
+                    saveInFlight = false;
+                    if (pendingRetry) { pendingRetry = false;
+                        saveData(); }
+                }
+            }
+
+            document.getElementById('saveStatus').addEventListener('click', () => {
+                if (document.getElementById('saveStatus').classList.contains('err')) saveData();
+            });
+
+            function fmtTime(ts) {
+                const d = new Date(ts);
+                const now = new Date();
+                const sameDay = d.toDateString() === now.toDateString();
+                const yest = new Date(now);
+                yest.setDate(now.getDate() - 1);
+                const isYest = d.toDateString() === yest.toDateString();
+                const hh = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toUpperCase();
+                if (sameDay) return 'TODAY ' + hh;
+                if (isYest) return 'YESTERDAY';
+                return d.toLocaleDateString([], { month: 'short', day: 'numeric' }).toUpperCase();
+            }
+
+            function isVideo(url) { return /\.(mp4|webm|mov)(\?|$)/i.test(url); }
+
+            function countReplies(node) {
+                let n = node.replies.length;
+                node.replies.forEach(r => n += countReplies(r));
+                return n;
+            }
+
+            function countAuthorActivity(authorId) {
+                let statementsCount = 0,
+                    repliesCount = 0;
+
+                function walk(node, isTop) {
+                    if (node.authorId === authorId) { isTop ? statementsCount++ : repliesCount++; }
+                    node.replies.forEach(r => walk(r, false));
+                }
+                statements.forEach(s => walk(s, true));
+                return { statementsCount, repliesCount };
+            }
+
+            function escapeHtml(s) {
+                return (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;',
+                    "'": '&#39;' } [c]));
+            }
+
+            function el(html) {
+                const t = document.createElement('template');
+                t.innerHTML = html.trim();
+                return t.content.firstElementChild;
+            }
+
+            function avatarHtml(authorId, size) {
+                const a = authorById(authorId);
+                if (!a) return `<div class="avatar sz-${size} v1">?</div>`;
+                const cls = ['avatar', 'sz-' + size, avatarVariant(a.id)];
+                if (a.kind === 'company') cls.push('company');
+                return `<div class="${cls.join(' ')}">${escapeHtml(initialsFor(a))}</div>`;
+            }
+
+            // ── profile modal ──────────────────────────────────────────
+
+            function openProfile(authorId) {
+                const a = authorById(authorId);
+                if (!a) return;
+                document.getElementById('profileAvatarSlot').innerHTML = avatarHtml(a.id, 'lg');
+                document.getElementById('profileName').textContent = a.name;
+                document.getElementById('profileKind').textContent = a.kind === 'company' ? 'COMPANY / BRAND' : 'PERSON';
+                document.getElementById('profileRole').textContent = a.role || '';
+                document.getElementById('profileTagline').textContent = a.tagline || '';
+                const { statementsCount, repliesCount } = countAuthorActivity(a.id);
+                document.getElementById('profileStats').textContent =
+                    `${statementsCount} STATEMENT${statementsCount===1?'':'S'} · ${repliesCount} REPL${repliesCount===1?'Y':'IES'}`;
+                document.getElementById('profileModal').hidden = false;
+            }
+            document.getElementById('profileClose').addEventListener('click', () => document.getElementById('profileModal')
+                .hidden = true);
+            document.getElementById('profileModal').addEventListener('click', (e) => {
+                if (e.target.id === 'profileModal') document.getElementById('profileModal').hidden = true;
+            });
+
+            // ── filters ────────────────────────────────────────────────
+
+            function passesFilters(s) {
+                const a = authorById(s.authorId);
+                if (!a) return false;
+
+                // Search filter
+                if (searchQuery) {
+                    const q = searchQuery.toLowerCase();
+                    const matchesText = s.text.toLowerCase().includes(q);
+                    const matchesAuthor = a.name.toLowerCase().includes(q);
+                    const matchesTag = s.tag ? s.tag.toLowerCase().includes(q) : false;
+                    if (!matchesText && !matchesAuthor && !matchesTag) return false;
+                }
+
+                const tagOk = activeTags.size === 0 || (s.tag && activeTags.has(s.tag));
+                const kindOk = activeKinds.size === 0 || (a && activeKinds.has(a.kind));
+                const discOk = activeDisciplines.size === 0 || (a && activeDisciplines.has(a.discipline));
+                return tagOk && kindOk && discOk;
+            }
+
+            function filtersActive() {
+                return activeTags.size > 0 || activeKinds.size > 0 || activeDisciplines.size > 0 || searchQuery.length > 0;
+            }
+
+            function clearFilters() {
+                activeTags.clear();
+                activeKinds.clear();
+                activeDisciplines.clear();
+                searchQuery = '';
+                document.getElementById('bentoSearch').value = '';
+                render();
+                updateFilterUI();
+            }
+
+            // ── conversation modal ──────────────────────────────────────
+
+            function openConversation(statementId) {
+                modalStatementId = statementId;
+                modalReplyTargetId = null;
+                const modal = document.getElementById('conversationModal');
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+                renderModalContent(statementId);
+            }
+
+            function closeConversation() {
+                document.getElementById('conversationModal').classList.remove('open');
+                document.body.style.overflow = '';
+                modalStatementId = null;
+                modalReplyTargetId = null;
+            }
+
+            // ── media helpers ──
+
+            function renderMediaThumb(url, sizeClass) {
+                if (!url) return '';
+                const isVid = isVideo(url);
+                const tag = isVid ? 'video' : 'img';
+                const attrs = isVid ? 'controls playsinline muted' : 'alt=""';
+                return `<div class="thumb ${sizeClass}"><${tag} src="${escapeHtml(url)}" ${attrs} loading="lazy" /></div>`;
+            }
+
+            function renderMediaHero(url) {
+                if (!url) return '';
+                const isVid = isVideo(url);
+                const tag = isVid ? 'video' : 'img';
+                const attrs = isVid ? 'controls playsinline' : 'alt=""';
+                return `<div class="thumb-lg"><${tag} src="${escapeHtml(url)}" ${attrs} loading="lazy" /></div>`;
+            }
+
+            function renderMediaGrid(url) {
+                if (!url) return '';
+                const isVid = isVideo(url);
+                const tag = isVid ? 'video' : 'img';
+                const attrs = isVid ? 'controls playsinline muted' : 'alt=""';
+                return `<div class="thumb-grid"><${tag} src="${escapeHtml(url)}" ${attrs} loading="lazy" /></div>`;
+            }
+
+            // ── modal rendering ──
+
+            function renderModalNode(node, statement, depth) {
+                const hasChildren = node.replies.length > 0;
+                const isCollapsed = collapsed.has(node.id);
+                const a = authorById(node.authorId);
+                const wrap = document.createElement('div');
+                wrap.className = 'modal-node';
+                wrap.dataset.nodeId = node.id;
+
+                let headHtml = `
+              <div class="modal-node-head">
+                ${hasChildren ? `<button class="modal-node-toggle" data-node-id="${node.id}">${isCollapsed ? '[+]' : '[–]'}</button>` : ''}
+                ${avatarHtml(node.authorId,'xs')}
+                <span class="modal-node-author" data-author-id="${node.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
+                ${a && a.kind==='company' ? '<span class="co-badge">CO</span>' : ''}
+                <span class="modal-node-time">${fmtTime(node.time)}</span>
+                ${isCollapsed ? `<span class="modal-node-collapsed-note">(${countReplies(node)+1} hidden)</span>` : ''}
+              </div>
+            `;
+                wrap.innerHTML = headHtml;
+
+                const head = wrap.querySelector('.modal-node-head');
+                head.querySelector('[data-author-id]').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openProfile(e.target.dataset.authorId);
+                });
+
+                if (hasChildren) {
+                    const toggle = head.querySelector('.modal-node-toggle');
+                    toggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (isCollapsed) collapsed.delete(node.id);
+                        else collapsed.add(node.id);
+                        renderModalContent(modalStatementId);
+                    });
+                }
+
+                if (!isCollapsed) {
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'modal-node-text';
+                    textDiv.textContent = node.text;
+                    wrap.appendChild(textDiv);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'modal-node-actions';
+                    const replyBtn = document.createElement('button');
+                    replyBtn.className = 'modal-node-link';
+                    replyBtn.textContent = 'reply';
+                    replyBtn.dataset.action = 'reply';
+                    replyBtn.dataset.nodeId = node.id;
+                    replyBtn.addEventListener('click', () => {
+                        modalReplyTargetId = (modalReplyTargetId === node.id) ? null : node.id;
+                        renderModalContent(modalStatementId);
+                    });
+                    actions.appendChild(replyBtn);
+                    wrap.appendChild(actions);
+
+                    if (modalReplyTargetId === node.id) {
+                        const form = renderModalReplyForm(node, statement);
+                        wrap.appendChild(form);
+                    }
+
+                    if (node.replies.length > 0) {
+                        const childWrap = document.createElement('div');
+                        childWrap.className = 'modal-node-children';
+                        node.replies.forEach(child => {
+                            childWrap.appendChild(renderModalNode(child, statement, (depth || 0) + 1));
+                        });
+                        wrap.appendChild(childWrap);
+                    }
+                }
+
+                return wrap;
+            }
+
+            function renderModalReplyForm(target, statement) {
+                const form = document.createElement('div');
+                form.className = 'modal-reply-form';
+                const sel = document.createElement('select');
+                sel.className = 'rf-author';
+                sel.innerHTML = authorOptionsHtml();
+                sel.value = lastAuthorId || authors[0].id;
+
+                const ta = document.createElement('textarea');
+                ta.className = 'rf-text';
+                ta.placeholder = 'Write a reply…';
+                ta.style.minHeight = '50px';
+
+                const actions = document.createElement('div');
+                actions.className = 'composer-actions';
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'btn ghost small';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.dataset.action = 'cancel';
+                cancelBtn.addEventListener('click', () => {
+                    modalReplyTargetId = null;
+                    renderModalContent(modalStatementId);
+                });
+
+                const submitBtn = document.createElement('button');
+                submitBtn.className = 'btn small';
+                submitBtn.textContent = 'Post reply';
+                submitBtn.dataset.action = 'submit';
+                submitBtn.addEventListener('click', () => {
+                    const authorId = sel.value;
+                    const text = ta.value.trim();
+                    if (!text || !authorId) return;
+                    lastAuthorId = authorId;
+                    target.replies.push({ id: uid(), authorId, time: Date.now(), text, replies: [] });
+                    modalReplyTargetId = null;
+                    saveData();
+                    renderModalContent(modalStatementId);
+                    render();
+                });
+
+                actions.appendChild(cancelBtn);
+                actions.appendChild(submitBtn);
+                form.appendChild(sel);
+                form.appendChild(ta);
+                form.appendChild(actions);
+                return form;
+            }
+
+            function renderModalContent(statementId) {
+                const s = statements.find(st => st.id === statementId);
+                if (!s) return;
+                const container = document.getElementById('modalContent');
+                const a = authorById(s.authorId);
+
+                let html = `
+              <div class="modal-statement">
+                <div class="card-who">
+                  ${avatarHtml(s.authorId,'md')}
+                  <div>
+                    <div class="card-author-row">
+                      <span class="card-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
+                      ${a && a.kind==='company' ? '<span class="co-badge">CO</span>' : ''}
+                      <span class="card-time">${fmtTime(s.time)}</span>
+                      ${s.tag ? `<span class="card-tag t-micro">${escapeHtml(s.tag)}</span>` : ''}
+                    </div>
+                    <div class="card-role">${a ? escapeHtml(a.role||'') : ''}</div>
+                  </div>
+                </div>
+                ${renderMediaHero(s.mediaUrl)}
+                <div class="card-text">${escapeHtml(s.text)}</div>
+              </div>
+              <div class="t-micro" style="margin-bottom:12px;">REPLIES (${countReplies(s)})</div>
+              <div class="modal-thread" id="modalThread"></div>
+              <div class="modal-reply-trigger" id="modalReplyTrigger"></div>
+            `;
+
+                container.innerHTML = html;
+
+                container.querySelector('.card-author').addEventListener('click', () => {
+                    openProfile(s.authorId);
+                });
+
+                const threadEl = container.querySelector('#modalThread');
+                s.replies.forEach(r => {
+                    threadEl.appendChild(renderModalNode(r, s, 0));
+                });
+
+                const trigger = container.querySelector('#modalReplyTrigger');
+                const link = document.createElement('button');
+                link.className = 'modal-node-link';
+                link.textContent = '+ reply to this statement';
+                link.addEventListener('click', () => {
+                    modalReplyTargetId = (modalReplyTargetId === s.id) ? null : s.id;
+                    renderModalContent(modalStatementId);
+                });
+                trigger.appendChild(link);
+
+                if (modalReplyTargetId === s.id) {
+                    const form = renderModalReplyForm(s, s);
+                    trigger.appendChild(form);
+                }
+            }
+
+            // ── rendering ──────────────────────────────────────────────
+
+            function render() {
+                if (gridMode) renderGrid();
+                else renderList();
+                updateFilterUI();
+            }
+
+            function renderList() {
+                const root = document.getElementById('listRoot');
+                root.innerHTML = '';
+
+                if (statements.length === 0) {
+                    document.getElementById('topCount').textContent = '000';
+                    root.appendChild(el(`
+                <div class="empty">
+                  <div class="t-micro">000 STATEMENTS</div>
+                  <p>Nothing here yet.</p>
+                  <button class="btn" id="emptyNew">Write the first one</button>
+                </div>
+              `));
+                    root.querySelector('#emptyNew').addEventListener('click', openComposer);
+                    renderHud();
+                    return;
+                }
+
+                const withIdx = statements.map((s, i) => ({ s, idx: String(statements.length - i).padStart(3, '0') }));
+                const visible = withIdx.filter(x => passesFilters(x.s));
+
+                document.getElementById('topCount').textContent = filtersActive() ?
+                    `${String(visible.length).padStart(3,'0')} / ${String(statements.length).padStart(3,'0')}` :
+                    String(statements.length).padStart(3, '0');
+
+                if (visible.length === 0) {
+                    root.appendChild(el(`
+                <div class="hud-empty">
+                  <div class="t-micro">NO MATCHES</div>
+                  <p>No statements match these filters.</p>
+                  <button class="btn ghost" id="clearFromEmpty">Clear filters</button>
+                </div>
+              `));
+                    root.querySelector('#clearFromEmpty').addEventListener('click', clearFilters);
+                    renderHud();
+                    return;
+                }
+
+                const list = el('<div class="list"></div>');
+                visible.forEach(({ s, idx }) => {
+                    list.appendChild(renderRow(s, idx));
+                });
+                root.appendChild(list);
+                populateAuthorSelects();
+                renderHud();
+            }
+
+            function renderRow(s, idx) {
+                const a = authorById(s.authorId);
+                const marker = s.mediaUrl ? (isVideo(s.mediaUrl) ? 'VID' : 'IMG') : '';
+                const row = el(`
+              <div class="row" data-id="${s.id}">
+                <div class="row-idx t-data">${idx}</div>
+                <div class="row-avatar">${avatarHtml(s.authorId,'sm')}</div>
+                <div class="row-meta" style="display:contents;">
+                  <div class="row-author">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</div>
+                  <div class="row-time">${fmtTime(s.time)}</div>
+                </div>
+                <div class="row-text">${escapeHtml(s.text)}</div>
+                <div class="row-marker">
+                  ${s.mediaUrl ? renderMediaThumb(s.mediaUrl, 'thumb-sm') : ''}
+                  ${marker}
+                </div>
+              </div>
+            `);
+                row.addEventListener('click', () => { openConversation(s.id); });
+                return row;
+            }
+
+            function renderGrid() {
+                const root = document.getElementById('listRoot');
+                root.innerHTML = '';
+
+                if (statements.length === 0) {
+                    document.getElementById('topCount').textContent = '000';
+                    root.appendChild(el(`
+                <div class="empty">
+                  <div class="t-micro">000 STATEMENTS</div>
+                  <p>Nothing here yet.</p>
+                  <button class="btn" id="emptyNew">Write the first one</button>
+                </div>
+              `));
+                    root.querySelector('#emptyNew').addEventListener('click', openComposer);
+                    renderHud();
+                    return;
+                }
+
+                const withIdx = statements.map((s, i) => ({ s, idx: String(statements.length - i).padStart(3, '0') }));
+                const visible = withIdx.filter(x => passesFilters(x.s));
+
+                document.getElementById('topCount').textContent = filtersActive() ?
+                    `${String(visible.length).padStart(3,'0')} / ${String(statements.length).padStart(3,'0')}` :
+                    String(statements.length).padStart(3, '0');
+
+                if (visible.length === 0) {
+                    root.appendChild(el(`
+                <div class="hud-empty">
+                  <div class="t-micro">NO MATCHES</div>
+                  <p>No statements match these filters.</p>
+                  <button class="btn ghost" id="clearFromEmpty">Clear filters</button>
+                </div>
+              `));
+                    root.querySelector('#clearFromEmpty').addEventListener('click', clearFilters);
+                    renderHud();
+                    return;
+                }
+
+                const list = el('<div class="list"></div>');
+                visible.forEach(({ s, idx }) => {
+                    list.appendChild(renderGridItem(s, idx));
+                });
+                root.appendChild(list);
+                populateAuthorSelects();
+                renderHud();
+            }
+
+            function renderGridItem(s, idx) {
+                const a = authorById(s.authorId);
+                const item = el(`
+              <div class="row grid-item" data-id="${s.id}">
+                <div class="row-avatar">${avatarHtml(s.authorId,'sm')}</div>
+                <div class="row-meta">
+                  <span class="row-author">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
+                  <span class="row-time">${fmtTime(s.time)}</span>
+                  ${s.tag ? `<span class="card-tag t-micro">${escapeHtml(s.tag)}</span>` : ''}
+                </div>
+                <div class="row-text">${escapeHtml(s.text)}</div>
+                ${s.mediaUrl ? renderMediaGrid(s.mediaUrl) : ''}
+                <div class="row-marker">${countReplies(s)} replies</div>
+              </div>
+            `);
+                item.addEventListener('click', () => { openConversation(s.id); });
+                return item;
+            }
+
+            // ── Filter UI Update ───────────────────────────────────────
+
+            function updateFilterUI() {
+                const count = activeTags.size + activeKinds.size + activeDisciplines.size + (searchQuery.length > 0 ? 1 : 0);
+                document.getElementById('filterCount').textContent = count;
+                const summary = document.getElementById('activeFilterSummary');
+                if (count === 0) {
+                    summary.textContent = 'No filters active';
+                } else {
+                    let parts = [];
+                    if (searchQuery) parts.push(`"${searchQuery}"`);
+                    if (activeTags.size > 0) parts.push(`${activeTags.size} tag${activeTags.size>1?'s':''}`);
+                    if (activeKinds.size > 0) parts.push(`${activeKinds.size} kind${activeKinds.size>1?'s':''}`);
+                    if (activeDisciplines.size > 0) parts.push(`${activeDisciplines.size} discipline${activeDisciplines.size>1?'s':''}`);
+                    summary.textContent = `Active: ${parts.join(', ')}`;
+                }
+                document.getElementById('hudClear').hidden = count === 0;
+            }
+
+            // ── Bento Modal ────────────────────────────────────────────
+
+            function openBento() {
+                const overlay = document.getElementById('bentoOverlay');
+                overlay.classList.add('open');
+                populateBentoChips();
+                document.getElementById('bentoSearch').value = searchQuery;
+            }
+
+            function closeBento() {
+                document.getElementById('bentoOverlay').classList.remove('open');
+            }
+
+            function populateBentoChips() {
+                // Tags
+                const tagContainer = document.querySelector('#bentoTags .chip-group');
+                const tagCounts = {};
+                statements.forEach(s => { if (s.tag) tagCounts[s.tag] = (tagCounts[s.tag] || 0) + 1; });
+                tagContainer.innerHTML = '';
+                Object.keys(tagCounts).sort().forEach(tag => {
+                    const chip = document.createElement('button');
+                    chip.className = 'chip' + (activeTags.has(tag) ? ' active' : '');
+                    chip.textContent = `${tag} (${tagCounts[tag]})`;
+                    chip.dataset.type = 'tag';
+                    chip.dataset.value = tag;
+                    chip.addEventListener('click', () => {
+                        if (activeTags.has(tag)) activeTags.delete(tag);
+                        else activeTags.add(tag);
+                        populateBentoChips();
+                    });
+                    tagContainer.appendChild(chip);
+                });
+
+                // People
+                const peopleContainer = document.querySelector('#bentoPeople .chip-group');
+                peopleContainer.innerHTML = '';
+                authors.filter(a => a.kind === 'person').forEach(a => {
+                    const chip = document.createElement('button');
+                    const isActive = activeKinds.has(a.id);
+                    chip.className = 'chip' + (isActive ? ' active' : '');
+                    chip.textContent = a.name;
+                    chip.dataset.type = 'person';
+                    chip.dataset.value = a.id;
+                    chip.addEventListener('click', () => {
+                        if (activeKinds.has(a.id)) activeKinds.delete(a.id);
+                        else activeKinds.add(a.id);
+                        populateBentoChips();
+                    });
+                    peopleContainer.appendChild(chip);
+                });
+
+                // Companies
+                const companiesContainer = document.querySelector('#bentoCompanies .chip-group');
+                companiesContainer.innerHTML = '';
+                authors.filter(a => a.kind === 'company').forEach(a => {
+                    const chip = document.createElement('button');
+                    const isActive = activeKinds.has(a.id);
+                    chip.className = 'chip' + (isActive ? ' active' : '');
+                    chip.textContent = a.name;
+                    chip.dataset.type = 'company';
+                    chip.dataset.value = a.id;
+                    chip.addEventListener('click', () => {
+                        if (activeKinds.has(a.id)) activeKinds.delete(a.id);
+                        else activeKinds.add(a.id);
+                        populateBentoChips();
+                    });
+                    companiesContainer.appendChild(chip);
+                });
+
+                // Disciplines
+                const discContainer = document.querySelector('#bentoDisciplines .chip-group');
+                const discCounts = {};
+                authors.forEach(a => { if (a.discipline) discCounts[a.discipline] = (discCounts[a.discipline] || 0) + 1; });
+                discContainer.innerHTML = '';
+                Object.keys(discCounts).sort().forEach(d => {
+                    const chip = document.createElement('button');
+                    chip.className = 'chip' + (activeDisciplines.has(d) ? ' active' : '');
+                    chip.textContent = `${d} (${discCounts[d]})`;
+                    chip.dataset.type = 'discipline';
+                    chip.dataset.value = d;
+                    chip.addEventListener('click', () => {
+                        if (activeDisciplines.has(d)) activeDisciplines.delete(d);
+                        else activeDisciplines.add(d);
+                        populateBentoChips();
+                    });
+                    discContainer.appendChild(chip);
+                });
+            }
+
+            // ── composer ───────────────────────────────────────────────
+
+            function populateAuthorSelects() {
+                const sel = document.getElementById('c-author-select');
+                if (!sel) return;
+                sel.innerHTML = authorOptionsHtml();
+                sel.value = lastAuthorId || authors[0].id;
+            }
+
+            function openComposer() {
+                document.getElementById('composer').classList.add('open');
+                populateAuthorSelects();
+                document.getElementById('c-text').focus();
+            }
+
+            function closeComposer() {
+                document.getElementById('composer').classList.remove('open');
+                document.getElementById('c-tag').value = '';
+                document.getElementById('c-media').value = '';
+                document.getElementById('c-text').value = '';
+                document.getElementById('newAuthorPanel').classList.remove('open');
+            }
+
+            function authorOptionsHtml() {
+                const people = authors.filter(a => a.kind === 'person');
+                const companies = authors.filter(a => a.kind === 'company');
+                const opt = a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`;
+                return `<optgroup label="People">${people.map(opt).join('')}</optgroup><optgroup label="Companies">${companies.map(opt).join('')}</optgroup>`;
+            }
+
+            // ── init ────────────────────────────────────────────────────
+
+            // Font & Scale controls (topbar)
+            document.getElementById('fontSelect').addEventListener('change', function() {
+                document.body.setAttribute('data-font', this.value);
+            });
+
+            document.querySelectorAll('.scale-group .chip').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const scale = btn.dataset.scale;
+                    document.body.setAttribute('data-scale', scale);
+                    document.querySelectorAll('.scale-group .chip').forEach(b => {
+                        b.classList.toggle('active', b.dataset.scale === scale);
+                    });
+                });
+            });
+
+            // Grid toggle
+            document.getElementById('toggleLayoutBtn').addEventListener('click', function() {
+                gridMode = !gridMode;
+                this.textContent = gridMode ? 'List' : 'Grid';
+                document.body.classList.toggle('grid-mode');
+                render();
+            });
+
+            // New post
+            document.getElementById('newBtn').addEventListener('click', () => {
+                const c = document.getElementById('composer');
+                c.classList.contains('open') ? closeComposer() : openComposer();
+            });
+            document.getElementById('c-cancel').addEventListener('click', closeComposer);
+            document.getElementById('c-post').addEventListener('click', () => {
+                const authorId = document.getElementById('c-author-select').value;
+                const tag = document.getElementById('c-tag').value.trim().toUpperCase();
+                const mediaUrl = document.getElementById('c-media').value.trim();
+                const text = document.getElementById('c-text').value.trim();
+                if (!text || !authorId) return;
+                lastAuthorId = authorId;
+                statements.unshift({ id: uid(), authorId, time: Date.now(), tag, text, mediaUrl, replies: [] });
+                saveData();
+                closeComposer();
+                render();
+            });
+
+            // New author
+            document.getElementById('toggleNewAuthor').addEventListener('click', () => {
+                document.getElementById('newAuthorPanel').classList.toggle('open');
+            });
+            document.querySelectorAll('input[name=na-kind]').forEach(r => {
+                r.addEventListener('change', (e) => {
+                    document.getElementById('na-role-label').textContent = e.target.value === 'company' ?
+                        'Tagline' : 'Role';
+                    document.getElementById('na-role').placeholder = e.target.value === 'company' ?
+                        'Hiring: 2 product designers' : 'Creative Director';
+                });
+            });
+            document.getElementById('na-save').addEventListener('click', () => {
+                const name = document.getElementById('na-name').value.trim();
+                if (!name) return;
+                const kind = document.querySelector('input[name=na-kind]:checked').value;
+                const role = document.getElementById('na-role').value.trim();
+                const newAuthor = { id: uid(), kind, name, role: kind === 'person' ? role : (role || ''),
+                    tagline: kind === 'company' ? role : '' };
+                authors.push(newAuthor);
+                saveData();
+                populateAuthorSelects();
+                document.getElementById('c-author-select').value = newAuthor.id;
+                lastAuthorId = newAuthor.id;
+                document.getElementById('na-name').value = '';
+                document.getElementById('na-role').value = '';
+                document.getElementById('newAuthorPanel').classList.remove('open');
+            });
+
+            // Reset
+            document.getElementById('resetLink').addEventListener('click', async (e) => {
+                e.preventDefault();
+                authors = seedAuthors();
+                statements = seedStatements(authors);
+                modalReplyTargetId = null;
+                collapsed.clear();
+                lastAuthorId = null;
+                clearFilters();
+                await saveData();
+                render();
+            });
+
+            // Bento modal controls
+            document.getElementById('filterToggleBtn').addEventListener('click', openBento);
+            document.getElementById('bentoClose').addEventListener('click', closeBento);
+            document.getElementById('bentoOverlay').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeBento();
+            });
+            document.getElementById('bentoClearAll').addEventListener('click', () => {
+                clearFilters();
+                populateBentoChips();
+                closeBento();
+            });
+            document.getElementById('bentoApply').addEventListener('click', () => {
+                const searchInput = document.getElementById('bentoSearch');
+                searchQuery = searchInput.value.trim();
+                closeBento();
+                render();
+            });
+
+            document.getElementById('bentoSearch').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('bentoApply').click();
+                }
+            });
+
+            document.getElementById('hudClear').addEventListener('click', clearFilters);
+
+            document.getElementById('modalClose').addEventListener('click', closeConversation);
+            document.getElementById('conversationModal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeConversation();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeConversation();
+                    if (!document.getElementById('profileModal').hidden) {
+                        document.getElementById('profileModal').hidden = true;
+                    }
+                    if (document.getElementById('bentoOverlay').classList.contains('open')) {
+                        closeBento();
+                    }
+                }
+            });
+
+            loadData().then(render);
+        })();
+    </script>
+</body>
+</html>
