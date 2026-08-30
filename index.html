@@ -119,7 +119,7 @@
             position: sticky;
             top: 0;
             z-index: 50;
-            background: rgba(240, 240, 242, 0.9);
+            background: rgba(240, 240, 242, 0.88);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border);
@@ -617,6 +617,7 @@
             cursor: pointer;
             animation: fadeUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
             min-height: 120px;
+            position: relative;
         }
         .letter-bento .card:hover {
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.02);
@@ -721,6 +722,7 @@
             border-bottom: 1px solid var(--border);
             cursor: pointer;
             transition: background .12s ease;
+            position: relative;
         }
         .letter-row:hover { background: rgba(0, 0, 0, 0.02); }
         .letter-row-idx { font-family: var(--font-mono); font-size: 9px; color: var(--ink-light); padding-top: 2px; }
@@ -796,6 +798,7 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             gap: 6px;
             min-height: 140px;
+            position: relative;
         }
         .letter-grid .grid-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
         .letter-grid .grid-item .grid-top { display: flex; align-items: center; gap: 10px; }
@@ -1856,6 +1859,136 @@
             border-radius: 2px;
             line-height: 1.3;
         }
+
+        /* ── Rapid Respond ── */
+        .rapid-respond {
+            position: fixed;
+            z-index: 600;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-floating);
+            padding: 12px 16px 12px 16px;
+            min-width: 220px;
+            max-width: 380px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: auto;
+            animation: rapidPop 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .rapid-respond.open { display: flex; }
+        @keyframes rapidPop {
+            from { opacity: 0; transform: scale(0.92) translateY(4px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .rapid-respond .rapid-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: calc(var(--fs-body) * 0.75);
+            font-weight: 600;
+            color: var(--ink);
+            font-family: var(--font);
+        }
+        .rapid-respond .rapid-header .avatar {
+            width: 24px;
+            height: 24px;
+            font-size: 8px;
+            cursor: default;
+        }
+        .rapid-respond .rapid-header .avatar:hover { transform: none; }
+        .rapid-respond .rapid-header .rapid-to {
+            font-weight: 400;
+            color: var(--ink-light);
+            font-size: calc(var(--fs-body) * 0.65);
+            font-family: var(--font-mono);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .rapid-respond .rapid-input-wrap {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+        }
+        .rapid-respond .rapid-input-wrap textarea {
+            flex: 1;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 6px 10px;
+            font-family: var(--font);
+            font-size: calc(var(--fs-body) * 0.85);
+            color: var(--ink);
+            resize: none;
+            min-height: 36px;
+            max-height: 120px;
+            transition: border-color .2s ease;
+            line-height: 1.5;
+        }
+        .rapid-respond .rapid-input-wrap textarea:focus {
+            outline: none;
+            border-color: var(--ink);
+        }
+        .rapid-respond .rapid-input-wrap .rapid-send {
+            background: var(--ink);
+            color: var(--card);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 6px 12px;
+            font-family: var(--font-mono);
+            font-size: 7px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            min-height: 36px;
+            white-space: nowrap;
+            transition: background .15s ease;
+            flex-shrink: 0;
+        }
+        .rapid-respond .rapid-input-wrap .rapid-send:hover { background: var(--ink-mid); }
+        .rapid-respond .rapid-input-wrap .rapid-send:active { transform: scale(0.96); }
+        .rapid-respond .rapid-close {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: var(--ink-light);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            line-height: 1;
+            transition: background .15s ease, color .15s ease;
+        }
+        .rapid-respond .rapid-close:hover { background: var(--bg); color: var(--ink); }
+        .rapid-respond .rapid-bubble-preview {
+            font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light);
+            padding: 2px 8px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            max-height: 40px;
+            overflow-y: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            display: none;
+        }
+        .rapid-respond .rapid-bubble-preview.has-text { display: block; }
+
+        @media (max-width: 480px) {
+            .rapid-respond {
+                min-width: 180px;
+                max-width: 300px;
+                padding: 10px 12px;
+            }
+            .rapid-respond .rapid-input-wrap textarea { font-size: calc(var(--fs-body) * 0.8); min-height: 30px; }
+            .rapid-respond .rapid-input-wrap .rapid-send { font-size: 6px; padding: 4px 10px; min-height: 30px; }
+        }
     </style>
 </head>
 <body data-scale="m" data-font="satoshi">
@@ -2057,6 +2190,21 @@
         </div>
     </div>
 
+    <!-- ─── RAPID RESPOND ─── -->
+    <div class="rapid-respond" id="rapidRespond">
+        <button class="rapid-close" id="rapidClose"> </button>
+        <div class="rapid-header">
+            <span class="avatar sz-sm" id="rapidAvatar">?</span>
+            <span>Reply to <span id="rapidName">...</span></span>
+            <span class="rapid-to">· rapid</span>
+        </div>
+        <div class="rapid-input-wrap">
+            <textarea id="rapidText" placeholder="Type your reply…" rows="1"></textarea>
+            <button class="rapid-send" id="rapidSend">→</button>
+        </div>
+        <div class="rapid-bubble-preview" id="rapidBubblePreview"></div>
+    </div>
+
     <script>
         (function() {
             'use strict';
@@ -2248,6 +2396,9 @@
             const activeDisciplines = new Set();
             let searchQuery = '';
 
+            // ── Rapid Respond State ──────────────────────────────────
+            let rapidTarget = null; // { statementId, authorId, authorName }
+
             // ── Attention ─────────────────────────────────────────────
             let attentionItems = [];
             const USER_ID = 'user_self';
@@ -2256,7 +2407,6 @@
                 try {
                     const raw = localStorage.getItem(ATTENTION_KEY);
                     attentionItems = raw ? JSON.parse(raw) : [];
-                    // Filter out any that reference non-existent objects
                     attentionItems = attentionItems.filter(item => {
                         if (item.objectType === 'person' || item.objectType === 'company') {
                             return authors.some(a => a.id === item.objectId);
@@ -2323,11 +2473,9 @@
                 const activeItems = attentionItems.filter(item => item.active !== false);
                 const count = activeItems.length;
 
-                // Update badge
                 badge.textContent = count;
                 badge.classList.toggle('hidden', count === 0);
 
-                // Update list
                 if (count === 0) {
                     list.innerHTML = `<div class="dropdown-empty">Nothing saved yet.</div>`;
                     return;
@@ -2351,14 +2499,12 @@
                     `;
                 }).join('');
 
-                // Click on item -> open profile modal
                 list.querySelectorAll('.notification-item').forEach(el => {
                     el.addEventListener('click', (e) => {
                         if (e.target.closest('.item-dismiss')) return;
                         const type = el.dataset.type;
                         const id = el.dataset.id;
                         openProfileModal(type, id);
-                        // Close dropdown
                         document.getElementById('notificationDropdown').classList.remove('open');
                     });
                     const dismiss = el.querySelector('.item-dismiss');
@@ -2386,8 +2532,6 @@
                 const varClass = avatarVariant(obj.id);
                 const isCompany = obj.kind === 'company';
                 const inAttn = isInAttention(objectType, objectId);
-
-                // Count statements by this author
                 const stmtCount = statements.filter(s => s.authorId === obj.id).length;
 
                 content.innerHTML = `
@@ -2418,7 +2562,6 @@
                         const nowIn = toggleAttention(objectType, objectId);
                         saveBtn.textContent = nowIn ? 'SAVED' : 'SAVE PROFILE';
                         saveBtn.classList.toggle('active', nowIn);
-                        // update attention badge/list
                         renderAttentionBadgeAndList();
                     });
                 }
@@ -2586,6 +2729,110 @@
                     if (dwell >= 250) logActivity('hover', s.id, { durationMs: dwell });
                 });
                 el.addEventListener('click', () => openConversation(s.id));
+                el.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openRapidRespond(s.id, e.clientX, e.clientY);
+                });
+            }
+
+            // ── Rapid Respond ─────────────────────────────────────────
+            function openRapidRespond(statementId, x, y) {
+                const s = statements.find(st => st.id === statementId);
+                if (!s) return;
+                const a = authorById(s.authorId);
+                if (!a) return;
+
+                rapidTarget = { statementId: s.id, authorId: a.id, authorName: a.name };
+
+                const el = document.getElementById('rapidRespond');
+                const avatar = document.getElementById('rapidAvatar');
+                const name = document.getElementById('rapidName');
+                const textarea = document.getElementById('rapidText');
+                const preview = document.getElementById('rapidBubblePreview');
+
+                // Position the bubble
+                const padding = 16;
+                let left = Math.min(x + 8, window.innerWidth - el.offsetWidth - padding);
+                let top = Math.min(y - 20, window.innerHeight - el.offsetHeight - padding);
+                left = Math.max(padding, left);
+                top = Math.max(padding, top);
+                el.style.left = left + 'px';
+                el.style.top = top + 'px';
+
+                // Set avatar and name
+                const varClass = avatarVariant(a.id);
+                const isCompany = a.kind === 'company';
+                avatar.className = `avatar sz-sm ${varClass}${isCompany ? ' company' : ''}`;
+                avatar.textContent = initialsFor(a);
+                name.textContent = a.name;
+
+                // Clear and focus
+                textarea.value = '';
+                preview.textContent = '';
+                preview.classList.remove('has-text');
+                el.classList.add('open');
+                textarea.focus();
+
+                // Update preview on input
+                textarea.oninput = function() {
+                    const val = this.value.trim();
+                    if (val) {
+                        preview.textContent = val;
+                        preview.classList.add('has-text');
+                    } else {
+                        preview.textContent = '';
+                        preview.classList.remove('has-text');
+                    }
+                    // Auto-resize
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+                };
+
+                // Send on Enter (Shift+Enter for newline)
+                textarea.onkeydown = function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        document.getElementById('rapidSend').click();
+                    }
+                };
+            }
+
+            function closeRapidRespond() {
+                document.getElementById('rapidRespond').classList.remove('open');
+                rapidTarget = null;
+            }
+
+            function submitRapidReply() {
+                if (!rapidTarget) return;
+                const textarea = document.getElementById('rapidText');
+                const text = textarea.value.trim();
+                if (!text) return;
+
+                const s = statements.find(st => st.id === rapidTarget.statementId);
+                if (!s) return;
+
+                // Pick a random author to reply as (for demo)
+                const replyAuthor = authors[Math.floor(Math.random() * authors.length)];
+
+                s.replies.push({
+                    id: uid(),
+                    authorId: replyAuthor.id,
+                    time: Date.now(),
+                    text: text,
+                    replies: []
+                });
+
+                saveData();
+                renderLetter(activeIndex);
+                logActivity('respond', rapidTarget.statementId, { rapid: true });
+
+                // Update modal if open
+                if (modalStatementId === rapidTarget.statementId) {
+                    renderModalContent(modalStatementId);
+                }
+
+                closeRapidRespond();
             }
 
             // ── Filters ──────────────────────────────────────────────
@@ -2680,7 +2927,6 @@
                 wrap.innerHTML = headHtml;
 
                 const head = wrap.querySelector('.modal-node-head');
-                // Click on author name or avatar opens profile
                 const authorEls = head.querySelectorAll('[data-author-id]');
                 authorEls.forEach(el => {
                     el.addEventListener('click', (e) => {
@@ -2693,7 +2939,6 @@
                         }
                     });
                 });
-                // Avatar clicks
                 const avatarEl = head.querySelector('.avatar');
                 if (avatarEl) {
                     avatarEl.addEventListener('click', (e) => {
@@ -2706,6 +2951,13 @@
                         }
                     });
                 }
+                // Context menu for rapid reply on node
+                wrap.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const sid = statement ? statement.id : null;
+                    if (sid) openRapidRespond(sid, e.clientX, e.clientY);
+                });
 
                 if (hasChildren) {
                     const toggle = head.querySelector('.modal-node-toggle');
@@ -2829,7 +3081,16 @@
 
                 container.innerHTML = html;
 
-                // Wire up avatar/profile clicks in the statement header
+                // Context menu on statement for rapid reply
+                const stmtEl = container.querySelector('.modal-statement');
+                if (stmtEl) {
+                    stmtEl.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openRapidRespond(s.id, e.clientX, e.clientY);
+                    });
+                }
+
                 const whoEl = container.querySelector('.card-who');
                 if (whoEl) {
                     const avatarEl = whoEl.querySelector('.avatar');
@@ -2917,7 +3178,6 @@
               `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
             `;
 
-                // Wire profile clicks
                 card.querySelectorAll('[data-author-id]').forEach(el => {
                     el.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -2929,7 +3189,6 @@
                         }
                     });
                 });
-                // Avatar click
                 const avatarEl = card.querySelector('.avatar');
                 if (avatarEl) {
                     avatarEl.addEventListener('click', (e) => {
@@ -2974,7 +3233,6 @@
               </div>
             `;
 
-                // Wire profile clicks
                 row.querySelectorAll('[data-author-id]').forEach(el => {
                     el.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -3471,7 +3729,6 @@
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const isOpen = dropdown.classList.contains('open');
-                    // Close other dropdowns
                     document.querySelectorAll('.notification-dropdown.open').forEach(d => d.classList.remove('open'));
                     if (!isOpen) {
                         renderAttentionBadgeAndList();
@@ -3606,8 +3863,8 @@
                                 closeBento();
                             if (document.getElementById('activityOverlay').classList.contains('open'))
                                 closeActivity();
-                            // Close notification dropdown
                             document.getElementById('notificationDropdown').classList.remove('open');
+                            closeRapidRespond();
                         }
                     });
 
@@ -3700,6 +3957,22 @@
                     document.getElementById('profileModal').addEventListener('click', (e) => {
                         if (e.target === e.currentTarget) closeProfileModal();
                     });
+
+                    // Rapid Respond
+                    document.getElementById('rapidClose').addEventListener('click', closeRapidRespond);
+                    document.getElementById('rapidSend').addEventListener('click', submitRapidReply);
+                    document.addEventListener('click', (e) => {
+                        const el = document.getElementById('rapidRespond');
+                        if (el.classList.contains('open') && !el.contains(e.target)) {
+                            closeRapidRespond();
+                        }
+                    });
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') closeRapidRespond();
+                    });
+
+                    // Clicking on rapid textarea should not close it
+                    document.getElementById('rapidText').addEventListener('click', (e) => e.stopPropagation());
 
                     renderLetter(0);
                 } catch (err) {
