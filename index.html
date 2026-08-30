@@ -158,6 +158,65 @@
             color: var(--ink-light);
             letter-spacing: 0.04em;
         }
+
+        /* ── logo tile: wordmark becomes a nav card on hover ──
+           Hover/focus (desktop) reveals a small philosophy-of-use
+           card anchored under the wordmark. Also toggles via .open
+           for touch, since touch devices have no hover. */
+        .logo-tile {
+            position: relative;
+            cursor: pointer;
+        }
+        .logo-tile .wordmark::after {
+            content: '▾';
+            font-size: 9px;
+            color: var(--ink-lighter);
+            margin-left: 1px;
+            transform: translateY(-1px);
+            transition: transform .2s ease, color .2s ease;
+        }
+        .logo-tile:hover .wordmark::after,
+        .logo-tile.open .wordmark::after {
+            transform: translateY(-1px) rotate(180deg);
+            color: var(--ink-light);
+        }
+        .logo-card {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            width: min(300px, calc(100vw - 2 * var(--margin)));
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-floating);
+            padding: 18px 18px 16px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px) scale(0.98);
+            transform-origin: top left;
+            transition: opacity .22s ease, transform .22s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility .22s;
+            z-index: 60;
+            pointer-events: none;
+            cursor: default;
+        }
+        .logo-tile:hover .logo-card,
+        .logo-tile:focus-within .logo-card,
+        .logo-tile.open .logo-card {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .logo-card-eyebrow { margin-bottom: 8px; }
+        .logo-card-text {
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--ink-mid);
+            margin-bottom: 14px;
+        }
+        .logo-card-home {
+            width: 100%;
+        }
         .save-status {
             font-family: var(--font-mono);
             font-size: 7px;
@@ -1468,7 +1527,14 @@
     <!-- ─── TOPBAR ─── -->
     <div class="topbar">
         <div class="wrap">
-            <div class="wordmark">NEVEREVER.LAND <span class="count t-data" id="topCount"></span> <span class="save-status" id="saveStatus"></span></div>
+            <div class="logo-tile" id="logoTile" tabindex="0" aria-haspopup="true" aria-expanded="false">
+                <div class="wordmark">NEVEREVER.LAND <span class="count t-data" id="topCount"></span> <span class="save-status" id="saveStatus"></span></div>
+                <div class="logo-card" id="logoCard">
+                    <p class="t-micro logo-card-eyebrow">Philosophy of use</p>
+                    <p class="logo-card-text">Every line here is a statement, not a post. No feed to game, no likes to chase — just what's true right now, in your own words, in public.</p>
+                    <button class="btn small logo-card-home" id="logoReset" type="button">↺ Reset demo</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2680,6 +2746,29 @@
                     if (e.key === 'Enter') document.getElementById('bentoApply').click();
                 });
                 document.getElementById('hudClear').addEventListener('click', clearFilters);
+
+                // Logo tile — touch/tap toggle (desktop gets hover/focus for free via CSS)
+                const logoTile = document.getElementById('logoTile');
+                const logoReset = document.getElementById('logoReset');
+                function setLogoOpen(open) {
+                    logoTile.classList.toggle('open', open);
+                    logoTile.setAttribute('aria-expanded', String(open));
+                }
+                logoTile.addEventListener('click', (e) => {
+                    if (e.target.closest('#logoReset')) return;
+                    setLogoOpen(!logoTile.classList.contains('open'));
+                });
+                document.addEventListener('click', (e) => {
+                    if (!logoTile.contains(e.target)) setLogoOpen(false);
+                });
+                logoReset.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (!confirm('Reset demo? This clears your cached statements and reseeds fresh sample content.')) return;
+                    await resetDemoContent();
+                    clearFilters();
+                    if (focusMode) setFocusMode(false);
+                    setLogoOpen(false);
+                });
 
                 // Conversation modal
                 document.getElementById('modalClose').addEventListener('click', closeConversation);
