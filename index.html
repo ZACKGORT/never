@@ -119,7 +119,7 @@
             position: sticky;
             top: 0;
             z-index: 50;
-            background: rgba(240, 240, 242, 0.88);
+            background: rgba(240, 240, 242, 0.9);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border);
@@ -155,6 +155,15 @@
             font-weight: 400;
             color: var(--ink-light);
             letter-spacing: 0.04em;
+        }
+        .save-status {
+            font-family: var(--font-mono);
+            font-size: 7px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            transition: color .2s ease;
+            white-space: nowrap;
         }
 
         .logo-tile {
@@ -209,14 +218,250 @@
             margin-bottom: 14px;
         }
         .logo-card-home { width: 100%; }
-        .save-status {
+
+        /* ── topbar right: appearance + notification ── */
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .topbar-appearance-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .topbar-appearance-wrapper .btn {
+            font-size: 8px;
+            min-height: 28px;
+            padding: 2px 10px;
+        }
+        .topbar-appearance-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            min-width: 100px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-floating);
+            padding: 4px 0;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+        }
+        .topbar-appearance-dropdown.open { display: flex; }
+        .topbar-appearance-dropdown .menu-item {
+            padding: 4px 12px;
+            font-family: var(--font-mono);
+            font-size: 8px;
+            letter-spacing: 0.04em;
+            color: var(--ink-mid);
+            cursor: pointer;
+            transition: background .12s ease, color .12s ease;
+            border: none;
+            background: none;
+            text-align: left;
+            width: 100%;
+            white-space: nowrap;
+        }
+        .topbar-appearance-dropdown .menu-item:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+        .topbar-appearance-dropdown .menu-item.active {
+            background: var(--ink);
+            color: var(--card);
+        }
+        @media (max-width: 640px) {
+            .topbar-appearance-dropdown .menu-item { font-size: 7px; padding: 3px 10px; }
+        }
+
+        /* ── Notification Bell ── */
+        .notification-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .notification-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--ink-mid);
+            transition: background .15s ease, border-color .15s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .notification-btn:hover {
+            background: var(--bg);
+            border-color: var(--ink-light);
+        }
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--ink);
+            color: var(--card);
             font-family: var(--font-mono);
             font-size: 7px;
+            font-weight: 600;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 1px solid var(--card);
+            transition: opacity .2s ease;
+            pointer-events: none;
+        }
+        .notification-badge.hidden { opacity: 0; transform: scale(0.8); }
+
+        .notification-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: -8px;
+            width: 280px;
+            max-height: 340px;
+            overflow-y: auto;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-floating);
+            padding: 6px 0;
+            z-index: 250;
+            display: none;
+            flex-direction: column;
+            scrollbar-width: thin;
+            scrollbar-color: var(--ink-lighter) transparent;
+        }
+        .notification-dropdown::-webkit-scrollbar {
+            width: 3px;
+        }
+        .notification-dropdown::-webkit-scrollbar-thumb {
+            background: var(--ink-lighter);
+            border-radius: 4px;
+        }
+        .notification-dropdown.open { display: flex; }
+        .notification-dropdown .dropdown-header {
+            padding: 6px 14px 4px;
+            font-family: var(--font-mono);
+            font-size: 7px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+        .notification-dropdown .dropdown-empty {
+            padding: 20px 14px;
+            font-family: var(--font-mono);
+            font-size: 8px;
+            color: var(--ink-light);
+            text-align: center;
+        }
+        .notification-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            cursor: pointer;
+            transition: background .12s ease;
+            border-bottom: 1px solid var(--border);
+        }
+        .notification-item:last-child { border-bottom: none; }
+        .notification-item:hover { background: var(--bg); }
+        .notification-item .item-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font);
+            font-size: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: var(--bg);
+            color: var(--ink);
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .notification-item .item-avatar.v0 { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+        .notification-item .item-avatar.v1 { background: var(--bg); color: var(--ink); }
+        .notification-item .item-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: var(--accent-2); }
+        .notification-item .item-avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .notification-item .item-avatar.company { position: relative; }
+        .notification-item .item-avatar.company::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border: 1px solid var(--card);
+            border-radius: 2px;
+        }
+        .notification-item .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .notification-item .item-name {
+            font-family: var(--font);
+            font-size: calc(var(--fs-body) * 0.8);
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .notification-item .item-type {
+            font-family: var(--font-mono);
+            font-size: 6px;
             letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--ink-light);
-            transition: color .2s ease;
-            white-space: nowrap;
+            margin-left: 4px;
+        }
+        .notification-item .item-dismiss {
+            background: none;
+            border: none;
+            color: var(--ink-light);
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 50%;
+            line-height: 1;
+            transition: color .15s ease, background .15s ease;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .notification-item .item-dismiss:hover {
+            color: var(--ink);
+            background: var(--bg);
+        }
+
+        @media (max-width: 480px) {
+            .notification-dropdown {
+                width: 260px;
+                right: -12px;
+                max-height: 280px;
+            }
+            .notification-btn { width: 26px; height: 26px; font-size: 12px; }
         }
 
         /* ── main wrap ── */
@@ -479,7 +724,7 @@
         }
         .letter-row:hover { background: rgba(0, 0, 0, 0.02); }
         .letter-row-idx { font-family: var(--font-mono); font-size: 9px; color: var(--ink-light); padding-top: 2px; }
-        .letter-row-avatar .avatar { width: 28px; height: 28px; font-size: 9px; }
+        .letter-row-avatar .avatar { width: 28px; height: 28px; font-size: 9px; cursor: pointer; }
         .letter-row-text-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
         .letter-row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 9px; }
         .letter-row-author {
@@ -493,7 +738,9 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             max-width: 120px;
+            cursor: pointer;
         }
+        .letter-row-author:hover { opacity: 0.7; }
         .letter-row-time { font-family: var(--font-mono); font-size: 7px; color: var(--ink-light); white-space: nowrap; }
         .letter-row-text {
             color: var(--ink-mid);
@@ -552,7 +799,7 @@
         }
         .letter-grid .grid-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
         .letter-grid .grid-item .grid-top { display: flex; align-items: center; gap: 10px; }
-        .letter-grid .grid-item .grid-top .avatar { width: 32px; height: 32px; font-size: 10px; }
+        .letter-grid .grid-item .grid-top .avatar { width: 32px; height: 32px; font-size: 10px; cursor: pointer; }
         .letter-grid .grid-item .grid-meta { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
         .letter-grid .grid-item .grid-author {
             font-family: var(--font);
@@ -564,7 +811,9 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            cursor: pointer;
         }
+        .letter-grid .grid-item .grid-author:hover { opacity: 0.7; }
         .letter-grid .grid-item .grid-time { font-family: var(--font-mono); font-size: 7px; color: var(--ink-light); }
         .letter-grid .grid-item .grid-text {
             font-size: calc(var(--fs-body) * 0.88);
@@ -614,7 +863,10 @@
             background: var(--bg);
             color: var(--ink);
             flex-shrink: 0;
+            cursor: pointer;
+            transition: transform .15s ease, border-color .15s ease;
         }
+        .avatar:hover { transform: scale(1.04); border-color: var(--ink); }
         .avatar.sz-xs { width: 20px; height: 20px; font-size: 7px; }
         .avatar.sz-sm { width: 28px; height: 28px; font-size: 9px; }
         .avatar.sz-md { width: 40px; height: 40px; font-size: 13px; }
@@ -865,70 +1117,70 @@
             text-align: center;
         }
 
-        /* ── Appearance Dropdown (context menu style) ── */
-        .hud-appearance-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        .appearance-dropdown {
-            position: absolute;
-            top: calc(100% + 6px);
-            right: 0;
-            min-width: 110px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-floating);
-            padding: 4px 0;
-            z-index: 200;
-            display: none;
-            flex-direction: column;
-        }
-        .appearance-dropdown.open {
-            display: flex;
-        }
-        .appearance-dropdown .menu-item {
-            padding: 4px 12px;
-            font-family: var(--font-mono);
-            font-size: 8px;
-            letter-spacing: 0.04em;
-            color: var(--ink-mid);
-            cursor: pointer;
-            transition: background .12s ease, color .12s ease;
-            border: none;
-            background: none;
-            text-align: left;
-            width: 100%;
-            white-space: nowrap;
-        }
-        .appearance-dropdown .menu-item:hover {
-            background: var(--bg);
-            color: var(--ink);
-        }
-        .appearance-dropdown .menu-item.active {
-            background: var(--ink);
-            color: var(--card);
+        @media (max-width: 640px) {
+            .hud-bottom {
+                bottom: 16px;
+                --hud-pad: 8px 12px;
+                --hud-min-h: 48px;
+                --hud-btn-min-h: 30px;
+                --hud-btn-pad: 5px 10px;
+                --hud-btn-fs: 9px;
+                --hud-icon-w: 30px;
+                --hud-icon-fs: 13px;
+                --hud-divider-h: 22px;
+                --hud-fs-count: 9px;
+                --hud-pad-count: 2px 6px;
+                --hud-minw-count: 18px;
+                --hud-fs-summary: 10px;
+                --hud-maxw-summary: 110px;
+                --hud-fs-label: 9px;
+            }
+            .hud-top {
+                top: calc(var(--topbar-height) + 8px);
+                --hud-pad: 4px 8px;
+                --hud-gap: 3px;
+                --hud-min-h: 38px;
+                --hud-btn-min-h: 22px;
+                --hud-btn-pad: 4px 8px;
+                --hud-btn-fs: 7px;
+                --hud-icon-w: 22px;
+                --hud-icon-fs: 10px;
+                --hud-divider-h: 16px;
+                --hud-fs-position: 7px;
+                --hud-minw-position: 28px;
+            }
+            .hud { border-radius: var(--radius-sm); }
+            .hud .hud-label { display: none; }
         }
 
-        @media (max-width: 640px) {
-            .appearance-dropdown {
-                min-width: 90px;
-                right: -6px;
-            }
-            .appearance-dropdown .menu-item {
-                font-size: 7px;
-                padding: 3px 10px;
-            }
-        }
         @media (max-width: 480px) {
-            .appearance-dropdown {
-                min-width: 80px;
-                right: -8px;
+            .hud-bottom {
+                bottom: 12px;
+                --hud-pad: 6px 10px;
+                --hud-gap: 3px;
+                --hud-min-h: 42px;
+                --hud-btn-min-h: 26px;
+                --hud-btn-pad: 4px 8px;
+                --hud-btn-fs: 8px;
+                --hud-icon-w: 26px;
+                --hud-icon-fs: 12px;
+                --hud-divider-h: 18px;
+                --hud-fs-summary: 9px;
+                --hud-maxw-summary: 90px;
             }
-            .appearance-dropdown .menu-item {
-                font-size: 6px;
-                padding: 2px 8px;
+            .hud-top {
+                top: calc(var(--topbar-height) + 6px);
+                --hud-pad: 3px 6px;
+                --hud-gap: 2px;
+                --hud-min-h: 34px;
+                --hud-btn-min-h: 20px;
+                --hud-btn-pad: 3px 6px;
+                --hud-btn-fs: 6px;
+                --hud-icon-w: 20px;
+                --hud-icon-fs: 9px;
+                --hud-divider-h: 14px;
+                --hud-fs-position: 6px;
+                --hud-minw-position: 24px;
             }
         }
 
@@ -1356,7 +1608,8 @@
         .conversation-modal #modalContent { flex: 1; max-width: 780px; width: 100%; margin: 0 auto; padding-bottom: 60px; }
 
         .modal-statement { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
-        .modal-statement .card-who { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+        .modal-statement .card-who { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; cursor: pointer; }
+        .modal-statement .card-who:hover .card-author { opacity: 0.7; }
         .modal-statement .card-author-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
         .modal-statement .card-author {
             font-family: var(--font);
@@ -1392,6 +1645,7 @@
             white-space: pre-wrap;
             color: var(--ink);
         }
+        .modal-statement .card-who .avatar { cursor: pointer; }
 
         .modal-thread { display: flex; flex-direction: column; margin-top: 6px; }
         .modal-node {
@@ -1455,6 +1709,10 @@
         .modal-reply-form select { max-width: 160px; }
         .modal-reply-trigger { margin: 4px 0 8px 0; }
 
+        /* modal avatar clickable */
+        .modal-statement .card-who .avatar,
+        .modal-node-head .avatar { cursor: pointer; }
+
         [hidden] { display: none !important; }
         @supports (padding-bottom: env(safe-area-inset-bottom)) {
             .hud-bottom { margin-bottom: env(safe-area-inset-bottom); }
@@ -1466,7 +1724,7 @@
         body.custom-cursor-active { cursor: none; }
         .write-cursor-dot,
         .write-cursor-ellipse {
-            position: fixed; top: 0; left: 0; z-index: 400; pointer-events: none;
+            position: fixed; top: 0; left: 0; z-index: 500; pointer-events: none;
             transform: translate(-9999px, -9999px);
             opacity: 0; transition: opacity .18s ease; will-change: transform;
         }
@@ -1499,6 +1757,105 @@
             right: 0;
             cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2744%27%20height%3D%2744%27%3E%3Ccircle%20cx%3D%2722%27%20cy%3D%2722%27%20r%3D%2720%27%20fill%3D%27rgba%2820%2C20%2C20%2C0.55%29%27/%3E%3Cpath%20d%3D%27M18%2012%20L28%2022%20L18%2032%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3C/svg%3E") 22 22, e-resize;
         }
+
+        /* ── Profile Modal ── */
+        .profile-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 400;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+        .profile-modal.open { opacity: 1; pointer-events: auto; }
+        .profile-card {
+            max-width: 420px;
+            width: 100%;
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-floating);
+            padding: 28px 28px 24px;
+            position: relative;
+            transform: scale(0.96);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .profile-modal.open .profile-card { transform: scale(1); }
+        .profile-card-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            color: var(--ink-light);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: background .15s ease, color .15s ease;
+            line-height: 1;
+        }
+        .profile-card-close:hover { background: var(--bg); color: var(--ink); }
+        .profile-card-header { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px; }
+        .profile-card-avatar {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font);
+            font-weight: 700;
+            font-size: 18px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--ink);
+        }
+        .profile-card-avatar.v0 { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+        .profile-card-avatar.v1 { background: var(--bg); color: var(--ink); }
+        .profile-card-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: var(--accent-2); }
+        .profile-card-avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .profile-card-avatar.company::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border: 2px solid var(--card);
+            border-radius: 3px;
+        }
+        .profile-card-info { flex: 1; min-width: 0; }
+        .profile-card-name { font-family: var(--font); font-size: calc(var(--fs-body) * 1.2); font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
+        .profile-card-role { font-size: calc(var(--fs-body) * 0.85); color: var(--ink-mid); margin-top: 2px; }
+        .profile-card-tagline { font-size: calc(var(--fs-body) * 0.8); color: var(--ink-light); margin-top: 4px; font-style: italic; }
+        .profile-card-stats { display: flex; gap: 24px; padding: 12px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+        .profile-card-stat { display: flex; flex-direction: column; }
+        .profile-card-stat .num { font-family: var(--font-mono); font-size: calc(var(--fs-body) * 1.2); font-weight: 600; color: var(--ink); }
+        .profile-card-stat .label { font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-light); }
+        .profile-card-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* ── Co badge ── */
+        .co-badge {
+            font-family: var(--font-mono);
+            font-size: 6px;
+            color: var(--ink-light);
+            border: 1px solid var(--border);
+            padding: 0 3px;
+            border-radius: 2px;
+            line-height: 1.3;
+        }
     </style>
 </head>
 <body data-scale="m" data-font="satoshi">
@@ -1518,19 +1875,31 @@
                     <button class="btn small logo-card-home" id="logoReset" type="button">↺ Reset demo</button>
                 </div>
             </div>
-        </div>
 
-        
-        <!-- Appearance Trigger & Dropdown -->
-        <div class="hud-appearance-wrapper">
-          <button class="btn" id="appearanceTrigger">Aa</button>
-          <div class="appearance-dropdown" id="appearanceDropdown">
-              <!-- populated by JS -->
-          </div>
-      </div>
+            <!-- Right: appearance + notification -->
+            <div class="topbar-right">
+                <!-- Appearance -->
+                <div class="topbar-appearance-wrapper">
+                    <button class="btn" id="appearanceTrigger">Aa</button>
+                    <div class="topbar-appearance-dropdown" id="appearanceDropdown"></div>
+                </div>
+
+                <!-- Notification / Attention -->
+                <div class="notification-wrapper" id="notificationWrapper">
+                    <button class="notification-btn" id="notificationBtn" aria-label="Attention">
+                        <span>👁</span>
+                        <span class="notification-badge hidden" id="notificationBadge">0</span>
+                    </button>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="dropdown-header">Attention</div>
+                        <div id="notificationList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- ─── TOP HUD (navigation + view + appearance) ─── -->
+    <!-- ─── TOP HUD (navigation + view) ─── -->
     <div class="hud hud-top" id="hudTop">
         <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
         <span class="hud-position" id="hudPosition">1 / 4</span>
@@ -1542,9 +1911,6 @@
         <button class="btn active" id="hudViewList">List</button>
         <button class="btn" id="hudViewGrid">Grid</button>
         <button class="btn" id="hudViewBento">Bento</button>
-
-      
-
     </div>
 
     <div class="wrap">
@@ -1683,12 +2049,21 @@
         </div>
     </div>
 
+    <!-- ─── PROFILE MODAL ─── -->
+    <div class="profile-modal" id="profileModal">
+        <div class="profile-card" id="profileCard">
+            <button class="profile-card-close" id="profileModalClose">✕</button>
+            <div id="profileCardContent"></div>
+        </div>
+    </div>
+
     <script>
         (function() {
             'use strict';
 
             // ── Constants ─────────────────────────────────────────────
             const STORAGE_KEY = 'neverever-statements-v9';
+            const ATTENTION_KEY = 'neverever-attention-v1';
             const ACTIVITY_KEY = 'neverever-activity-v1';
             const PAGE_SIZE = 12;
             const AVIF_IMAGES = [
@@ -1734,12 +2109,19 @@
                 return n;
             }
 
-            function avatarHtml(authorId, size) {
+            function avatarHtml(authorId, size, clickable) {
                 const a = authorById(authorId);
                 if (!a) return `<div class="avatar sz-${size} v1">?</div>`;
                 const cls = ['avatar', 'sz-' + size, avatarVariant(a.id)];
                 if (a.kind === 'company') cls.push('company');
-                return `<div class="${cls.join(' ')}">${escapeHtml(initialsFor(a))}</div>`;
+                const clickAttr = clickable ? ` data-author-id="${a.id}" style="cursor:pointer;"` : '';
+                return `<div class="${cls.join(' ')}"${clickAttr}>${escapeHtml(initialsFor(a))}</div>`;
+            }
+
+            function avatarHtmlForObject(obj, size) {
+                const cls = ['avatar', 'sz-' + size, avatarVariant(obj.id)];
+                if (obj.kind === 'company') cls.push('company');
+                return `<div class="${cls.join(' ')}">${escapeHtml(initialsFor(obj))}</div>`;
             }
 
             function renderMediaThumb(url) {
@@ -1866,6 +2248,194 @@
             const activeDisciplines = new Set();
             let searchQuery = '';
 
+            // ── Attention ─────────────────────────────────────────────
+            let attentionItems = [];
+            const USER_ID = 'user_self';
+
+            function loadAttention() {
+                try {
+                    const raw = localStorage.getItem(ATTENTION_KEY);
+                    attentionItems = raw ? JSON.parse(raw) : [];
+                    // Filter out any that reference non-existent objects
+                    attentionItems = attentionItems.filter(item => {
+                        if (item.objectType === 'person' || item.objectType === 'company') {
+                            return authors.some(a => a.id === item.objectId);
+                        }
+                        return true;
+                    });
+                } catch (e) { attentionItems = []; }
+            }
+
+            function saveAttention() {
+                try {
+                    localStorage.setItem(ATTENTION_KEY, JSON.stringify(attentionItems));
+                } catch (e) {}
+                renderAttentionBadgeAndList();
+            }
+
+            function isInAttention(objectType, objectId) {
+                return attentionItems.some(item => item.objectType === objectType && item.objectId === objectId && item
+                    .active !== false);
+            }
+
+            function addAttention(objectType, objectId) {
+                attentionItems = attentionItems.filter(item => !(item.objectType === objectType && item.objectId ===
+                    objectId));
+                attentionItems.unshift({
+                    id: uid(),
+                    userId: USER_ID,
+                    objectType,
+                    objectId,
+                    createdAt: Date.now(),
+                    active: true
+                });
+                saveAttention();
+            }
+
+            function removeAttention(objectType, objectId) {
+                attentionItems = attentionItems.filter(item => !(item.objectType === objectType && item.objectId ===
+                    objectId));
+                saveAttention();
+            }
+
+            function toggleAttention(objectType, objectId) {
+                if (isInAttention(objectType, objectId)) {
+                    removeAttention(objectType, objectId);
+                    return false;
+                } else {
+                    addAttention(objectType, objectId);
+                    return true;
+                }
+            }
+
+            function getAttentionObject(item) {
+                if (item.objectType === 'person' || item.objectType === 'company') {
+                    return authors.find(a => a.id === item.objectId);
+                }
+                return null;
+            }
+
+            function renderAttentionBadgeAndList() {
+                const badge = document.getElementById('notificationBadge');
+                const list = document.getElementById('notificationList');
+                if (!badge || !list) return;
+
+                const activeItems = attentionItems.filter(item => item.active !== false);
+                const count = activeItems.length;
+
+                // Update badge
+                badge.textContent = count;
+                badge.classList.toggle('hidden', count === 0);
+
+                // Update list
+                if (count === 0) {
+                    list.innerHTML = `<div class="dropdown-empty">Nothing saved yet.</div>`;
+                    return;
+                }
+
+                list.innerHTML = activeItems.map(item => {
+                    const obj = getAttentionObject(item);
+                    if (!obj) return '';
+                    const varClass = avatarVariant(obj.id);
+                    const typeLabel = item.objectType === 'person' ? 'person' : 'company';
+                    const initials = initialsFor(obj);
+                    return `
+                        <div class="notification-item" data-type="${item.objectType}" data-id="${item.objectId}">
+                            <div class="item-avatar ${varClass}${obj.kind === 'company' ? ' company' : ''}">${escapeHtml(initials)}</div>
+                            <div class="item-info">
+                                <span class="item-name">${escapeHtml(obj.name)}</span>
+                                <span class="item-type">${typeLabel}</span>
+                            </div>
+                            <button class="item-dismiss" data-type="${item.objectType}" data-id="${item.objectId}" title="Dismiss">×</button>
+                        </div>
+                    `;
+                }).join('');
+
+                // Click on item -> open profile modal
+                list.querySelectorAll('.notification-item').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        if (e.target.closest('.item-dismiss')) return;
+                        const type = el.dataset.type;
+                        const id = el.dataset.id;
+                        openProfileModal(type, id);
+                        // Close dropdown
+                        document.getElementById('notificationDropdown').classList.remove('open');
+                    });
+                    const dismiss = el.querySelector('.item-dismiss');
+                    if (dismiss) {
+                        dismiss.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const type = dismiss.dataset.type;
+                            const id = dismiss.dataset.id;
+                            removeAttention(type, id);
+                        });
+                    }
+                });
+            }
+
+            // ── Profile Modal ──────────────────────────────────────────
+            function openProfileModal(objectType, objectId) {
+                const obj = objectType === 'person' || objectType === 'company' ?
+                    authors.find(a => a.id === objectId) : null;
+                if (!obj) return;
+
+                const modal = document.getElementById('profileModal');
+                const content = document.getElementById('profileCardContent');
+                if (!modal || !content) return;
+
+                const varClass = avatarVariant(obj.id);
+                const isCompany = obj.kind === 'company';
+                const inAttn = isInAttention(objectType, objectId);
+
+                // Count statements by this author
+                const stmtCount = statements.filter(s => s.authorId === obj.id).length;
+
+                content.innerHTML = `
+                    <div class="profile-card-header">
+                        <div class="profile-card-avatar ${varClass}${isCompany ? ' company' : ''}">${escapeHtml(initialsFor(obj))}</div>
+                        <div class="profile-card-info">
+                            <div class="profile-card-name">${escapeHtml(obj.name)}</div>
+                            <div class="profile-card-role">${escapeHtml(obj.role || '')}</div>
+                            ${obj.tagline ? `<div class="profile-card-tagline">${escapeHtml(obj.tagline)}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="profile-card-stats">
+                        <div class="profile-card-stat"><span class="num">${stmtCount}</span><span class="label">Statements</span></div>
+                        <div class="profile-card-stat"><span class="num">${isCompany ? 'Company' : 'Person'}</span><span class="label">Type</span></div>
+                    </div>
+                    <div class="profile-card-actions">
+                        <button class="btn ${inAttn ? 'active' : ''}" id="profileSaveBtn">${inAttn ? 'SAVED' : 'SAVE PROFILE'}</button>
+                        <button class="btn ghost" id="profileViewBtn">VIEW (inert)</button>
+                    </div>
+                `;
+
+                modal.classList.add('open');
+
+                const saveBtn = document.getElementById('profileSaveBtn');
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const nowIn = toggleAttention(objectType, objectId);
+                        saveBtn.textContent = nowIn ? 'SAVED' : 'SAVE PROFILE';
+                        saveBtn.classList.toggle('active', nowIn);
+                        // update attention badge/list
+                        renderAttentionBadgeAndList();
+                    });
+                }
+
+                const viewBtn = document.getElementById('profileViewBtn');
+                if (viewBtn) {
+                    viewBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        console.log('View profile (inert)');
+                    });
+                }
+            }
+
+            function closeProfileModal() {
+                document.getElementById('profileModal').classList.remove('open');
+            }
+
             // ── Data loading ──────────────────────────────────────────
             async function loadData() {
                 try {
@@ -1910,15 +2480,19 @@
             // ── DEV: reset ──
             async function resetDemoContent() {
                 try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+                try { localStorage.removeItem(ATTENTION_KEY); } catch (e) {}
                 authors = seedAuthors();
                 statements = seedStatements(authors);
                 await saveData();
+                attentionItems = [];
+                saveAttention();
                 activityLog = [];
                 saveActivityLog();
                 updateActivityCount();
                 renderActivityLog();
                 activeIndex = 0;
                 renderTrack();
+                renderAttentionBadgeAndList();
                 console.log('resetDemoContent: reseeded', authors.length, 'authors /', statements.length, 'statements');
             }
             window.resetDemoContent = resetDemoContent;
@@ -2001,6 +2575,7 @@
                 document.getElementById('activityOverlay').classList.remove('open');
             }
 
+            // ── Interaction tracking ──────────────────────────────────
             function wireInteractionTracking(el, s) {
                 let hoverStart = null;
                 el.addEventListener('mouseenter', () => { hoverStart = Date.now(); });
@@ -2095,9 +2670,9 @@
                     `
               <div class="modal-node-head">
                 ${hasChildren ? `<button class="modal-node-toggle" data-node-id="${node.id}">${isCollapsed ? '[+]' : '[–]'}</button>` : ''}
-                ${avatarHtml(node.authorId,'xs')}
+                ${avatarHtml(node.authorId,'xs', true)}
                 <span class="modal-node-author" data-author-id="${node.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
-                ${a && a.kind==='company' ? '<span class="co-badge" style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 3px;border-radius:2px;">CO</span>' : ''}
+                ${a && a.kind==='company' ? '<span class="co-badge">CO</span>' : ''}
                 <span class="modal-node-time">${fmtTime(node.time)}</span>
                 ${isCollapsed ? `<span style="font-family:var(--font-mono);font-size:8px;color:var(--ink-light);">(${countReplies(node)+1} hidden)</span>` : ''}
               </div>
@@ -2105,7 +2680,32 @@
                 wrap.innerHTML = headHtml;
 
                 const head = wrap.querySelector('.modal-node-head');
-                head.querySelector('[data-author-id]').addEventListener('click', e => e.stopPropagation());
+                // Click on author name or avatar opens profile
+                const authorEls = head.querySelectorAll('[data-author-id]');
+                authorEls.forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = el.dataset.authorId;
+                        const aObj = authorById(id);
+                        if (aObj) {
+                            const type = aObj.kind === 'company' ? 'company' : 'person';
+                            openProfileModal(type, id);
+                        }
+                    });
+                });
+                // Avatar clicks
+                const avatarEl = head.querySelector('.avatar');
+                if (avatarEl) {
+                    avatarEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = node.authorId;
+                        const aObj = authorById(id);
+                        if (aObj) {
+                            const type = aObj.kind === 'company' ? 'company' : 'person';
+                            openProfileModal(type, id);
+                        }
+                    });
+                }
 
                 if (hasChildren) {
                     const toggle = head.querySelector('.modal-node-toggle');
@@ -2208,13 +2808,13 @@
                     `
               <div class="modal-statement">
                 <div class="card-who">
-                  ${avatarHtml(s.authorId,'md')}
+                  ${avatarHtml(s.authorId,'md', true)}
                   <div>
                     <div class="card-author-row">
                       <span class="card-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
-                      ${a && a.kind==='company' ? '<span class="co-badge" style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 3px;border-radius:2px;">CO</span>' : ''}
+                      ${a && a.kind==='company' ? '<span class="co-badge">CO</span>' : ''}
                       <span class="card-time">${fmtTime(s.time)}</span>
-                      ${s.tag ? `<span class="card-tag" style="font-family:var(--font-mono);font-size:8px;color:var(--ink-light);border:1px solid var(--border);padding:0 6px;border-radius:var(--radius-sm);letter-spacing:0.04em;">${escapeHtml(s.tag)}</span>` : ''}
+                      ${s.tag ? `<span class="card-tag">${escapeHtml(s.tag)}</span>` : ''}
                     </div>
                     <div class="card-role">${a ? escapeHtml(a.role||'') : ''}</div>
                   </div>
@@ -2228,6 +2828,35 @@
             `;
 
                 container.innerHTML = html;
+
+                // Wire up avatar/profile clicks in the statement header
+                const whoEl = container.querySelector('.card-who');
+                if (whoEl) {
+                    const avatarEl = whoEl.querySelector('.avatar');
+                    const authorEl = whoEl.querySelector('.card-author');
+                    if (avatarEl) {
+                        avatarEl.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const id = s.authorId;
+                            const obj = authorById(id);
+                            if (obj) {
+                                const type = obj.kind === 'company' ? 'company' : 'person';
+                                openProfileModal(type, id);
+                            }
+                        });
+                    }
+                    if (authorEl) {
+                        authorEl.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const id = s.authorId;
+                            const obj = authorById(id);
+                            if (obj) {
+                                const type = obj.kind === 'company' ? 'company' : 'person';
+                                openProfileModal(type, id);
+                            }
+                        });
+                    }
+                }
 
                 const threadEl = container.querySelector('#modalThread');
                 s.replies.forEach(r => threadEl.appendChild(renderModalNode(r, s, 0)));
@@ -2267,10 +2896,15 @@
                 const bodyColor = isDark ? 'rgba(255,255,255,0.8)' : 'var(--ink-mid)';
                 const metaColor = isDark ? 'rgba(255,255,255,0.4)' : 'var(--ink-light)';
 
+                const avatarStr = avatarHtml(s.authorId, 'sm', true);
+
                 card.innerHTML = `
               <div>
                 <div class="label-sm">${escapeHtml(s.tag || 'STATEMENT')}</div>
-                <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};">${escapeHtml(a ? a.name : 'Unknown')}</div>
+                <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};display:flex;align-items:center;gap:6px;">
+                  ${avatarStr}
+                  <span style="cursor:pointer;" data-author-id="${s.authorId}">${escapeHtml(a ? a.name : 'Unknown')}</span>
+                </div>
                 ${a?.role ? `<div class="body-xs" style="color:${lightColor};">${escapeHtml(a.role)}</div>` : ''}
               </div>
               <div class="mt-auto">
@@ -2283,6 +2917,32 @@
               `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
             `;
 
+                // Wire profile clicks
+                card.querySelectorAll('[data-author-id]').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = el.dataset.authorId;
+                        const obj = authorById(id);
+                        if (obj) {
+                            const type = obj.kind === 'company' ? 'company' : 'person';
+                            openProfileModal(type, id);
+                        }
+                    });
+                });
+                // Avatar click
+                const avatarEl = card.querySelector('.avatar');
+                if (avatarEl) {
+                    avatarEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = s.authorId;
+                        const obj = authorById(id);
+                        if (obj) {
+                            const type = obj.kind === 'company' ? 'company' : 'person';
+                            openProfileModal(type, id);
+                        }
+                    });
+                }
+
                 wireInteractionTracking(card, s);
                 return card;
             }
@@ -2293,13 +2953,16 @@
                 const row = document.createElement('div');
                 row.className = 'letter-row';
                 row.dataset.id = s.id;
+
+                const avatarStr = avatarHtml(s.authorId, 'sm', true);
+
                 row.innerHTML =
                     `
               <div class="letter-row-idx t-data">${idx}</div>
-              <div class="letter-row-avatar">${avatarHtml(s.authorId,'sm')}</div>
+              <div class="letter-row-avatar">${avatarStr}</div>
               <div class="letter-row-text-wrap">
                 <div class="letter-row-meta">
-                  <span class="letter-row-author">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
+                  <span class="letter-row-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
                   <span class="letter-row-time">${fmtTime(s.time)}</span>
                   ${s.tag ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;">${escapeHtml(s.tag)}</span>` : ''}
                 </div>
@@ -2310,6 +2973,32 @@
                 ${countReplies(s)} replies
               </div>
             `;
+
+                // Wire profile clicks
+                row.querySelectorAll('[data-author-id]').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = el.dataset.authorId;
+                        const obj = authorById(id);
+                        if (obj) {
+                            const type = obj.kind === 'company' ? 'company' : 'person';
+                            openProfileModal(type, id);
+                        }
+                    });
+                });
+                const avatarEl = row.querySelector('.avatar');
+                if (avatarEl) {
+                    avatarEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = s.authorId;
+                        const obj = authorById(id);
+                        if (obj) {
+                            const type = obj.kind === 'company' ? 'company' : 'person';
+                            openProfileModal(type, id);
+                        }
+                    });
+                }
+
                 wireInteractionTracking(row, s);
                 return row;
             }
@@ -2319,12 +3008,15 @@
                 const item = document.createElement('div');
                 item.className = 'grid-item';
                 item.dataset.id = s.id;
+
+                const avatarStr = avatarHtml(s.authorId, 'sm', true);
+
                 item.innerHTML =
                     `
               <div class="grid-top">
-                ${avatarHtml(s.authorId,'sm')}
+                ${avatarStr}
                 <div class="grid-meta">
-                  <span class="grid-author">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
+                  <span class="grid-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
                   <span class="grid-time">${fmtTime(s.time)}</span>
                 </div>
               </div>
@@ -2335,6 +3027,31 @@
                 ${s.tag ? `<span class="grid-tag" style="font-family:var(--font-mono);font-size:6px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-light);border:1px solid var(--border);padding:1px 8px;border-radius:var(--radius-sm);">${escapeHtml(s.tag)}</span>` : ''}
               </div>
             `;
+
+                item.querySelectorAll('[data-author-id]').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = el.dataset.authorId;
+                        const obj = authorById(id);
+                        if (obj) {
+                            const type = obj.kind === 'company' ? 'company' : 'person';
+                            openProfileModal(type, id);
+                        }
+                    });
+                });
+                const avatarEl = item.querySelector('.avatar');
+                if (avatarEl) {
+                    avatarEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = s.authorId;
+                        const obj = authorById(id);
+                        if (obj) {
+                            const type = obj.kind === 'company' ? 'company' : 'person';
+                            openProfileModal(type, id);
+                        }
+                    });
+                }
+
                 wireInteractionTracking(item, s);
                 return item;
             }
@@ -2440,7 +3157,6 @@
                 document.getElementById('hudPosition').textContent = (index + 1) + ' / ' + letterData.length;
                 updateFilterUI();
 
-                // Update HUD view buttons
                 ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.classList.toggle('active', id === 'hudView' + mode.charAt(0).toUpperCase() + mode
@@ -2685,14 +3401,11 @@
                 });
             }
 
-            // ── Init ──────────────────────────────────────────────────
-            window.__clearFilters = clearFilters;
-
-            // ── Appearance Dropdown setup ────────────────────────────
+            // ── Appearance Dropdown ──────────────────────────────────
             function setupAppearanceDropdown() {
                 const trigger = document.getElementById('appearanceTrigger');
                 const dropdown = document.getElementById('appearanceDropdown');
-                const wrapper = document.querySelector('.hud-appearance-wrapper');
+                const wrapper = document.querySelector('.topbar-appearance-wrapper');
 
                 if (!trigger || !dropdown || !wrapper) return;
 
@@ -2730,8 +3443,8 @@
                 trigger.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const isOpen = dropdown.classList.contains('open');
-                    // Close any other open dropdowns
-                    document.querySelectorAll('.appearance-dropdown.open').forEach(d => d.classList.remove('open'));
+                    document.querySelectorAll('.topbar-appearance-dropdown.open').forEach(d => d.classList.remove(
+                    'open'));
                     if (!isOpen) {
                         renderMenu();
                         dropdown.classList.add('open');
@@ -2747,13 +3460,47 @@
                 });
             }
 
+            // ── Notification dropdown toggle ─────────────────────────
+            function setupNotificationToggle() {
+                const btn = document.getElementById('notificationBtn');
+                const dropdown = document.getElementById('notificationDropdown');
+                const wrapper = document.getElementById('notificationWrapper');
+
+                if (!btn || !dropdown || !wrapper) return;
+
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = dropdown.classList.contains('open');
+                    // Close other dropdowns
+                    document.querySelectorAll('.notification-dropdown.open').forEach(d => d.classList.remove('open'));
+                    if (!isOpen) {
+                        renderAttentionBadgeAndList();
+                        dropdown.classList.add('open');
+                    } else {
+                        dropdown.classList.remove('open');
+                    }
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!wrapper.contains(e.target)) {
+                        dropdown.classList.remove('open');
+                    }
+                });
+            }
+
+            // ── Init ──────────────────────────────────────────────────
+            window.__clearFilters = clearFilters;
+            window.openProfileModal = openProfileModal;
+
             document.addEventListener('DOMContentLoaded', async function() {
                 try {
                     // Setup appearance dropdown
                     setupAppearanceDropdown();
+                    setupNotificationToggle();
 
                     // Load data
                     await loadData();
+                    loadAttention();
                     loadActivity();
                     updateActivityCount();
                     if (new URLSearchParams(location.search).has('reset-demo')) {
@@ -2768,6 +3515,7 @@
                     ];
 
                     renderTrack();
+                    renderAttentionBadgeAndList();
 
                     // ─── HUD controls ─────────────────────────────────────
                     document.getElementById('hudPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
@@ -2848,7 +3596,19 @@
                             activatePanel(activeIndex - 1); }
                         if (e.key === 'ArrowRight') { e.preventDefault();
                             activatePanel(activeIndex + 1); }
-                        if (e.key === 'Escape' && focusMode) setFocusMode(false);
+                        if (e.key === 'Escape') {
+                            if (focusMode) setFocusMode(false);
+                            if (document.getElementById('profileModal').classList.contains('open'))
+                                closeProfileModal();
+                            if (document.getElementById('conversationModal').classList.contains('open'))
+                                closeConversation();
+                            if (document.getElementById('bentoOverlay').classList.contains('open'))
+                                closeBento();
+                            if (document.getElementById('activityOverlay').classList.contains('open'))
+                                closeActivity();
+                            // Close notification dropdown
+                            document.getElementById('notificationDropdown').classList.remove('open');
+                        }
                     });
 
                     document.getElementById('c-cancel').addEventListener('click', closeComposer);
@@ -2861,7 +3621,7 @@
                         const text = document.getElementById('c-text').value.trim();
                         if (!text || !authorId) return;
                         statements.unshift({ id: uid(), authorId, time: Date.now(), tag, text, mediaUrl,
-                        replies: [] });
+                            replies: [] });
                         saveData();
                         closeComposer();
                         renderLetter(activeIndex);
@@ -2935,12 +3695,10 @@
                         });
                     });
 
-                    document.addEventListener('keydown', (e) => {
-                        if (e.key === 'Escape') {
-                            closeConversation();
-                            if (document.getElementById('bentoOverlay').classList.contains('open')) closeBento();
-                            if (document.getElementById('activityOverlay').classList.contains('open')) closeActivity();
-                        }
+                    // Profile modal
+                    document.getElementById('profileModalClose').addEventListener('click', closeProfileModal);
+                    document.getElementById('profileModal').addEventListener('click', (e) => {
+                        if (e.target === e.currentTarget) closeProfileModal();
                     });
 
                     renderLetter(0);
