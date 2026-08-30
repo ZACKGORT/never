@@ -735,6 +735,7 @@
         .letter-row-avatar .avatar { width: 28px; height: 28px; font-size: 9px; cursor: pointer; }
         .letter-row-text-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
         .letter-row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 9px; }
+
         .letter-row-author {
             font-family: var(--font);
             font-size: calc(var(--fs-body) * 0.8);
@@ -742,13 +743,15 @@
             letter-spacing: 0.02em;
             text-transform: uppercase;
             color: var(--ink);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 120px;
+            /* No truncation: full name visible */
+            overflow: visible;
+            white-space: normal;
+            max-width: none;
             cursor: pointer;
+            word-break: break-word;
         }
         .letter-row-author:hover { opacity: 0.7; }
+
         .letter-row-time { font-family: var(--font-mono); font-size: 7px; color: var(--ink-light); white-space: nowrap; }
         .letter-row-text {
             color: var(--ink-mid);
@@ -1536,7 +1539,13 @@
             .letter-bento .card { padding: 1.5rem; border-radius: 1.25rem; }
             .letter-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
             .letter-row { grid-template-columns: 20px 28px 1fr auto; gap: 8px; padding: 10px 0; }
-            .letter-row-author { font-size: calc(var(--fs-body) * 0.7); max-width: 80px; }
+            .letter-row-author {
+                font-size: calc(var(--fs-body) * 0.7);
+                /* remove truncation overrides */
+                max-width: none;
+                white-space: normal;
+                overflow: visible;
+            }
             .letter-row-text { font-size: calc(var(--fs-body) * 0.82); }
         }
         @media (max-width: 540px) {
@@ -1561,7 +1570,12 @@
             .letter-grid .grid-item { padding: 12px 14px 14px; min-height: 100px; }
             .letter-row { grid-template-columns: 16px 24px 1fr auto; gap: 6px; padding: 8px 0; }
             .letter-row-avatar .avatar { width: 24px; height: 24px; font-size: 8px; }
-            .letter-row-author { font-size: calc(var(--fs-body) * 0.65); max-width: 60px; }
+            .letter-row-author {
+                font-size: calc(var(--fs-body) * 0.65);
+                max-width: none;
+                white-space: normal;
+                overflow: visible;
+            }
             .letter-row-text { font-size: calc(var(--fs-body) * 0.78); -webkit-line-clamp: 2; }
             .letter-row-time { font-size: 6px; }
             .letter-row-idx { font-size: 8px; }
@@ -2257,7 +2271,7 @@
             const ATTENTION_KEY = 'neverever-attention-v1';
             const ACTIVITY_KEY = 'neverever-activity-v1';
             const PAGE_SIZE = 12;
-            const MAX_ATTENTION = 20; // cap to enforce curation
+            const MAX_ATTENTION = 20;
             const AVIF_IMAGES = [
                 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?fm=avif&w=800&h=450&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?fm=avif&w=800&h=450&fit=crop&q=80',
@@ -2473,7 +2487,6 @@
             }
 
             function addAttention(objectType, objectId) {
-                // Enforce cap: max 20 active attention items
                 const activeItems = attentionItems.filter(item => item.active !== false);
                 if (activeItems.length >= MAX_ATTENTION) {
                     alert(`Attention cap reached (${MAX_ATTENTION}). Please remove some items first.`);
@@ -2791,16 +2804,13 @@
             const hoverStartMap = new Map();
 
             function setupDelegatedEvents() {
-                // Use capturing phase to catch events early
                 document.addEventListener('pointerenter', (e) => {
                     const item = e.target.closest('[data-statement-id]');
                     if (!item) return;
-                    // Only track if inside active panel
                     const panel = item.closest('.letter-panel.active');
                     if (!panel) return;
                     const sid = item.dataset.statementId;
                     if (!sid) return;
-                    // Avoid re-entering same item
                     if (hoverStartMap.has(sid)) return;
                     hoverStartMap.set(sid, Date.now());
                 }, true);
@@ -3302,7 +3312,6 @@
                     });
                 }
 
-                // No per-element wireInteractionTracking needed — delegated events handle it
                 return card;
             }
 
@@ -3881,7 +3890,7 @@
                 try {
                     setupAppearanceDropdown();
                     setupAttentionToggle();
-                    setupDelegatedEvents(); // single-pass delegation for all interactions
+                    setupDelegatedEvents();
 
                     await loadData();
                     loadAttention();
