@@ -50,9 +50,7 @@
         body[data-scale="xxl"] { --fs-body: 24px; --fs-display: 96px; }
 
         body[data-font="satoshi"] { --font: 'Satoshi', sans-serif; }
-        body[data-font="inter"] { --font: 'Inter', sans-serif; }
         body[data-font="serif"] { --font: 'EB Garamond', serif; }
-        body[data-font="mono"] { --font: 'JetBrains Mono', monospace; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
@@ -764,10 +762,6 @@
             --hud-fs-label: 6px;
             --hud-fs-position: 8px;
             --hud-minw-position: 36px;
-            --hud-fs-select: 7px;
-            --hud-maxw-select: 54px;
-            --hud-fs-chip: 6px;
-            --hud-pad-chip: 2px 4px;
 
             position: fixed;
             left: 50%;
@@ -871,118 +865,70 @@
             text-align: center;
         }
 
-        /* Appearance controls — now in top hud */
-        .hud .hud-appearance {
+        /* ── Appearance Dropdown (context menu style) ── */
+        .hud-appearance-wrapper {
+            position: relative;
             display: flex;
             align-items: center;
-            gap: 4px;
         }
-        .hud .font-select {
-            background: transparent;
-            border: none;
-            color: var(--ink-mid);
-            font-family: var(--font-mono);
-            font-size: var(--hud-fs-select);
+        .appearance-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            min-width: 110px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-floating);
             padding: 4px 0;
-            cursor: pointer;
-            outline: none;
-            max-width: var(--hud-maxw-select);
-            font-weight: 500;
-            -webkit-appearance: none;
-            appearance: none;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
         }
-        .hud .scale-group {
+        .appearance-dropdown.open {
             display: flex;
-            gap: 1px;
         }
-        .hud .scale-group .chip {
-            border: none;
-            padding: var(--hud-pad-chip);
-            font-size: var(--hud-fs-chip);
-            color: var(--ink-light);
-            background: transparent;
-            border-radius: 3px;
-            cursor: pointer;
+        .appearance-dropdown .menu-item {
+            padding: 4px 12px;
             font-family: var(--font-mono);
+            font-size: 8px;
             letter-spacing: 0.04em;
-            font-weight: 500;
-            touch-action: manipulation;
+            color: var(--ink-mid);
+            cursor: pointer;
+            transition: background .12s ease, color .12s ease;
+            border: none;
+            background: none;
+            text-align: left;
+            width: 100%;
+            white-space: nowrap;
         }
-        .hud .scale-group .chip.active { background: var(--ink); color: var(--card); }
-        .hud .scale-group .chip:hover { color: var(--ink); }
+        .appearance-dropdown .menu-item:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+        .appearance-dropdown .menu-item.active {
+            background: var(--ink);
+            color: var(--card);
+        }
 
         @media (max-width: 640px) {
-            .hud-bottom {
-                bottom: 16px;
-                --hud-pad: 8px 12px;
-                --hud-min-h: 48px;
-                --hud-btn-min-h: 30px;
-                --hud-btn-pad: 5px 10px;
-                --hud-btn-fs: 9px;
-                --hud-icon-w: 30px;
-                --hud-icon-fs: 13px;
-                --hud-divider-h: 22px;
-                --hud-fs-count: 9px;
-                --hud-pad-count: 2px 6px;
-                --hud-minw-count: 18px;
-                --hud-fs-summary: 10px;
-                --hud-maxw-summary: 110px;
-                --hud-fs-label: 9px;
+            .appearance-dropdown {
+                min-width: 90px;
+                right: -6px;
             }
-            .hud-top {
-                top: calc(var(--topbar-height) + 8px);
-                --hud-pad: 4px 8px;
-                --hud-gap: 3px;
-                --hud-min-h: 38px;
-                --hud-btn-min-h: 22px;
-                --hud-btn-pad: 4px 8px;
-                --hud-btn-fs: 7px;
-                --hud-icon-w: 22px;
-                --hud-icon-fs: 10px;
-                --hud-divider-h: 16px;
-                --hud-fs-position: 7px;
-                --hud-minw-position: 28px;
-                --hud-fs-select: 7px;
-                --hud-maxw-select: 44px;
-                --hud-fs-chip: 6px;
-                --hud-pad-chip: 2px 4px;
+            .appearance-dropdown .menu-item {
+                font-size: 7px;
+                padding: 3px 10px;
             }
-            .hud { border-radius: var(--radius-sm); }
-            .hud .hud-label { display: none; }
         }
-
         @media (max-width: 480px) {
-            .hud-bottom {
-                bottom: 12px;
-                --hud-pad: 6px 10px;
-                --hud-gap: 3px;
-                --hud-min-h: 42px;
-                --hud-btn-min-h: 26px;
-                --hud-btn-pad: 4px 8px;
-                --hud-btn-fs: 8px;
-                --hud-icon-w: 26px;
-                --hud-icon-fs: 12px;
-                --hud-divider-h: 18px;
-                --hud-fs-summary: 9px;
-                --hud-maxw-summary: 90px;
+            .appearance-dropdown {
+                min-width: 80px;
+                right: -8px;
             }
-            .hud-top {
-                top: calc(var(--topbar-height) + 6px);
-                --hud-pad: 3px 6px;
-                --hud-gap: 2px;
-                --hud-min-h: 34px;
-                --hud-btn-min-h: 20px;
-                --hud-btn-pad: 3px 6px;
-                --hud-btn-fs: 6px;
-                --hud-icon-w: 20px;
-                --hud-icon-fs: 9px;
-                --hud-divider-h: 14px;
-                --hud-fs-position: 6px;
-                --hud-minw-position: 24px;
-                --hud-fs-select: 6px;
-                --hud-maxw-select: 36px;
-                --hud-fs-chip: 5px;
-                --hud-pad-chip: 1px 3px;
+            .appearance-dropdown .menu-item {
+                font-size: 6px;
+                padding: 2px 8px;
             }
         }
 
@@ -1573,9 +1519,18 @@
                 </div>
             </div>
         </div>
+
+        
+        <!-- Appearance Trigger & Dropdown -->
+        <div class="hud-appearance-wrapper">
+          <button class="btn" id="appearanceTrigger">Aa</button>
+          <div class="appearance-dropdown" id="appearanceDropdown">
+              <!-- populated by JS -->
+          </div>
+      </div>
     </div>
 
-    <!-- ─── TOP HUD (navigation + view + font/scale) ─── -->
+    <!-- ─── TOP HUD (navigation + view + appearance) ─── -->
     <div class="hud hud-top" id="hudTop">
         <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
         <span class="hud-position" id="hudPosition">1 / 4</span>
@@ -1588,8 +1543,7 @@
         <button class="btn" id="hudViewGrid">Grid</button>
         <button class="btn" id="hudViewBento">Bento</button>
 
-   
-
+      
 
     </div>
 
@@ -2734,35 +2688,69 @@
             // ── Init ──────────────────────────────────────────────────
             window.__clearFilters = clearFilters;
 
-            // ── Topbar appearance controls ───────────────────────────
-            function setupTopbarAppearance() {
-                const fontSelect = document.getElementById('fontSelectTop');
-                const scaleGroup = document.getElementById('scaleGroupTop');
+            // ── Appearance Dropdown setup ────────────────────────────
+            function setupAppearanceDropdown() {
+                const trigger = document.getElementById('appearanceTrigger');
+                const dropdown = document.getElementById('appearanceDropdown');
+                const wrapper = document.querySelector('.hud-appearance-wrapper');
 
-                if (fontSelect) {
-                    fontSelect.value = document.body.getAttribute('data-font') || 'satoshi';
-                    fontSelect.addEventListener('change', function() {
-                        document.body.setAttribute('data-font', this.value);
-                    });
-                }
+                if (!trigger || !dropdown || !wrapper) return;
 
-                if (scaleGroup) {
-                    scaleGroup.querySelectorAll('.chip').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            const scale = btn.dataset.scale;
-                            document.body.setAttribute('data-scale', scale);
-                            scaleGroup.querySelectorAll('.chip').forEach(b => {
-                                b.classList.toggle('active', b.dataset.scale === scale);
+                const scales = ['xxl', 'xl', 'l', 'm', 's'];
+                const fonts = ['satoshi', 'serif'];
+                const labelMap = { 'satoshi': 'Sat', 'serif': 'Ser' };
+                const scaleMap = { 's': 'S', 'm': 'M', 'l': 'L', 'xl': 'XL', 'xxl': 'XXL' };
+
+                function renderMenu() {
+                    const currentFont = document.body.getAttribute('data-font') || 'satoshi';
+                    const currentScale = document.body.getAttribute('data-scale') || 'm';
+                    dropdown.innerHTML = '';
+
+                    fonts.forEach(font => {
+                        scales.forEach(scale => {
+                            const item = document.createElement('button');
+                            item.className = 'menu-item';
+                            const isActive = (font === currentFont && scale === currentScale);
+                            if (isActive) item.classList.add('active');
+                            item.textContent = `${labelMap[font]} ${scaleMap[scale]}`;
+                            item.dataset.font = font;
+                            item.dataset.scale = scale;
+                            item.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                document.body.setAttribute('data-font', font);
+                                document.body.setAttribute('data-scale', scale);
+                                renderMenu();
+                                dropdown.classList.remove('open');
                             });
+                            dropdown.appendChild(item);
                         });
                     });
                 }
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = dropdown.classList.contains('open');
+                    // Close any other open dropdowns
+                    document.querySelectorAll('.appearance-dropdown.open').forEach(d => d.classList.remove('open'));
+                    if (!isOpen) {
+                        renderMenu();
+                        dropdown.classList.add('open');
+                    } else {
+                        dropdown.classList.remove('open');
+                    }
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!wrapper.contains(e.target)) {
+                        dropdown.classList.remove('open');
+                    }
+                });
             }
 
             document.addEventListener('DOMContentLoaded', async function() {
                 try {
-                    // Topbar appearance controls
-                    setupTopbarAppearance();
+                    // Setup appearance dropdown
+                    setupAppearanceDropdown();
 
                     // Load data
                     await loadData();
