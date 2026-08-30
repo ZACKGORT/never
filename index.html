@@ -587,19 +587,79 @@
             border-radius: 2px;
         }
 
-        /* ── composer ── */
+        /* ── composer: floating, draggable, persistent window ──
+           Fixed-positioned so it stays put over content regardless of
+           scroll, with no backdrop — everything behind it (hud, letters,
+           filters) stays fully clickable. */
         .composer {
+            position: fixed;
+            top: calc(var(--topbar-height) + 20px);
+            right: 24px;
+            width: min(380px, calc(100vw - 32px));
+            max-height: calc(100vh - var(--topbar-height) - 40px);
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 16px 18px;
+            box-shadow: var(--shadow-floating);
             display: none;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
+            z-index: 90;
+            transition: box-shadow .2s ease;
         }
         .composer.open { display: flex; }
+        .composer.dragging { transition: none; user-select: none; box-shadow: var(--shadow-hover); }
+
+        .composer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 8px 10px 14px;
+            border-bottom: 1px solid var(--border);
+            cursor: grab;
+            touch-action: none;
+            flex-shrink: 0;
+        }
+        .composer-header:active { cursor: grabbing; }
+        .composer-title {
+            font-family: var(--font-mono);
+            font-size: 8px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .composer-title .grip {
+            letter-spacing: 0;
+            opacity: 0.4;
+            font-size: 11px;
+        }
+        .composer-close {
+            width: 24px;
+            height: 24px;
+            min-height: 24px;
+            padding: 0;
+            font-size: 12px;
+            border: none;
+            background: transparent;
+            color: var(--ink-light);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .composer-close:hover { background: var(--ink); color: var(--card); }
+
+        .composer-body {
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+        }
         .field-row { display: flex; gap: 10px; flex-wrap: wrap; }
         .field-row .field { flex: 1; min-width: 120px; }
         label.t-micro { display: block; margin-bottom: 3px; font-size: 7px; letter-spacing: 0.1em; color: var(--ink-light); }
@@ -623,7 +683,20 @@
         textarea:focus,
         select:focus { outline: none; border-color: var(--ink); }
         textarea { min-height: 56px; line-height: 1.6; }
-        .composer-actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
+        .composer-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 10px 16px 14px;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 480px) {
+            .composer { top: auto; bottom: 16px; right: 12px; left: 12px; width: auto; }
+        }
 
         /* ── FLOATING HUD ──
            Two independent floating pills. Everything inside a .hud is
@@ -1021,17 +1094,60 @@
             .bento-actions .btn { padding: 10px 12px; font-size: 8px; min-height: 36px; }
         }
 
-        /* ── focus mode ── */
-        .letters-track.focus-mode { padding-left: 6vw; padding-right: 6vw; cursor: auto; }
+        /* ── focus mode — one letter takes over the full viewport ── */
+        body.focus-mode .topbar,
+        body.focus-mode .hud-top,
+        body.focus-mode .hud-bottom { display: none; }
+        body.focus-mode { overflow-x: hidden; }
+        body.focus-mode .letters-viewport { overflow-y: visible; }
+        .letters-track.focus-mode {
+            padding: 0;
+            cursor: auto;
+        }
         .letters-track.focus-mode .letter-panel:not(.active) { display: none; }
         .letters-track.focus-mode .letter-panel.active {
             flex: 0 0 auto;
-            width: min(100%, 900px);
-            max-width: 900px;
-            margin: 0 auto;
+            width: 100vw;
+            max-width: none;
+            margin: 0;
             opacity: 1;
         }
-        body.focus-mode .letters-track { padding-top: clamp(20px, 4vh, 40px); }
+        .letters-track.focus-mode .letter-panel.active .letter-card-frame {
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            min-height: 100vh;
+            padding: clamp(28px, 6vh, 72px) clamp(20px, 8vw, 140px);
+            box-sizing: border-box;
+        }
+        .letters-track.focus-mode .letter-panel.active .letter-card-frame:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        body.focus-mode .letters-track { padding-top: 0; }
+
+        .focus-exit-btn {
+            display: none;
+            position: fixed;
+            top: clamp(14px, 2vh, 24px);
+            right: clamp(14px, 2vw, 24px);
+            z-index: 500;
+            width: 36px;
+            height: 36px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--ink-light);
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: color .15s ease, border-color .15s ease, transform .15s ease;
+        }
+        .focus-exit-btn:hover { color: var(--ink); border-color: var(--ink); transform: scale(1.06); }
+        body.focus-mode .focus-exit-btn { display: flex; }
 
         .letter-card-focus-toggle {
             position: absolute;
@@ -1053,6 +1169,7 @@
         }
         .letter-card-focus-toggle:hover { color: var(--ink); border-color: var(--ink); }
         .letter-card-focus-toggle.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        body.focus-mode .letter-card-focus-toggle { display: none; }
 
         .empty-letter { padding: 40px 0; text-align: center; color: var(--ink-light); }
         .empty-letter .t-micro { margin-bottom: 6px; }
@@ -1298,9 +1415,55 @@
             .bento-panel { padding-bottom: env(safe-area-inset-bottom); }
             .conversation-modal .modal-card { padding-bottom: env(safe-area-inset-bottom); }
         }
+        /* ── custom cursor — dot + trailing inertia ellipse.
+           Suppressed over real controls (buttons, links, drag handles,
+           form fields) via body.write-native-cursor so those keep
+           their own affordance instead of fighting the overlay. */
+        body.custom-cursor-active { cursor: none; }
+        .write-cursor-dot,
+        .write-cursor-ellipse {
+            position: fixed; top: 0; left: 0; z-index: 400; pointer-events: none;
+            transform: translate(-9999px, -9999px);
+            opacity: 0; transition: opacity .18s ease; will-change: transform;
+        }
+        .write-cursor-dot.visible,
+        .write-cursor-ellipse.visible { opacity: 1; }
+        .write-cursor-dot {
+            width: 6px; height: 6px; margin: -3px 0 0 -3px;
+            border-radius: 50%; background: var(--ink);
+        }
+        .write-cursor-ellipse {
+            width: 34px; height: 34px; margin: -17px 0 0 -17px;
+            border: 1.5px solid var(--ink); border-radius: 50%; opacity: 0;
+        }
+        .write-cursor-ellipse.visible { opacity: .32; }
+        body.custom-cursor-active.write-native-cursor { cursor: auto; }
+        .write-native-cursor .write-cursor-dot,
+        .write-native-cursor .write-cursor-ellipse { opacity: 0 !important; }
+
+        /* ── click hotspots — thin edge zones over the letters viewport
+           so paging between letters is a single low-effort click near
+           either side, with a directional cursor to signal it. ── */
+        .letter-hotspot {
+            position: absolute; top: 0; bottom: 0;
+            width: clamp(56px, 9vw, 180px);
+            z-index: 20;
+        }
+        .letter-hotspot-prev {
+            left: 0;
+            cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2744%27%20height%3D%2744%27%3E%3Ccircle%20cx%3D%2722%27%20cy%3D%2722%27%20r%3D%2720%27%20fill%3D%27rgba%2820%2C20%2C20%2C0.55%29%27/%3E%3Cpath%20d%3D%27M26%2012%20L16%2022%20L26%2032%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3C/svg%3E") 22 22, w-resize;
+        }
+        .letter-hotspot-next {
+            right: 0;
+            cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2744%27%20height%3D%2744%27%3E%3Ccircle%20cx%3D%2722%27%20cy%3D%2722%27%20r%3D%2720%27%20fill%3D%27rgba%2820%2C20%2C20%2C0.55%29%27/%3E%3Cpath%20d%3D%27M18%2012%20L28%2022%20L18%2032%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3C/svg%3E") 22 22, e-resize;
+        }
     </style>
 </head>
 <body data-scale="m" data-font="satoshi">
+
+<div class="write-cursor-ellipse" id="writeCursorEllipse" aria-hidden="true"></div>
+<div class="write-cursor-dot" id="writeCursorDot" aria-hidden="true"></div>
+<button class="focus-exit-btn" id="focusExitBtn" type="button" aria-label="Exit focus mode" title="Exit focus (Esc)">×</button>
 
     <!-- ─── TOPBAR ─── -->
     <div class="topbar">
@@ -1321,25 +1484,31 @@
     </div>
 
     <div class="wrap">
-        <!-- ─── COMPOSER ─── -->
+        <!-- ─── COMPOSER (floating, draggable) ─── -->
         <div class="composer" id="composer">
-            <div class="field-row">
-                <div class="field">
-                    <label class="t-micro">Posting as</label>
-                    <select id="c-author-select"></select>
+            <div class="composer-header" id="composerHeader">
+                <span class="composer-title"><span class="grip">⠿⠿</span> New statement</span>
+                <button class="composer-close" id="composerClose" title="Close" aria-label="Close">×</button>
+            </div>
+            <div class="composer-body">
+                <div class="field-row">
+                    <div class="field">
+                        <label class="t-micro">Posting as</label>
+                        <select id="c-author-select"></select>
+                    </div>
+                    <div class="field">
+                        <label class="t-micro">Tag (optional)</label>
+                        <input type="text" id="c-tag" placeholder="OPEN TO WORK / HIRING / BRAND" />
+                    </div>
                 </div>
                 <div class="field">
-                    <label class="t-micro">Tag (optional)</label>
-                    <input type="text" id="c-tag" placeholder="OPEN TO WORK / HIRING / BRAND" />
+                    <label class="t-micro">Media URL (optional — image or .mp4)</label>
+                    <input type="text" id="c-media" placeholder="https://…" />
                 </div>
-            </div>
-            <div class="field">
-                <label class="t-micro">Media URL (optional — image or .mp4)</label>
-                <input type="text" id="c-media" placeholder="https://…" />
-            </div>
-            <div class="field">
-                <label class="t-micro">Statement</label>
-                <textarea id="c-text" placeholder="Open to staff-level product roles."></textarea>
+                <div class="field">
+                    <label class="t-micro">Statement</label>
+                    <textarea id="c-text" placeholder="Open to staff-level product roles."></textarea>
+                </div>
             </div>
             <div class="composer-actions">
                 <button class="btn ghost small" id="c-cancel">Cancel</button>
@@ -1350,6 +1519,8 @@
         <!-- ─── LETTERS CAROUSEL ─── -->
         <div class="letters-viewport" id="lettersViewport">
             <div class="letters-track" id="lettersTrack"></div>
+            <div class="letter-hotspot letter-hotspot-prev" id="letterHotspotPrev" aria-hidden="true" tabindex="-1"></div>
+            <div class="letter-hotspot letter-hotspot-next" id="letterHotspotNext" aria-hidden="true" tabindex="-1"></div>
         </div>
     </div>
 
@@ -1656,6 +1827,20 @@
                 } catch (e) { setSaveStatus('err'); }
                 saveInFlight = false;
             }
+
+            // ── DEV: wipe saved statements and reseed fresh demo content ──
+            // Console: resetDemoContent()
+            // URL, once: yourfile.html?reset-demo
+            async function resetDemoContent() {
+                try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+                authors = seedAuthors();
+                statements = seedStatements(authors);
+                await saveData();
+                activeIndex = 0;
+                renderTrack();
+                console.log('resetDemoContent: reseeded', authors.length, 'authors /', statements.length, 'statements');
+            }
+            window.resetDemoContent = resetDemoContent;
 
             // ── Filters ──────────────────────────────────────────────
             function passesFilters(s) {
@@ -2231,6 +2416,57 @@
                 document.getElementById('c-text').value = '';
             }
 
+            // Drag the composer by its header. Position persists across
+            // close/reopen (same DOM node, inline style just stays put)
+            // and across navigation — dragging never touches .open, so
+            // moving the window doesn't close it or block anything behind it.
+            function setupComposerDrag() {
+                const composer = document.getElementById('composer');
+                const header = document.getElementById('composerHeader');
+                if (!composer || !header) return;
+                let dragging = false,
+                    offsetX = 0,
+                    offsetY = 0;
+
+                header.addEventListener('pointerdown', (e) => {
+                    if (e.target.closest('.composer-close')) return;
+                    const rect = composer.getBoundingClientRect();
+                    composer.style.left = rect.left + 'px';
+                    composer.style.top = rect.top + 'px';
+                    composer.style.right = 'auto';
+                    composer.style.bottom = 'auto';
+                    offsetX = e.clientX - rect.left;
+                    offsetY = e.clientY - rect.top;
+                    dragging = true;
+                    composer.classList.add('dragging');
+                    header.setPointerCapture(e.pointerId);
+                });
+                header.addEventListener('pointermove', (e) => {
+                    if (!dragging) return;
+                    const maxX = Math.max(8, window.innerWidth - composer.offsetWidth - 8);
+                    const maxY = Math.max(8, window.innerHeight - composer.offsetHeight - 8);
+                    const x = Math.min(Math.max(8, e.clientX - offsetX), maxX);
+                    const y = Math.min(Math.max(8, e.clientY - offsetY), maxY);
+                    composer.style.left = x + 'px';
+                    composer.style.top = y + 'px';
+                });
+                const endDrag = () => {
+                    dragging = false;
+                    composer.classList.remove('dragging');
+                };
+                header.addEventListener('pointerup', endDrag);
+                header.addEventListener('pointercancel', endDrag);
+
+                // Keep the window on-screen if the viewport shrinks (e.g. rotation).
+                window.addEventListener('resize', () => {
+                    if (composer.style.left === '' || composer.style.top === '') return;
+                    const maxX = Math.max(8, window.innerWidth - composer.offsetWidth - 8);
+                    const maxY = Math.max(8, window.innerHeight - composer.offsetHeight - 8);
+                    composer.style.left = Math.min(parseFloat(composer.style.left), maxX) + 'px';
+                    composer.style.top = Math.min(parseFloat(composer.style.top), maxY) + 'px';
+                });
+            }
+
             // ── Filter modal ──────────────────────────────────────────
             function openBento() {
                 document.getElementById('bentoOverlay').classList.add('open');
@@ -2304,6 +2540,9 @@
 
                 // Load data
                 await loadData();
+                if (new URLSearchParams(location.search).has('reset-demo')) {
+                    await resetDemoContent();
+                }
 
                 // Letter data
                 letterData = [
@@ -2320,6 +2559,9 @@
                 // Navigation
                 document.getElementById('hudPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
                 document.getElementById('hudNext').addEventListener('click', () => activatePanel(activeIndex + 1));
+                document.getElementById('letterHotspotPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
+                document.getElementById('letterHotspotNext').addEventListener('click', () => activatePanel(activeIndex + 1));
+                document.getElementById('focusExitBtn').addEventListener('click', () => setFocusMode(false));
 
                 // View mode
                 document.getElementById('hudViewList').addEventListener('click', function() {
@@ -2403,6 +2645,8 @@
 
                 // Composer
                 document.getElementById('c-cancel').addEventListener('click', closeComposer);
+                document.getElementById('composerClose').addEventListener('click', closeComposer);
+                setupComposerDrag();
                 document.getElementById('c-post').addEventListener('click', () => {
                     const authorId = document.getElementById('c-author-select').value;
                     const tag = document.getElementById('c-tag').value.trim().toUpperCase();
@@ -2459,6 +2703,79 @@
                 console.error('neverever.land init failed:', err);
               }
             });
+        })();
+
+        // ── custom cursor — dot + inertia ellipse. Suppressed over real
+        // controls (buttons, links, drag handles, form fields) via
+        // body.write-native-cursor so those keep their native affordance.
+        (function initWriteCursor(){
+            const writeCursorDot = document.getElementById('writeCursorDot');
+            const writeCursorEllipse = document.getElementById('writeCursorEllipse');
+            if (!writeCursorDot || !writeCursorEllipse) return;
+
+            const NATIVE_SELECTOR = [
+                'button', 'a', 'input', 'textarea', 'select', 'label',
+                '[contenteditable="true"]', '[role="button"]',
+                '.composer-header'
+            ].join(', ');
+
+            const ELLIPSE_LERP = 0.22;
+            const SPEED_SATURATE = 34;
+            const MAX_STRETCH = 0.6;
+
+            let ptrX = 0, ptrY = 0;
+            let prevFrameX = 0, prevFrameY = 0, frameInit = false;
+            let ellAngle = 0, ellScaleX = 1, ellScaleY = 1;
+            let rafId = null;
+
+            function shortAngleLerp(current, target, factor){
+                const diff = ((target - current + 540) % 360) - 180;
+                return current + diff * factor;
+            }
+
+            function step(){
+                if (!frameInit){ prevFrameX = ptrX; prevFrameY = ptrY; frameInit = true; }
+                const dx = ptrX - prevFrameX;
+                const dy = ptrY - prevFrameY;
+                prevFrameX = ptrX; prevFrameY = ptrY;
+
+                const speed = Math.hypot(dx, dy);
+                const angleTarget = speed > 0.4 ? Math.atan2(dy, dx) * (180 / Math.PI) : ellAngle;
+                const stretch = Math.min(speed / SPEED_SATURATE, 1) * MAX_STRETCH;
+
+                ellAngle = shortAngleLerp(ellAngle, angleTarget, ELLIPSE_LERP);
+                ellScaleX += ((1 + stretch) - ellScaleX) * ELLIPSE_LERP;
+                ellScaleY += ((1 - stretch * 0.45) - ellScaleY) * ELLIPSE_LERP;
+
+                writeCursorEllipse.style.transform =
+                    'translate(' + ptrX + 'px,' + ptrY + 'px) rotate(' + ellAngle + 'deg) scale(' + ellScaleX + ',' + ellScaleY + ')';
+
+                rafId = requestAnimationFrame(step);
+            }
+            function startLoop(){ if (!rafId) rafId = requestAnimationFrame(step); }
+            function stopLoop(){ if (rafId){ cancelAnimationFrame(rafId); rafId = null; } }
+
+            function hideAll(){
+                writeCursorDot.classList.remove('visible');
+                writeCursorEllipse.classList.remove('visible');
+                document.body.classList.remove('write-native-cursor', 'custom-cursor-active');
+                stopLoop();
+            }
+
+            window.addEventListener('mousemove', (e) => {
+                const overNative = !!e.target.closest(NATIVE_SELECTOR);
+                document.body.classList.add('custom-cursor-active');
+                document.body.classList.toggle('write-native-cursor', overNative);
+
+                ptrX = e.clientX; ptrY = e.clientY;
+
+                writeCursorDot.style.transform = 'translate(' + ptrX + 'px,' + ptrY + 'px)';
+                writeCursorDot.classList.add('visible');
+                writeCursorEllipse.classList.add('visible');
+
+                startLoop();
+            });
+            document.addEventListener('mouseleave', hideAll);
         })();
     </script>
 </body>
