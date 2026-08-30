@@ -4,12 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
 
-  
-    <!-- ─── YELLOW BLOCK FAVICON with "NE" and notification dot ─── -->
+    <!-- ─── YELLOW BLOCK FAVICON with "NE" and attention dot ─── -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%23E5E567'/><rect x='6' y='6' width='88' height='88' rx='8' fill='%23F5F557'/><rect x='14' y='14' width='72' height='72' rx='6' fill='%23E5E567'/><text x='50' y='62' font-family='Satoshi, sans-serif' font-size='34' font-weight='700' fill='%231C1C1E' text-anchor='middle' letter-spacing='-2'>NE</text><circle cx='78' cy='20' r='10' fill='%23FF3B30'/><circle cx='78' cy='20' r='5' fill='%23FF6B60'/></svg>" />
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%23E5E567'/><rect x='6' y='6' width='88' height='88' rx='8' fill='%23F5F557'/><rect x='14' y='14' width='72' height='72' rx='6' fill='%23E5E567'/><text x='50' y='62' font-family='Satoshi, sans-serif' font-size='34' font-weight='700' fill='%231C1C1E' text-anchor='middle' letter-spacing='-2'>NE</text><circle cx='78' cy='20' r='10' fill='%23FF3B30'/><circle cx='78' cy='20' r='5' fill='%23FF6B60'/></svg>" />
-    
-
 
     <title>neverever.land · 2026</title>
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@1,2,3,4,5,6,7,8,9&display=swap" rel="stylesheet" />
@@ -42,6 +39,7 @@
             --topbar-height: 56px;
             --hud-height: 64px;
             --hud-top-height: 44px;
+            --scrollbar-height: 3px;
         }
 
         @media (min-width: 640px) {
@@ -72,7 +70,7 @@
             -moz-osx-font-smoothing: grayscale;
             min-height: 100vh;
             min-height: 100dvh;
-            padding-bottom: calc(var(--hud-height) + 20px);
+            padding-bottom: calc(var(--hud-height) + 20px + var(--scrollbar-height));
             transition: font-size 0.2s ease, font-family 0.2s ease;
             overflow-x: hidden;
         }
@@ -227,7 +225,7 @@
         }
         .logo-card-home { width: 100%; }
 
-        /* ── topbar right: appearance + notification ── */
+        /* ── topbar right: appearance + attention ── */
         .topbar-right {
             display: flex;
             align-items: center;
@@ -285,14 +283,14 @@
             .topbar-appearance-dropdown .menu-item { font-size: 7px; padding: 3px 10px; }
         }
 
-        /* ── Notification Bell ── */
-        .notification-wrapper {
+        /* ── Attention ── */
+        .attention-wrapper {
             position: relative;
             display: flex;
             align-items: center;
             cursor: pointer;
         }
-        .notification-btn {
+        .attention-btn {
             background: transparent;
             border: 1px solid var(--border);
             border-radius: 50%;
@@ -307,11 +305,11 @@
             cursor: pointer;
             position: relative;
         }
-        .notification-btn:hover {
+        .attention-btn:hover {
             background: var(--bg);
             border-color: var(--ink-light);
         }
-        .notification-badge {
+        .attention-badge {
             position: absolute;
             top: -4px;
             right: -4px;
@@ -331,9 +329,9 @@
             transition: opacity .2s ease;
             pointer-events: none;
         }
-        .notification-badge.hidden { opacity: 0; transform: scale(0.8); }
+        .attention-badge.hidden { opacity: 0; transform: scale(0.8); }
 
-        .notification-dropdown {
+        .attention-dropdown {
             position: absolute;
             top: calc(100% + 8px);
             right: -8px;
@@ -351,15 +349,15 @@
             scrollbar-width: thin;
             scrollbar-color: var(--ink-lighter) transparent;
         }
-        .notification-dropdown::-webkit-scrollbar {
+        .attention-dropdown::-webkit-scrollbar {
             width: 3px;
         }
-        .notification-dropdown::-webkit-scrollbar-thumb {
+        .attention-dropdown::-webkit-scrollbar-thumb {
             background: var(--ink-lighter);
             border-radius: 4px;
         }
-        .notification-dropdown.open { display: flex; }
-        .notification-dropdown .dropdown-header {
+        .attention-dropdown.open { display: flex; }
+        .attention-dropdown .dropdown-header {
             padding: 6px 14px 4px;
             font-family: var(--font-mono);
             font-size: 7px;
@@ -370,14 +368,14 @@
             margin-bottom: 4px;
             flex-shrink: 0;
         }
-        .notification-dropdown .dropdown-empty {
+        .attention-dropdown .dropdown-empty {
             padding: 20px 14px;
             font-family: var(--font-mono);
             font-size: 8px;
             color: var(--ink-light);
             text-align: center;
         }
-        .notification-item {
+        .attention-item {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -386,9 +384,9 @@
             transition: background .12s ease;
             border-bottom: 1px solid var(--border);
         }
-        .notification-item:last-child { border-bottom: none; }
-        .notification-item:hover { background: var(--bg); }
-        .notification-item .item-avatar {
+        .attention-item:last-child { border-bottom: none; }
+        .attention-item:hover { background: var(--bg); }
+        .attention-item .item-avatar {
             width: 24px;
             height: 24px;
             border-radius: var(--radius-sm);
@@ -404,12 +402,12 @@
             border: 1px solid var(--border);
             flex-shrink: 0;
         }
-        .notification-item .item-avatar.v0 { background: var(--accent); color: var(--ink); border-color: var(--accent); }
-        .notification-item .item-avatar.v1 { background: var(--bg); color: var(--ink); }
-        .notification-item .item-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: var(--accent-2); }
-        .notification-item .item-avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .notification-item .item-avatar.company { position: relative; }
-        .notification-item .item-avatar.company::after {
+        .attention-item .item-avatar.v0 { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+        .attention-item .item-avatar.v1 { background: var(--bg); color: var(--ink); }
+        .attention-item .item-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: var(--accent-2); }
+        .attention-item .item-avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .attention-item .item-avatar.company { position: relative; }
+        .attention-item .item-avatar.company::after {
             content: '';
             position: absolute;
             top: -2px;
@@ -420,11 +418,11 @@
             border: 1px solid var(--card);
             border-radius: 2px;
         }
-        .notification-item .item-info {
+        .attention-item .item-info {
             flex: 1;
             min-width: 0;
         }
-        .notification-item .item-name {
+        .attention-item .item-name {
             font-family: var(--font);
             font-size: calc(var(--fs-body) * 0.8);
             font-weight: 600;
@@ -434,7 +432,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .notification-item .item-type {
+        .attention-item .item-type {
             font-family: var(--font-mono);
             font-size: 6px;
             letter-spacing: 0.06em;
@@ -442,7 +440,7 @@
             color: var(--ink-light);
             margin-left: 4px;
         }
-        .notification-item .item-dismiss {
+        .attention-item .item-dismiss {
             background: none;
             border: none;
             color: var(--ink-light);
@@ -458,18 +456,18 @@
             align-items: center;
             justify-content: center;
         }
-        .notification-item .item-dismiss:hover {
+        .attention-item .item-dismiss:hover {
             color: var(--ink);
             background: var(--bg);
         }
 
         @media (max-width: 480px) {
-            .notification-dropdown {
+            .attention-dropdown {
                 width: 260px;
                 right: -12px;
                 max-height: 280px;
             }
-            .notification-btn { width: 26px; height: 26px; font-size: 12px; }
+            .attention-btn { width: 26px; height: 26px; font-size: 12px; }
         }
 
         /* ── main wrap ── */
@@ -1023,7 +1021,6 @@
             --hud-fs-summary: 9px;
             --hud-maxw-summary: 140px;
             --hud-fs-label: 6px;
-            --hud-fs-position: 8px;
             --hud-minw-position: 36px;
 
             position: fixed;
@@ -1047,7 +1044,7 @@
         .hud:hover { box-shadow: var(--shadow-hover); }
 
         .hud-bottom {
-            bottom: 24px;
+            bottom: calc(12px + var(--scrollbar-height));
             --hud-pad: 10px 18px;
             --hud-gap: 6px;
             --hud-min-h: 56px;
@@ -1064,8 +1061,8 @@
             --hud-maxw-summary: 190px;
             --hud-fs-label: 9px;
         }
-        .hud-top { 
-            top: calc(var(--topbar-height) + 12px); 
+        .hud-top {
+            top: calc(var(--topbar-height) + 12px);
             --hud-btn-pad: 5px 10px;
             --hud-btn-fs: 8px;
         }
@@ -1120,17 +1117,11 @@
             opacity: 0.5;
             margin-right: 2px;
         }
-        .hud .hud-position {
-            font-family: var(--font-mono);
-            font-size: var(--hud-fs-position);
-            color: var(--ink-light);
-            min-width: var(--hud-minw-position);
-            text-align: center;
-        }
+        .hud .hud-position { display: none; }
 
         @media (max-width: 640px) {
             .hud-bottom {
-                bottom: 16px;
+                bottom: calc(10px + var(--scrollbar-height));
                 --hud-pad: 8px 12px;
                 --hud-min-h: 48px;
                 --hud-btn-min-h: 30px;
@@ -1157,8 +1148,6 @@
                 --hud-icon-w: 22px;
                 --hud-icon-fs: 10px;
                 --hud-divider-h: 16px;
-                --hud-fs-position: 7px;
-                --hud-minw-position: 28px;
             }
             .hud { border-radius: var(--radius-sm); }
             .hud .hud-label { display: none; }
@@ -1166,7 +1155,7 @@
 
         @media (max-width: 480px) {
             .hud-bottom {
-                bottom: 12px;
+                bottom: calc(8px + var(--scrollbar-height));
                 --hud-pad: 6px 10px;
                 --hud-gap: 3px;
                 --hud-min-h: 42px;
@@ -1190,11 +1179,37 @@
                 --hud-icon-w: 20px;
                 --hud-icon-fs: 9px;
                 --hud-divider-h: 14px;
-                --hud-fs-position: 6px;
-                --hud-minw-position: 24px;
             }
         }
 
+        /* ── SCROLL PROGRESS BAR ── */
+        .scroll-progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--scrollbar-height);
+            background: rgba(0, 0, 0, 0.06);
+            z-index: 150;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .scroll-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: width 0.1s ease;
+            border-radius: 0 2px 2px 0;
+        }
+        .scroll-progress-fill.dim {
+            opacity: 0.5;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .scroll-progress-bar {
+                background: rgba(255, 255, 255, 0.08);
+            }
+        }
         /* ── Bento Filter Modal ── */
         .bento-overlay {
             position: fixed;
@@ -1525,7 +1540,7 @@
             .letter-row-text { font-size: calc(var(--fs-body) * 0.82); }
         }
         @media (max-width: 540px) {
-            body { padding-bottom: calc(var(--hud-height) + 12px); }
+            body { padding-bottom: calc(var(--hud-height) + 12px + var(--scrollbar-height)); }
             .letters-track {
                 gap: 12px;
                 padding-top: clamp(12px, 2vh, 30px);
@@ -1729,25 +1744,39 @@
             .hud-bottom { margin-bottom: env(safe-area-inset-bottom); }
             .bento-panel { padding-bottom: env(safe-area-inset-bottom); }
             .conversation-modal .modal-card { padding-bottom: env(safe-area-inset-bottom); }
+            .scroll-progress-bar { bottom: env(safe-area-inset-bottom, 0); }
         }
 
         /* ── custom cursor ── */
         body.custom-cursor-active { cursor: none; }
         .write-cursor-dot,
         .write-cursor-ellipse {
-            position: fixed; top: 0; left: 0; z-index: 500; pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 500;
+            pointer-events: none;
             transform: translate(-9999px, -9999px);
-            opacity: 0; transition: opacity .18s ease; will-change: transform;
+            opacity: 0;
+            transition: opacity .18s ease;
+            will-change: transform;
         }
         .write-cursor-dot.visible,
         .write-cursor-ellipse.visible { opacity: 1; }
         .write-cursor-dot {
-            width: 6px; height: 6px; margin: -3px 0 0 -3px;
-            border-radius: 50%; background: var(--ink);
+            width: 6px;
+            height: 6px;
+            margin: -3px 0 0 -3px;
+            border-radius: 50%;
+            background: var(--ink);
         }
         .write-cursor-ellipse {
-            width: 34px; height: 34px; margin: -17px 0 0 -17px;
-            border: 1.5px solid var(--ink); border-radius: 50%; opacity: 0;
+            width: 34px;
+            height: 34px;
+            margin: -17px 0 0 -17px;
+            border: 1.5px solid var(--ink);
+            border-radius: 50%;
+            opacity: 0;
         }
         .write-cursor-ellipse.visible { opacity: .32; }
         body.custom-cursor-active.write-native-cursor { cursor: auto; }
@@ -1756,7 +1785,9 @@
 
         /* ── click hotspots ── */
         .letter-hotspot {
-            position: absolute; top: 0; bottom: 0;
+            position: absolute;
+            top: 0;
+            bottom: 0;
             width: clamp(56px, 9vw, 180px);
             z-index: 20;
         }
@@ -2001,9 +2032,14 @@
 </head>
 <body data-scale="m" data-font="satoshi">
 
-<div class="write-cursor-ellipse" id="writeCursorEllipse" aria-hidden="true"></div>
-<div class="write-cursor-dot" id="writeCursorDot" aria-hidden="true"></div>
-<button class="focus-exit-btn" id="focusExitBtn" type="button" aria-label="Exit focus mode" title="Exit focus (Esc)">×</button>
+    <div class="write-cursor-ellipse" id="writeCursorEllipse" aria-hidden="true"></div>
+    <div class="write-cursor-dot" id="writeCursorDot" aria-hidden="true"></div>
+    <button class="focus-exit-btn" id="focusExitBtn" type="button" aria-label="Exit focus mode" title="Exit focus (Esc)">×</button>
+
+    <!-- ─── SCROLL PROGRESS BAR ─── -->
+    <div class="scroll-progress-bar" id="scrollProgressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="scroll-progress-fill" id="scrollProgressFill"></div>
+    </div>
 
     <!-- ─── TOPBAR ─── -->
     <div class="topbar">
@@ -2017,7 +2053,7 @@
                 </div>
             </div>
 
-            <!-- Right: appearance + notification -->
+            <!-- Right: appearance + attention -->
             <div class="topbar-right">
                 <!-- Appearance -->
                 <div class="topbar-appearance-wrapper">
@@ -2025,15 +2061,15 @@
                     <div class="topbar-appearance-dropdown" id="appearanceDropdown"></div>
                 </div>
 
-                <!-- Notification / Attention -->
-                <div class="notification-wrapper" id="notificationWrapper">
-                    <button class="notification-btn" id="notificationBtn" aria-label="Attention">
+                <!-- Attention -->
+                <div class="attention-wrapper" id="attentionWrapper">
+                    <button class="attention-btn" id="attentionBtn" aria-label="Attention">
                         <span>👁</span>
-                        <span class="notification-badge hidden" id="notificationBadge">0</span>
+                        <span class="attention-badge hidden" id="attentionBadge">0</span>
                     </button>
-                    <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="attention-dropdown" id="attentionDropdown">
                         <div class="dropdown-header">Attention</div>
-                        <div id="notificationList"></div>
+                        <div id="attentionList"></div>
                     </div>
                 </div>
             </div>
@@ -2043,7 +2079,6 @@
     <!-- ─── TOP HUD (navigation + view) ─── -->
     <div class="hud hud-top" id="hudTop">
         <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
-        <span class="hud-position" id="hudPosition">1 / 4</span>
         <button class="btn btn-icon" id="hudNext" title="Next">›</button>
 
         <div class="hud-divider"></div>
@@ -2222,6 +2257,7 @@
             const ATTENTION_KEY = 'neverever-attention-v1';
             const ACTIVITY_KEY = 'neverever-activity-v1';
             const PAGE_SIZE = 12;
+            const MAX_ATTENTION = 20; // cap to enforce curation
             const AVIF_IMAGES = [
                 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?fm=avif&w=800&h=450&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?fm=avif&w=800&h=450&fit=crop&q=80',
@@ -2405,7 +2441,7 @@
             let searchQuery = '';
 
             // ── Rapid Respond State ──────────────────────────────────
-            let rapidTarget = null; // { statementId, authorId, authorName }
+            let rapidTarget = null;
 
             // ── Attention ─────────────────────────────────────────────
             let attentionItems = [];
@@ -2428,7 +2464,7 @@
                 try {
                     localStorage.setItem(ATTENTION_KEY, JSON.stringify(attentionItems));
                 } catch (e) {}
-                renderAttentionBadgeAndList();
+                renderAttention();
             }
 
             function isInAttention(objectType, objectId) {
@@ -2437,6 +2473,12 @@
             }
 
             function addAttention(objectType, objectId) {
+                // Enforce cap: max 20 active attention items
+                const activeItems = attentionItems.filter(item => item.active !== false);
+                if (activeItems.length >= MAX_ATTENTION) {
+                    alert(`Attention cap reached (${MAX_ATTENTION}). Please remove some items first.`);
+                    return false;
+                }
                 attentionItems = attentionItems.filter(item => !(item.objectType === objectType && item.objectId ===
                     objectId));
                 attentionItems.unshift({
@@ -2448,6 +2490,7 @@
                     active: true
                 });
                 saveAttention();
+                return true;
             }
 
             function removeAttention(objectType, objectId) {
@@ -2461,8 +2504,7 @@
                     removeAttention(objectType, objectId);
                     return false;
                 } else {
-                    addAttention(objectType, objectId);
-                    return true;
+                    return addAttention(objectType, objectId);
                 }
             }
 
@@ -2473,9 +2515,9 @@
                 return null;
             }
 
-            function renderAttentionBadgeAndList() {
-                const badge = document.getElementById('notificationBadge');
-                const list = document.getElementById('notificationList');
+            function renderAttention() {
+                const badge = document.getElementById('attentionBadge');
+                const list = document.getElementById('attentionList');
                 if (!badge || !list) return;
 
                 const activeItems = attentionItems.filter(item => item.active !== false);
@@ -2496,7 +2538,7 @@
                     const typeLabel = item.objectType === 'person' ? 'person' : 'company';
                     const initials = initialsFor(obj);
                     return `
-                        <div class="notification-item" data-type="${item.objectType}" data-id="${item.objectId}">
+                        <div class="attention-item" data-type="${item.objectType}" data-id="${item.objectId}">
                             <div class="item-avatar ${varClass}${obj.kind === 'company' ? ' company' : ''}">${escapeHtml(initials)}</div>
                             <div class="item-info">
                                 <span class="item-name">${escapeHtml(obj.name)}</span>
@@ -2507,13 +2549,13 @@
                     `;
                 }).join('');
 
-                list.querySelectorAll('.notification-item').forEach(el => {
+                list.querySelectorAll('.attention-item').forEach(el => {
                     el.addEventListener('click', (e) => {
                         if (e.target.closest('.item-dismiss')) return;
                         const type = el.dataset.type;
                         const id = el.dataset.id;
                         openProfileModal(type, id);
-                        document.getElementById('notificationDropdown').classList.remove('open');
+                        document.getElementById('attentionDropdown').classList.remove('open');
                     });
                     const dismiss = el.querySelector('.item-dismiss');
                     if (dismiss) {
@@ -2570,7 +2612,7 @@
                         const nowIn = toggleAttention(objectType, objectId);
                         saveBtn.textContent = nowIn ? 'SAVED' : 'SAVE PROFILE';
                         saveBtn.classList.toggle('active', nowIn);
-                        renderAttentionBadgeAndList();
+                        renderAttention();
                     });
                 }
 
@@ -2643,7 +2685,7 @@
                 renderActivityLog();
                 activeIndex = 0;
                 renderTrack();
-                renderAttentionBadgeAndList();
+                renderAttention();
                 console.log('resetDemoContent: reseeded', authors.length, 'authors /', statements.length, 'statements');
             }
             window.resetDemoContent = resetDemoContent;
@@ -2670,10 +2712,33 @@
                 if (el) el.textContent = String(activityLog.length);
             }
 
+            // ── Performance: batched activity logging ──────────────
+            let logQueue = [];
+            let logScheduled = false;
+
+            function enqueueLog(entry) {
+                logQueue.push(entry);
+                if (!logScheduled) {
+                    logScheduled = true;
+                    requestIdleCallback(() => {
+                        if (logQueue.length) {
+                            activityLog.unshift(...logQueue);
+                            if (activityLog.length > 300) activityLog.length = 300;
+                            saveActivityLog();
+                            updateActivityCount();
+                            if (document.getElementById('activityOverlay')?.classList.contains('open'))
+                                renderActivityLog();
+                        }
+                        logQueue = [];
+                        logScheduled = false;
+                    }, { timeout: 200 });
+                }
+            }
+
             function logActivity(type, statementId, extra) {
                 const s = statements.find(st => st.id === statementId);
                 const a = s ? authorById(s.authorId) : null;
-                activityLog.unshift({
+                enqueueLog({
                     id: uid(),
                     type,
                     statementId,
@@ -2683,10 +2748,6 @@
                     snippet: s ? s.text : '',
                     ...(extra || {})
                 });
-                if (activityLog.length > 300) activityLog.length = 300;
-                saveActivityLog();
-                updateActivityCount();
-                if (document.getElementById('activityOverlay')?.classList.contains('open')) renderActivityLog();
             }
 
             function fmtAgo(ts) {
@@ -2726,22 +2787,62 @@
                 document.getElementById('activityOverlay').classList.remove('open');
             }
 
-            // ── Interaction tracking ──────────────────────────────────
-            function wireInteractionTracking(el, s) {
-                let hoverStart = null;
-                el.addEventListener('mouseenter', () => { hoverStart = Date.now(); });
-                el.addEventListener('mouseleave', () => {
-                    if (hoverStart == null) return;
-                    const dwell = Date.now() - hoverStart;
-                    hoverStart = null;
-                    if (dwell >= 250) logActivity('hover', s.id, { durationMs: dwell });
-                });
-                el.addEventListener('click', () => openConversation(s.id));
-                el.addEventListener('contextmenu', (e) => {
+            // ── Delegated event handling for interactions ────────────
+            const hoverStartMap = new Map();
+
+            function setupDelegatedEvents() {
+                // Use capturing phase to catch events early
+                document.addEventListener('pointerenter', (e) => {
+                    const item = e.target.closest('[data-statement-id]');
+                    if (!item) return;
+                    // Only track if inside active panel
+                    const panel = item.closest('.letter-panel.active');
+                    if (!panel) return;
+                    const sid = item.dataset.statementId;
+                    if (!sid) return;
+                    // Avoid re-entering same item
+                    if (hoverStartMap.has(sid)) return;
+                    hoverStartMap.set(sid, Date.now());
+                }, true);
+
+                document.addEventListener('pointerleave', (e) => {
+                    const item = e.target.closest('[data-statement-id]');
+                    if (!item) return;
+                    const panel = item.closest('.letter-panel.active');
+                    if (!panel) return;
+                    const sid = item.dataset.statementId;
+                    if (!sid) return;
+                    const start = hoverStartMap.get(sid);
+                    if (start == null) return;
+                    hoverStartMap.delete(sid);
+                    const dwell = Date.now() - start;
+                    if (dwell >= 250) {
+                        logActivity('hover', sid, { durationMs: dwell });
+                    }
+                }, true);
+
+                document.addEventListener('click', (e) => {
+                    const item = e.target.closest('[data-statement-id]');
+                    if (!item) return;
+                    const panel = item.closest('.letter-panel.active');
+                    if (!panel) return;
+                    const sid = item.dataset.statementId;
+                    if (!sid) return;
+                    e.preventDefault();
+                    openConversation(sid);
+                }, true);
+
+                document.addEventListener('contextmenu', (e) => {
+                    const item = e.target.closest('[data-statement-id]');
+                    if (!item) return;
+                    const panel = item.closest('.letter-panel.active');
+                    if (!panel) return;
+                    const sid = item.dataset.statementId;
+                    if (!sid) return;
                     e.preventDefault();
                     e.stopPropagation();
-                    openRapidRespond(s.id, e.clientX, e.clientY);
-                });
+                    openRapidRespond(sid, e.clientX, e.clientY);
+                }, true);
             }
 
             // ── Rapid Respond ─────────────────────────────────────────
@@ -2759,7 +2860,6 @@
                 const textarea = document.getElementById('rapidText');
                 const preview = document.getElementById('rapidBubblePreview');
 
-                // Position the bubble
                 const padding = 16;
                 let left = Math.min(x + 8, window.innerWidth - el.offsetWidth - padding);
                 let top = Math.min(y - 20, window.innerHeight - el.offsetHeight - padding);
@@ -2768,21 +2868,18 @@
                 el.style.left = left + 'px';
                 el.style.top = top + 'px';
 
-                // Set avatar and name
                 const varClass = avatarVariant(a.id);
                 const isCompany = a.kind === 'company';
                 avatar.className = `avatar sz-sm ${varClass}${isCompany ? ' company' : ''}`;
                 avatar.textContent = initialsFor(a);
                 name.textContent = a.name;
 
-                // Clear and focus
                 textarea.value = '';
                 preview.textContent = '';
                 preview.classList.remove('has-text');
                 el.classList.add('open');
                 textarea.focus();
 
-                // Update preview on input
                 textarea.oninput = function() {
                     const val = this.value.trim();
                     if (val) {
@@ -2792,12 +2889,10 @@
                         preview.textContent = '';
                         preview.classList.remove('has-text');
                     }
-                    // Auto-resize
                     this.style.height = 'auto';
                     this.style.height = Math.min(this.scrollHeight, 120) + 'px';
                 };
 
-                // Send on Enter (Shift+Enter for newline)
                 textarea.onkeydown = function(e) {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -2820,7 +2915,6 @@
                 const s = statements.find(st => st.id === rapidTarget.statementId);
                 if (!s) return;
 
-                // Pick a random author to reply as (for demo)
                 const replyAuthor = authors[Math.floor(Math.random() * authors.length)];
 
                 s.replies.push({
@@ -2835,7 +2929,6 @@
                 renderLetter(activeIndex);
                 logActivity('respond', rapidTarget.statementId, { rapid: true });
 
-                // Update modal if open
                 if (modalStatementId === rapidTarget.statementId) {
                     renderModalContent(modalStatementId);
                 }
@@ -2959,7 +3052,6 @@
                         }
                     });
                 }
-                // Context menu for rapid reply on node
                 wrap.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -3089,7 +3181,6 @@
 
                 container.innerHTML = html;
 
-                // Context menu on statement for rapid reply
                 const stmtEl = container.querySelector('.modal-statement');
                 if (stmtEl) {
                     stmtEl.addEventListener('contextmenu', (e) => {
@@ -3158,6 +3249,7 @@
                 const card = document.createElement('div');
                 card.className = ['card', variant, spans].filter(Boolean).join(' ');
                 card.style.animationDelay = (Math.random() * 0.2) + 's';
+                card.dataset.statementId = s.id;
 
                 const isDark = variant.includes('dark') || variant.includes('mid');
                 const textColor = isDark ? '#fff' : 'var(--ink)';
@@ -3210,7 +3302,7 @@
                     });
                 }
 
-                wireInteractionTracking(card, s);
+                // No per-element wireInteractionTracking needed — delegated events handle it
                 return card;
             }
 
@@ -3220,6 +3312,7 @@
                 const row = document.createElement('div');
                 row.className = 'letter-row';
                 row.dataset.id = s.id;
+                row.dataset.statementId = s.id;
 
                 const avatarStr = avatarHtml(s.authorId, 'sm', true);
 
@@ -3265,7 +3358,6 @@
                     });
                 }
 
-                wireInteractionTracking(row, s);
                 return row;
             }
 
@@ -3274,6 +3366,7 @@
                 const item = document.createElement('div');
                 item.className = 'grid-item';
                 item.dataset.id = s.id;
+                item.dataset.statementId = s.id;
 
                 const avatarStr = avatarHtml(s.authorId, 'sm', true);
 
@@ -3318,7 +3411,6 @@
                     });
                 }
 
-                wireInteractionTracking(item, s);
                 return item;
             }
 
@@ -3420,7 +3512,6 @@
                 frame.appendChild(content);
 
                 document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
-                document.getElementById('hudPosition').textContent = (index + 1) + ' / ' + letterData.length;
                 updateFilterUI();
 
                 ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach(id => {
@@ -3428,6 +3519,32 @@
                     if (btn) btn.classList.toggle('active', id === 'hudView' + mode.charAt(0).toUpperCase() + mode
                         .slice(1));
                 });
+
+                updateProgressBar();
+            }
+
+            // ── Scroll Progress Bar ──────────────────────────────────
+            function updateProgressBar() {
+                const fill = document.getElementById('scrollProgressFill');
+                const track = document.getElementById('lettersTrack');
+                if (!fill || !track) return;
+
+                const total = letterData.length;
+                if (total <= 1) {
+                    fill.style.width = '0%';
+                    fill.classList.add('dim');
+                    return;
+                }
+
+                const progress = activeIndex / (total - 1);
+                const percent = Math.round(progress * 100);
+                fill.style.width = percent + '%';
+                fill.classList.remove('dim');
+
+                const bar = document.getElementById('scrollProgressBar');
+                if (bar) {
+                    bar.setAttribute('aria-valuenow', String(percent));
+                }
             }
 
             // ── Letter panel building ────────────────────────────────
@@ -3505,12 +3622,14 @@
                 track.innerHTML = '';
                 letterData.forEach((data, i) => track.appendChild(buildLetterPanel(i, data)));
                 renderLetter(0);
+                updateProgressBar();
             }
 
             function activatePanel(newIndex) {
                 if (newIndex < 0) newIndex = letterData.length - 1;
                 if (newIndex >= letterData.length) newIndex = 0;
-                if (newIndex === activeIndex) { scrollToPanel(newIndex); return; }
+                if (newIndex === activeIndex) { scrollToPanel(newIndex);
+                    updateProgressBar(); return; }
 
                 const panels = document.querySelectorAll('.letter-panel');
                 panels.forEach(p => p.classList.remove('active'));
@@ -3518,6 +3637,7 @@
                 panels[activeIndex].classList.add('active');
                 renderLetter(activeIndex);
                 scrollToPanel(activeIndex);
+                updateProgressBar();
             }
 
             function scrollToPanel(index) {
@@ -3726,20 +3846,20 @@
                 });
             }
 
-            // ── Notification dropdown toggle ─────────────────────────
-            function setupNotificationToggle() {
-                const btn = document.getElementById('notificationBtn');
-                const dropdown = document.getElementById('notificationDropdown');
-                const wrapper = document.getElementById('notificationWrapper');
+            // ── Attention dropdown toggle ──────────────────────────
+            function setupAttentionToggle() {
+                const btn = document.getElementById('attentionBtn');
+                const dropdown = document.getElementById('attentionDropdown');
+                const wrapper = document.getElementById('attentionWrapper');
 
                 if (!btn || !dropdown || !wrapper) return;
 
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const isOpen = dropdown.classList.contains('open');
-                    document.querySelectorAll('.notification-dropdown.open').forEach(d => d.classList.remove('open'));
+                    document.querySelectorAll('.attention-dropdown.open').forEach(d => d.classList.remove('open'));
                     if (!isOpen) {
-                        renderAttentionBadgeAndList();
+                        renderAttention();
                         dropdown.classList.add('open');
                     } else {
                         dropdown.classList.remove('open');
@@ -3759,11 +3879,10 @@
 
             document.addEventListener('DOMContentLoaded', async function() {
                 try {
-                    // Setup appearance dropdown
                     setupAppearanceDropdown();
-                    setupNotificationToggle();
+                    setupAttentionToggle();
+                    setupDelegatedEvents(); // single-pass delegation for all interactions
 
-                    // Load data
                     await loadData();
                     loadAttention();
                     loadActivity();
@@ -3780,7 +3899,7 @@
                     ];
 
                     renderTrack();
-                    renderAttentionBadgeAndList();
+                    renderAttention();
 
                     // ─── HUD controls ─────────────────────────────────────
                     document.getElementById('hudPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
@@ -3829,6 +3948,9 @@
                                 activeIndex = best;
                                 panels[best].classList.add('active');
                                 renderLetter(activeIndex);
+                                updateProgressBar();
+                            } else {
+                                updateProgressBar();
                             }
                         }, 150);
                     }, { passive: true });
@@ -3871,7 +3993,7 @@
                                 closeBento();
                             if (document.getElementById('activityOverlay').classList.contains('open'))
                                 closeActivity();
-                            document.getElementById('notificationDropdown').classList.remove('open');
+                            document.getElementById('attentionDropdown').classList.remove('open');
                             closeRapidRespond();
                         }
                     });
@@ -3914,6 +4036,7 @@
 
                     const logoTile = document.getElementById('logoTile');
                     const logoReset = document.getElementById('logoReset');
+
                     function setLogoOpen(open) {
                         logoTile.classList.toggle('open', open);
                         logoTile.setAttribute('aria-expanded', String(open));
@@ -3979,9 +4102,9 @@
                         if (e.key === 'Escape') closeRapidRespond();
                     });
 
-                    // Clicking on rapid textarea should not close it
                     document.getElementById('rapidText').addEventListener('click', (e) => e.stopPropagation());
 
+                    setTimeout(updateProgressBar, 100);
                     renderLetter(0);
                 } catch (err) {
                     console.error('neverever.land init failed:', err);
@@ -3990,7 +4113,7 @@
         })();
 
         // ── custom cursor ─────────────────────────────────────────────
-        (function initWriteCursor(){
+        (function initWriteCursor() {
             const writeCursorDot = document.getElementById('writeCursorDot');
             const writeCursorEllipse = document.getElementById('writeCursorEllipse');
             if (!writeCursorDot || !writeCursorEllipse) return;
@@ -4005,21 +4128,29 @@
             const SPEED_SATURATE = 34;
             const MAX_STRETCH = 0.6;
 
-            let ptrX = 0, ptrY = 0;
-            let prevFrameX = 0, prevFrameY = 0, frameInit = false;
-            let ellAngle = 0, ellScaleX = 1, ellScaleY = 1;
+            let ptrX = 0,
+                ptrY = 0;
+            let prevFrameX = 0,
+                prevFrameY = 0,
+                frameInit = false;
+            let ellAngle = 0,
+                ellScaleX = 1,
+                ellScaleY = 1;
             let rafId = null;
 
-            function shortAngleLerp(current, target, factor){
+            function shortAngleLerp(current, target, factor) {
                 const diff = ((target - current + 540) % 360) - 180;
                 return current + diff * factor;
             }
 
-            function step(){
-                if (!frameInit){ prevFrameX = ptrX; prevFrameY = ptrY; frameInit = true; }
+            function step() {
+                if (!frameInit) { prevFrameX = ptrX;
+                    prevFrameY = ptrY;
+                    frameInit = true; }
                 const dx = ptrX - prevFrameX;
                 const dy = ptrY - prevFrameY;
-                prevFrameX = ptrX; prevFrameY = ptrY;
+                prevFrameX = ptrX;
+                prevFrameY = ptrY;
 
                 const speed = Math.hypot(dx, dy);
                 const angleTarget = speed > 0.4 ? Math.atan2(dy, dx) * (180 / Math.PI) : ellAngle;
@@ -4030,14 +4161,18 @@
                 ellScaleY += ((1 - stretch * 0.45) - ellScaleY) * ELLIPSE_LERP;
 
                 writeCursorEllipse.style.transform =
-                    'translate(' + ptrX + 'px,' + ptrY + 'px) rotate(' + ellAngle + 'deg) scale(' + ellScaleX + ',' + ellScaleY + ')';
+                    'translate(' + ptrX + 'px,' + ptrY + 'px) rotate(' + ellAngle + 'deg) scale(' + ellScaleX + ',' +
+                    ellScaleY + ')';
 
                 rafId = requestAnimationFrame(step);
             }
-            function startLoop(){ if (!rafId) rafId = requestAnimationFrame(step); }
-            function stopLoop(){ if (rafId){ cancelAnimationFrame(rafId); rafId = null; } }
 
-            function hideAll(){
+            function startLoop() { if (!rafId) rafId = requestAnimationFrame(step); }
+
+            function stopLoop() { if (rafId) { cancelAnimationFrame(rafId);
+                    rafId = null; } }
+
+            function hideAll() {
                 writeCursorDot.classList.remove('visible');
                 writeCursorEllipse.classList.remove('visible');
                 document.body.classList.remove('write-native-cursor', 'custom-cursor-active');
@@ -4049,7 +4184,8 @@
                 document.body.classList.add('custom-cursor-active');
                 document.body.classList.toggle('write-native-cursor', overNative);
 
-                ptrX = e.clientX; ptrY = e.clientY;
+                ptrX = e.clientX;
+                ptrY = e.clientY;
 
                 writeCursorDot.style.transform = 'translate(' + ptrX + 'px,' + ptrY + 'px)';
                 writeCursorDot.classList.add('visible');
