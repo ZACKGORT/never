@@ -221,174 +221,6 @@
             white-space: nowrap;
         }
 
-        /* ── topbar right: appearance controls + profile ── */
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-        .topbar-appearance {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            background: rgba(255,255,255,0.5);
-            padding: 2px 6px 2px 8px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-        }
-        .topbar-appearance .font-select {
-            background: transparent;
-            border: none;
-            color: var(--ink-mid);
-            font-family: var(--font-mono);
-            font-size: 7px;
-            padding: 2px 0;
-            cursor: pointer;
-            outline: none;
-            max-width: 54px;
-            font-weight: 500;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        .topbar-appearance .scale-group {
-            display: flex;
-            gap: 1px;
-            margin-left: 2px;
-        }
-        .topbar-appearance .scale-group .chip {
-            border: none;
-            padding: 1px 4px;
-            font-size: 6px;
-            color: var(--ink-light);
-            background: transparent;
-            border-radius: 2px;
-            cursor: pointer;
-            font-family: var(--font-mono);
-            letter-spacing: 0.04em;
-            font-weight: 500;
-            touch-action: manipulation;
-            min-height: 16px;
-            line-height: 1.2;
-        }
-        .topbar-appearance .scale-group .chip.active { background: var(--ink); color: var(--card); }
-        .topbar-appearance .scale-group .chip:hover { color: var(--ink); }
-
-        .topbar-appearance .divider {
-            width: 1px;
-            height: 14px;
-            background: var(--border);
-            margin: 0 2px;
-        }
-
-        /* ── profile avatar + dropdown ── */
-        .profile-tile {
-            position: relative;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .profile-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: var(--ink);
-            color: var(--card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font);
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            border: 1.5px solid var(--border);
-            transition: border-color .2s ease, transform .2s ease;
-        }
-        .profile-tile:hover .profile-avatar,
-        .profile-tile.open .profile-avatar {
-            border-color: var(--ink);
-            transform: scale(1.04);
-        }
-
-        .profile-menu {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            width: 160px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-floating);
-            padding: 6px 0;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-4px) scale(0.98);
-            transform-origin: top right;
-            transition: opacity .2s ease, transform .22s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility .2s;
-            z-index: 60;
-            pointer-events: none;
-        }
-        .profile-tile:hover .profile-menu,
-        .profile-tile:focus-within .profile-menu,
-        .profile-tile.open .profile-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
-        .profile-menu-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            font-family: var(--font-mono);
-            font-size: 7px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--ink-mid);
-            text-decoration: none;
-            cursor: pointer;
-            transition: background .12s ease, color .12s ease;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-        }
-        .profile-menu-item:hover {
-            background: var(--bg);
-            color: var(--ink);
-        }
-        .profile-menu-item .icon {
-            font-size: 11px;
-            opacity: 0.6;
-            width: 18px;
-            text-align: center;
-        }
-        .profile-menu-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 4px 12px;
-        }
-
-        @media (max-width: 640px) {
-            .topbar-appearance .font-select { max-width: 40px; font-size: 6px; }
-            .topbar-appearance .scale-group .chip { font-size: 5px; padding: 1px 3px; }
-            .topbar-appearance { padding: 2px 4px 2px 6px; }
-            .profile-avatar { width: 26px; height: 26px; font-size: 9px; }
-            .profile-menu { width: 140px; right: -4px; }
-            .profile-menu-item { font-size: 6px; padding: 5px 12px; }
-            .topbar-right { gap: 4px; }
-        }
-        @media (max-width: 480px) {
-            .topbar-appearance .font-select { max-width: 32px; font-size: 5px; }
-            .topbar-appearance .scale-group .chip { font-size: 4px; padding: 0 2px; }
-            .topbar-appearance { padding: 1px 3px 1px 5px; gap: 1px; }
-            .profile-avatar { width: 22px; height: 22px; font-size: 8px; }
-            .profile-menu { width: 120px; right: -6px; }
-            .profile-menu-item { font-size: 5px; padding: 4px 10px; }
-            .topbar-right { gap: 2px; }
-            .wordmark { font-size: clamp(9px, 2.5vw, 12px); }
-        }
-
         /* ── main wrap ── */
         .wrap {
             max-width: var(--max-width);
@@ -932,6 +764,10 @@
             --hud-fs-label: 6px;
             --hud-fs-position: 8px;
             --hud-minw-position: 36px;
+            --hud-fs-select: 7px;
+            --hud-maxw-select: 54px;
+            --hud-fs-chip: 6px;
+            --hud-pad-chip: 2px 4px;
 
             position: fixed;
             left: 50%;
@@ -970,10 +806,12 @@
             --hud-fs-summary: 12px;
             --hud-maxw-summary: 190px;
             --hud-fs-label: 9px;
-            --hud-fs-position: 8px;
-            --hud-minw-position: 36px;
         }
-        .hud-top { top: calc(var(--topbar-height) + 12px); }
+        .hud-top { 
+            top: calc(var(--topbar-height) + 12px); 
+            --hud-btn-pad: 5px 10px;
+            --hud-btn-fs: 8px;
+        }
 
         .hud-divider {
             width: 1px;
@@ -1033,6 +871,46 @@
             text-align: center;
         }
 
+        /* Appearance controls — now in top hud */
+        .hud .hud-appearance {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .hud .font-select {
+            background: transparent;
+            border: none;
+            color: var(--ink-mid);
+            font-family: var(--font-mono);
+            font-size: var(--hud-fs-select);
+            padding: 4px 0;
+            cursor: pointer;
+            outline: none;
+            max-width: var(--hud-maxw-select);
+            font-weight: 500;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .hud .scale-group {
+            display: flex;
+            gap: 1px;
+        }
+        .hud .scale-group .chip {
+            border: none;
+            padding: var(--hud-pad-chip);
+            font-size: var(--hud-fs-chip);
+            color: var(--ink-light);
+            background: transparent;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            letter-spacing: 0.04em;
+            font-weight: 500;
+            touch-action: manipulation;
+        }
+        .hud .scale-group .chip.active { background: var(--ink); color: var(--card); }
+        .hud .scale-group .chip:hover { color: var(--ink); }
+
         @media (max-width: 640px) {
             .hud-bottom {
                 bottom: 16px;
@@ -1054,16 +932,20 @@
             .hud-top {
                 top: calc(var(--topbar-height) + 8px);
                 --hud-pad: 4px 8px;
-                --hud-gap: 2px;
+                --hud-gap: 3px;
                 --hud-min-h: 38px;
                 --hud-btn-min-h: 22px;
-                --hud-btn-pad: 2px 6px;
-                --hud-btn-fs: 6px;
+                --hud-btn-pad: 4px 8px;
+                --hud-btn-fs: 7px;
                 --hud-icon-w: 22px;
                 --hud-icon-fs: 10px;
                 --hud-divider-h: 16px;
                 --hud-fs-position: 7px;
                 --hud-minw-position: 28px;
+                --hud-fs-select: 7px;
+                --hud-maxw-select: 44px;
+                --hud-fs-chip: 6px;
+                --hud-pad-chip: 2px 4px;
             }
             .hud { border-radius: var(--radius-sm); }
             .hud .hud-label { display: none; }
@@ -1087,16 +969,20 @@
             .hud-top {
                 top: calc(var(--topbar-height) + 6px);
                 --hud-pad: 3px 6px;
-                --hud-gap: 1px;
+                --hud-gap: 2px;
                 --hud-min-h: 34px;
                 --hud-btn-min-h: 20px;
-                --hud-btn-pad: 2px 5px;
-                --hud-btn-fs: 5px;
+                --hud-btn-pad: 3px 6px;
+                --hud-btn-fs: 6px;
                 --hud-icon-w: 20px;
                 --hud-icon-fs: 9px;
                 --hud-divider-h: 14px;
                 --hud-fs-position: 6px;
                 --hud-minw-position: 24px;
+                --hud-fs-select: 6px;
+                --hud-maxw-select: 36px;
+                --hud-fs-chip: 5px;
+                --hud-pad-chip: 1px 3px;
             }
         }
 
@@ -1630,11 +1516,11 @@
             .conversation-modal .modal-card { padding-bottom: env(safe-area-inset-bottom); }
         }
 
-        /* ── custom cursor — now at z-index: 450 to stay above overlays (400) ── */
+        /* ── custom cursor ── */
         body.custom-cursor-active { cursor: none; }
         .write-cursor-dot,
         .write-cursor-ellipse {
-            position: fixed; top: 0; left: 0; z-index: 450; pointer-events: none;
+            position: fixed; top: 0; left: 0; z-index: 400; pointer-events: none;
             transform: translate(-9999px, -9999px);
             opacity: 0; transition: opacity .18s ease; will-change: transform;
         }
@@ -1678,7 +1564,6 @@
     <!-- ─── TOPBAR ─── -->
     <div class="topbar">
         <div class="wrap">
-            <!-- Left: brand -->
             <div class="logo-tile" id="logoTile" tabindex="0" aria-haspopup="true" aria-expanded="false">
                 <div class="wordmark">NEVEREVER.LAND <span class="count t-data" id="topCount"></span> <span class="save-status" id="saveStatus"></span></div>
                 <div class="logo-card" id="logoCard">
@@ -1687,52 +1572,29 @@
                     <button class="btn small logo-card-home" id="logoReset" type="button">↺ Reset demo</button>
                 </div>
             </div>
-
-            <!-- Right: appearance controls + profile -->
-            <div class="topbar-right">
-                <!-- Appearance -->
-                <div class="topbar-appearance">
-                    <select class="font-select" id="fontSelectTop">
-                        <option value="satoshi">Sat</option>
-                        <option value="inter">Int</option>
-                        <option value="serif">Ser</option>
-                        <option value="mono">Mon</option>
-                    </select>
-                    <span class="divider"></span>
-                    <div class="scale-group" id="scaleGroupTop">
-                        <button class="chip" data-scale="s">S</button>
-                        <button class="chip active" data-scale="m">M</button>
-                        <button class="chip" data-scale="l">L</button>
-                        <button class="chip" data-scale="xl">XL</button>
-                        <button class="chip" data-scale="xxl">XXL</button>
-                    </div>
-                </div>
-
-                <!-- Profile -->
-                <div class="profile-tile" id="profileTile" tabindex="0" aria-haspopup="true" aria-expanded="false">
-                    <div class="profile-avatar">U</div>
-                    <div class="profile-menu" id="profileMenu">
-                        <button class="profile-menu-item" data-action="profile"><span class="icon">◇</span> Profile</button>
-                        <button class="profile-menu-item" data-action="settings"><span class="icon">⚙</span> Settings</button>
-                        <div class="profile-menu-divider"></div>
-                        <button class="profile-menu-item" data-action="activity"><span class="icon">▦</span> Activity Log</button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- ─── TOP HUD (navigation + create) ─── -->
+    <!-- ─── TOP HUD (navigation + view + font/scale) ─── -->
     <div class="hud hud-top" id="hudTop">
         <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
         <span class="hud-position" id="hudPosition">1 / 4</span>
         <button class="btn btn-icon" id="hudNext" title="Next">›</button>
+
         <div class="hud-divider"></div>
-        <button class="btn btn-primary" id="hudNew">+ New</button>
+
+        <span class="hud-label">View</span>
+        <button class="btn active" id="hudViewList">List</button>
+        <button class="btn" id="hudViewGrid">Grid</button>
+        <button class="btn" id="hudViewBento">Bento</button>
+
+   
+
+
     </div>
 
     <div class="wrap">
-        <!-- ─── COMPOSER ─── -->
+        <!-- ─── COMPOSER (floating, draggable) ─── -->
         <div class="composer" id="composer">
             <div class="composer-header" id="composerHeader">
                 <span class="composer-title"><span class="grip">⠿⠿</span> New statement</span>
@@ -1772,24 +1634,31 @@
         </div>
     </div>
 
-    <!-- ─── BOTTOM HUD ─── -->
+    <!-- ─── BOTTOM HUD (filters + activity + new) ─── -->
     <div class="hud hud-bottom" id="hud">
+        <!-- Filter -->
         <button class="btn" id="filterToggleBtn">
             <span>Filters</span>
             <span class="filter-count" id="filterCount">0</span>
         </button>
         <button class="btn ghost" id="hudClear" hidden>Clear</button>
+
         <div class="hud-divider"></div>
+
+        <!-- Activity -->
         <button class="btn" id="activityToggleBtn">
             <span>Activity</span>
             <span class="filter-count" id="activityCount">0</span>
         </button>
+
         <div class="hud-divider"></div>
-        <span class="hud-label">View</span>
-        <button class="btn active" id="hudViewList">List</button>
-        <button class="btn" id="hudViewGrid">Grid</button>
-        <button class="btn" id="hudViewBento">Bento</button>
+
+        <!-- New -->
+        <button class="btn btn-primary" id="hudNew">+ New</button>
+
         <div class="hud-divider"></div>
+
+        <!-- Summary -->
         <span class="filter-summary" id="activeFilterSummary">No filters active</span>
     </div>
 
@@ -1847,7 +1716,7 @@
                 <h4>Filter</h4>
                 <div class="chip-group" id="activityFilterChips">
                     <button class="chip active" data-atype="all">All</button>
-                    <button class="chip" data-atype="hover">Hovered (3s+)</button>
+                    <button class="chip" data-atype="hover">Hovered</button>
                     <button class="chip" data-atype="click">Clicked</button>
                     <button class="chip" data-atype="abandon">Abandoned</button>
                     <button class="chip" data-atype="respond">Responded</button>
@@ -1868,7 +1737,6 @@
             const STORAGE_KEY = 'neverever-statements-v9';
             const ACTIVITY_KEY = 'neverever-activity-v1';
             const PAGE_SIZE = 12;
-            const HOVER_THRESHOLD_MS = 3500; // deliberate hover: 3.5 seconds
             const AVIF_IMAGES = [
                 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?fm=avif&w=800&h=450&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?fm=avif&w=800&h=450&fit=crop&q=80',
@@ -2104,7 +1972,7 @@
             // ── Activity log ────────────────────────────────────────
             let activityLog = [];
             let activityFilter = 'all';
-            const ACTIVITY_LABELS = { hover: 'HOVERED (3s+)', click: 'CLICKED', abandon: 'ABANDONED', respond: 'RESPONDED' };
+            const ACTIVITY_LABELS = { hover: 'HOVERED', click: 'CLICKED', abandon: 'ABANDONED', respond: 'RESPONDED' };
 
             function loadActivity() {
                 try {
@@ -2186,10 +2054,7 @@
                     if (hoverStart == null) return;
                     const dwell = Date.now() - hoverStart;
                     hoverStart = null;
-                    // only log deliberate hover: minimum 3.5 seconds
-                    if (dwell >= HOVER_THRESHOLD_MS) {
-                        logActivity('hover', s.id, { durationMs: dwell });
-                    }
+                    if (dwell >= 250) logActivity('hover', s.id, { durationMs: dwell });
                 });
                 el.addEventListener('click', () => openConversation(s.id));
             }
@@ -2621,6 +2486,7 @@
                 document.getElementById('hudPosition').textContent = (index + 1) + ' / ' + letterData.length;
                 updateFilterUI();
 
+                // Update HUD view buttons
                 ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.classList.toggle('active', id === 'hudView' + mode.charAt(0).toUpperCase() + mode
@@ -2868,37 +2734,6 @@
             // ── Init ──────────────────────────────────────────────────
             window.__clearFilters = clearFilters;
 
-            // ── Profile menu ──────────────────────────────────────────
-            function setupProfileMenu() {
-                const tile = document.getElementById('profileTile');
-                if (!tile) return;
-                function setOpen(open) {
-                    tile.classList.toggle('open', open);
-                    tile.setAttribute('aria-expanded', String(open));
-                }
-                tile.addEventListener('click', (e) => {
-                    if (e.target.closest('.profile-menu-item')) return;
-                    setOpen(!tile.classList.contains('open'));
-                });
-                document.addEventListener('click', (e) => {
-                    if (!tile.contains(e.target)) setOpen(false);
-                });
-                tile.querySelectorAll('.profile-menu-item').forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const action = item.dataset.action;
-                        setOpen(false);
-                        if (action === 'activity') {
-                            openActivity();
-                        } else if (action === 'profile') {
-                            console.log('Profile — inert');
-                        } else if (action === 'settings') {
-                            console.log('Settings — inert');
-                        }
-                    });
-                });
-            }
-
             // ── Topbar appearance controls ───────────────────────────
             function setupTopbarAppearance() {
                 const fontSelect = document.getElementById('fontSelectTop');
@@ -2926,9 +2761,8 @@
 
             document.addEventListener('DOMContentLoaded', async function() {
                 try {
-                    // Topbar appearance
+                    // Topbar appearance controls
                     setupTopbarAppearance();
-                    setupProfileMenu();
 
                     // Load data
                     await loadData();
