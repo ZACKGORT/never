@@ -21,32 +21,26 @@
             --border: #e6e6e8;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
             --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.02);
-            --radius: 1.25rem;
+            --shadow-floating: 0 8px 32px rgba(0, 0, 0, 0.10);
+            --radius: 1.5rem;
             --radius-sm: 0.65rem;
             --font: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
             --fs-body: 15px;
             --fs-display: 54px;
-            --max-width: 1440px;
+            --max-width: 1600px;
             --transition: 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --margin: 16px;
             --topbar-height: 56px;
-            --hud-height: 52px;
+            --hud-height: 64px;
+            --hud-top-height: 44px;
         }
 
         @media (min-width: 640px) {
-            :root {
-                --margin: 24px;
-                --topbar-height: 64px;
-                --hud-height: 56px;
-            }
+            :root { --margin: 24px; --topbar-height: 64px; --hud-height: 70px; --hud-top-height: 48px; }
         }
         @media (min-width: 1024px) {
-            :root {
-                --margin: 32px;
-                --topbar-height: 72px;
-                --hud-height: 60px;
-            }
+            :root { --margin: 32px; --topbar-height: 72px; --hud-height: 76px; --hud-top-height: 52px; }
         }
 
         body[data-scale="s"] { --fs-body: 12px; --fs-display: 40px; }
@@ -84,22 +78,11 @@
 
         .t-micro {
             font-family: var(--font-mono);
-            font-size: 8px;
-            letter-spacing: 0.08em;
+            font-size: 7px;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             color: var(--ink-light);
             line-height: 1.4;
-        }
-        .t-data { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-        .co-badge {
-            font-family: var(--font-mono);
-            font-size: 6px;
-            color: var(--ink-light);
-            border: 1px solid var(--border);
-            padding: 0 3px;
-            flex: none;
-            letter-spacing: 0.06em;
-            border-radius: 2px;
         }
 
         .btn {
@@ -110,32 +93,28 @@
             background: transparent;
             border: 1px solid var(--border);
             color: var(--ink-mid);
-            padding: 6px 12px;
+            padding: 5px 12px;
             cursor: pointer;
-            transition: background .2s ease, color .2s ease, border-color .2s ease;
+            transition: all .2s ease;
             border-radius: var(--radius-sm);
             font-weight: 500;
             touch-action: manipulation;
-            min-height: 32px;
+            min-height: 30px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             white-space: nowrap;
+            gap: 6px;
         }
         .btn:hover { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .btn:active { transform: scale(0.97); }
+        .btn:active { transform: scale(0.96); }
         .btn.ghost { border-color: var(--border); color: var(--ink-light); }
         .btn.ghost:hover { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .btn.small { padding: 3px 8px; font-size: 7px; min-height: 24px; }
+        .btn.small { padding: 3px 8px; font-size: 6px; min-height: 22px; }
         .btn.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
         .btn-primary { background: var(--ink); color: var(--card); border-color: var(--ink); }
         .btn-primary:hover { background: var(--ink-mid); border-color: var(--ink-mid); }
-        .btn-accent { background: var(--accent); color: var(--ink); border-color: var(--accent); }
-        .btn-accent:hover { background: var(--accent-2); border-color: var(--accent-2); }
-
-        @media (max-width: 480px) {
-            .btn { font-size: 7px; padding: 5px 10px; min-height: 28px; }
-        }
+        .btn-icon { width: 30px; padding: 0; justify-content: center; font-size: 14px; }
 
         /* ── topbar ── */
         .topbar {
@@ -146,7 +125,7 @@
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border);
-            padding: 8px 0;
+            padding: 6px 0;
             min-height: var(--topbar-height);
             display: flex;
             align-items: center;
@@ -188,140 +167,389 @@
             transition: color .2s ease;
             white-space: nowrap;
         }
-        .save-status.err { color: #e74c3c; cursor: pointer; }
-        .save-status.ok { color: var(--ink-light); }
-
-        .topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-        .topbar-controls {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: var(--card);
-            padding: 2px 6px 2px 10px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-        }
-        .topbar-controls .font-select {
-            background: transparent;
-            border: none;
-            color: var(--ink);
-            font-family: var(--font);
-            font-size: 8px;
-            padding: 4px 0;
-            cursor: pointer;
-            outline: none;
-            max-width: 56px;
-            font-weight: 500;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        .topbar-controls .font-select option { background: var(--card); color: var(--ink); }
-        .topbar-controls .scale-group {
-            display: flex;
-            gap: 1px;
-            border-left: 1px solid var(--border);
-            padding-left: 6px;
-        }
-        .topbar-controls .scale-group .chip {
-            border: none;
-            padding: 2px 4px;
-            font-size: 7px;
-            color: var(--ink-light);
-            background: transparent;
-            border-radius: 3px;
-            cursor: pointer;
-            font-family: var(--font-mono);
-            letter-spacing: 0.04em;
-            font-weight: 500;
-            touch-action: manipulation;
-        }
-        .topbar-controls .scale-group .chip.active { background: var(--ink); color: var(--card); }
-        .topbar-controls .scale-group .chip:hover { color: var(--ink); }
-        .topbar-actions .btn { min-height: 30px; padding: 4px 10px; font-size: 7px; }
-
-        @media (max-width: 640px) {
-            .topbar-controls .font-select { max-width: 40px; font-size: 7px; }
-            .topbar-controls .scale-group .chip { font-size: 6px; padding: 1px 3px; }
-            .topbar-controls { padding: 2px 4px 2px 6px; }
-            .topbar-actions .btn { padding: 3px 8px; font-size: 6px; min-height: 26px; }
-            .wordmark { font-size: clamp(10px, 3vw, 16px); }
-            .wordmark .count { font-size: 7px; }
-            .save-status { font-size: 6px; }
-        }
 
         /* ── main wrap ── */
         .wrap {
             max-width: var(--max-width);
             margin: 0 auto;
-            padding: 12px var(--margin) 100px;
+            padding: calc(var(--hud-top-height) + 28px) var(--margin) 100px;
             transition: padding 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        @media (max-width: 480px) { .wrap { padding: 8px 8px 80px; } }
 
-        /* ── composer ── */
-        .composer {
-            background: var(--card);
+        /* ── LETTER CAROUSEL ──
+           Breaks out of .wrap's max-width/padding to span the true
+           viewport width, so the ambient (non-active) letters peeking
+           in from the sides aren't clipped by the content column. */
+        .letters-viewport {
+            position: relative;
+            overflow: hidden;
+            width: 100vw;
+            left: 50%;
+            margin-left: -50vw;
+        }
+        .letters-track {
+            display: flex;
+            align-items: flex-start;
+            gap: 22px;
+            padding-top: clamp(20px, 4vh, 60px);
+            padding-bottom: 60px;
+            padding-left: max(4vw, calc(50% - 520px));
+            padding-right: max(4vw, calc(50% - 520px));
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            cursor: grab;
+            user-select: none;
+            box-sizing: border-box;
+        }
+        .letters-track.dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; }
+        .letter-panel {
+            flex: 0 0 auto;
+            width: min(92vw, 1000px);
+            max-width: 1000px;
+            scroll-snap-align: center;
+            box-sizing: border-box;
+            opacity: .35;
+            transition: opacity .3s ease, transform .3s ease;
+            cursor: pointer;
+        }
+        .letter-panel.active { opacity: 1; cursor: auto; transform: scale(1); }
+
+        .letter-card-frame {
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 16px 18px;
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 16px;
+            padding: 28px clamp(20px, 3vw, 36px) 40px;
+            background: var(--card);
             box-shadow: var(--shadow);
+            transition: box-shadow .3s ease, transform .3s ease;
+            position: relative;
         }
-        .composer.open { display: flex; }
-        .field-row { display: flex; gap: 10px; flex-wrap: wrap; }
-        .field-row .field { flex: 1; min-width: 120px; }
-        label.t-micro { display: block; margin-bottom: 3px; font-size: 7px; letter-spacing: 0.1em; color: var(--ink-light); }
-        input[type=text], textarea, select {
-            width: 100%;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--ink);
-            padding: 8px 10px;
-            font-size: calc(var(--fs-body) * 0.85);
-            font-family: var(--font);
-            border-radius: var(--radius-sm);
-            resize: vertical;
-            transition: border-color .2s ease;
-            -webkit-appearance: none;
-            appearance: none;
+        .letter-panel.active .letter-card-frame {
+            box-shadow: var(--shadow-hover);
         }
-        input[type=text]:focus, textarea:focus, select:focus { outline: none; border-color: var(--ink); }
-        textarea { min-height: 56px; line-height: 1.6; }
-        .composer-actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
-        .new-author-panel {
-            border: 1px dashed var(--border);
-            padding: 12px;
-            display: none;
+        .letter-panel.active .letter-card-frame:hover {
+            box-shadow: 0 24px 56px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.04);
+            transform: translateY(-2px);
+        }
+
+        .letter-cover {
+            display: flex;
             flex-direction: column;
-            gap: 8px;
-            border-radius: var(--radius-sm);
+            gap: 6px;
+            padding-bottom: 18px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
         }
-        .new-author-panel.open { display: flex; }
-        .kind-radios { display: flex; gap: 12px; flex-wrap: wrap; }
-        .kind-radios label {
+        .letter-cover-kicker {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+        }
+        .letter-cover-name {
+            font-family: var(--font);
+            font-size: clamp(22px, 3vw, 34px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+        }
+        .letter-cover-deck {
+            font-family: var(--font);
+            font-size: clamp(13px, 1vw, 16px);
+            line-height: 1.5;
+            color: var(--ink-light);
+            max-width: 520px;
+        }
+
+        .letter-toolbar {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 8px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .letter-toolbar .view-toggle {
+            display: flex;
+            gap: 2px;
+            background: var(--bg);
+            padding: 2px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        .letter-toolbar .view-toggle .chip {
+            border: none;
+            padding: 3px 10px;
+            font-size: 7px;
+            font-family: var(--font-mono);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            background: transparent;
+            color: var(--ink-light);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background .15s ease, color .15s ease;
+        }
+        .letter-toolbar .view-toggle .chip.active {
+            background: var(--ink);
+            color: var(--card);
+        }
+        .letter-toolbar .view-toggle .chip:hover:not(.active) { color: var(--ink); }
+        .letter-toolbar .letter-count {
             font-family: var(--font-mono);
             font-size: 8px;
-            text-transform: uppercase;
-            letter-spacing: .06em;
+            color: var(--ink-light);
+            margin-left: auto;
+        }
+
+        /* ── BENTO VIEW ── */
+        .letter-bento {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+            padding-top: 6px;
+        }
+        .letter-bento .card {
+            background: #ffffff;
+            border: 1px solid #e6e6e8;
+            border-radius: 1.5rem;
+            padding: 1.75rem 1.75rem 1.75rem 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: box-shadow 0.2s ease, transform 0.15s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
             cursor: pointer;
+            animation: fadeUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+            min-height: 120px;
+        }
+        .letter-bento .card:hover {
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.02);
+            transform: translateY(-2px);
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .letter-bento .card-dark { background: #1C1C1E; border-color: #1C1C1E; }
+        .letter-bento .card-dark .text-dark,
+        .letter-bento .card-dark .text-mid,
+        .letter-bento .card-dark .label-sm,
+        .letter-bento .card-dark .label-xs { color: #ffffff; }
+        .letter-bento .card-dark .text-light { color: rgba(255, 255, 255, 0.6); }
+        .letter-bento .card-mid { background: #3A3A3C; border-color: #3A3A3C; }
+        .letter-bento .card-mid .text-dark,
+        .letter-bento .card-mid .text-mid,
+        .letter-bento .card-mid .label-sm,
+        .letter-bento .card-mid .label-xs { color: #ffffff; }
+        .letter-bento .card-mid .text-light { color: rgba(255, 255, 255, 0.6); }
+        .letter-bento .card-accent { background: #E5E567; border-color: #E5E567; }
+        .letter-bento .card-accent .text-dark,
+        .letter-bento .card-accent .text-mid,
+        .letter-bento .card-accent .label-sm,
+        .letter-bento .card-accent .label-xs { color: #1C1C1E; }
+        .letter-bento .card-accent .text-light { color: rgba(28, 28, 30, 0.6); }
+        .letter-bento .card-accent-2 { background: #F5F557; border-color: #F5F557; }
+        .letter-bento .card-accent-2 .text-dark,
+        .letter-bento .card-accent-2 .text-mid,
+        .letter-bento .card-accent-2 .label-sm,
+        .letter-bento .card-accent-2 .label-xs { color: #1C1C1E; }
+        .letter-bento .card-accent-2 .text-light { color: rgba(28, 28, 30, 0.6); }
+        .letter-bento .card-light { background: #f8f8fa; border-color: #e6e6e8; }
+        .letter-bento .card-white { background: #ffffff; border-color: #e6e6e8; }
+
+        .letter-bento .label-sm {
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #8e8e93;
+            font-weight: 500;
+        }
+        .letter-bento .label-xs {
+            font-size: 0.55rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #8e8e93;
+            font-weight: 500;
+        }
+        .letter-bento .display-sm {
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+            color: #1C1C1E;
+        }
+        .letter-bento .body-sm {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #6e6e73;
+        }
+        .letter-bento .body-xs {
+            font-size: 0.7rem;
+            line-height: 1.4;
+            color: #8e8e93;
+        }
+        .letter-bento .mt-auto { margin-top: auto; }
+        .letter-bento .span-2 { grid-column: span 2; }
+        .letter-bento .span-3 { grid-column: span 3; }
+        .letter-bento .row-span-2 { grid-row: span 2; }
+
+        .letter-bento .dot-grid { display: flex; gap: 0.3rem; }
+        .letter-bento .dot-grid .dot { display: block; width: 8px; height: 8px; border-radius: 2px; }
+        .letter-bento .hex-row {
+            display: flex;
+            gap: 0.4rem;
+            font-family: var(--font-mono);
+            font-size: 0.45rem;
+            letter-spacing: 0.02em;
+            color: rgba(255, 255, 255, 0.4);
+            flex-wrap: wrap;
+        }
+        .letter-bento .card-accent .hex-row,
+        .letter-bento .card-accent-2 .hex-row { color: rgba(28, 28, 30, 0.4); }
+        .letter-bento .icon-row {
+            display: flex;
+            gap: 0.4rem;
+            font-size: 0.7rem;
+            color: #8e8e93;
+        }
+        .letter-bento .card-dark .icon-row { color: rgba(255, 255, 255, 0.4); }
+
+        /* ── LIST & GRID VIEWS ── */
+        .letter-list { border-top: 1px solid var(--border); padding-top: 4px; }
+        .letter-row {
+            display: grid;
+            grid-template-columns: 24px 32px 1fr auto;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background .12s ease;
+        }
+        .letter-row:hover { background: rgba(0, 0, 0, 0.02); }
+        .letter-row-idx { font-family: var(--font-mono); font-size: 9px; color: var(--ink-light); padding-top: 2px; }
+        .letter-row-avatar .avatar { width: 28px; height: 28px; font-size: 9px; }
+        .letter-row-text-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .letter-row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 9px; }
+        .letter-row-author {
+            font-family: var(--font);
+            font-size: calc(var(--fs-body) * 0.8);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            color: var(--ink);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 120px;
+        }
+        .letter-row-time { font-family: var(--font-mono); font-size: 7px; color: var(--ink-light); white-space: nowrap; }
+        .letter-row-text {
             color: var(--ink-mid);
+            font-size: calc(var(--fs-body) * 0.88);
+            font-weight: 400;
+            word-wrap: break-word;
+            line-height: 1.5;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
-        @media (max-width: 480px) {
-            .composer { padding: 12px 12px; border-radius: var(--radius-sm); }
-            .field-row { flex-direction: column; gap: 8px; }
-            .field-row .field { min-width: 100%; }
+        .letter-row-marker {
+            font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            padding-left: 4px;
+            flex-shrink: 0;
         }
+
+        .thumb-sm {
+            width: 48px;
+            height: 34px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+            line-height: 0;
+        }
+        .thumb-sm img,
+        .thumb-sm video { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+        .letter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+            padding-top: 6px;
+        }
+        .letter-grid .grid-item {
+            display: flex;
+            flex-direction: column;
+            padding: 14px 16px 18px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            gap: 6px;
+            min-height: 140px;
+        }
+        .letter-grid .grid-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .letter-grid .grid-item .grid-top { display: flex; align-items: center; gap: 10px; }
+        .letter-grid .grid-item .grid-top .avatar { width: 32px; height: 32px; font-size: 10px; }
+        .letter-grid .grid-item .grid-meta { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+        .letter-grid .grid-item .grid-author {
+            font-family: var(--font);
+            font-size: calc(var(--fs-body) * 0.75);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            color: var(--ink);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .letter-grid .grid-item .grid-time { font-family: var(--font-mono); font-size: 7px; color: var(--ink-light); }
+        .letter-grid .grid-item .grid-text {
+            font-size: calc(var(--fs-body) * 0.88);
+            line-height: 1.4;
+            color: var(--ink-mid);
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            margin: 2px 0 4px;
+        }
+        .letter-grid .grid-item .grid-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light);
+        }
+        .letter-grid .grid-item .thumb-grid {
+            width: 100%;
+            height: 90px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            margin: 2px 0;
+        }
+        .letter-grid .grid-item .thumb-grid img,
+        .letter-grid .grid-item .thumb-grid video { display: block; width: 100%; height: 100%; object-fit: cover; }
 
         /* ── avatar ── */
         .avatar {
@@ -359,453 +587,290 @@
             border-radius: 2px;
         }
 
-        /* ── thumbnails ── */
-        .thumb {
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            background: var(--bg);
-            flex: none;
-            line-height: 0;
-            flex-shrink: 0;
-        }
-        .thumb img, .thumb video { display: block; width: 100%; height: 100%; object-fit: cover; }
-        .thumb-sm { width: 56px; height: 40px; border: 1px solid var(--border); }
-        .thumb-md { width: 100%; height: 100px; border: 1px solid var(--border); margin: 4px 0 4px; }
-        .thumb-lg {
-            border: 1px solid var(--border);
-            margin: 10px 0 12px;
-            border-radius: var(--radius-sm);
-            max-height: 320px;
-            background: var(--bg);
-        }
-        .thumb-lg img, .thumb-lg video { display: block; width: 100%; height: auto; max-height: 320px; object-fit: cover; }
-        .thumb-grid {
-            width: 100%;
-            height: 120px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            margin: 6px 0 4px;
-            overflow: hidden;
-            background: var(--bg);
-        }
-        .thumb-grid img, .thumb-grid video { display: block; width: 100%; height: 100%; object-fit: cover; }
-
-        @media (max-width: 480px) {
-            .thumb-sm { width: 44px; height: 32px; }
-            .thumb-grid { height: 100px; }
-            .thumb-lg { max-height: 220px; }
-            .thumb-lg img, .thumb-lg video { max-height: 220px; }
-            .thumb-md { height: 80px; }
-        }
-
-        /* ── LIST VIEW ── */
-        .list { border-top: 1px solid var(--border); padding-top: 4px; }
-        .row {
-            display: grid;
-            grid-template-columns: 24px 32px 1fr auto;
-            grid-template-areas: "idx avatar text marker";
-            align-items: start;
-            gap: 10px;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: background .15s ease;
-        }
-        .row:hover { background: rgba(0, 0, 0, 0.02); }
-        .row:active { background: rgba(0, 0, 0, 0.04); }
-        .row-idx { grid-area: idx; font-family: var(--font-mono); font-size: 10px; color: var(--ink-light); padding-top: 2px; }
-        .row-avatar { grid-area: avatar; }
-        .row-avatar .avatar { width: 32px; height: 32px; font-size: 10px; }
-        .row-text-wrap {
-            grid-area: text;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            min-width: 0;
-        }
-        .row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 10px; }
-        .row-author {
-            font-family: var(--font);
-            font-size: calc(var(--fs-body) * 0.85);
-            font-weight: 600;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-            color: var(--ink);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 120px;
-        }
-        .row-time { font-family: var(--font-mono); font-size: 8px; color: var(--ink-light); white-space: nowrap; }
-        .row-text {
-            color: var(--ink-mid);
-            font-size: calc(var(--fs-body) * 0.92);
-            font-weight: 400;
-            white-space: normal;
-            word-wrap: break-word;
-            line-height: 1.5;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-        .row-marker {
-            grid-area: marker;
-            font-family: var(--font-mono);
-            font-size: 8px;
-            color: var(--ink-light);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-            padding-left: 4px;
-            flex-shrink: 0;
-        }
-        .row-marker .thumb-sm { width: 56px; height: 40px; }
-
-        .empty { padding: 40px 0; text-align: left; }
-        .empty .t-micro { margin-bottom: 4px; }
-        .empty p {
-            font-family: var(--font);
-            font-size: calc(var(--fs-display) * 0.4);
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            margin: 0 0 12px;
-            color: var(--ink);
-        }
-
-        @media (max-width: 480px) {
-            .row {
-                grid-template-columns: 20px 28px 1fr auto;
-                gap: 8px;
-                padding: 12px 0;
-            }
-            .row-avatar .avatar { width: 28px; height: 28px; font-size: 8px; }
-            .row-author { font-size: calc(var(--fs-body) * 0.8); max-width: 80px; }
-            .row-text { font-size: calc(var(--fs-body) * 0.88); -webkit-line-clamp: 2; }
-            .row-time { font-size: 7px; }
-            .row-idx { font-size: 8px; }
-            .row-marker { font-size: 7px; }
-            .row-marker .thumb-sm { width: 44px; height: 32px; }
-        }
-
-        /* ── GRID MODE (Infinite Scroll Bento) ── */
-        body.grid-mode .wrap { max-width: 100%; padding-left: var(--margin); padding-right: var(--margin); }
-
-        body.grid-mode .list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            border-top: none;
-            padding-top: 16px;
-        }
-
-        body.grid-mode .row {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            padding: 18px 20px 22px;
+        /* ── composer ── */
+        .composer {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                box-shadow 0.25s ease;
-            cursor: pointer;
-            gap: 8px;
-            grid-template-columns: none;
-            grid-template-areas: none;
-            position: relative;
-            box-shadow: var(--shadow);
-            min-height: 180px;
-        }
-
-        body.grid-mode .row:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
-        body.grid-mode .row:active { transform: scale(0.98); }
-
-        body.grid-mode .row .row-idx { display: none; }
-
-        body.grid-mode .row .row-top {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 100%;
-        }
-
-        body.grid-mode .row .row-avatar .avatar { width: 44px; height: 44px; font-size: 14px; }
-
-        body.grid-mode .row .row-meta {
-            display: flex;
+            padding: 16px 18px;
+            display: none;
             flex-direction: column;
-            align-items: flex-start;
-            gap: 2px;
-            flex: 1;
-            font-size: calc(var(--fs-body) * 0.75);
+            gap: 10px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
         }
-
-        body.grid-mode .row .row-author {
-            font-size: calc(var(--fs-body) * 0.9);
-            font-weight: 700;
-            max-width: 100%;
-            white-space: normal;
-            text-overflow: clip;
-        }
-
-        body.grid-mode .row .row-time { font-size: calc(var(--fs-body) * 0.65); }
-
-        body.grid-mode .row .row-text {
-            font-size: calc(var(--fs-body) * 1.0);
-            font-weight: 500;
-            line-height: 1.4;
-            letter-spacing: -0.01em;
-            color: var(--ink);
+        .composer.open { display: flex; }
+        .field-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .field-row .field { flex: 1; min-width: 120px; }
+        label.t-micro { display: block; margin-bottom: 3px; font-size: 7px; letter-spacing: 0.1em; color: var(--ink-light); }
+        input[type=text],
+        textarea,
+        select {
             width: 100%;
-            margin: 4px 0 6px;
-            -webkit-line-clamp: 3;
-        }
-
-        body.grid-mode .row .row-marker {
-            font-size: calc(var(--fs-body) * 0.6);
-            align-self: flex-start;
-            margin-top: 6px;
-            border-top: 1px solid var(--border);
-            padding-top: 10px;
-            width: 100%;
-            justify-content: flex-start;
-            gap: 8px;
-        }
-
-        body.grid-mode .row .thumb-grid {
-            width: 100%;
-            height: 150px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            margin: 4px 0 6px;
-            overflow: hidden;
             background: var(--bg);
-        }
-
-        body.grid-mode .row .thumb-grid img,
-        body.grid-mode .row .thumb-grid video {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        body.grid-mode .row .row-tag {
-            font-family: var(--font-mono);
-            font-size: 7px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--ink-light);
-            border: 1px solid var(--border);
-            padding: 1px 8px;
-            border-radius: var(--radius-sm);
-            align-self: flex-start;
-        }
-
-        /* Grid mode responsive */
-        @media (max-width: 640px) {
-            body.grid-mode .list {
-                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-                gap: 14px;
-                padding-top: 12px;
-            }
-            body.grid-mode .row { padding: 14px 14px 18px; border-radius: var(--radius-sm); }
-            body.grid-mode .row .row-avatar .avatar { width: 36px; height: 36px; font-size: 11px; }
-            body.grid-mode .row .row-text { font-size: calc(var(--fs-body) * 0.92); -webkit-line-clamp: 3; }
-            body.grid-mode .row .thumb-grid { height: 120px; }
-        }
-
-        @media (max-width: 480px) {
-            body.grid-mode .list {
-                grid-template-columns: 1fr;
-                gap: 12px;
-                padding-top: 8px;
-            }
-            body.grid-mode .row { padding: 12px 14px 16px; }
-            body.grid-mode .row .row-avatar .avatar { width: 32px; height: 32px; font-size: 10px; }
-            body.grid-mode .row .row-text { font-size: calc(var(--fs-body) * 0.88); -webkit-line-clamp: 3; }
-            body.grid-mode .row .thumb-grid { height: 100px; }
-        }
-
-        /* ── conversation modal ── */
-        .conversation-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 300;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding: 0;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.35s ease;
-            overflow: hidden;
-        }
-        .conversation-modal.open { opacity: 1; pointer-events: auto; }
-        .conversation-modal .modal-card {
-            width: 100vw;
-            height: 100vh;
-            height: 100dvh;
-            max-height: 100vh;
-            max-height: 100dvh;
-            background: var(--card);
-            border: none;
-            border-radius: 0;
-            padding: 16px 16px 24px;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: none;
-            display: flex;
-            flex-direction: column;
-        }
-        .conversation-modal .modal-card::-webkit-scrollbar { width: 4px; }
-        .conversation-modal .modal-card::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: var(--radius-sm); }
-        .conversation-modal .close-btn {
-            position: sticky;
-            top: 0;
-            float: right;
-            background: var(--card);
             border: 1px solid var(--border);
             color: var(--ink);
-            width: 36px;
-            height: 36px;
-            font-size: 18px;
-            cursor: pointer;
-            border-radius: 50%;
+            padding: 8px 10px;
+            font-size: calc(var(--fs-body) * 0.85);
+            font-family: var(--font);
+            border-radius: var(--radius-sm);
+            resize: vertical;
+            transition: border-color .2s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        input[type=text]:focus,
+        textarea:focus,
+        select:focus { outline: none; border-color: var(--ink); }
+        textarea { min-height: 56px; line-height: 1.6; }
+        .composer-actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
+
+        /* ── FLOATING HUD ──
+           Two independent floating pills. Everything inside a .hud is
+           deliberately set in fixed px sizes on --font-mono (never --font
+           or --fs-body) so the font/size appearance controls — which now
+           live inside the bottom hud itself — can never resize the hud
+           that hosts them. */
+        .hud {
+            /* Sizing tokens — .hud-top keeps these defaults (compact: just
+               nav + new). .hud-bottom overrides them larger below for
+               readability/touch-target size, since it's the hud people
+               actually read and interact with most. */
+            --hud-pad: 6px 12px;
+            --hud-gap: 4px;
+            --hud-min-h: 44px;
+            --hud-btn-min-h: 28px;
+            --hud-btn-pad: 3px 10px;
+            --hud-btn-fs: 7px;
+            --hud-icon-w: 28px;
+            --hud-icon-fs: 12px;
+            --hud-divider-h: 24px;
+            --hud-fs-count: 7px;
+            --hud-pad-count: 1px 6px;
+            --hud-minw-count: 18px;
+            --hud-fs-summary: 9px;
+            --hud-maxw-summary: 140px;
+            --hud-fs-label: 6px;
+            --hud-fs-position: 8px;
+            --hud-minw-position: 36px;
+            --hud-fs-select: 7px;
+            --hud-maxw-select: 54px;
+            --hud-fs-chip: 6px;
+            --hud-pad-chip: 2px 4px;
+
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-floating);
+            padding: var(--hud-pad);
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            margin-left: auto;
-            transition: background 0.2s;
+            gap: var(--hud-gap);
+            transition: box-shadow .3s ease, padding .2s ease;
+            min-height: var(--hud-min-h);
+            font-family: var(--font-mono);
+        }
+        .hud:hover { box-shadow: var(--shadow-hover); }
+
+        .hud-bottom {
+            bottom: 24px;
+            --hud-pad: 10px 18px;
+            --hud-gap: 6px;
+            --hud-min-h: 56px;
+            --hud-btn-min-h: 36px;
+            --hud-btn-pad: 7px 14px;
+            --hud-btn-fs: 11px;
+            --hud-icon-w: 36px;
+            --hud-icon-fs: 16px;
+            --hud-divider-h: 30px;
+            --hud-fs-count: 10px;
+            --hud-pad-count: 2px 8px;
+            --hud-minw-count: 22px;
+            --hud-fs-summary: 12px;
+            --hud-maxw-summary: 190px;
+            --hud-fs-label: 9px;
+            --hud-fs-select: 11px;
+            --hud-maxw-select: 70px;
+            --hud-fs-chip: 10px;
+            --hud-pad-chip: 4px 7px;
+        }
+        .hud-top { top: calc(var(--topbar-height) + 12px); }
+
+        .hud-divider {
+            width: 1px;
+            height: var(--hud-divider-h);
+            background: var(--border);
             flex-shrink: 0;
-            z-index: 10;
-            box-shadow: var(--shadow);
-        }
-        .conversation-modal .close-btn:hover { background: var(--ink); color: var(--card); }
-        .conversation-modal #modalContent { flex: 1; max-width: 780px; width: 100%; margin: 0 auto; padding-bottom: 60px; }
-        @media (max-width: 480px) {
-            .conversation-modal .modal-card { padding: 12px 12px 20px; }
-            .conversation-modal .close-btn { width: 32px; height: 32px; font-size: 16px; margin-bottom: 8px; }
+            margin: 0 2px;
         }
 
-        .modal-statement { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
-        .modal-statement .card-who { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
-        .modal-statement .card-author-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-        .modal-statement .card-author {
-            font-family: var(--font);
-            font-size: calc(var(--fs-body) * 1.1);
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-            cursor: pointer;
-            color: var(--ink);
-        }
-        .modal-statement .card-author:hover { opacity: 0.7; }
-        .modal-statement .card-role { font-size: calc(var(--fs-body) * 0.8); color: var(--ink-light); }
-        .modal-statement .card-time, .modal-statement .card-tag {
-            font-family: var(--font-mono);
-            font-size: 9px;
-            color: var(--ink-light);
-        }
-        .modal-statement .card-tag {
-            border: 1px solid var(--border);
-            padding: 0 6px;
+        .hud .btn {
+            min-height: var(--hud-btn-min-h);
+            padding: var(--hud-btn-pad);
+            font-size: var(--hud-btn-fs);
             border-radius: var(--radius-sm);
-            letter-spacing: 0.04em;
-            font-size: 8px;
         }
-        .modal-statement .card-text {
-            font-family: var(--font);
-            font-size: calc(var(--fs-display) * 0.4);
-            font-weight: 500;
-            line-height: 1.4;
-            letter-spacing: -0.01em;
-            margin-bottom: 10px;
-            white-space: pre-wrap;
-            color: var(--ink);
+        .hud .btn-icon {
+            width: var(--hud-icon-w);
+            padding: 0;
+            font-size: var(--hud-icon-fs);
+            min-height: var(--hud-btn-min-h);
         }
-        @media (max-width: 480px) {
-            .modal-statement .card-text { font-size: calc(var(--fs-display) * 0.32); }
-            .modal-statement .card-who { gap: 10px; }
-            .modal-statement .card-author { font-size: calc(var(--fs-body) * 1.0); }
-        }
-
-        .modal-thread { display: flex; flex-direction: column; margin-top: 6px; }
-        .modal-node {
-            position: relative;
-            padding: 8px 0 8px 14px;
-            border-left: 1px solid var(--border);
-        }
-        .modal-node-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .modal-node-author {
-            font-family: var(--font);
-            font-size: calc(var(--fs-body) * 0.75);
+        .hud .filter-count {
+            background: var(--ink);
+            color: var(--card);
+            padding: var(--hud-pad-count);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: var(--hud-fs-count);
             font-weight: 600;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-            cursor: pointer;
-            color: var(--ink);
+            min-width: var(--hud-minw-count);
+            text-align: center;
         }
-        .modal-node-author:hover { opacity: 0.7; }
-        .modal-node-time { font-family: var(--font-mono); font-size: 8px; color: var(--ink-light); }
-        .modal-node-toggle {
+        .hud .filter-summary {
             font-family: var(--font-mono);
-            font-size: 8px;
+            font-size: var(--hud-fs-summary);
             color: var(--ink-light);
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 0 2px;
+            max-width: var(--hud-maxw-summary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0 4px;
         }
-        .modal-node-toggle:hover { color: var(--ink); }
-        .modal-node-text {
-            font-family: var(--font);
-            font-size: calc(var(--fs-body) * 0.92);
-            line-height: 1.6;
-            margin: 4px 0 4px 24px;
-            white-space: pre-wrap;
-            color: var(--ink-mid);
-        }
-        .modal-node-actions { display: flex; gap: 12px; margin-left: 24px; }
-        .modal-node-link {
+        .hud .hud-label {
             font-family: var(--font-mono);
-            font-size: 7px;
+            font-size: var(--hud-fs-label);
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: var(--ink-light);
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            transition: color .2s ease;
+            opacity: 0.5;
+            margin-right: 2px;
         }
-        .modal-node-link:hover { color: var(--ink); }
-        .modal-node-children { display: flex; flex-direction: column; }
-        .modal-node-collapsed-note { font-family: var(--font-mono); font-size: 8px; color: var(--ink-light); }
-        .modal-reply-form {
-            margin: 6px 0 4px 24px;
-            padding: 0;
+        .hud .hud-position {
+            font-family: var(--font-mono);
+            font-size: var(--hud-fs-position);
+            color: var(--ink-light);
+            min-width: var(--hud-minw-position);
+            text-align: center;
+        }
+
+        /* Appearance controls (font / scale) — bottom hud only */
+        .hud .hud-appearance {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
-            max-width: 100%;
+            align-items: center;
+            gap: 4px;
         }
-        .modal-reply-form select { max-width: 160px; }
-        .modal-reply-trigger { margin: 4px 0 8px 0; }
-        .modal-reply-trigger .modal-node-link { font-size: 8px; }
+        .hud .font-select {
+            background: transparent;
+            border: none;
+            color: var(--ink-mid);
+            font-family: var(--font-mono);
+            font-size: var(--hud-fs-select);
+            padding: 4px 0;
+            cursor: pointer;
+            outline: none;
+            max-width: var(--hud-maxw-select);
+            font-weight: 500;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .hud .scale-group {
+            display: flex;
+            gap: 1px;
+        }
+        .hud .scale-group .chip {
+            border: none;
+            padding: var(--hud-pad-chip);
+            font-size: var(--hud-fs-chip);
+            color: var(--ink-light);
+            background: transparent;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            letter-spacing: 0.04em;
+            font-weight: 500;
+            touch-action: manipulation;
+        }
+        .hud .scale-group .chip.active { background: var(--ink); color: var(--card); }
+        .hud .scale-group .chip:hover { color: var(--ink); }
+
+        @media (max-width: 640px) {
+            .hud-bottom {
+                bottom: 16px;
+                --hud-pad: 8px 12px;
+                --hud-min-h: 48px;
+                --hud-btn-min-h: 30px;
+                --hud-btn-pad: 5px 10px;
+                --hud-btn-fs: 9px;
+                --hud-icon-w: 30px;
+                --hud-icon-fs: 13px;
+                --hud-divider-h: 22px;
+                --hud-fs-count: 9px;
+                --hud-pad-count: 2px 6px;
+                --hud-minw-count: 18px;
+                --hud-fs-summary: 10px;
+                --hud-maxw-summary: 110px;
+                --hud-fs-select: 9px;
+                --hud-maxw-select: 50px;
+                --hud-fs-chip: 8px;
+                --hud-pad-chip: 3px 5px;
+            }
+            .hud-top {
+                top: calc(var(--topbar-height) + 8px);
+                --hud-pad: 4px 8px;
+                --hud-gap: 2px;
+                --hud-min-h: 38px;
+                --hud-btn-min-h: 22px;
+                --hud-btn-pad: 2px 6px;
+                --hud-btn-fs: 6px;
+                --hud-icon-w: 22px;
+                --hud-icon-fs: 10px;
+                --hud-divider-h: 16px;
+                --hud-fs-position: 7px;
+                --hud-minw-position: 28px;
+            }
+            .hud { border-radius: var(--radius-sm); }
+            .hud .hud-label { display: none; }
+        }
+
         @media (max-width: 480px) {
-            .modal-node { padding: 6px 0 6px 10px; }
-            .modal-node-text { margin-left: 16px; font-size: calc(var(--fs-body) * 0.88); }
-            .modal-node-actions { margin-left: 16px; }
-            .modal-reply-form { margin-left: 16px; }
-            .modal-node-author { font-size: calc(var(--fs-body) * 0.7); }
+            .hud-bottom {
+                bottom: 12px;
+                --hud-pad: 6px 10px;
+                --hud-gap: 3px;
+                --hud-min-h: 42px;
+                --hud-btn-min-h: 26px;
+                --hud-btn-pad: 4px 8px;
+                --hud-btn-fs: 8px;
+                --hud-icon-w: 26px;
+                --hud-icon-fs: 12px;
+                --hud-divider-h: 18px;
+                --hud-fs-summary: 9px;
+                --hud-maxw-summary: 90px;
+                --hud-fs-select: 8px;
+                --hud-maxw-select: 42px;
+                --hud-pad-chip: 2px 4px;
+            }
+            .hud-top {
+                top: calc(var(--topbar-height) + 6px);
+                --hud-pad: 3px 6px;
+                --hud-gap: 1px;
+                --hud-min-h: 34px;
+                --hud-btn-min-h: 20px;
+                --hud-btn-pad: 2px 5px;
+                --hud-btn-fs: 5px;
+                --hud-icon-w: 20px;
+                --hud-icon-fs: 9px;
+                --hud-divider-h: 14px;
+                --hud-fs-position: 6px;
+                --hud-minw-position: 24px;
+            }
         }
 
         /* ── Bento Filter Modal ── */
@@ -855,7 +920,7 @@
         }
         .bento-header h2 {
             font-family: var(--font);
-            font-size: calc(var(--fs-body) * 1.8);
+            font-size: calc(var(--fs-body) * 1.6);
             font-weight: 700;
             letter-spacing: -0.02em;
             margin: 0;
@@ -911,7 +976,7 @@
 
         .bento-card .chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
         .bento-card .chip-group .chip {
-            font-size: calc(var(--fs-body) * 0.75);
+            font-size: calc(var(--fs-body) * 0.7);
             padding: 4px 10px;
             border: 1px solid var(--border);
             background: var(--bg);
@@ -927,7 +992,6 @@
         }
         .bento-card .chip-group .chip.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
         .bento-card .chip-group .chip:hover { border-color: var(--ink); color: var(--ink); }
-        .bento-card .chip-group .chip:active { transform: scale(0.95); }
 
         .bento-actions {
             display: flex;
@@ -957,197 +1021,307 @@
             .bento-actions .btn { padding: 10px 12px; font-size: 8px; min-height: 36px; }
         }
 
-        /* ── HUD ── */
-        .hud {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 150;
-            background: rgba(240, 240, 242, 0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-top: 1px solid var(--border);
-            min-height: var(--hud-height);
-            display: flex;
-            align-items: center;
-            padding: 4px 0;
-        }
-        .hud-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            max-width: var(--max-width);
+        /* ── focus mode ── */
+        .letters-track.focus-mode { padding-left: 6vw; padding-right: 6vw; cursor: auto; }
+        .letters-track.focus-mode .letter-panel:not(.active) { display: none; }
+        .letters-track.focus-mode .letter-panel.active {
+            flex: 0 0 auto;
+            width: min(100%, 900px);
+            max-width: 900px;
             margin: 0 auto;
-            padding: 0 var(--margin);
-            width: 100%;
-            flex-wrap: wrap;
+            opacity: 1;
         }
-        .hud .filter-summary {
-            font-family: var(--font);
-            font-size: calc(var(--fs-body) * 0.75);
-            color: var(--ink-light);
-            flex: 1;
-            text-align: right;
-            min-width: 60px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .hud .filter-count {
-            background: var(--ink);
-            color: var(--card);
-            padding: 1px 6px;
-            border-radius: var(--radius-sm);
+        body.focus-mode .letters-track { padding-top: clamp(20px, 4vh, 40px); }
+
+        .letter-card-focus-toggle {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            z-index: 5;
             font-family: var(--font-mono);
             font-size: 8px;
-            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--ink-light);
+            padding: 4px 12px;
+            cursor: pointer;
+            transition: all .2s ease;
+            box-shadow: var(--shadow);
         }
-        .hud .btn { min-height: 28px; padding: 4px 10px; font-size: 7px; flex-shrink: 0; }
-        @media (max-width: 480px) {
-            .hud-row { gap: 4px; padding: 0 8px; }
-            .hud .filter-summary { font-size: calc(var(--fs-body) * 0.65); min-width: 40px; }
-            .hud .btn { padding: 3px 8px; font-size: 6px; min-height: 24px; }
-            .hud .filter-count { font-size: 7px; padding: 1px 4px; }
+        .letter-card-focus-toggle:hover { color: var(--ink); border-color: var(--ink); }
+        .letter-card-focus-toggle.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
+
+        .empty-letter { padding: 40px 0; text-align: center; color: var(--ink-light); }
+        .empty-letter .t-micro { margin-bottom: 6px; }
+        .empty-letter p { font-family: var(--font); font-size: calc(var(--fs-body) * 1.1); font-weight: 500; color: var(
+                --ink-mid); }
+
+        .load-more-trigger {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem 0 0.5rem;
+            gap: 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #8e8e93;
+            cursor: pointer;
+            transition: color .2s ease;
+        }
+        .load-more-trigger:hover { color: var(--ink); }
+
+        /* ── responsive ── */
+        @media (max-width: 1280px) {
+            .letter-bento { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        }
+        @media (max-width: 820px) {
+            .letters-track { gap: 16px;
+                padding-left: max(2vw, calc(50% - 400px));
+                padding-right: max(2vw, calc(50% - 400px)); }
+            .letter-panel { width: min(94vw, 800px); }
+            .letter-bento { grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+            .letter-bento .span-2,
+            .letter-bento .span-3,
+            .letter-bento .span-4 { grid-column: span 2; }
+            .letter-bento .row-span-2,
+            .letter-bento .row-span-3 { grid-row: span 1; }
+            .letter-bento .card { padding: 1.5rem; border-radius: 1.25rem; }
+            .letter-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+            .letter-row { grid-template-columns: 20px 28px 1fr auto; gap: 8px; padding: 10px 0; }
+            .letter-row-author { font-size: calc(var(--fs-body) * 0.7); max-width: 80px; }
+            .letter-row-text { font-size: calc(var(--fs-body) * 0.82); }
+        }
+        @media (max-width: 540px) {
+            body { padding-bottom: calc(var(--hud-height) + 12px); }
+            .letters-track {
+                gap: 12px;
+                padding-top: clamp(12px, 2vh, 30px);
+                padding-bottom: 40px;
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+            .letter-panel { width: 94vw; }
+            .letter-card-frame { padding: 16px 14px 28px; border-radius: var(--radius-sm); }
+            .letter-cover { padding-bottom: 12px; margin-bottom: 16px; }
+            .letter-cover-name { font-size: clamp(18px, 2.5vw, 24px); }
+            .letter-bento { grid-template-columns: 1fr; gap: 0.75rem; }
+            .letter-bento .span-2,
+            .letter-bento .span-3,
+            .letter-bento .span-4 { grid-column: span 1; }
+            .letter-bento .card { padding: 1.25rem; border-radius: 1rem; min-height: 100px; }
+            .letter-grid { grid-template-columns: 1fr; gap: 10px; }
+            .letter-grid .grid-item { padding: 12px 14px 14px; min-height: 100px; }
+            .letter-row { grid-template-columns: 16px 24px 1fr auto; gap: 6px; padding: 8px 0; }
+            .letter-row-avatar .avatar { width: 24px; height: 24px; font-size: 8px; }
+            .letter-row-author { font-size: calc(var(--fs-body) * 0.65); max-width: 60px; }
+            .letter-row-text { font-size: calc(var(--fs-body) * 0.78); -webkit-line-clamp: 2; }
+            .letter-row-time { font-size: 6px; }
+            .letter-row-idx { font-size: 8px; }
+            .letter-toolbar .view-toggle .chip { font-size: 6px; padding: 2px 8px; }
+            .letter-toolbar .letter-count { font-size: 7px; }
+            .topbar .wrap { padding: 0 8px; }
+            .wordmark { font-size: clamp(10px, 3vw, 14px); }
+            .wordmark .count { font-size: 7px; }
         }
 
-        /* ── profile modal ── */
-        .modal-backdrop {
+        /* ── conversation modal ── */
+        .conversation-modal {
             position: fixed;
             inset: 0;
+            z-index: 300;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            z-index: 200;
-            padding: 16px;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+            overflow: hidden;
         }
-        .modal-backdrop[hidden] { display: none; }
-        .profile-card {
+        .conversation-modal.open { opacity: 1; pointer-events: auto; }
+        .conversation-modal .modal-card {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            max-height: 100vh;
+            max-height: 100dvh;
+            background: var(--card);
+            border: none;
+            border-radius: 0;
+            padding: 16px 16px 24px;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+        }
+        .conversation-modal .modal-card::-webkit-scrollbar { width: 4px; }
+        .conversation-modal .modal-card::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: var(
+                --radius-sm); }
+        .conversation-modal .close-btn {
+            position: sticky;
+            top: 0;
+            float: right;
             background: var(--card);
             border: 1px solid var(--border);
-            max-width: 320px;
-            width: 100%;
-            padding: 24px;
-            position: relative;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-hover);
-            margin: 16px;
-        }
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 28px;
-            height: 28px;
-            border: 1px solid var(--border);
-            background: transparent;
             color: var(--ink);
-            font-family: var(--font-mono);
-            font-size: 12px;
+            width: 36px;
+            height: 36px;
+            font-size: 18px;
             cursor: pointer;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 12px;
+            margin-left: auto;
+            transition: background 0.2s;
+            flex-shrink: 0;
+            z-index: 10;
+            box-shadow: var(--shadow);
         }
-        .modal-close:hover { background: var(--ink); color: var(--card); }
-        .profile-top { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
-        .profile-name {
+        .conversation-modal .close-btn:hover { background: var(--ink); color: var(--card); }
+        .conversation-modal #modalContent { flex: 1; max-width: 780px; width: 100%; margin: 0 auto; padding-bottom: 60px; }
+
+        .modal-statement { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+        .modal-statement .card-who { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+        .modal-statement .card-author-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+        .modal-statement .card-author {
             font-family: var(--font);
-            font-size: 20px;
+            font-size: calc(var(--fs-body) * 1.1);
             font-weight: 700;
-            letter-spacing: -0.02em;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            cursor: pointer;
             color: var(--ink);
         }
-        .profile-kind { margin-top: 2px; font-size: 7px; color: var(--ink-light); }
-        .profile-role { font-family: var(--font); font-size: 12px; color: var(--ink-light); margin: 8px 0 4px; }
-        .profile-tagline { font-family: var(--font); font-size: 13px; margin-bottom: 12px; line-height: 1.6; color: var(--ink-mid); }
-        .profile-stats { border-top: 1px solid var(--border); padding-top: 10px; font-size: 7px; color: var(--ink-light); }
-        @media (max-width: 480px) {
-            .profile-card { padding: 18px; max-width: 280px; }
-            .profile-name { font-size: 17px; }
-            .profile-tagline { font-size: 12px; }
-            .profile-role { font-size: 11px; }
-        }
-
-        footer { padding: 24px 0 40px; }
-        footer .t-micro { font-size: 7px; letter-spacing: 0.1em; color: var(--ink-light); }
-        footer .t-micro a { text-decoration: underline; text-underline-offset: 2px; }
-
-        .hud-empty { padding: 30px 0; text-align: left; }
-        .hud-empty .t-micro { margin-bottom: 4px; }
-        .hud-empty p {
-            font-family: var(--font);
-            font-size: calc(var(--fs-display) * 0.3);
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            margin: 0 0 10px;
-            color: var(--ink);
-        }
-
-        [hidden] { display: none !important; }
-
-        @supports (padding-bottom: env(safe-area-inset-bottom)) {
-            .hud { padding-bottom: env(safe-area-inset-bottom); }
-            .conversation-modal .modal-card { padding-bottom: env(safe-area-inset-bottom); }
-            .bento-panel { padding-bottom: env(safe-area-inset-bottom); }
-        }
-
-        /* ── Infinite scroll loading indicator ── */
-        .load-more-trigger {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 20px 0;
+        .modal-statement .card-author:hover { opacity: 0.7; }
+        .modal-statement .card-role { font-size: calc(var(--fs-body) * 0.8); color: var(--ink-light); }
+        .modal-statement .card-time,
+        .modal-statement .card-tag {
+            font-family: var(--font-mono);
+            font-size: 9px;
             color: var(--ink-light);
+        }
+        .modal-statement .card-tag {
+            border: 1px solid var(--border);
+            padding: 0 6px;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.04em;
+            font-size: 8px;
+        }
+        .modal-statement .card-text {
+            font-family: var(--font);
+            font-size: calc(var(--fs-display) * 0.4);
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.01em;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            color: var(--ink);
+        }
+
+        .modal-thread { display: flex; flex-direction: column; margin-top: 6px; }
+        .modal-node {
+            position: relative;
+            padding: 8px 0 8px 14px;
+            border-left: 1px solid var(--border);
+        }
+        .modal-node-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .modal-node-author {
+            font-family: var(--font);
+            font-size: calc(var(--fs-body) * 0.75);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            cursor: pointer;
+            color: var(--ink);
+        }
+        .modal-node-author:hover { opacity: 0.7; }
+        .modal-node-time { font-family: var(--font-mono); font-size: 8px; color: var(--ink-light); }
+        .modal-node-toggle {
             font-family: var(--font-mono);
             font-size: 8px;
+            color: var(--ink-light);
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0 2px;
+        }
+        .modal-node-toggle:hover { color: var(--ink); }
+        .modal-node-text {
+            font-family: var(--font);
+            font-size: calc(var(--fs-body) * 0.92);
+            line-height: 1.6;
+            margin: 4px 0 4px 24px;
+            white-space: pre-wrap;
+            color: var(--ink-mid);
+        }
+        .modal-node-actions { display: flex; gap: 12px; margin-left: 24px; }
+        .modal-node-link {
+            font-family: var(--font-mono);
+            font-size: 7px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
+            color: var(--ink-light);
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: color .2s ease;
         }
-        .load-more-trigger .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border);
-            border-top-color: var(--ink);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
+        .modal-node-link:hover { color: var(--ink); }
+        .modal-node-children { display: flex; flex-direction: column; }
+        .modal-reply-form {
+            margin: 6px 0 4px 24px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-width: 100%;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .modal-reply-form select { max-width: 160px; }
+        .modal-reply-trigger { margin: 4px 0 8px 0; }
+
+        [hidden] { display: none !important; }
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .hud-bottom { margin-bottom: env(safe-area-inset-bottom); }
+            .bento-panel { padding-bottom: env(safe-area-inset-bottom); }
+            .conversation-modal .modal-card { padding-bottom: env(safe-area-inset-bottom); }
+        }
     </style>
 </head>
 <body data-scale="m" data-font="satoshi">
+
+    <!-- ─── TOPBAR ─── -->
     <div class="topbar">
         <div class="wrap">
             <div class="wordmark">NEVEREVER.LAND <span class="count t-data" id="topCount"></span> <span class="save-status" id="saveStatus"></span></div>
-            <div class="topbar-actions">
-                <div class="topbar-controls">
-                    <select class="font-select" id="fontSelect">
-                        <option value="satoshi">Satoshi</option>
-                        <option value="inter">Inter</option>
-                        <option value="serif">Serif</option>
-                        <option value="mono">Mono</option>
-                    </select>
-                    <div class="scale-group">
-                        <button class="chip" data-scale="s">S</button>
-                        <button class="chip active" data-scale="m">M</button>
-                        <button class="chip" data-scale="l">L</button>
-                        <button class="chip" data-scale="xl">XL</button>
-                        <button class="chip" data-scale="xxl">XXL</button>
-                    </div>
-                </div>
-                <button class="btn" id="toggleLayoutBtn">Grid</button>
-                <button class="btn btn-primary" id="newBtn">+ New</button>
-            </div>
         </div>
     </div>
 
+    <!-- ─── TOP HUD (navigation + create) ─── -->
+    <div class="hud hud-top" id="hudTop">
+        <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
+        <span class="hud-position" id="hudPosition">1 / 4</span>
+        <button class="btn btn-icon" id="hudNext" title="Next">›</button>
+
+        <div class="hud-divider"></div>
+
+        <button class="btn btn-primary" id="hudNew">+ New</button>
+    </div>
+
     <div class="wrap">
+        <!-- ─── COMPOSER ─── -->
         <div class="composer" id="composer">
             <div class="field-row">
                 <div class="field">
@@ -1157,26 +1331,6 @@
                 <div class="field">
                     <label class="t-micro">Tag (optional)</label>
                     <input type="text" id="c-tag" placeholder="OPEN TO WORK / HIRING / BRAND" />
-                </div>
-            </div>
-            <button class="btn ghost small" id="toggleNewAuthor" style="align-self:flex-start;">+ New author</button>
-            <div class="new-author-panel" id="newAuthorPanel">
-                <div class="kind-radios">
-                    <label><input type="radio" name="na-kind" value="person" checked /> Person</label>
-                    <label><input type="radio" name="na-kind" value="company" /> Company / brand</label>
-                </div>
-                <div class="field-row">
-                    <div class="field">
-                        <label class="t-micro">Name</label>
-                        <input type="text" id="na-name" placeholder="Maya Chen / Studio North" />
-                    </div>
-                    <div class="field">
-                        <label class="t-micro" id="na-role-label">Role</label>
-                        <input type="text" id="na-role" placeholder="Creative Director" />
-                    </div>
-                </div>
-                <div class="composer-actions">
-                    <button class="btn small" id="na-save">Add author</button>
                 </div>
             </div>
             <div class="field">
@@ -1193,23 +1347,53 @@
             </div>
         </div>
 
-        <div id="listRoot"></div>
-
-        <footer>
-            <div class="t-micro">STATEMENTS PERSIST LOCALLY · <a href="#" id="resetLink">RESET DEMO DATA</a></div>
-        </footer>
-    </div>
-
-    <!-- Bottom HUD -->
-    <div class="hud" id="hud">
-        <div class="hud-row">
-            <button class="btn" id="filterToggleBtn">Filters <span class="filter-count" id="filterCount">0</span></button>
-            <button class="btn ghost" id="hudClear">Clear</button>
-            <span class="filter-summary" id="activeFilterSummary"></span>
+        <!-- ─── LETTERS CAROUSEL ─── -->
+        <div class="letters-viewport" id="lettersViewport">
+            <div class="letters-track" id="lettersTrack"></div>
         </div>
     </div>
 
-    <!-- Bento Filter Modal -->
+    <!-- ─── BOTTOM HUD (appearance + filters) ─── -->
+    <div class="hud hud-bottom" id="hud">
+        <!-- Filter -->
+        <button class="btn" id="filterToggleBtn">
+            <span>Filters</span>
+            <span class="filter-count" id="filterCount">0</span>
+        </button>
+        <button class="btn ghost" id="hudClear" hidden>Clear</button>
+
+        <div class="hud-divider"></div>
+
+        <!-- View -->
+        <span class="hud-label">View</span>
+        <button class="btn active" id="hudViewList">List</button>
+        <button class="btn" id="hudViewGrid">Grid</button>
+        <button class="btn" id="hudViewBento">Bento</button>
+
+        <div class="hud-divider"></div>
+
+        <!-- Appearance: font / size (does not affect the hud itself) -->
+        <div class="hud-appearance">
+            <select class="font-select" id="fontSelect">
+                <option value="satoshi">Satoshi</option>
+                <option value="inter">Inter</option>
+                <option value="serif">Serif</option>
+                <option value="mono">Mono</option>
+            </select>
+            <div class="scale-group">
+                <button class="chip" data-scale="s">S</button>
+                <button class="chip active" data-scale="m">M</button>
+                <button class="chip" data-scale="l">L</button>
+                <button class="chip" data-scale="xl">XL</button>
+                <button class="chip" data-scale="xxl">XXL</button>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <span class="filter-summary" id="activeFilterSummary">No filters active</span>
+    </div>
+
+    <!-- ─── BENTO FILTER MODAL ─── -->
     <div class="bento-overlay" id="bentoOverlay">
         <div class="bento-panel">
             <div class="bento-header">
@@ -1244,26 +1428,9 @@
         </div>
     </div>
 
-    <!-- Profile Modal -->
-    <div class="modal-backdrop" id="profileModal" hidden>
-        <div class="profile-card">
-            <button class="modal-close" id="profileClose">✕</button>
-            <div class="profile-top">
-                <div id="profileAvatarSlot"></div>
-                <div>
-                    <div class="profile-name" id="profileName"></div>
-                    <div class="profile-kind t-micro" id="profileKind"></div>
-                </div>
-            </div>
-            <div class="profile-role" id="profileRole"></div>
-            <div class="profile-tagline" id="profileTagline"></div>
-            <div class="profile-stats t-micro" id="profileStats"></div>
-        </div>
-    </div>
-
-    <!-- Conversation Modal -->
+    <!-- ─── CONVERSATION MODAL ─── -->
     <div class="conversation-modal" id="conversationModal">
-        <div class="modal-card" id="modalCard">
+        <div class="modal-card">
             <button class="close-btn" id="modalClose">✕</button>
             <div id="modalContent"></div>
         </div>
@@ -1271,548 +1438,38 @@
 
     <script>
         (function() {
-            const STORAGE_KEY = 'neverever-statements-v3';
-            let statements = [];
-            let authors = [];
-            let replyTargetId = null;
-            let lastAuthorId = null;
-            const collapsed = new Set();
-            const activeTags = new Set();
-            const activeKinds = new Set();
-            const activeDisciplines = new Set();
-            let gridMode = false;
-            let modalStatementId = null;
-            let modalReplyTargetId = null;
-            let searchQuery = '';
-            let allLoaded = false;
-            let pageSize = 10;
-            let currentPage = 0;
-            let isLoading = false;
+            'use strict';
 
-            const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
-
-            function hash(str) {
-                let h = 0;
-                for (let i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) >>> 0; }
-                return h;
-            }
-
-            function avatarVariant(id) { return 'v' + (hash(id) % 4); }
-
-            function initialsFor(a) {
-                const clean = a.name.replace(/[^A-Za-z ]/g, '');
-                const parts = clean.trim().split(/\s+/).filter(Boolean);
-                if (parts.length === 0) return '?';
-                if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-            }
-
-            function authorById(id) { return authors.find(a => a.id === id); }
-
-            function seedAuthors() {
-                return [
-                    { id: 'zack', kind: 'person', discipline: 'DESIGN', name: 'Zack Gort',
-                        role: 'Product / UX Designer', tagline: 'Six years freelance. Multi-hyphenate, single-purpose.' },
-                    { id: 'maya', kind: 'person', discipline: 'DESIGN', name: 'Maya Chen', role: 'Creative Director',
-                        tagline: 'Ex-agency. Building a smaller practice on purpose.' },
-                    { id: 'tom', kind: 'person', discipline: 'ENGINEERING', name: 'Tom Okafor',
-                        role: 'ML Engineer', tagline: 'Infra and eval systems. Open to staff roles.' },
-                    { id: 'ria', kind: 'person', discipline: 'BRAND', name: 'Ria Patel',
-                        role: 'Brand Strategist', tagline: 'Naming, systems, the occasional necessary rebrand.' },
-                    { id: 'dev', kind: 'person', discipline: 'ENGINEERING', name: 'Dev Singh',
-                        role: 'Frontend Engineer', tagline: 'React / Swift, 4 years. Open to work.' },
-                    { id: 'elena', kind: 'person', discipline: 'DESIGN', name: 'Elena Vogt',
-                        role: 'Design Director', tagline: 'Building design systems at scale.' },
-                    { id: 'james', kind: 'person', discipline: 'ENGINEERING', name: 'James Kwon',
-                        role: 'Staff Engineer', tagline: 'Distributed systems, consensus protocols.' },
-                    { id: 'sophie', kind: 'person', discipline: 'BRAND', name: 'Sophie Laurent',
-                        role: 'Brand Director', tagline: 'Helping companies find their voice.' },
-                    { id: 'marco', kind: 'person', discipline: 'ENGINEERING', name: 'Marco Rossi',
-                        role: 'VP Engineering', tagline: 'Scaled teams from 5 to 500.' },
-                    { id: 'aisha', kind: 'person', discipline: 'DESIGN', name: 'Aisha Okonkwo',
-                        role: 'Product Designer', tagline: 'Fintech, healthtech, and the spaces in between.' },
-                    { id: 'liam', kind: 'person', discipline: 'ENGINEERING', name: 'Liam O\'Brien',
-                        role: 'DevOps Lead', tagline: 'Kubernetes, observability, and keeping things alive.' },
-                    { id: 'nina', kind: 'person', discipline: 'BRAND', name: 'Nina Chen',
-                        role: 'Creative Director', tagline: 'Brand strategy for climate tech.' },
-                    { id: 'peter', kind: 'person', discipline: 'DESIGN', name: 'Peter Malkin',
-                        role: 'Design Lead', tagline: 'UX research + product design. 8 years.' },
-                    { id: 'clara', kind: 'person', discipline: 'ENGINEERING', name: 'Clara Fischer',
-                        role: 'Backend Engineer', tagline: 'Go, Rust, and the occasional Python crime.' },
-                    { id: 'studio-north', kind: 'company', discipline: 'DESIGN', name: 'Studio North',
-                        role: 'Design studio, 12 people', tagline: 'Systems-heavy product design for regulated industries.' },
-                    { id: 'forge-labs', kind: 'company', discipline: 'ENGINEERING', name: 'Forge Labs',
-                        role: 'Inference infra, Series A', tagline: 'Building tooling for model deployment at scale.' },
-                    { id: 'hollow-co', kind: 'company', discipline: 'BRAND', name: 'Hollow & Co',
-                        role: 'Branding agency', tagline: 'Portfolio reviews every Friday.' },
-                    { id: 'strata', kind: 'company', discipline: 'ENGINEERING', name: 'Strata',
-                        role: 'Cloud infrastructure, Series B', tagline: 'Multi-cloud networking for the rest of us.' },
-                    { id: 'fieldwork', kind: 'company', discipline: 'DESIGN', name: 'Fieldwork',
-                        role: 'Product design consultancy', tagline: 'We work with founders who care about craft.' },
-                    { id: 'catalyst', kind: 'company', discipline: 'BRAND', name: 'Catalyst',
-                        role: 'Brand + comms', tagline: 'For companies that want to say something real.' },
-                ];
-            }
-
+            // ── Constants ─────────────────────────────────────────────
+            const STORAGE_KEY = 'neverever-statements-v9';
+            const PAGE_SIZE = 12;
             const AVIF_IMAGES = [
                 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?fm=avif&w=800&h=450&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?fm=avif&w=800&h=450&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1485550409059-9afb054cada4?fm=avif&w=800&h=450&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1519681393784-d120267933ba?fm=avif&w=800&h=450&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?fm=avif&w=800&h=450&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1522071820081-009f0129c71c?fm=avif&w=800&h=450&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?fm=avif&w=800&h=450&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1556761175-4b46a572b786?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?fm=avif&w=800&h=450&fit=crop&q=80'
             ];
 
-            function getRandomAVIF() { return AVIF_IMAGES[Math.floor(Math.random() * AVIF_IMAGES.length)]; }
-
-            function seedStatements(authorsList) {
-                const now = Date.now();
-                const day = 24 * 60 * 60 * 1000;
-                const hr = 60 * 60 * 1000;
-
-                function r(authorId, text, timeOffset, children) {
-                    return { id: uid(), authorId, time: now + timeOffset, text, replies: children || [] };
-                }
-
-                const img1 = getRandomAVIF();
-                const img2 = getRandomAVIF();
-                const img3 = getRandomAVIF();
-                const img4 = getRandomAVIF();
-                const img5 = getRandomAVIF();
-
-                return [{
-                    id: uid(),
-                    authorId: 'zack',
-                    time: now - day * 12 - hr * 3,
-                    tag: 'OPEN TO WORK',
-                    text: 'Six years freelance, shipped 20+ products across fintech, health, and consumer. Looking for staff-level product work.',
-                    mediaUrl: img1,
-                    replies: [
-                        r('maya', 'Zack, this is the most honest "open to work" I\'ve seen.', -day * 12 + hr * 2, [
-                            r('zack', 'Honestly? A clinical trial dashboard for a rare disease nonprofit.',
-                                -day * 12 + hr * 4, [
-                                    r('maya', 'That\'s the kind of work that actually matters.', -day * 12 + hr * 5,
-                                    [])
-                                ])
-                        ]),
-                        r('tom', 'Staff-level means different things. What\'s your definition?', -day * 12 + hr * 6, [
-                            r('zack', 'I want to own outcomes, not just outputs.', -day * 12 + hr * 8, [
-                                r('tom', 'That\'s the right definition.', -day * 12 + hr * 9, [])
-                            ])
-                        ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'studio-north',
-                    time: now - day * 10 - hr * 6,
-                    tag: 'HIRING',
-                    text: 'Senior Product Designer. Remote-first. We build systems for regulated industries — healthcare, finance, energy. This is governance, scale, and making complex things simple.',
-                    mediaUrl: img2,
-                    replies: [
-                        r('maya', 'What does "systems-heavy" mean here specifically?', -day * 10 + hr * 2, [
-                            r('studio-north',
-                                'Component libraries + governance — versioning, documentation, contribution workflows.',
-                                -day * 10 + hr * 4, [
-                                    r('maya', 'That\'s the right answer. I\'ll send you my portfolio.', -day *
-                                        10 + hr * 5, [])
-                                ])
-                        ]),
-                        r('ria', 'Do you sponsor visas for this role?', -day * 10 + hr * 7, [
-                            r('studio-north', 'Case by case — if you\'re a strong fit, we\'ll work with you.',
-                                -day * 10 + hr * 8, [
-                                    r('ria', 'Good to know. I\'m applying today.', -day * 10 + hr * 9, [])
-                                ])
-                        ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'maya',
-                    time: now - day * 9 - hr * 2,
-                    tag: 'CAREER',
-                    text: 'Left my agency job today. No regrets yet — ask me in a month. Six years of building other people\'s visions. Time to build my own.',
-                    mediaUrl: '',
-                    replies: [
-                        r('ria', 'The "yet" is doing a lot of work. But honestly, good for you.', -day * 9 + hr *
-                            1, [
-                                r('maya', 'I keep telling myself that the first month is the hardest.', -day * 9 +
-                                    hr * 2, [
-                                        r('ria', 'It\'s month three where the doubts creep in. Stay focused.',
-                                            -day * 9 + hr * 3, [])
-                                    ])
-                            ]),
-                        r('zack', 'Welcome to the other side. Freelance isn\'t easier, but it\'s yours.', -day *
-                            9 + hr * 5, [
-                                r('maya', 'Any advice for someone who\'s used to having a team?', -day * 9 +
-                                    hr * 6, [
-                                        r('zack', 'Build your network before you need it.', -day * 9 + hr *
-                                            7, [])
-                                    ])
-                            ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'forge-labs',
-                    time: now - day * 8 - hr * 8,
-                    tag: 'HIRING',
-                    text: 'We\'re building inference tooling for teams shipping models to production. Looking for two ML engineers — one senior, one mid-level.',
-                    mediaUrl: img3,
-                    replies: [
-                        r('tom', 'What\'s the serving stack?', -day * 8 + hr * 2, [
-                            r('forge-labs',
-                                'Triton + a custom scheduler. It\'s a full orchestration layer, not a wrapper.',
-                                -day * 8 + hr * 4, [
-                                    r('tom', 'That\'s the answer I was hoping for. I\'ll DM you.', -day * 8 +
-                                        hr * 5, [])
-                                ])
-                        ]),
-                        r('clara', 'What\'s the tech stack beyond the inference layer?', -day * 8 + hr * 7, [
-                            r('forge-labs', 'Go for control plane, Rust for data path, Python for glue.',
-                                -day * 8 + hr * 8, [
-                                    r('clara', 'That\'s a smart stack. I\'m applying.', -day * 8 + hr * 9,
-                                    [])
-                                ])
-                        ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'tom',
-                    time: now - day * 7 - hr * 4,
-                    tag: 'THOUGHTS',
-                    text: 'A staff title means nothing if the team around it is broken. I\'ve seen staff engineers who couldn\'t ship because the culture was toxic.',
-                    mediaUrl: '',
-                    replies: [
-                        r('maya', 'Hard agree. Titles are a proxy that people use because evaluating actual leadership is harder.',
-                            -day * 7 + hr * 1, [
-                                r('ria', 'Titles still matter for comp benchmarking even if they\'re a bad proxy.',
-                                    -day * 7 + hr * 2, [
-                                        r('maya', 'We should be paying for impact, not for a label.', -day *
-                                            7 + hr * 3, [
-                                                r('tom', 'This is the whole thread in miniature.', -day *
-                                                    7 + hr * 4, [])
-                                            ])
-                                    ])
-                            ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'ria',
-                    time: now - day * 6 - hr * 10,
-                    tag: 'BRAND',
-                    text: 'Rebranded three companies this year. None of them actually needed it. They needed clarity on their product-market fit, not a new logo.',
-                    mediaUrl: img4,
-                    replies: [
-                        r('hollow-co', '80% of rebrands are just "we\'re bored" or "we want to charge more."',
-                            -day * 6 + hr * 2, [
-                                r('ria', 'Say it louder for the agencies in the back.', -day * 6 + hr * 3, [
-                                    r('hollow-co', 'We would, but then nobody would hire us.', -day * 6 +
-                                        hr * 4, [])
-                                ])
-                            ]),
-                        r('sophie', 'Brand is about strategy, not aesthetics. If the strategy isn\'t there, the brand is just decoration.',
-                            -day * 6 + hr * 7, [
-                                r('ria', 'Yes! I\'m stealing that line.', -day * 6 + hr * 8, [])
-                            ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'dev',
-                    time: now - day * 5 - hr * 6,
-                    tag: 'OPEN TO WORK',
-                    text: 'Frontend, React / Swift, 4 YOE. Open to work — prefer product over agency. I care about accessibility, performance, and building things that people actually use.',
-                    mediaUrl: '',
-                    replies: [
-                        r('james', 'I\'m hiring for a product role at a climate tech startup. Send me your portfolio.',
-                            -day * 5 + hr * 1, [
-                                r('dev', 'Just sent it. Thanks James.', -day * 5 + hr * 2, [])
-                            ]),
-                        r('clara', 'I know a team at a fintech company that\'s looking for React engineers.',
-                            -day * 5 + hr * 3, [
-                                r('dev', 'Yes please! I\'d appreciate that.', -day * 5 + hr * 4, [])
-                            ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'hollow-co',
-                    time: now - day * 4 - hr * 2,
-                    tag: 'COMMUNITY',
-                    text: 'Portfolio reviews are back. Every Friday, we look at 5 portfolios and give honest feedback — no sugarcoating, no pitch decks.',
-                    mediaUrl: img5,
-                    replies: [
-                        r('sophie', 'This is such a great initiative.', -day * 4 + hr * 1, [
-                            r('hollow-co', 'People are hungry for honest feedback.', -day * 4 + hr * 2, [
-                                r('sophie', 'Where do people sign up?', -day * 4 + hr * 3, [
-                                    r('hollow-co', 'DM us on here or email.', -day * 4 + hr * 4, [])
-                                ])
-                            ])
-                        ]),
-                        r('peter', 'I\'ve done one of these reviews — it was genuinely helpful.', -day * 4 + hr *
-                            5, [
-                                r('hollow-co', 'Hope you\'re using the new narrative structure.', -day * 4 +
-                                    hr * 6, [
-                                        r('peter', 'I am! It\'s made a huge difference.', -day * 4 + hr * 7,
-                                        [])
-                                    ])
-                            ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'elena',
-                    time: now - day * 3 - hr * 8,
-                    tag: 'THOUGHTS',
-                    text: 'Design systems are not about consistency. They\'re about enabling speed and quality at scale. If your design system is just a library of components, you\'ve built a tool, not a system.',
-                    mediaUrl: '',
-                    replies: [
-                        r('studio-north', 'This is the distinction that separates the good from the great.',
-                            -day * 3 + hr * 2, [
-                                r('elena', 'A system is a way of working, not a collection of files.', -day *
-                                    3 + hr * 3, [
-                                        r('studio-north', 'We should write a manifesto together.', -day *
-                                            3 + hr * 4, [
-                                                r('elena', 'I\'m in. Let\'s do it.', -day * 3 + hr * 5,
-                                                [])
-                                            ])
-                                    ])
-                            ]),
-                        r('maya', 'The real system is the culture around it.', -day * 3 + hr * 6, [
-                            r('elena', 'Yes! The culture is the hardest part to build.', -day * 3 + hr * 7,
-                            [])
-                        ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'james',
-                    time: now - day * 3 - hr * 2,
-                    tag: 'THOUGHTS',
-                    text: 'Distributed systems are hard because we\'re trying to make unreliable things reliable. The best systems are the ones that embrace failure.',
-                    mediaUrl: '',
-                    replies: [
-                        r('tom', 'The best systems I\'ve built had failure as a first-class concern.', -day *
-                            3 + hr * 1, [
-                                r('james', 'The goal isn\'t to prevent failure. It\'s to handle it gracefully.',
-                                    -day * 3 + hr * 2, [
-                                        r('tom', '"Make failure boring" — I\'m using that.', -day * 3 + hr *
-                                            3, [])
-                                    ])
-                            ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'sophie',
-                    time: now - day * 2 - hr * 12,
-                    tag: 'BRAND',
-                    text: 'Your brand isn\'t your logo, your website, or your tagline. It\'s what people say about you when you\'re not in the room.',
-                    mediaUrl: '',
-                    replies: [
-                        r('ria', 'The visual identity is the easy part. The hard part is building real relationships.',
-                            -day * 2 + hr * 2, [
-                                r('sophie', 'And yet we charge $100k+ for the easy part.', -day * 2 + hr * 3,
-                                [
-                                        r('ria', 'I\'ve started telling clients that the brand is the last thing they need.',
-                                            -day * 2 + hr * 4, [])
-                                    ])
-                            ]),
-                        r('nina', 'Your brand is the promise you make. Your product is the delivery.', -day *
-                            2 + hr * 7, [
-                                r('sophie', 'That\'s a great way to frame it.', -day * 2 + hr * 8, [])
-                            ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'marco',
-                    time: now - day * 2 - hr * 4,
-                    tag: 'LEADERSHIP',
-                    text: 'Scaling a team from 5 to 500 taught me: leadership is about creating the conditions for others to succeed, not about making all the decisions.',
-                    mediaUrl: '',
-                    replies: [
-                        r('james', 'The hardest lesson for new managers. You stop being the hero and start being the enabler.',
-                            -day * 2 + hr * 1, [
-                                r('marco', 'Management is a craft, not a reward.', -day * 2 + hr * 2, [])
-                            ]),
-                        r('elena', 'The best designer on the team becomes the design lead and then stops doing design work.',
-                            -day * 2 + hr * 4, [
-                                r('marco', 'We need more dual-track career paths.', -day * 2 + hr * 5, [
-                                    r('elena', 'I\'m one of those people. I love designing. I don\'t want to manage.',
-                                        -day * 2 + hr * 6, [])
-                                ])
-                            ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'aisha',
-                    time: now - day * 1 - hr * 14,
-                    tag: 'OPEN TO WORK',
-                    text: 'Product designer, 7 years. Fintech + healthtech. I care about the details that make products feel human.',
-                    mediaUrl: '',
-                    replies: [
-                        r('fieldwork', 'We\'re hiring for exactly this. Let\'s talk.', -day * 1 + hr * 2, [
-                            r('aisha', 'I\'d love that. I\'ll send you my portfolio.', -day * 1 + hr * 3, [])
-                        ]),
-                        r('peter', 'Aisha, your work is incredible.', -day * 1 + hr * 4, [
-                            r('aisha', 'Thank you Peter! That means a lot.', -day * 1 + hr * 5, [])
-                        ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'clara',
-                    time: now - hr * 18,
-                    tag: 'THOUGHTS',
-                    text: 'Go is the best programming language for infrastructure work. I\'ll die on this hill. Simple, fast, and the concurrency model actually works.',
-                    mediaUrl: '',
-                    replies: [
-                        r('tom', 'For performance-critical paths, Rust has its place. It\'s not either/or.', -hr *
-                            16, [
-                                r('clara', 'Rust\'s learning curve is brutal. Go lets you ship faster.', -hr *
-                                    14, [
-                                        r('tom', 'Use the right tool for the job. But Go is a great default.',
-                                            -hr * 12, [])
-                                    ])
-                            ]),
-                        r('james', 'I was a Rust evangelist. Then I built a system in Go and shipped it in half the time.',
-                            -hr * 8, [
-                                r('clara', 'Welcome to the light side.', -hr * 6, [])
-                            ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'nina',
-                    time: now - hr * 12,
-                    tag: 'COMMUNITY',
-                    text: 'If you\'re in climate tech and you\'re hiring — please post your roles here. I\'m building a community of climate tech talent.',
-                    mediaUrl: '',
-                    replies: [
-                        r('james', 'We\'re hiring for a staff engineer. I\'ll DM you the details.', -hr * 10, [
-                            r('nina', 'Perfect. I\'ll circulate it in the community.', -hr * 8, [])
-                        ]),
-                        r('sophie', 'I\'m working with several climate tech companies. I\'ll connect you.', -hr *
-                            6, [
-                                r('nina', 'That would be amazing. Thank you.', -hr * 4, [])
-                            ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'liam',
-                    time: now - hr * 8,
-                    tag: 'THOUGHTS',
-                    text: 'Observability isn\'t about dashboards. It\'s about being able to answer questions you didn\'t know you\'d need to ask.',
-                    mediaUrl: '',
-                    replies: [
-                        r('clara', 'The best systems I\'ve worked on had rich telemetry.', -hr * 6, [
-                            r('liam', 'And the worst had "good enough" telemetry that became "not enough" at 2 AM.',
-                                -hr * 4, [
-                                    r('clara', 'I\'ve been there. The "it\'s probably the network" phase is the worst.',
-                                        -hr * 2, [])
-                                ])
-                        ]),
-                        r('tom', 'We spent 6 months building an observability stack. Best investment ever.',
-                            -hr * 5, [
-                                r('liam', 'The cost of not having observability is always higher.', -hr * 3,
-                                [])
-                            ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'peter',
-                    time: now - hr * 4,
-                    tag: 'OPEN TO WORK',
-                    text: 'UX researcher + product designer, 8 years. I\'m looking for a role where research actually drives the product decisions.',
-                    mediaUrl: '',
-                    replies: [
-                        r('aisha', 'Peter, you\'re one of the best researchers I\'ve worked with.', -hr * 3, [
-                            r('peter', 'Thank you Aisha. That means a lot.', -hr * 2, [])
-                        ]),
-                        r('fieldwork', 'We\'re looking for a design researcher. I\'d love to chat.', -hr * 1, [
-                            r('peter', 'I\'d love that. Sending my portfolio.', -hr * 0.5, [])
-                        ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'strata',
-                    time: now - hr * 2,
-                    tag: 'HIRING',
-                    text: 'Cloud infrastructure engineer, remote-first. Multi-cloud networking that actually works.',
-                    mediaUrl: '',
-                    replies: [
-                        r('liam', 'This is exactly the kind of work I\'ve been doing. I\'ll DM you.', -hr * 1, [
-                            r('strata', 'Please do. We\'re moving fast.', -hr * 0.5, [])
-                        ])
-                    ]
-                }, {
-                    id: uid(),
-                    authorId: 'catalyst',
-                    time: now - hr * 1,
-                    tag: 'COMMUNITY',
-                    text: 'Running a free brand strategy workshop next week. 2 hours, 20 people max. First come, first served.',
-                    mediaUrl: '',
-                    replies: [
-                        r('ria', 'I\'m in. I\'ve been wanting to see how Catalyst works.', -hr * 0.75, [
-                            r('catalyst', 'You\'re in. Sending the details.', -hr * 0.5, [])
-                        ]),
-                        r('sophie', 'I\'d love to attend.', -hr * 0.5, [
-                            r('catalyst', 'We\'d be honored. Sending the invite now.', -hr * 0.25, [])
-                        ])
-                    ]
-                }];
-            }
-
-            async function loadData() {
-                try {
-                    const res = await window.storage.get(STORAGE_KEY, false);
-                    if (res && res.value) {
-                        const parsed = JSON.parse(res.value);
-                        authors = parsed.authors || [];
-                        statements = parsed.statements || [];
-                        if (authors.length && statements.length) return;
-                    }
-                } catch (e) {}
-                authors = seedAuthors();
-                statements = seedStatements(authors);
-                await saveData();
-            }
-
-            let saveInFlight = false;
-            let pendingRetry = false;
-
-            function setSaveStatus(state) {
-                const el = document.getElementById('saveStatus');
-                if (!el) return;
-                el.classList.remove('err', 'ok');
-                if (state === 'saving') { el.textContent = '· saving…'; } else if (state === 'ok') { el.textContent =
-                        '· saved';
-                    el.classList.add('ok'); } else if (state === 'err') { el.textContent = '· not saved — click to retry';
-                    el.classList.add('err'); } else { el.textContent = ''; }
-            }
-
-            async function saveData(isRetry) {
-                if (saveInFlight) { pendingRetry = true; return; }
-                saveInFlight = true;
-                setSaveStatus('saving');
-                try {
-                    await window.storage.set(STORAGE_KEY, JSON.stringify({ authors, statements }), false);
-                    setSaveStatus('ok');
-                } catch (e) {
-                    console.error('storage save failed', e);
-                    if (!isRetry) {
-                        saveInFlight = false;
-                        await new Promise(r => setTimeout(r, 800));
-                        return saveData(true);
-                    }
-                    setSaveStatus('err');
-                } finally {
-                    saveInFlight = false;
-                    if (pendingRetry) { pendingRetry = false;
-                        saveData(); }
-                }
-            }
-
-            document.getElementById('saveStatus').addEventListener('click', () => {
-                if (document.getElementById('saveStatus').classList.contains('err')) saveData();
-            });
+            // ── Helpers ──────────────────────────────────────────────
+            const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+            const hash = str => { let h = 0; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0; return h; };
+            const avatarVariant = id => 'v' + (hash(id) % 4);
+            const initialsFor = a => {
+                const parts = a.name.replace(/[^A-Za-z ]/g, '').trim().split(/\s+/).filter(Boolean);
+                if (!parts.length) return '?';
+                if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+                return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+            };
+            const authorById = id => authors.find(a => a.id === id);
+            const randAVIF = () => AVIF_IMAGES[Math.floor(Math.random() * AVIF_IMAGES.length)];
+            const isVideo = url => /\.(mp4|webm|mov)(\?|$)/i.test(url);
+            const escapeHtml = s => (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;',
+                '"': '&quot;', "'": '&#39;' } [c]));
 
             function fmtTime(ts) {
-                const d = new Date(ts);
-                const now = new Date();
+                const d = new Date(ts),
+                    now = new Date();
                 const sameDay = d.toDateString() === now.toDateString();
                 const yest = new Date(now);
                 yest.setDate(now.getDate() - 1);
@@ -1823,35 +1480,10 @@
                 return d.toLocaleDateString([], { month: 'short', day: 'numeric' }).toUpperCase();
             }
 
-            function isVideo(url) { return /\.(mp4|webm|mov)(\?|$)/i.test(url); }
-
             function countReplies(node) {
                 let n = node.replies.length;
                 node.replies.forEach(r => n += countReplies(r));
                 return n;
-            }
-
-            function countAuthorActivity(authorId) {
-                let statementsCount = 0,
-                    repliesCount = 0;
-
-                function walk(node, isTop) {
-                    if (node.authorId === authorId) { isTop ? statementsCount++ : repliesCount++; }
-                    node.replies.forEach(r => walk(r, false));
-                }
-                statements.forEach(s => walk(s, true));
-                return { statementsCount, repliesCount };
-            }
-
-            function escapeHtml(s) {
-                return (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;',
-                    "'": '&#39;' } [c]));
-            }
-
-            function el(html) {
-                const t = document.createElement('template');
-                t.innerHTML = html.trim();
-                return t.content.firstElementChild;
             }
 
             function avatarHtml(authorId, size) {
@@ -1862,42 +1494,185 @@
                 return `<div class="${cls.join(' ')}">${escapeHtml(initialsFor(a))}</div>`;
             }
 
-            function openProfile(authorId) {
-                const a = authorById(authorId);
-                if (!a) return;
-                document.getElementById('profileAvatarSlot').innerHTML = avatarHtml(a.id, 'lg');
-                document.getElementById('profileName').textContent = a.name;
-                document.getElementById('profileKind').textContent = a.kind === 'company' ? 'COMPANY / BRAND' : 'PERSON';
-                document.getElementById('profileRole').textContent = a.role || '';
-                document.getElementById('profileTagline').textContent = a.tagline || '';
-                const { statementsCount, repliesCount } = countAuthorActivity(a.id);
-                document.getElementById('profileStats').textContent =
-                    `${statementsCount} STATEMENT${statementsCount===1?'':'S'} · ${repliesCount} REPL${repliesCount===1?'Y':'IES'}`;
-                document.getElementById('profileModal').hidden = false;
+            function renderMediaThumb(url) {
+                if (!url) return '';
+                const tag = isVideo(url) ? 'video' : 'img';
+                const attrs = isVideo(url) ? 'controls playsinline muted' : 'alt=""';
+                return `<div class="thumb-sm"><${tag} src="${escapeHtml(url)}" ${attrs} loading="lazy" /></div>`;
             }
-            document.getElementById('profileClose').addEventListener('click', () => document.getElementById('profileModal')
-                .hidden = true);
-            document.getElementById('profileModal').addEventListener('click', (e) => {
-                if (e.target.id === 'profileModal') document.getElementById('profileModal').hidden = true;
-            });
 
+            function renderMediaHero(url) {
+                if (!url) return '';
+                const tag = isVideo(url) ? 'video' : 'img';
+                const attrs = isVideo(url) ? 'controls playsinline' : 'alt=""';
+                return `<div style="margin-top:0.3rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);"><${tag} src="${escapeHtml(url)}" ${attrs} loading="lazy" style="display:block;width:100%;height:auto;max-height:200px;object-fit:cover;" /></div>`;
+            }
+
+            // ── Seed data ─────────────────────────────────────────────
+            function seedAuthors() {
+                return [
+                    { id: 'zack', kind: 'person', discipline: 'DESIGN', name: 'Zack Gort',
+                    role: 'Product / UX Designer', tagline: 'Six years freelance.' },
+                    { id: 'maya', kind: 'person', discipline: 'DESIGN', name: 'Maya Chen', role: 'Creative Director',
+                        tagline: 'Ex-agency.' },
+                    { id: 'tom', kind: 'person', discipline: 'ENGINEERING', name: 'Tom Okafor', role: 'ML Engineer',
+                        tagline: 'Infra and eval.' },
+                    { id: 'ria', kind: 'person', discipline: 'BRAND', name: 'Ria Patel', role: 'Brand Strategist',
+                        tagline: 'Naming, systems.' },
+                    { id: 'dev', kind: 'person', discipline: 'ENGINEERING', name: 'Dev Singh',
+                        role: 'Frontend Engineer', tagline: 'React / Swift.' },
+                    { id: 'elena', kind: 'person', discipline: 'DESIGN', name: 'Elena Vogt', role: 'Design Director',
+                        tagline: 'Design systems.' },
+                    { id: 'james', kind: 'person', discipline: 'ENGINEERING', name: 'James Kwon',
+                        role: 'Staff Engineer', tagline: 'Distributed systems.' },
+                    { id: 'sophie', kind: 'person', discipline: 'BRAND', name: 'Sophie Laurent',
+                        role: 'Brand Director', tagline: 'Finding voice.' },
+                    { id: 'marco', kind: 'person', discipline: 'ENGINEERING', name: 'Marco Rossi',
+                        role: 'VP Engineering', tagline: 'Scaled teams.' },
+                    { id: 'aisha', kind: 'person', discipline: 'DESIGN', name: 'Aisha Okonkwo',
+                        role: 'Product Designer', tagline: 'Fintech, healthtech.' },
+                    { id: 'liam', kind: 'person', discipline: 'ENGINEERING', name: 'Liam O\'Brien',
+                        role: 'DevOps Lead', tagline: 'Kubernetes.' },
+                    { id: 'nina', kind: 'person', discipline: 'BRAND', name: 'Nina Chen', role: 'Creative Director',
+                        tagline: 'Climate tech.' },
+                    { id: 'peter', kind: 'person', discipline: 'DESIGN', name: 'Peter Malkin', role: 'Design Lead',
+                        tagline: 'UX research.' },
+                    { id: 'clara', kind: 'person', discipline: 'ENGINEERING', name: 'Clara Fischer',
+                        role: 'Backend Engineer', tagline: 'Go, Rust.' },
+                    { id: 'studio-north', kind: 'company', discipline: 'DESIGN', name: 'Studio North',
+                        role: 'Design studio, 12 people', tagline: 'Systems-heavy.' },
+                    { id: 'forge-labs', kind: 'company', discipline: 'ENGINEERING', name: 'Forge Labs',
+                        role: 'Inference infra', tagline: 'Model deployment.' },
+                    { id: 'hollow-co', kind: 'company', discipline: 'BRAND', name: 'Hollow & Co',
+                        role: 'Branding agency', tagline: 'Portfolio reviews.' },
+                    { id: 'strata', kind: 'company', discipline: 'ENGINEERING', name: 'Strata',
+                        role: 'Cloud infrastructure', tagline: 'Multi-cloud.' },
+                    { id: 'fieldwork', kind: 'company', discipline: 'DESIGN', name: 'Fieldwork',
+                        role: 'Product design consultancy', tagline: 'Founders.' },
+                    { id: 'catalyst', kind: 'company', discipline: 'BRAND', name: 'Catalyst',
+                        role: 'Brand + comms', tagline: 'Say something real.' }
+                ];
+            }
+
+            function seedStatements(authorsList) {
+                const now = Date.now(),
+                    day = 24 * 60 * 60 * 1000;
+                const texts = [
+                    'Looking for staff-level product work. Six years freelance, shipped 20+ products.',
+                    'Left my agency job today. No regrets yet — ask me in a month.',
+                    'A staff title means nothing if the team around it is broken.',
+                    'Rebranded three companies this year. None needed it.',
+                    'Design systems are not about consistency. They\'re about enabling speed.',
+                    'Distributed systems are hard because we\'re trying to make unreliable things reliable.',
+                    'Your brand isn\'t your logo. It\'s what people say about you when you\'re not in the room.',
+                    'Leadership is about creating conditions for others to succeed.',
+                    'I care about the details that make products feel human.',
+                    'Observability isn\'t about dashboards. It\'s about answering questions you didn\'t know you\'d need to ask.',
+                    'Go is the best programming language for infrastructure work.',
+                    'Building inference tooling for teams shipping models to production.',
+                    'Senior Product Designer. Remote-first. We build systems for regulated industries.',
+                    'Free brand strategy workshop next week. 2 hours, 20 people max.',
+                    'Portfolio reviews back. Every Friday, 5 portfolios, honest feedback.',
+                    'The real system is the culture around it.',
+                    'Best systems I\'ve built had failure as first-class concern.',
+                    'UX researcher + product designer, 8 years. Looking for role where research drives decisions.',
+                    'If you\'re in climate tech and hiring — please post roles here.'
+                ];
+                const tags = ['OPEN TO WORK', 'HIRING', 'CAREER', 'THOUGHTS', 'BRAND', 'COMMUNITY', 'LEADERSHIP'];
+                const result = [];
+                for (let i = 0; i < 24; i++) {
+                    const a = authorsList[Math.floor(Math.random() * authorsList.length)];
+                    result.push({
+                        id: uid(),
+                        authorId: a.id,
+                        time: now - (Math.random() * 14 * day),
+                        tag: tags[Math.floor(Math.random() * tags.length)],
+                        text: texts[i % texts.length],
+                        mediaUrl: Math.random() > 0.6 ? randAVIF() : '',
+                        replies: []
+                    });
+                }
+                return result;
+            }
+
+            // ── Storage ──────────────────────────────────────────────
+            const storage = {
+                get: async key => { try { const v = localStorage.getItem(key); return v !== null ? { value: v } : null; }
+                    catch (e) { return null; } },
+                set: async (key, val) => { try { localStorage.setItem(key, val); return true; } catch (e) { return false; } }
+            };
+
+            // ── State ─────────────────────────────────────────────────
+            let authors = [];
+            let statements = [];
+            let letterData = [];
+            let activeIndex = 0;
+            let focusMode = false;
+            let modalStatementId = null;
+            let modalReplyTargetId = null;
+            const collapsed = new Set();
+            const activeTags = new Set();
+            const activeKinds = new Set();
+            const activeDisciplines = new Set();
+            let searchQuery = '';
+
+            // ── Data loading ──────────────────────────────────────────
+            async function loadData() {
+                try {
+                    const res = await storage.get(STORAGE_KEY);
+                    if (res && res.value) {
+                        const parsed = JSON.parse(res.value);
+                        if (parsed.authors?.length && parsed.statements?.length) {
+                            authors = parsed.authors;
+                            statements = parsed.statements;
+                            return;
+                        }
+                    }
+                } catch (e) {}
+                authors = seedAuthors();
+                statements = seedStatements(authors);
+                await saveData();
+            }
+
+            let saveInFlight = false;
+
+            function setSaveStatus(state) {
+                const el = document.getElementById('saveStatus');
+                if (!el) return;
+                el.classList.remove('err', 'ok');
+                if (state === 'saving') el.textContent = '· saving…';
+                else if (state === 'ok') { el.textContent = '· saved';
+                    el.classList.add('ok'); } else if (state === 'err') { el.textContent = '· not saved';
+                    el.classList.add('err'); } else { el.textContent = ''; }
+            }
+
+            async function saveData() {
+                if (saveInFlight) return;
+                saveInFlight = true;
+                setSaveStatus('saving');
+                try {
+                    await storage.set(STORAGE_KEY, JSON.stringify({ authors, statements }));
+                    setSaveStatus('ok');
+                } catch (e) { setSaveStatus('err'); }
+                saveInFlight = false;
+            }
+
+            // ── Filters ──────────────────────────────────────────────
             function passesFilters(s) {
                 const a = authorById(s.authorId);
                 if (!a) return false;
-
                 if (searchQuery) {
                     const q = searchQuery.toLowerCase();
-                    const matchesText = s.text.toLowerCase().includes(q);
-                    const matchesAuthor = a.name.toLowerCase().includes(q);
-                    const matchesTag = s.tag ? s.tag.toLowerCase().includes(q) : false;
-                    if (!matchesText && !matchesAuthor && !matchesTag) return false;
+                    if (!s.text.toLowerCase().includes(q) && !a.name.toLowerCase().includes(q) && !(s.tag && s.tag
+                            .toLowerCase().includes(q))) return false;
                 }
-
                 const tagOk = activeTags.size === 0 || (s.tag && activeTags.has(s.tag));
-                const kindOk = activeKinds.size === 0 || (a && activeKinds.has(a.kind));
-                const discOk = activeDisciplines.size === 0 || (a && activeDisciplines.has(a.discipline));
+                const kindOk = activeKinds.size === 0 || activeKinds.has(a.kind);
+                const discOk = activeDisciplines.size === 0 || activeDisciplines.has(a.discipline);
                 return tagOk && kindOk && discOk;
             }
+
+            function getFiltered() { return statements.filter(passesFilters); }
 
             function filtersActive() {
                 return activeTags.size > 0 || activeKinds.size > 0 || activeDisciplines.size > 0 || searchQuery.length > 0;
@@ -1909,19 +1684,34 @@
                 activeDisciplines.clear();
                 searchQuery = '';
                 document.getElementById('bentoSearch').value = '';
-                currentPage = 0;
-                allLoaded = false;
-                render();
+                renderLetter(activeIndex);
                 updateFilterUI();
             }
 
-            function openConversation(statementId) {
-                modalStatementId = statementId;
+            function updateFilterUI() {
+                const count = activeTags.size + activeKinds.size + activeDisciplines.size + (searchQuery.length > 0 ? 1 :
+                0);
+                document.getElementById('filterCount').textContent = count;
+                const summary = document.getElementById('activeFilterSummary');
+                if (count === 0) summary.textContent = 'No filters active';
+                else {
+                    const parts = [];
+                    if (searchQuery) parts.push(`"${searchQuery}"`);
+                    if (activeTags.size) parts.push(`${activeTags.size} tag${activeTags.size>1?'s':''}`);
+                    if (activeKinds.size) parts.push(`${activeKinds.size} kind${activeKinds.size>1?'s':''}`);
+                    if (activeDisciplines.size) parts.push(`${activeDisciplines.size} discipline${activeDisciplines.size>1?'s':''}`);
+                    summary.textContent = `Active: ${parts.join(', ')}`;
+                }
+                document.getElementById('hudClear').hidden = count === 0;
+            }
+
+            // ── Conversation modal ───────────────────────────────────
+            function openConversation(id) {
+                modalStatementId = id;
                 modalReplyTargetId = null;
-                const modal = document.getElementById('conversationModal');
-                modal.classList.add('open');
+                document.getElementById('conversationModal').classList.add('open');
                 document.body.style.overflow = 'hidden';
-                renderModalContent(statementId);
+                renderModalContent(id);
             }
 
             function closeConversation() {
@@ -1929,30 +1719,6 @@
                 document.body.style.overflow = '';
                 modalStatementId = null;
                 modalReplyTargetId = null;
-            }
-
-            function renderMediaThumb(url, sizeClass) {
-                if (!url) return '';
-                const isVid = isVideo(url);
-                const tag = isVid ? 'video' : 'img';
-                const attrs = isVid ? 'controls playsinline muted' : 'alt=""';
-                return `<div class="thumb ${sizeClass}"><${tag} src="${escapeHtml(url)}" ${attrs} loading="lazy" /></div>`;
-            }
-
-            function renderMediaHero(url) {
-                if (!url) return '';
-                const isVid = isVideo(url);
-                const tag = isVid ? 'video' : 'img';
-                const attrs = isVid ? 'controls playsinline' : 'alt=""';
-                return `<div class="thumb-lg"><${tag} src="${escapeHtml(url)}" ${attrs} loading="lazy" /></div>`;
-            }
-
-            function renderMediaGrid(url) {
-                if (!url) return '';
-                const isVid = isVideo(url);
-                const tag = isVid ? 'video' : 'img';
-                const attrs = isVid ? 'controls playsinline muted' : 'alt=""';
-                return `<div class="thumb-grid"><${tag} src="${escapeHtml(url)}" ${attrs} loading="lazy" /></div>`;
             }
 
             function renderModalNode(node, statement, depth) {
@@ -1963,30 +1729,27 @@
                 wrap.className = 'modal-node';
                 wrap.dataset.nodeId = node.id;
 
-                let headHtml = `
+                let headHtml =
+                    `
               <div class="modal-node-head">
                 ${hasChildren ? `<button class="modal-node-toggle" data-node-id="${node.id}">${isCollapsed ? '[+]' : '[–]'}</button>` : ''}
                 ${avatarHtml(node.authorId,'xs')}
                 <span class="modal-node-author" data-author-id="${node.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
-                ${a && a.kind==='company' ? '<span class="co-badge">CO</span>' : ''}
+                ${a && a.kind==='company' ? '<span class="co-badge" style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 3px;border-radius:2px;">CO</span>' : ''}
                 <span class="modal-node-time">${fmtTime(node.time)}</span>
-                ${isCollapsed ? `<span class="modal-node-collapsed-note">(${countReplies(node)+1} hidden)</span>` : ''}
+                ${isCollapsed ? `<span style="font-family:var(--font-mono);font-size:8px;color:var(--ink-light);">(${countReplies(node)+1} hidden)</span>` : ''}
               </div>
             `;
                 wrap.innerHTML = headHtml;
 
                 const head = wrap.querySelector('.modal-node-head');
-                head.querySelector('[data-author-id]').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    openProfile(e.target.dataset.authorId);
-                });
+                head.querySelector('[data-author-id]').addEventListener('click', e => e.stopPropagation());
 
                 if (hasChildren) {
                     const toggle = head.querySelector('.modal-node-toggle');
-                    toggle.addEventListener('click', (e) => {
+                    toggle.addEventListener('click', e => {
                         e.stopPropagation();
-                        if (isCollapsed) collapsed.delete(node.id);
-                        else collapsed.add(node.id);
+                        isCollapsed ? collapsed.delete(node.id) : collapsed.add(node.id);
                         renderModalContent(modalStatementId);
                     });
                 }
@@ -2002,8 +1765,6 @@
                     const replyBtn = document.createElement('button');
                     replyBtn.className = 'modal-node-link';
                     replyBtn.textContent = 'reply';
-                    replyBtn.dataset.action = 'reply';
-                    replyBtn.dataset.nodeId = node.id;
                     replyBtn.addEventListener('click', () => {
                         modalReplyTargetId = (modalReplyTargetId === node.id) ? null : node.id;
                         renderModalContent(modalStatementId);
@@ -2012,30 +1773,28 @@
                     wrap.appendChild(actions);
 
                     if (modalReplyTargetId === node.id) {
-                        const form = renderModalReplyForm(node, statement);
+                        const form = renderModalReplyForm(node);
                         wrap.appendChild(form);
                     }
 
-                    if (node.replies.length > 0) {
+                    if (node.replies.length) {
                         const childWrap = document.createElement('div');
                         childWrap.className = 'modal-node-children';
-                        node.replies.forEach(child => {
-                            childWrap.appendChild(renderModalNode(child, statement, (depth || 0) + 1));
-                        });
+                        node.replies.forEach(child => childWrap.appendChild(renderModalNode(child, statement, (depth ||
+                            0) + 1)));
                         wrap.appendChild(childWrap);
                     }
                 }
-
                 return wrap;
             }
 
-            function renderModalReplyForm(target, statement) {
+            function renderModalReplyForm(target) {
                 const form = document.createElement('div');
                 form.className = 'modal-reply-form';
                 const sel = document.createElement('select');
                 sel.className = 'rf-author';
                 sel.innerHTML = authorOptionsHtml();
-                sel.value = lastAuthorId || authors[0].id;
+                sel.value = authors[0]?.id || '';
 
                 const ta = document.createElement('textarea');
                 ta.className = 'rf-text';
@@ -2048,7 +1807,6 @@
                 const cancelBtn = document.createElement('button');
                 cancelBtn.className = 'btn ghost small';
                 cancelBtn.textContent = 'Cancel';
-                cancelBtn.dataset.action = 'cancel';
                 cancelBtn.addEventListener('click', () => {
                     modalReplyTargetId = null;
                     renderModalContent(modalStatementId);
@@ -2057,17 +1815,15 @@
                 const submitBtn = document.createElement('button');
                 submitBtn.className = 'btn btn-primary small';
                 submitBtn.textContent = 'Post reply';
-                submitBtn.dataset.action = 'submit';
                 submitBtn.addEventListener('click', () => {
                     const authorId = sel.value;
                     const text = ta.value.trim();
                     if (!text || !authorId) return;
-                    lastAuthorId = authorId;
                     target.replies.push({ id: uid(), authorId, time: Date.now(), text, replies: [] });
                     modalReplyTargetId = null;
                     saveData();
                     renderModalContent(modalStatementId);
-                    render();
+                    renderLetter(activeIndex);
                 });
 
                 actions.appendChild(cancelBtn);
@@ -2078,22 +1834,23 @@
                 return form;
             }
 
-            function renderModalContent(statementId) {
-                const s = statements.find(st => st.id === statementId);
+            function renderModalContent(id) {
+                const s = statements.find(st => st.id === id);
                 if (!s) return;
                 const container = document.getElementById('modalContent');
                 const a = authorById(s.authorId);
 
-                let html = `
+                let html =
+                    `
               <div class="modal-statement">
                 <div class="card-who">
                   ${avatarHtml(s.authorId,'md')}
                   <div>
                     <div class="card-author-row">
                       <span class="card-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
-                      ${a && a.kind==='company' ? '<span class="co-badge">CO</span>' : ''}
+                      ${a && a.kind==='company' ? '<span class="co-badge" style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 3px;border-radius:2px;">CO</span>' : ''}
                       <span class="card-time">${fmtTime(s.time)}</span>
-                      ${s.tag ? `<span class="card-tag t-micro">${escapeHtml(s.tag)}</span>` : ''}
+                      ${s.tag ? `<span class="card-tag" style="font-family:var(--font-mono);font-size:8px;color:var(--ink-light);border:1px solid var(--border);padding:0 6px;border-radius:var(--radius-sm);letter-spacing:0.04em;">${escapeHtml(s.tag)}</span>` : ''}
                     </div>
                     <div class="card-role">${a ? escapeHtml(a.role||'') : ''}</div>
                   </div>
@@ -2108,14 +1865,8 @@
 
                 container.innerHTML = html;
 
-                container.querySelector('.card-author').addEventListener('click', () => {
-                    openProfile(s.authorId);
-                });
-
                 const threadEl = container.querySelector('#modalThread');
-                s.replies.forEach(r => {
-                    threadEl.appendChild(renderModalNode(r, s, 0));
-                });
+                s.replies.forEach(r => threadEl.appendChild(renderModalNode(r, s, 0)));
 
                 const trigger = container.querySelector('#modalReplyTrigger');
                 const link = document.createElement('button');
@@ -2128,368 +1879,343 @@
                 trigger.appendChild(link);
 
                 if (modalReplyTargetId === s.id) {
-                    const form = renderModalReplyForm(s, s);
-                    trigger.appendChild(form);
+                    trigger.appendChild(renderModalReplyForm(s));
                 }
             }
 
-            // ── Infinite scroll render ──
-            function render() {
-                currentPage = 0;
-                allLoaded = false;
-                if (gridMode) renderGridInfinite();
-                else renderListInfinite();
-                updateFilterUI();
-            }
-
-            function getFilteredStatements() {
-                return statements.filter(s => passesFilters(s));
-            }
-
-            function renderListInfinite() {
-                const root = document.getElementById('listRoot');
-                root.innerHTML = '';
-                const filtered = getFilteredStatements();
-
-                if (filtered.length === 0) {
-                    document.getElementById('topCount').textContent = '000';
-                    root.appendChild(el(`
-                        <div class="empty">
-                            <div class="t-micro">000 STATEMENTS</div>
-                            <p>${statements.length === 0 ? 'Nothing here yet.' : 'No matches for these filters.'}</p>
-                            ${statements.length === 0 ? '<button class="btn btn-primary" id="emptyNew">Write the first one</button>' : '<button class="btn ghost" id="clearFromEmpty">Clear filters</button>'}
-                        </div>
-                    `));
-                    const btn = root.querySelector('#emptyNew') || root.querySelector('#clearFromEmpty');
-                    if (btn) btn.addEventListener('click', btn.id === 'emptyNew' ? openComposer : clearFilters);
-                    renderHud();
-                    return;
-                }
-
-                document.getElementById('topCount').textContent = filtersActive() ?
-                    `${String(filtered.length).padStart(3,'0')} / ${String(statements.length).padStart(3,'0')}` :
-                    String(statements.length).padStart(3, '0');
-
-                const list = el('<div class="list"></div>');
-                root.appendChild(list);
-
-                const endIdx = Math.min(pageSize, filtered.length);
-                for (let i = 0; i < endIdx; i++) {
-                    const s = filtered[i];
-                    const idx = String(statements.length - statements.indexOf(s)).padStart(3, '0');
-                    list.appendChild(renderRow(s, idx));
-                }
-
-                if (filtered.length > pageSize) {
-                    const trigger = el(`
-                        <div class="load-more-trigger" id="loadMoreTrigger">
-                            <span class="spinner" style="display:none;"></span>
-                            <span class="load-text">Load more (${filtered.length - pageSize} remaining)</span>
-                        </div>
-                    `);
-                    list.appendChild(trigger);
-                    const observer = new IntersectionObserver((entries) => {
-                        if (entries[0].isIntersecting && !isLoading && !allLoaded) {
-                            loadMoreList(filtered, list);
-                        }
-                    }, { rootMargin: '0px 0px 100px 0px' });
-                    observer.observe(trigger);
-                    trigger._observer = observer;
-                } else {
-                    allLoaded = true;
-                }
-
-                populateAuthorSelects();
-                renderHud();
-            }
-
-            function loadMoreList(filtered, list) {
-                if (isLoading || allLoaded) return;
-                isLoading = true;
-                const trigger = list.querySelector('#loadMoreTrigger');
-                if (trigger) {
-                    trigger.querySelector('.spinner').style.display = 'inline-block';
-                    trigger.querySelector('.load-text').textContent = 'Loading...';
-                }
-
-                setTimeout(() => {
-                    const currentCount = list.querySelectorAll('.row:not(.load-more-trigger)').length;
-                    const nextBatch = Math.min(currentCount + pageSize, filtered.length);
-                    for (let i = currentCount; i < nextBatch; i++) {
-                        const s = filtered[i];
-                        const idx = String(statements.length - statements.indexOf(s)).padStart(3, '0');
-                        list.insertBefore(renderRow(s, idx), trigger);
-                    }
-                    isLoading = false;
-                    if (nextBatch >= filtered.length) {
-                        allLoaded = true;
-                        if (trigger) {
-                            trigger.querySelector('.spinner').style.display = 'none';
-                            trigger.querySelector('.load-text').textContent = 'All loaded ✓';
-                        }
-                    } else {
-                        if (trigger) {
-                            trigger.querySelector('.spinner').style.display = 'none';
-                            trigger.querySelector('.load-text').textContent =
-                                `Load more (${filtered.length - nextBatch} remaining)`;
-                        }
-                    }
-                }, 300);
-            }
-
-            function renderGridInfinite() {
-                const root = document.getElementById('listRoot');
-                root.innerHTML = '';
-                const filtered = getFilteredStatements();
-
-                if (filtered.length === 0) {
-                    document.getElementById('topCount').textContent = '000';
-                    root.appendChild(el(`
-                        <div class="empty">
-                            <div class="t-micro">000 STATEMENTS</div>
-                            <p>${statements.length === 0 ? 'Nothing here yet.' : 'No matches for these filters.'}</p>
-                            ${statements.length === 0 ? '<button class="btn btn-primary" id="emptyNew">Write the first one</button>' : '<button class="btn ghost" id="clearFromEmpty">Clear filters</button>'}
-                        </div>
-                    `));
-                    const btn = root.querySelector('#emptyNew') || root.querySelector('#clearFromEmpty');
-                    if (btn) btn.addEventListener('click', btn.id === 'emptyNew' ? openComposer : clearFilters);
-                    renderHud();
-                    return;
-                }
-
-                document.getElementById('topCount').textContent = filtersActive() ?
-                    `${String(filtered.length).padStart(3,'0')} / ${String(statements.length).padStart(3,'0')}` :
-                    String(statements.length).padStart(3, '0');
-
-                const list = el('<div class="list"></div>');
-                root.appendChild(list);
-
-                const endIdx = Math.min(pageSize, filtered.length);
-                for (let i = 0; i < endIdx; i++) {
-                    const s = filtered[i];
-                    const idx = String(statements.length - statements.indexOf(s)).padStart(3, '0');
-                    list.appendChild(renderGridItem(s, idx));
-                }
-
-                if (filtered.length > pageSize) {
-                    const trigger = el(`
-                        <div class="load-more-trigger" id="loadMoreTrigger">
-                            <span class="spinner" style="display:none;"></span>
-                            <span class="load-text">Load more (${filtered.length - pageSize} remaining)</span>
-                        </div>
-                    `);
-                    list.appendChild(trigger);
-                    const observer = new IntersectionObserver((entries) => {
-                        if (entries[0].isIntersecting && !isLoading && !allLoaded) {
-                            loadMoreGrid(filtered, list);
-                        }
-                    }, { rootMargin: '0px 0px 100px 0px' });
-                    observer.observe(trigger);
-                    trigger._observer = observer;
-                } else {
-                    allLoaded = true;
-                }
-
-                populateAuthorSelects();
-                renderHud();
-            }
-
-            function loadMoreGrid(filtered, list) {
-                if (isLoading || allLoaded) return;
-                isLoading = true;
-                const trigger = list.querySelector('#loadMoreTrigger');
-                if (trigger) {
-                    trigger.querySelector('.spinner').style.display = 'inline-block';
-                    trigger.querySelector('.load-text').textContent = 'Loading...';
-                }
-
-                setTimeout(() => {
-                    const currentCount = list.querySelectorAll('.row:not(.load-more-trigger)').length;
-                    const nextBatch = Math.min(currentCount + pageSize, filtered.length);
-                    for (let i = currentCount; i < nextBatch; i++) {
-                        const s = filtered[i];
-                        const idx = String(statements.length - statements.indexOf(s)).padStart(3, '0');
-                        list.insertBefore(renderGridItem(s, idx), trigger);
-                    }
-                    isLoading = false;
-                    if (nextBatch >= filtered.length) {
-                        allLoaded = true;
-                        if (trigger) {
-                            trigger.querySelector('.spinner').style.display = 'none';
-                            trigger.querySelector('.load-text').textContent = 'All loaded ✓';
-                        }
-                    } else {
-                        if (trigger) {
-                            trigger.querySelector('.spinner').style.display = 'none';
-                            trigger.querySelector('.load-text').textContent =
-                                `Load more (${filtered.length - nextBatch} remaining)`;
-                        }
-                    }
-                }, 300);
-            }
-
-            function renderRow(s, idx) {
+            // ── Bento card builder ───────────────────────────────────
+            function buildBentoCard(s) {
                 const a = authorById(s.authorId);
-                const marker = s.mediaUrl ? (isVideo(s.mediaUrl) ? 'VID' : 'IMG') : '';
-                const row = el(`
-              <div class="row" data-id="${s.id}">
-                <div class="row-idx t-data">${idx}</div>
-                <div class="row-avatar">${avatarHtml(s.authorId,'sm')}</div>
-                <div class="row-text-wrap">
-                  <div class="row-meta">
-                    <span class="row-author">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
-                    <span class="row-time">${fmtTime(s.time)}</span>
-                    ${s.tag ? `<span class="card-tag t-micro" style="font-size:6px;border:1px solid var(--border);padding:0 4px;border-radius:2px;">${escapeHtml(s.tag)}</span>` : ''}
-                  </div>
-                  <div class="row-text">${escapeHtml(s.text)}</div>
-                </div>
-                <div class="row-marker">
-                  ${s.mediaUrl ? renderMediaThumb(s.mediaUrl, 'thumb-sm') : ''}
-                  ${marker}
-                </div>
+                const variants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
+                const variant = variants[Math.floor(Math.random() * variants.length)];
+                let spans = '';
+                const r = Math.random();
+                if (r < 0.2) spans = 'span-2';
+                else if (r < 0.3) spans = 'row-span-2';
+
+                const card = document.createElement('div');
+                card.className = ['card', variant, spans].filter(Boolean).join(' ');
+                card.style.animationDelay = (Math.random() * 0.2) + 's';
+
+                const isDark = variant.includes('dark') || variant.includes('mid');
+                const textColor = isDark ? '#fff' : 'var(--ink)';
+                const lightColor = isDark ? 'rgba(255,255,255,0.6)' : 'var(--ink-light)';
+                const bodyColor = isDark ? 'rgba(255,255,255,0.8)' : 'var(--ink-mid)';
+                const metaColor = isDark ? 'rgba(255,255,255,0.4)' : 'var(--ink-light)';
+
+                card.innerHTML = `
+              <div>
+                <div class="label-sm">${escapeHtml(s.tag || 'STATEMENT')}</div>
+                <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};">${escapeHtml(a ? a.name : 'Unknown')}</div>
+                ${a?.role ? `<div class="body-xs" style="color:${lightColor};">${escapeHtml(a.role)}</div>` : ''}
               </div>
-            `);
-                row.addEventListener('click', () => { openConversation(s.id); });
+              <div class="mt-auto">
+                <p class="body-sm" style="max-width:30ch;margin-top:0.2rem;color:${bodyColor};">${escapeHtml(s.text)}</p>
+                ${s.mediaUrl ? `<div style="margin-top:0.4rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);max-height:80px;"><img src="${escapeHtml(s.mediaUrl)}" alt="" style="display:block;width:100%;height:auto;object-fit:cover;" loading="lazy" /></div>` : ''}
+                <div class="label-xs" style="margin-top:0.3rem;color:${metaColor};">${fmtTime(s.time)} · ${countReplies(s)} repl${countReplies(s)===1?'y':'ies'}</div>
+              </div>
+              ${isDark ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>` :
+              variant.includes('accent') ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>` :
+              `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
+            `;
+
+                card.addEventListener('click', () => openConversation(s.id));
+                return card;
+            }
+
+            // ── Item builders (list, grid) ───────────────────────────
+            function buildRow(s, idx) {
+                const a = authorById(s.authorId);
+                const row = document.createElement('div');
+                row.className = 'letter-row';
+                row.dataset.id = s.id;
+                row.innerHTML =
+                    `
+              <div class="letter-row-idx t-data">${idx}</div>
+              <div class="letter-row-avatar">${avatarHtml(s.authorId,'sm')}</div>
+              <div class="letter-row-text-wrap">
+                <div class="letter-row-meta">
+                  <span class="letter-row-author">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
+                  <span class="letter-row-time">${fmtTime(s.time)}</span>
+                  ${s.tag ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;">${escapeHtml(s.tag)}</span>` : ''}
+                </div>
+                <div class="letter-row-text">${escapeHtml(s.text)}</div>
+              </div>
+              <div class="letter-row-marker">
+                ${s.mediaUrl ? renderMediaThumb(s.mediaUrl) : ''}
+                ${countReplies(s)} replies
+              </div>
+            `;
+                row.addEventListener('click', () => openConversation(s.id));
                 return row;
             }
 
-            function renderGridItem(s, idx) {
+            function buildGridItem(s) {
                 const a = authorById(s.authorId);
-                const item = el(`
-              <div class="row grid-item" data-id="${s.id}">
-                <div class="row-top">
-                  <div class="row-avatar">${avatarHtml(s.authorId,'sm')}</div>
-                  <div class="row-meta">
-                    <span class="row-author">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
-                    <span class="row-time">${fmtTime(s.time)}</span>
-                    ${s.tag ? `<span class="row-tag">${escapeHtml(s.tag)}</span>` : ''}
-                  </div>
+                const item = document.createElement('div');
+                item.className = 'grid-item';
+                item.dataset.id = s.id;
+                item.innerHTML =
+                    `
+              <div class="grid-top">
+                ${avatarHtml(s.authorId,'sm')}
+                <div class="grid-meta">
+                  <span class="grid-author">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
+                  <span class="grid-time">${fmtTime(s.time)}</span>
                 </div>
-                <div class="row-text">${escapeHtml(s.text)}</div>
-                ${s.mediaUrl ? renderMediaGrid(s.mediaUrl) : ''}
-                <div class="row-marker">${countReplies(s)} replies</div>
               </div>
-            `);
-                item.addEventListener('click', () => { openConversation(s.id); });
+              ${s.mediaUrl ? `<div class="thumb-grid"><img src="${escapeHtml(s.mediaUrl)}" alt="" loading="lazy" /></div>` : ''}
+              <div class="grid-text">${escapeHtml(s.text)}</div>
+              <div class="grid-footer">
+                <span>${countReplies(s)} replies</span>
+                ${s.tag ? `<span class="grid-tag" style="font-family:var(--font-mono);font-size:6px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-light);border:1px solid var(--border);padding:1px 8px;border-radius:var(--radius-sm);">${escapeHtml(s.tag)}</span>` : ''}
+              </div>
+            `;
+                item.addEventListener('click', () => openConversation(s.id));
                 return item;
             }
 
-            function updateFilterUI() {
-                const count = activeTags.size + activeKinds.size + activeDisciplines.size + (searchQuery.length > 0 ? 1 : 0);
-                document.getElementById('filterCount').textContent = count;
-                const summary = document.getElementById('activeFilterSummary');
-                if (count === 0) {
-                    summary.textContent = 'No filters active';
-                } else {
-                    let parts = [];
-                    if (searchQuery) parts.push(`"${searchQuery}"`);
-                    if (activeTags.size > 0) parts.push(`${activeTags.size} tag${activeTags.size>1?'s':''}`);
-                    if (activeKinds.size > 0) parts.push(`${activeKinds.size} kind${activeKinds.size>1?'s':''}`);
-                    if (activeDisciplines.size > 0) parts.push(`${activeDisciplines.size} discipline${activeDisciplines.size>1?'s':''}`);
-                    summary.textContent = `Active: ${parts.join(', ')}`;
+            // ── Rendering ─────────────────────────────────────────────
+            function renderLetter(index) {
+                const panels = document.querySelectorAll('.letter-panel');
+                if (!panels.length) return;
+                const panel = panels[index];
+                if (!panel) return;
+                const data = letterData[index];
+                if (!data) return;
+
+                const frame = panel.querySelector('.letter-card-frame');
+                if (!frame) return;
+
+                // Update cover
+                const cover = frame.querySelector('.letter-cover');
+                if (cover) {
+                    const kicker = cover.querySelector('.letter-cover-kicker');
+                    const title = cover.querySelector('.letter-cover-name');
+                    const deck = cover.querySelector('.letter-cover-deck');
+                    if (kicker) kicker.textContent = 'LETTER ' + String(index + 1).padStart(2, '0');
+                    if (title) title.textContent = data.title || 'Untitled letter';
+                    if (deck) deck.textContent = data.deck || '';
                 }
-                document.getElementById('hudClear').hidden = count === 0;
+
+                // Update toolbar
+                const toolbar = frame.querySelector('.letter-toolbar');
+                const mode = data.viewMode || 'list';
+                const filtered = getFiltered();
+
+                const toggle = toolbar?.querySelector('.view-toggle');
+                if (toggle) {
+                    ['list', 'grid', 'bento'].forEach(m => {
+                        const btn = toggle.querySelector(`[data-mode="${m}"]`);
+                        if (btn) btn.classList.toggle('active', m === mode);
+                    });
+                }
+
+                const countEl = toolbar?.querySelector('.letter-count');
+                if (countEl) countEl.textContent = filtered.length + ' statements';
+
+                // Remove old content
+                const oldContent = frame.querySelector('.letter-content');
+                if (oldContent) oldContent.remove();
+
+                const content = document.createElement('div');
+                content.className = 'letter-content';
+
+                if (filtered.length === 0) {
+                    content.innerHTML =
+                        `
+                    <div class="empty-letter">
+                      <div class="t-micro">NO STATEMENTS</div>
+                      <p>Nothing matches these filters.</p>
+                      <button class="btn ghost small" onclick="window.__clearFilters()" style="margin-top:8px;">Clear filters</button>
+                    </div>
+                  `;
+                } else {
+                    const container = document.createElement('div');
+                    container.className = mode === 'list' ? 'letter-list' : mode === 'grid' ? 'letter-grid' :
+                        'letter-bento';
+
+                    const endIdx = Math.min(PAGE_SIZE, filtered.length);
+                    for (let i = 0; i < endIdx; i++) {
+                        const s = filtered[i];
+                        const idx = String(statements.length - statements.indexOf(s)).padStart(3, '0');
+                        const el = mode === 'list' ? buildRow(s, idx) : mode === 'grid' ? buildGridItem(s) :
+                            buildBentoCard(s);
+                        container.appendChild(el);
+                    }
+                    content.appendChild(container);
+
+                    if (filtered.length > PAGE_SIZE) {
+                        const trigger = document.createElement('div');
+                        trigger.className = 'load-more-trigger';
+                        trigger.textContent = `Load more (${filtered.length - PAGE_SIZE} remaining)`;
+                        trigger.addEventListener('click', () => {
+                            const currentCount = container.querySelectorAll(
+                                mode === 'list' ? '.letter-row' : mode === 'grid' ? '.grid-item' : '.card')
+                                .length;
+                            const nextBatch = Math.min(currentCount + PAGE_SIZE, filtered.length);
+                            for (let i = currentCount; i < nextBatch; i++) {
+                                const s = filtered[i];
+                                const idx = String(statements.length - statements.indexOf(s)).padStart(3,
+                                '0');
+                                const el = mode === 'list' ? buildRow(s, idx) : mode === 'grid' ?
+                                    buildGridItem(s) : buildBentoCard(s);
+                                container.appendChild(el);
+                            }
+                            if (nextBatch >= filtered.length) {
+                                trigger.textContent = 'All loaded ✓';
+                                trigger.style.cursor = 'default';
+                            } else {
+                                trigger.textContent = `Load more (${filtered.length - nextBatch} remaining)`;
+                            }
+                        });
+                        content.appendChild(trigger);
+                    }
+                }
+
+                frame.appendChild(content);
+
+                // Update UI
+                document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
+                document.getElementById('hudPosition').textContent = (index + 1) + ' / ' + letterData.length;
+                updateFilterUI();
+
+                // Update HUD view buttons
+                ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    if (btn) btn.classList.toggle('active', id === 'hudView' + mode.charAt(0).toUpperCase() + mode
+                        .slice(1));
+                });
             }
 
-            function renderHud() { /* HUD always visible */ }
+            // ── Letter panel building ────────────────────────────────
+            function buildLetterPanel(index, data) {
+                const panel = document.createElement('div');
+                panel.className = 'letter-panel' + (index === 0 ? ' active' : '');
+                panel.dataset.index = String(index);
 
-            function openBento() {
-                const overlay = document.getElementById('bentoOverlay');
-                overlay.classList.add('open');
-                populateBentoChips();
-                document.getElementById('bentoSearch').value = searchQuery;
-                document.body.style.overflow = 'hidden';
+                const inner = document.createElement('div');
+                inner.className = 'letter-panel-inner';
+
+                const frame = document.createElement('div');
+                frame.className = 'letter-card-frame';
+
+                // Focus toggle
+                const focusBtn = document.createElement('button');
+                focusBtn.className = 'letter-card-focus-toggle';
+                focusBtn.textContent = 'Focus';
+                focusBtn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    setFocusMode(!focusMode);
+                });
+                frame.appendChild(focusBtn);
+
+                // Cover
+                const cover = document.createElement('div');
+                cover.className = 'letter-cover';
+                cover.innerHTML = `
+              <span class="letter-cover-kicker">LETTER ${String(index + 1).padStart(2, '0')}</span>
+              <h2 class="letter-cover-name">${escapeHtml(data.title || 'Untitled letter')}</h2>
+              <p class="letter-cover-deck">${escapeHtml(data.deck || '')}</p>
+            `;
+                frame.appendChild(cover);
+
+                // Toolbar
+                const toolbar = document.createElement('div');
+                toolbar.className = 'letter-toolbar';
+                const toggle = document.createElement('div');
+                toggle.className = 'view-toggle';
+                ['list', 'grid', 'bento'].forEach(m => {
+                    const btn = document.createElement('button');
+                    btn.className = 'chip' + (m === (data.viewMode || 'list') ? ' active' : '');
+                    btn.dataset.mode = m;
+                    btn.textContent = m.charAt(0).toUpperCase() + m.slice(1);
+                    btn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        data.viewMode = m;
+                        renderLetter(index);
+                    });
+                    toggle.appendChild(btn);
+                });
+                toolbar.appendChild(toggle);
+
+                const countEl = document.createElement('span');
+                countEl.className = 'letter-count';
+                countEl.textContent = '0 statements';
+                toolbar.appendChild(countEl);
+                frame.appendChild(toolbar);
+
+                // Content
+                const content = document.createElement('div');
+                content.className = 'letter-content';
+                frame.appendChild(content);
+
+                inner.appendChild(frame);
+                panel.appendChild(inner);
+
+                panel.addEventListener('click', () => {
+                    const idx = Number(panel.dataset.index);
+                    if (idx !== activeIndex) activatePanel(idx);
+                });
+
+                return panel;
             }
 
-            function closeBento() {
-                document.getElementById('bentoOverlay').classList.remove('open');
-                document.body.style.overflow = '';
+            // ── Carousel ──────────────────────────────────────────────
+            function renderTrack() {
+                const track = document.getElementById('lettersTrack');
+                track.innerHTML = '';
+                letterData.forEach((data, i) => track.appendChild(buildLetterPanel(i, data)));
+                renderLetter(0);
             }
 
-            function populateBentoChips() {
-                const tagContainer = document.querySelector('#bentoTags .chip-group');
-                const tagCounts = {};
-                statements.forEach(s => { if (s.tag) tagCounts[s.tag] = (tagCounts[s.tag] || 0) + 1; });
-                tagContainer.innerHTML = '';
-                Object.keys(tagCounts).sort().forEach(tag => {
-                    const chip = document.createElement('button');
-                    chip.className = 'chip' + (activeTags.has(tag) ? ' active' : '');
-                    chip.textContent = `${tag} (${tagCounts[tag]})`;
-                    chip.dataset.type = 'tag';
-                    chip.dataset.value = tag;
-                    chip.addEventListener('click', () => {
-                        if (activeTags.has(tag)) activeTags.delete(tag);
-                        else activeTags.add(tag);
-                        populateBentoChips();
-                    });
-                    tagContainer.appendChild(chip);
-                });
+            function activatePanel(newIndex) {
+                if (newIndex < 0) newIndex = letterData.length - 1;
+                if (newIndex >= letterData.length) newIndex = 0;
+                if (newIndex === activeIndex) { scrollToPanel(newIndex); return; }
 
-                const peopleContainer = document.querySelector('#bentoPeople .chip-group');
-                peopleContainer.innerHTML = '';
-                authors.filter(a => a.kind === 'person').forEach(a => {
-                    const chip = document.createElement('button');
-                    const isActive = activeKinds.has(a.id);
-                    chip.className = 'chip' + (isActive ? ' active' : '');
-                    chip.textContent = a.name;
-                    chip.dataset.type = 'person';
-                    chip.dataset.value = a.id;
-                    chip.addEventListener('click', () => {
-                        if (activeKinds.has(a.id)) activeKinds.delete(a.id);
-                        else activeKinds.add(a.id);
-                        populateBentoChips();
-                    });
-                    peopleContainer.appendChild(chip);
-                });
+                const panels = document.querySelectorAll('.letter-panel');
+                panels.forEach(p => p.classList.remove('active'));
+                activeIndex = newIndex;
+                panels[activeIndex].classList.add('active');
+                renderLetter(activeIndex);
+                scrollToPanel(activeIndex);
+            }
 
-                const companiesContainer = document.querySelector('#bentoCompanies .chip-group');
-                companiesContainer.innerHTML = '';
-                authors.filter(a => a.kind === 'company').forEach(a => {
-                    const chip = document.createElement('button');
-                    const isActive = activeKinds.has(a.id);
-                    chip.className = 'chip' + (isActive ? ' active' : '');
-                    chip.textContent = a.name;
-                    chip.dataset.type = 'company';
-                    chip.dataset.value = a.id;
-                    chip.addEventListener('click', () => {
-                        if (activeKinds.has(a.id)) activeKinds.delete(a.id);
-                        else activeKinds.add(a.id);
-                        populateBentoChips();
-                    });
-                    companiesContainer.appendChild(chip);
-                });
+            function scrollToPanel(index) {
+                const panel = document.querySelectorAll('.letter-panel')[index];
+                if (!panel) return;
+                const track = document.getElementById('lettersTrack');
+                const trackRect = track.getBoundingClientRect();
+                const panelRect = panel.getBoundingClientRect();
+                const delta = (panelRect.left + panelRect.width / 2) - (trackRect.left + trackRect.width / 2);
+                track.scrollTo({ left: track.scrollLeft + delta, behavior: 'smooth' });
+            }
 
-                const discContainer = document.querySelector('#bentoDisciplines .chip-group');
-                const discCounts = {};
-                authors.forEach(a => { if (a.discipline) discCounts[a.discipline] = (discCounts[a.discipline] || 0) + 1; });
-                discContainer.innerHTML = '';
-                Object.keys(discCounts).sort().forEach(d => {
-                    const chip = document.createElement('button');
-                    chip.className = 'chip' + (activeDisciplines.has(d) ? ' active' : '');
-                    chip.textContent = `${d} (${discCounts[d]})`;
-                    chip.dataset.type = 'discipline';
-                    chip.dataset.value = d;
-                    chip.addEventListener('click', () => {
-                        if (activeDisciplines.has(d)) activeDisciplines.delete(d);
-                        else activeDisciplines.add(d);
-                        populateBentoChips();
-                    });
-                    discContainer.appendChild(chip);
-                });
+            function setFocusMode(on) {
+                focusMode = on;
+                document.body.classList.toggle('focus-mode', on);
+                document.getElementById('lettersTrack').classList.toggle('focus-mode', on);
+                const btn = document.querySelector('.letter-card-focus-toggle');
+                if (btn) {
+                    btn.classList.toggle('active', on);
+                    btn.textContent = on ? 'Exit focus' : 'Focus';
+                }
+            }
+
+            // ── Composer ──────────────────────────────────────────────
+            function authorOptionsHtml() {
+                const people = authors.filter(a => a.kind === 'person');
+                const companies = authors.filter(a => a.kind === 'company');
+                const opt = a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`;
+                return `<optgroup label="People">${people.map(opt).join('')}</optgroup><optgroup label="Companies">${companies.map(opt).join('')}</optgroup>`;
             }
 
             function populateAuthorSelects() {
                 const sel = document.getElementById('c-author-select');
                 if (!sel) return;
                 sel.innerHTML = authorOptionsHtml();
-                sel.value = lastAuthorId || authors[0].id;
-            }
-
-            function authorOptionsHtml() {
-                const people = authors.filter(a => a.kind === 'person');
-                const companies = authors.filter(a => a.kind === 'company');
-                const opt = a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`;
-                return `<optgroup label="People">${people.map(opt).join('')}</optgroup><optgroup label="Companies">${companies.map(opt).join('')}</optgroup>`;
+                sel.value = authors[0]?.id || '';
             }
 
             function openComposer() {
@@ -2503,132 +2229,236 @@
                 document.getElementById('c-tag').value = '';
                 document.getElementById('c-media').value = '';
                 document.getElementById('c-text').value = '';
-                document.getElementById('newAuthorPanel').classList.remove('open');
             }
 
-            // ── init ────────────────────────────────────────────────────
+            // ── Filter modal ──────────────────────────────────────────
+            function openBento() {
+                document.getElementById('bentoOverlay').classList.add('open');
+                populateBentoChips();
+                document.getElementById('bentoSearch').value = searchQuery;
+                document.body.style.overflow = 'hidden';
+            }
 
-            document.getElementById('fontSelect').addEventListener('change', function() {
-                document.body.setAttribute('data-font', this.value);
-            });
+            function closeBento() {
+                document.getElementById('bentoOverlay').classList.remove('open');
+                document.body.style.overflow = '';
+            }
 
-            document.querySelectorAll('.scale-group .chip').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const scale = btn.dataset.scale;
-                    document.body.setAttribute('data-scale', scale);
-                    document.querySelectorAll('.scale-group .chip').forEach(b => {
-                        b.classList.toggle('active', b.dataset.scale === scale);
+            function populateBentoChips() {
+                const sections = [
+                    { id: 'bentoTags', items: statements.reduce((acc, s) => { if (s.tag) acc[s.tag] = (acc[s.tag] ||
+                            0) + 1; return acc; }, {}), type: 'tag', active: activeTags },
+                    { id: 'bentoPeople', items: authors.filter(a => a.kind === 'person'), type: 'person',
+                    active: activeKinds },
+                    { id: 'bentoCompanies', items: authors.filter(a => a.kind === 'company'), type: 'company',
+                        active: activeKinds },
+                    { id: 'bentoDisciplines', items: authors.reduce((acc, a) => { if (a.discipline) acc[a.discipline] = (
+                            acc[a.discipline] || 0) + 1; return acc; }, {}), type: 'discipline',
+                    active: activeDisciplines }
+                ];
+
+                sections.forEach(section => {
+                    const container = document.querySelector(`#${section.id} .chip-group`);
+                    if (!container) return;
+                    container.innerHTML = '';
+                    const entries = typeof section.items === 'object' && !Array.isArray(section.items) ?
+                        Object.entries(section.items) :
+                        section.items.map(a => [a.id, a.name]);
+                    entries.sort((a, b) => a[1].localeCompare(b[1]));
+                    entries.forEach(([key, label]) => {
+                        const chip = document.createElement('button');
+                        const isActive = section.active.has(key);
+                        chip.className = 'chip' + (isActive ? ' active' : '');
+                        const count = typeof section.items === 'object' && !Array.isArray(section.items) ?
+                            ` (${section.items[key]})` :
+                            '';
+                        chip.textContent = label + count;
+                        chip.addEventListener('click', () => {
+                            if (section.active.has(key)) section.active.delete(key);
+                            else section.active.add(key);
+                            populateBentoChips();
+                        });
+                        container.appendChild(chip);
                     });
                 });
-            });
+            }
 
-            document.getElementById('toggleLayoutBtn').addEventListener('click', function() {
-                gridMode = !gridMode;
-                this.textContent = gridMode ? 'List' : 'Grid';
-                document.body.classList.toggle('grid-mode');
-                render();
-            });
+            // ── Init ──────────────────────────────────────────────────
+            window.__clearFilters = clearFilters;
 
-            document.getElementById('newBtn').addEventListener('click', () => {
-                const c = document.getElementById('composer');
-                c.classList.contains('open') ? closeComposer() : openComposer();
-            });
-            document.getElementById('c-cancel').addEventListener('click', closeComposer);
-            document.getElementById('c-post').addEventListener('click', () => {
-                const authorId = document.getElementById('c-author-select').value;
-                const tag = document.getElementById('c-tag').value.trim().toUpperCase();
-                const mediaUrl = document.getElementById('c-media').value.trim();
-                const text = document.getElementById('c-text').value.trim();
-                if (!text || !authorId) return;
-                lastAuthorId = authorId;
-                statements.unshift({ id: uid(), authorId, time: Date.now(), tag, text, mediaUrl, replies: [] });
-                saveData();
-                closeComposer();
-                render();
-            });
-
-            document.getElementById('toggleNewAuthor').addEventListener('click', () => {
-                document.getElementById('newAuthorPanel').classList.toggle('open');
-            });
-            document.querySelectorAll('input[name=na-kind]').forEach(r => {
-                r.addEventListener('change', (e) => {
-                    document.getElementById('na-role-label').textContent = e.target.value === 'company' ?
-                        'Tagline' : 'Role';
-                    document.getElementById('na-role').placeholder = e.target.value === 'company' ?
-                        'Hiring: 2 product designers' : 'Creative Director';
+            document.addEventListener('DOMContentLoaded', async function() {
+              try {
+                // Font & scale
+                document.getElementById('fontSelect').addEventListener('change', function() {
+                    document.body.setAttribute('data-font', this.value);
                 });
-            });
-            document.getElementById('na-save').addEventListener('click', () => {
-                const name = document.getElementById('na-name').value.trim();
-                if (!name) return;
-                const kind = document.querySelector('input[name=na-kind]:checked').value;
-                const role = document.getElementById('na-role').value.trim();
-                const newAuthor = { id: uid(), kind, name, role: kind === 'person' ? role : (role || ''),
-                    tagline: kind === 'company' ? role : '' };
-                authors.push(newAuthor);
-                saveData();
-                populateAuthorSelects();
-                document.getElementById('c-author-select').value = newAuthor.id;
-                lastAuthorId = newAuthor.id;
-                document.getElementById('na-name').value = '';
-                document.getElementById('na-role').value = '';
-                document.getElementById('newAuthorPanel').classList.remove('open');
-            });
+                document.querySelectorAll('.scale-group .chip').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const scale = btn.dataset.scale;
+                        document.body.setAttribute('data-scale', scale);
+                        document.querySelectorAll('.scale-group .chip').forEach(b => {
+                            b.classList.toggle('active', b.dataset.scale === scale);
+                        });
+                    });
+                });
 
-            document.getElementById('resetLink').addEventListener('click', async (e) => {
-                e.preventDefault();
-                authors = seedAuthors();
-                statements = seedStatements(authors);
-                modalReplyTargetId = null;
-                collapsed.clear();
-                lastAuthorId = null;
-                clearFilters();
-                await saveData();
-                render();
-            });
+                // Load data
+                await loadData();
 
-            document.getElementById('filterToggleBtn').addEventListener('click', openBento);
-            document.getElementById('bentoClose').addEventListener('click', closeBento);
-            document.getElementById('bentoOverlay').addEventListener('click', (e) => {
-                if (e.target === e.currentTarget) closeBento();
-            });
-            document.getElementById('bentoClearAll').addEventListener('click', () => {
-                clearFilters();
-                populateBentoChips();
-            });
-            document.getElementById('bentoApply').addEventListener('click', () => {
-                const searchInput = document.getElementById('bentoSearch');
-                searchQuery = searchInput.value.trim();
-                closeBento();
-                render();
-            });
+                // Letter data
+                letterData = [
+                    { title: 'The Feed', deck: 'All statements, unfiltered.', viewMode: 'bento' },
+                    { title: 'Open to Work', deck: 'People looking for their next role.', viewMode: 'list' },
+                    { title: 'Hiring', deck: 'Companies and teams looking for talent.', viewMode: 'list' },
+                    { title: 'Thoughts', deck: 'Ideas, observations, provocations.', viewMode: 'grid' }
+                ];
 
-            document.getElementById('bentoSearch').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    document.getElementById('bentoApply').click();
-                }
-            });
+                // Build track
+                renderTrack();
 
-            document.getElementById('hudClear').addEventListener('click', clearFilters);
+                // ─── HUD controls ─────────────────────────────────────
+                // Navigation
+                document.getElementById('hudPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
+                document.getElementById('hudNext').addEventListener('click', () => activatePanel(activeIndex + 1));
 
-            document.getElementById('modalClose').addEventListener('click', closeConversation);
-            document.getElementById('conversationModal').addEventListener('click', (e) => {
-                if (e.target === e.currentTarget) closeConversation();
-            });
+                // View mode
+                document.getElementById('hudViewList').addEventListener('click', function() {
+                    letterData[activeIndex].viewMode = 'list';
+                    renderLetter(activeIndex);
+                });
+                document.getElementById('hudViewGrid').addEventListener('click', function() {
+                    letterData[activeIndex].viewMode = 'grid';
+                    renderLetter(activeIndex);
+                });
+                document.getElementById('hudViewBento').addEventListener('click', function() {
+                    letterData[activeIndex].viewMode = 'bento';
+                    renderLetter(activeIndex);
+                });
 
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    closeConversation();
-                    if (!document.getElementById('profileModal').hidden) {
-                        document.getElementById('profileModal').hidden = true;
+                // New
+                document.getElementById('hudNew').addEventListener('click', function() {
+                    const c = document.getElementById('composer');
+                    c.classList.contains('open') ? closeComposer() : openComposer();
+                });
+
+                // Scroll settle
+                let settleTimer = null;
+                const track = document.getElementById('lettersTrack');
+                track.addEventListener('scroll', () => {
+                    clearTimeout(settleTimer);
+                    settleTimer = setTimeout(() => {
+                        const rect = track.getBoundingClientRect();
+                        const centerX = rect.left + rect.width / 2;
+                        let best = 0,
+                            bestDist = Infinity;
+                        Array.from(track.children).forEach((panel, i) => {
+                            const r = panel.getBoundingClientRect();
+                            const c = r.left + r.width / 2;
+                            const d = Math.abs(c - centerX);
+                            if (d < bestDist) { bestDist = d;
+                                best = i; }
+                        });
+                        if (best !== activeIndex) {
+                            const panels = track.querySelectorAll('.letter-panel');
+                            panels.forEach(p => p.classList.remove('active'));
+                            activeIndex = best;
+                            panels[best].classList.add('active');
+                            renderLetter(activeIndex);
+                        }
+                    }, 150);
+                }, { passive: true });
+
+                // Drag to scroll
+                let isDragging = false,
+                    dragStartX = 0,
+                    dragStartScroll = 0;
+                track.addEventListener('pointerdown', (e) => {
+                    if (e.pointerType === 'touch') return;
+                    if (e.target.closest('.letter-row, .grid-item, .card, button, a')) return;
+                    isDragging = true;
+                    dragStartX = e.clientX;
+                    dragStartScroll = track.scrollLeft;
+                    track.classList.add('dragging');
+                    track.setPointerCapture(e.pointerId);
+                });
+                track.addEventListener('pointermove', (e) => {
+                    if (!isDragging) return;
+                    track.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
+                });
+                track.addEventListener('pointerup', () => { isDragging = false;
+                    track.classList.remove('dragging'); });
+                track.addEventListener('pointercancel', () => { isDragging = false;
+                    track.classList.remove('dragging'); });
+
+                // Keyboard
+                document.addEventListener('keydown', (e) => {
+                    if (e.target.closest('.letter-row, .grid-item, .card, button, a, input, textarea'))
+                        return;
+                    if (e.key === 'ArrowLeft') { e.preventDefault();
+                        activatePanel(activeIndex - 1); }
+                    if (e.key === 'ArrowRight') { e.preventDefault();
+                        activatePanel(activeIndex + 1); }
+                    if (e.key === 'Escape' && focusMode) setFocusMode(false);
+                });
+
+                // Composer
+                document.getElementById('c-cancel').addEventListener('click', closeComposer);
+                document.getElementById('c-post').addEventListener('click', () => {
+                    const authorId = document.getElementById('c-author-select').value;
+                    const tag = document.getElementById('c-tag').value.trim().toUpperCase();
+                    const mediaUrl = document.getElementById('c-media').value.trim();
+                    const text = document.getElementById('c-text').value.trim();
+                    if (!text || !authorId) return;
+                    statements.unshift({ id: uid(), authorId, time: Date.now(), tag, text, mediaUrl,
+                    replies: [] });
+                    saveData();
+                    closeComposer();
+                    renderLetter(activeIndex);
+                    document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
+                });
+
+                // Filters
+                document.getElementById('filterToggleBtn').addEventListener('click', openBento);
+                document.getElementById('bentoClose').addEventListener('click', closeBento);
+                document.getElementById('bentoOverlay').addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) closeBento();
+                });
+                document.getElementById('bentoClearAll').addEventListener('click', () => {
+                    clearFilters();
+                    populateBentoChips();
+                });
+                document.getElementById('bentoApply').addEventListener('click', () => {
+                    searchQuery = document.getElementById('bentoSearch').value.trim();
+                    closeBento();
+                    renderLetter(activeIndex);
+                });
+                document.getElementById('bentoSearch').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') document.getElementById('bentoApply').click();
+                });
+                document.getElementById('hudClear').addEventListener('click', clearFilters);
+
+                // Conversation modal
+                document.getElementById('modalClose').addEventListener('click', closeConversation);
+                document.getElementById('conversationModal').addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) closeConversation();
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        closeConversation();
+                        if (document.getElementById('bentoOverlay').classList.contains('open')) closeBento();
                     }
-                    if (document.getElementById('bentoOverlay').classList.contains('open')) {
-                        closeBento();
-                    }
-                }
-            });
+                });
 
-            loadData().then(render);
+                // Initial render
+                renderLetter(0);
+              } catch (err) {
+                // Fail loudly instead of silently — a single missing element
+                // used to abort init partway through and take the HUD,
+                // composer, and filters down with it with no visible sign.
+                console.error('neverever.land init failed:', err);
+              }
+            });
         })();
     </script>
 </body>
