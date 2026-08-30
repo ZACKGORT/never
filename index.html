@@ -159,10 +159,6 @@
             letter-spacing: 0.04em;
         }
 
-        /* ── logo tile: wordmark becomes a nav card on hover ──
-           Hover/focus (desktop) reveals a small philosophy-of-use
-           card anchored under the wordmark. Also toggles via .open
-           for touch, since touch devices have no hover. */
         .logo-tile {
             position: relative;
             cursor: pointer;
@@ -214,9 +210,7 @@
             color: var(--ink-mid);
             margin-bottom: 14px;
         }
-        .logo-card-home {
-            width: 100%;
-        }
+        .logo-card-home { width: 100%; }
         .save-status {
             font-family: var(--font-mono);
             font-size: 7px;
@@ -227,6 +221,174 @@
             white-space: nowrap;
         }
 
+        /* ── topbar right: appearance controls + profile ── */
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .topbar-appearance {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            background: rgba(255,255,255,0.5);
+            padding: 2px 6px 2px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        .topbar-appearance .font-select {
+            background: transparent;
+            border: none;
+            color: var(--ink-mid);
+            font-family: var(--font-mono);
+            font-size: 7px;
+            padding: 2px 0;
+            cursor: pointer;
+            outline: none;
+            max-width: 54px;
+            font-weight: 500;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .topbar-appearance .scale-group {
+            display: flex;
+            gap: 1px;
+            margin-left: 2px;
+        }
+        .topbar-appearance .scale-group .chip {
+            border: none;
+            padding: 1px 4px;
+            font-size: 6px;
+            color: var(--ink-light);
+            background: transparent;
+            border-radius: 2px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            letter-spacing: 0.04em;
+            font-weight: 500;
+            touch-action: manipulation;
+            min-height: 16px;
+            line-height: 1.2;
+        }
+        .topbar-appearance .scale-group .chip.active { background: var(--ink); color: var(--card); }
+        .topbar-appearance .scale-group .chip:hover { color: var(--ink); }
+
+        .topbar-appearance .divider {
+            width: 1px;
+            height: 14px;
+            background: var(--border);
+            margin: 0 2px;
+        }
+
+        /* ── profile avatar + dropdown ── */
+        .profile-tile {
+            position: relative;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .profile-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--ink);
+            color: var(--card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border: 1.5px solid var(--border);
+            transition: border-color .2s ease, transform .2s ease;
+        }
+        .profile-tile:hover .profile-avatar,
+        .profile-tile.open .profile-avatar {
+            border-color: var(--ink);
+            transform: scale(1.04);
+        }
+
+        .profile-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 160px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-floating);
+            padding: 6px 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px) scale(0.98);
+            transform-origin: top right;
+            transition: opacity .2s ease, transform .22s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility .2s;
+            z-index: 60;
+            pointer-events: none;
+        }
+        .profile-tile:hover .profile-menu,
+        .profile-tile:focus-within .profile-menu,
+        .profile-tile.open .profile-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .profile-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            font-family: var(--font-mono);
+            font-size: 7px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ink-mid);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background .12s ease, color .12s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .profile-menu-item:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+        .profile-menu-item .icon {
+            font-size: 11px;
+            opacity: 0.6;
+            width: 18px;
+            text-align: center;
+        }
+        .profile-menu-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 12px;
+        }
+
+        @media (max-width: 640px) {
+            .topbar-appearance .font-select { max-width: 40px; font-size: 6px; }
+            .topbar-appearance .scale-group .chip { font-size: 5px; padding: 1px 3px; }
+            .topbar-appearance { padding: 2px 4px 2px 6px; }
+            .profile-avatar { width: 26px; height: 26px; font-size: 9px; }
+            .profile-menu { width: 140px; right: -4px; }
+            .profile-menu-item { font-size: 6px; padding: 5px 12px; }
+            .topbar-right { gap: 4px; }
+        }
+        @media (max-width: 480px) {
+            .topbar-appearance .font-select { max-width: 32px; font-size: 5px; }
+            .topbar-appearance .scale-group .chip { font-size: 4px; padding: 0 2px; }
+            .topbar-appearance { padding: 1px 3px 1px 5px; gap: 1px; }
+            .profile-avatar { width: 22px; height: 22px; font-size: 8px; }
+            .profile-menu { width: 120px; right: -6px; }
+            .profile-menu-item { font-size: 5px; padding: 4px 10px; }
+            .topbar-right { gap: 2px; }
+            .wordmark { font-size: clamp(9px, 2.5vw, 12px); }
+        }
+
         /* ── main wrap ── */
         .wrap {
             max-width: var(--max-width);
@@ -235,10 +397,7 @@
             transition: padding 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        /* ── LETTER CAROUSEL ──
-           Breaks out of .wrap's max-width/padding to span the true
-           viewport width, so the ambient (non-active) letters peeking
-           in from the sides aren't clipped by the content column. */
+        /* ── LETTER CAROUSEL ── */
         .letters-viewport {
             position: relative;
             overflow: hidden;
@@ -646,10 +805,7 @@
             border-radius: 2px;
         }
 
-        /* ── composer: floating, draggable, persistent window ──
-           Fixed-positioned so it stays put over content regardless of
-           scroll, with no backdrop — everything behind it (hud, letters,
-           filters) stays fully clickable. */
+        /* ── composer ── */
         .composer {
             position: fixed;
             top: calc(var(--topbar-height) + 20px);
@@ -757,17 +913,8 @@
             .composer { top: auto; bottom: 16px; right: 12px; left: 12px; width: auto; }
         }
 
-        /* ── FLOATING HUD ──
-           Two independent floating pills. Everything inside a .hud is
-           deliberately set in fixed px sizes on --font-mono (never --font
-           or --fs-body) so the font/size appearance controls — which now
-           live inside the bottom hud itself — can never resize the hud
-           that hosts them. */
+        /* ── FLOATING HUD ── */
         .hud {
-            /* Sizing tokens — .hud-top keeps these defaults (compact: just
-               nav + new). .hud-bottom overrides them larger below for
-               readability/touch-target size, since it's the hud people
-               actually read and interact with most. */
             --hud-pad: 6px 12px;
             --hud-gap: 4px;
             --hud-min-h: 44px;
@@ -785,10 +932,6 @@
             --hud-fs-label: 6px;
             --hud-fs-position: 8px;
             --hud-minw-position: 36px;
-            --hud-fs-select: 7px;
-            --hud-maxw-select: 54px;
-            --hud-fs-chip: 6px;
-            --hud-pad-chip: 2px 4px;
 
             position: fixed;
             left: 50%;
@@ -827,10 +970,8 @@
             --hud-fs-summary: 12px;
             --hud-maxw-summary: 190px;
             --hud-fs-label: 9px;
-            --hud-fs-select: 11px;
-            --hud-maxw-select: 70px;
-            --hud-fs-chip: 10px;
-            --hud-pad-chip: 4px 7px;
+            --hud-fs-position: 8px;
+            --hud-minw-position: 36px;
         }
         .hud-top { top: calc(var(--topbar-height) + 12px); }
 
@@ -892,46 +1033,6 @@
             text-align: center;
         }
 
-        /* Appearance controls (font / scale) — bottom hud only */
-        .hud .hud-appearance {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .hud .font-select {
-            background: transparent;
-            border: none;
-            color: var(--ink-mid);
-            font-family: var(--font-mono);
-            font-size: var(--hud-fs-select);
-            padding: 4px 0;
-            cursor: pointer;
-            outline: none;
-            max-width: var(--hud-maxw-select);
-            font-weight: 500;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        .hud .scale-group {
-            display: flex;
-            gap: 1px;
-        }
-        .hud .scale-group .chip {
-            border: none;
-            padding: var(--hud-pad-chip);
-            font-size: var(--hud-fs-chip);
-            color: var(--ink-light);
-            background: transparent;
-            border-radius: 3px;
-            cursor: pointer;
-            font-family: var(--font-mono);
-            letter-spacing: 0.04em;
-            font-weight: 500;
-            touch-action: manipulation;
-        }
-        .hud .scale-group .chip.active { background: var(--ink); color: var(--card); }
-        .hud .scale-group .chip:hover { color: var(--ink); }
-
         @media (max-width: 640px) {
             .hud-bottom {
                 bottom: 16px;
@@ -948,10 +1049,7 @@
                 --hud-minw-count: 18px;
                 --hud-fs-summary: 10px;
                 --hud-maxw-summary: 110px;
-                --hud-fs-select: 9px;
-                --hud-maxw-select: 50px;
-                --hud-fs-chip: 8px;
-                --hud-pad-chip: 3px 5px;
+                --hud-fs-label: 9px;
             }
             .hud-top {
                 top: calc(var(--topbar-height) + 8px);
@@ -985,9 +1083,6 @@
                 --hud-divider-h: 18px;
                 --hud-fs-summary: 9px;
                 --hud-maxw-summary: 90px;
-                --hud-fs-select: 8px;
-                --hud-maxw-select: 42px;
-                --hud-pad-chip: 2px 4px;
             }
             .hud-top {
                 top: calc(var(--topbar-height) + 6px);
@@ -1134,9 +1229,7 @@
         }
         .bento-actions .btn { width: 100%; text-align: center; padding: 12px 16px; font-size: 9px; min-height: 40px; }
 
-        /* ── activity log ──
-           Reuses .bento-overlay / .bento-panel / .bento-header / .chip
-           chrome so it feels like the same system as the filter modal. */
+        /* ── activity log ── */
         .activity-list {
             display: flex;
             flex-direction: column;
@@ -1218,7 +1311,7 @@
             .bento-actions .btn { padding: 10px 12px; font-size: 8px; min-height: 36px; }
         }
 
-        /* ── focus mode — one letter takes over the full viewport ── */
+        /* ── focus mode ── */
         body.focus-mode .topbar,
         body.focus-mode .hud-top,
         body.focus-mode .hud-bottom { display: none; }
@@ -1297,8 +1390,7 @@
 
         .empty-letter { padding: 40px 0; text-align: center; color: var(--ink-light); }
         .empty-letter .t-micro { margin-bottom: 6px; }
-        .empty-letter p { font-family: var(--font); font-size: calc(var(--fs-body) * 1.1); font-weight: 500; color: var(
-                --ink-mid); }
+        .empty-letter p { font-family: var(--font); font-size: calc(var(--fs-body) * 1.1); font-weight: 500; color: var(--ink-mid); }
 
         .load-more-trigger {
             grid-column: 1 / -1;
@@ -1317,7 +1409,6 @@
         }
         .load-more-trigger:hover { color: var(--ink); }
 
-        /* ── responsive ── */
         @media (max-width: 1280px) {
             .letter-bento { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
         }
@@ -1406,8 +1497,7 @@
             flex-direction: column;
         }
         .conversation-modal .modal-card::-webkit-scrollbar { width: 4px; }
-        .conversation-modal .modal-card::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: var(
-                --radius-sm); }
+        .conversation-modal .modal-card::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: var(--radius-sm); }
         .conversation-modal .close-btn {
             position: sticky;
             top: 0;
@@ -1539,14 +1629,12 @@
             .bento-panel { padding-bottom: env(safe-area-inset-bottom); }
             .conversation-modal .modal-card { padding-bottom: env(safe-area-inset-bottom); }
         }
-        /* ── custom cursor — dot + trailing inertia ellipse.
-           Suppressed over real controls (buttons, links, drag handles,
-           form fields) via body.write-native-cursor so those keep
-           their own affordance instead of fighting the overlay. */
+
+        /* ── custom cursor — now at z-index: 450 to stay above overlays (400) ── */
         body.custom-cursor-active { cursor: none; }
         .write-cursor-dot,
         .write-cursor-ellipse {
-            position: fixed; top: 0; left: 0; z-index: 400; pointer-events: none;
+            position: fixed; top: 0; left: 0; z-index: 450; pointer-events: none;
             transform: translate(-9999px, -9999px);
             opacity: 0; transition: opacity .18s ease; will-change: transform;
         }
@@ -1565,9 +1653,7 @@
         .write-native-cursor .write-cursor-dot,
         .write-native-cursor .write-cursor-ellipse { opacity: 0 !important; }
 
-        /* ── click hotspots — thin edge zones over the letters viewport
-           so paging between letters is a single low-effort click near
-           either side, with a directional cursor to signal it. ── */
+        /* ── click hotspots ── */
         .letter-hotspot {
             position: absolute; top: 0; bottom: 0;
             width: clamp(56px, 9vw, 180px);
@@ -1592,12 +1678,45 @@
     <!-- ─── TOPBAR ─── -->
     <div class="topbar">
         <div class="wrap">
+            <!-- Left: brand -->
             <div class="logo-tile" id="logoTile" tabindex="0" aria-haspopup="true" aria-expanded="false">
                 <div class="wordmark">NEVEREVER.LAND <span class="count t-data" id="topCount"></span> <span class="save-status" id="saveStatus"></span></div>
                 <div class="logo-card" id="logoCard">
                     <p class="t-micro logo-card-eyebrow">Philosophy of use</p>
                     <p class="logo-card-text">Every line here is a statement, not a post. No feed to game, no likes to chase — just what's true right now, in your own words, in public.</p>
                     <button class="btn small logo-card-home" id="logoReset" type="button">↺ Reset demo</button>
+                </div>
+            </div>
+
+            <!-- Right: appearance controls + profile -->
+            <div class="topbar-right">
+                <!-- Appearance -->
+                <div class="topbar-appearance">
+                    <select class="font-select" id="fontSelectTop">
+                        <option value="satoshi">Sat</option>
+                        <option value="inter">Int</option>
+                        <option value="serif">Ser</option>
+                        <option value="mono">Mon</option>
+                    </select>
+                    <span class="divider"></span>
+                    <div class="scale-group" id="scaleGroupTop">
+                        <button class="chip" data-scale="s">S</button>
+                        <button class="chip active" data-scale="m">M</button>
+                        <button class="chip" data-scale="l">L</button>
+                        <button class="chip" data-scale="xl">XL</button>
+                        <button class="chip" data-scale="xxl">XXL</button>
+                    </div>
+                </div>
+
+                <!-- Profile -->
+                <div class="profile-tile" id="profileTile" tabindex="0" aria-haspopup="true" aria-expanded="false">
+                    <div class="profile-avatar">U</div>
+                    <div class="profile-menu" id="profileMenu">
+                        <button class="profile-menu-item" data-action="profile"><span class="icon">◇</span> Profile</button>
+                        <button class="profile-menu-item" data-action="settings"><span class="icon">⚙</span> Settings</button>
+                        <div class="profile-menu-divider"></div>
+                        <button class="profile-menu-item" data-action="activity"><span class="icon">▦</span> Activity Log</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1608,14 +1727,12 @@
         <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
         <span class="hud-position" id="hudPosition">1 / 4</span>
         <button class="btn btn-icon" id="hudNext" title="Next">›</button>
-
         <div class="hud-divider"></div>
-
         <button class="btn btn-primary" id="hudNew">+ New</button>
     </div>
 
     <div class="wrap">
-        <!-- ─── COMPOSER (floating, draggable) ─── -->
+        <!-- ─── COMPOSER ─── -->
         <div class="composer" id="composer">
             <div class="composer-header" id="composerHeader">
                 <span class="composer-title"><span class="grip">⠿⠿</span> New statement</span>
@@ -1655,51 +1772,24 @@
         </div>
     </div>
 
-    <!-- ─── BOTTOM HUD (appearance + filters) ─── -->
+    <!-- ─── BOTTOM HUD ─── -->
     <div class="hud hud-bottom" id="hud">
-        <!-- Filter -->
         <button class="btn" id="filterToggleBtn">
             <span>Filters</span>
             <span class="filter-count" id="filterCount">0</span>
         </button>
         <button class="btn ghost" id="hudClear" hidden>Clear</button>
-
         <div class="hud-divider"></div>
-
-        <!-- Activity -->
         <button class="btn" id="activityToggleBtn">
             <span>Activity</span>
             <span class="filter-count" id="activityCount">0</span>
         </button>
-
         <div class="hud-divider"></div>
-
-        <!-- View -->
         <span class="hud-label">View</span>
         <button class="btn active" id="hudViewList">List</button>
         <button class="btn" id="hudViewGrid">Grid</button>
         <button class="btn" id="hudViewBento">Bento</button>
-
         <div class="hud-divider"></div>
-
-        <!-- Appearance: font / size (does not affect the hud itself) -->
-        <div class="hud-appearance">
-            <select class="font-select" id="fontSelect">
-                <option value="satoshi">Satoshi</option>
-                <option value="inter">Inter</option>
-                <option value="serif">Serif</option>
-                <option value="mono">Mono</option>
-            </select>
-            <div class="scale-group">
-                <button class="chip" data-scale="s">S</button>
-                <button class="chip active" data-scale="m">M</button>
-                <button class="chip" data-scale="l">L</button>
-                <button class="chip" data-scale="xl">XL</button>
-                <button class="chip" data-scale="xxl">XXL</button>
-            </div>
-        </div>
-
-        <!-- Summary -->
         <span class="filter-summary" id="activeFilterSummary">No filters active</span>
     </div>
 
@@ -1746,10 +1836,7 @@
         </div>
     </div>
 
-    <!-- ─── ACTIVITY LOG ───
-         Tracks real engagement, not passive likes/saves: hovered,
-         clicked (opened), abandoned (opened + closed within 3s
-         without replying), and responded. -->
+    <!-- ─── ACTIVITY LOG ─── -->
     <div class="bento-overlay" id="activityOverlay">
         <div class="bento-panel">
             <div class="bento-header">
@@ -1760,7 +1847,7 @@
                 <h4>Filter</h4>
                 <div class="chip-group" id="activityFilterChips">
                     <button class="chip active" data-atype="all">All</button>
-                    <button class="chip" data-atype="hover">Hovered</button>
+                    <button class="chip" data-atype="hover">Hovered (3s+)</button>
                     <button class="chip" data-atype="click">Clicked</button>
                     <button class="chip" data-atype="abandon">Abandoned</button>
                     <button class="chip" data-atype="respond">Responded</button>
@@ -1781,6 +1868,7 @@
             const STORAGE_KEY = 'neverever-statements-v9';
             const ACTIVITY_KEY = 'neverever-activity-v1';
             const PAGE_SIZE = 12;
+            const HOVER_THRESHOLD_MS = 3500; // deliberate hover: 3.5 seconds
             const AVIF_IMAGES = [
                 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?fm=avif&w=800&h=450&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?fm=avif&w=800&h=450&fit=crop&q=80',
@@ -1997,9 +2085,7 @@
                 saveInFlight = false;
             }
 
-            // ── DEV: wipe saved statements and reseed fresh demo content ──
-            // Console: resetDemoContent()
-            // URL, once: yourfile.html?reset-demo
+            // ── DEV: reset ──
             async function resetDemoContent() {
                 try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
                 authors = seedAuthors();
@@ -2016,13 +2102,9 @@
             window.resetDemoContent = resetDemoContent;
 
             // ── Activity log ────────────────────────────────────────
-            // No likes, no saves — interest is measured by real signals:
-            // hover (attention), click (opened it), abandon (opened it,
-            // closed within 3s without replying — didn't hold interest),
-            // respond (actually said something back).
             let activityLog = [];
             let activityFilter = 'all';
-            const ACTIVITY_LABELS = { hover: 'HOVERED', click: 'CLICKED', abandon: 'ABANDONED', respond: 'RESPONDED' };
+            const ACTIVITY_LABELS = { hover: 'HOVERED (3s+)', click: 'CLICKED', abandon: 'ABANDONED', respond: 'RESPONDED' };
 
             function loadActivity() {
                 try {
@@ -2097,7 +2179,6 @@
                 document.getElementById('activityOverlay').classList.remove('open');
             }
 
-            // Attach hover + click tracking to a statement's rendered element.
             function wireInteractionTracking(el, s) {
                 let hoverStart = null;
                 el.addEventListener('mouseenter', () => { hoverStart = Date.now(); });
@@ -2105,7 +2186,10 @@
                     if (hoverStart == null) return;
                     const dwell = Date.now() - hoverStart;
                     hoverStart = null;
-                    if (dwell >= 250) logActivity('hover', s.id, { durationMs: dwell });
+                    // only log deliberate hover: minimum 3.5 seconds
+                    if (dwell >= HOVER_THRESHOLD_MS) {
+                        logActivity('hover', s.id, { durationMs: dwell });
+                    }
                 });
                 el.addEventListener('click', () => openConversation(s.id));
             }
@@ -2127,10 +2211,6 @@
 
             function getFiltered() { return statements.filter(passesFilters); }
 
-            function filtersActive() {
-                return activeTags.size > 0 || activeKinds.size > 0 || activeDisciplines.size > 0 || searchQuery.length > 0;
-            }
-
             function clearFilters() {
                 activeTags.clear();
                 activeKinds.clear();
@@ -2142,8 +2222,7 @@
             }
 
             function updateFilterUI() {
-                const count = activeTags.size + activeKinds.size + activeDisciplines.size + (searchQuery.length > 0 ? 1 :
-                0);
+                const count = activeTags.size + activeKinds.size + activeDisciplines.size + (searchQuery.length > 0 ? 1 : 0);
                 document.getElementById('filterCount').textContent = count;
                 const summary = document.getElementById('activeFilterSummary');
                 if (count === 0) summary.textContent = 'No filters active';
@@ -2389,7 +2468,7 @@
                 return card;
             }
 
-            // ── Item builders (list, grid) ───────────────────────────
+            // ── Item builders ─────────────────────────────────────────
             function buildRow(s, idx) {
                 const a = authorById(s.authorId);
                 const row = document.createElement('div');
@@ -2453,7 +2532,6 @@
                 const frame = panel.querySelector('.letter-card-frame');
                 if (!frame) return;
 
-                // Update cover
                 const cover = frame.querySelector('.letter-cover');
                 if (cover) {
                     const kicker = cover.querySelector('.letter-cover-kicker');
@@ -2464,7 +2542,6 @@
                     if (deck) deck.textContent = data.deck || '';
                 }
 
-                // Update toolbar
                 const toolbar = frame.querySelector('.letter-toolbar');
                 const mode = data.viewMode || 'list';
                 const filtered = getFiltered();
@@ -2480,7 +2557,6 @@
                 const countEl = toolbar?.querySelector('.letter-count');
                 if (countEl) countEl.textContent = filtered.length + ' statements';
 
-                // Remove old content
                 const oldContent = frame.querySelector('.letter-content');
                 if (oldContent) oldContent.remove();
 
@@ -2517,8 +2593,8 @@
                         trigger.textContent = `Load more (${filtered.length - PAGE_SIZE} remaining)`;
                         trigger.addEventListener('click', () => {
                             const currentCount = container.querySelectorAll(
-                                mode === 'list' ? '.letter-row' : mode === 'grid' ? '.grid-item' : '.card')
-                                .length;
+                                mode === 'list' ? '.letter-row' : mode === 'grid' ? '.grid-item' : '.card'
+                                ).length;
                             const nextBatch = Math.min(currentCount + PAGE_SIZE, filtered.length);
                             for (let i = currentCount; i < nextBatch; i++) {
                                 const s = filtered[i];
@@ -2541,12 +2617,10 @@
 
                 frame.appendChild(content);
 
-                // Update UI
                 document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
                 document.getElementById('hudPosition').textContent = (index + 1) + ' / ' + letterData.length;
                 updateFilterUI();
 
-                // Update HUD view buttons
                 ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.classList.toggle('active', id === 'hudView' + mode.charAt(0).toUpperCase() + mode
@@ -2566,7 +2640,6 @@
                 const frame = document.createElement('div');
                 frame.className = 'letter-card-frame';
 
-                // Focus toggle
                 const focusBtn = document.createElement('button');
                 focusBtn.className = 'letter-card-focus-toggle';
                 focusBtn.textContent = 'Focus';
@@ -2576,7 +2649,6 @@
                 });
                 frame.appendChild(focusBtn);
 
-                // Cover
                 const cover = document.createElement('div');
                 cover.className = 'letter-cover';
                 cover.innerHTML = `
@@ -2586,7 +2658,6 @@
             `;
                 frame.appendChild(cover);
 
-                // Toolbar
                 const toolbar = document.createElement('div');
                 toolbar.className = 'letter-toolbar';
                 const toggle = document.createElement('div');
@@ -2611,7 +2682,6 @@
                 toolbar.appendChild(countEl);
                 frame.appendChild(toolbar);
 
-                // Content
                 const content = document.createElement('div');
                 content.className = 'letter-content';
                 frame.appendChild(content);
@@ -2697,10 +2767,6 @@
                 document.getElementById('c-text').value = '';
             }
 
-            // Drag the composer by its header. Position persists across
-            // close/reopen (same DOM node, inline style just stays put)
-            // and across navigation — dragging never touches .open, so
-            // moving the window doesn't close it or block anything behind it.
             function setupComposerDrag() {
                 const composer = document.getElementById('composer');
                 const header = document.getElementById('composerHeader');
@@ -2738,7 +2804,6 @@
                 header.addEventListener('pointerup', endDrag);
                 header.addEventListener('pointercancel', endDrag);
 
-                // Keep the window on-screen if the viewport shrinks (e.g. rotation).
                 window.addEventListener('resize', () => {
                     if (composer.style.left === '' || composer.style.top === '') return;
                     const maxX = Math.max(8, window.innerWidth - composer.offsetWidth - 8);
@@ -2803,240 +2868,267 @@
             // ── Init ──────────────────────────────────────────────────
             window.__clearFilters = clearFilters;
 
-            document.addEventListener('DOMContentLoaded', async function() {
-              try {
-                // Font & scale
-                document.getElementById('fontSelect').addEventListener('change', function() {
-                    document.body.setAttribute('data-font', this.value);
-                });
-                document.querySelectorAll('.scale-group .chip').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const scale = btn.dataset.scale;
-                        document.body.setAttribute('data-scale', scale);
-                        document.querySelectorAll('.scale-group .chip').forEach(b => {
-                            b.classList.toggle('active', b.dataset.scale === scale);
-                        });
-                    });
-                });
-
-                // Load data
-                await loadData();
-                loadActivity();
-                updateActivityCount();
-                if (new URLSearchParams(location.search).has('reset-demo')) {
-                    await resetDemoContent();
+            // ── Profile menu ──────────────────────────────────────────
+            function setupProfileMenu() {
+                const tile = document.getElementById('profileTile');
+                if (!tile) return;
+                function setOpen(open) {
+                    tile.classList.toggle('open', open);
+                    tile.setAttribute('aria-expanded', String(open));
                 }
-
-                // Letter data
-                letterData = [
-                    { title: 'The Feed', deck: 'All statements, unfiltered.', viewMode: 'bento' },
-                    { title: 'Open to Work', deck: 'People looking for their next role.', viewMode: 'list' },
-                    { title: 'Hiring', deck: 'Companies and teams looking for talent.', viewMode: 'list' },
-                    { title: 'Thoughts', deck: 'Ideas, observations, provocations.', viewMode: 'grid' }
-                ];
-
-                // Build track
-                renderTrack();
-
-                // ─── HUD controls ─────────────────────────────────────
-                // Navigation
-                document.getElementById('hudPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
-                document.getElementById('hudNext').addEventListener('click', () => activatePanel(activeIndex + 1));
-                document.getElementById('letterHotspotPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
-                document.getElementById('letterHotspotNext').addEventListener('click', () => activatePanel(activeIndex + 1));
-                document.getElementById('focusExitBtn').addEventListener('click', () => setFocusMode(false));
-
-                // View mode
-                document.getElementById('hudViewList').addEventListener('click', function() {
-                    letterData[activeIndex].viewMode = 'list';
-                    renderLetter(activeIndex);
-                });
-                document.getElementById('hudViewGrid').addEventListener('click', function() {
-                    letterData[activeIndex].viewMode = 'grid';
-                    renderLetter(activeIndex);
-                });
-                document.getElementById('hudViewBento').addEventListener('click', function() {
-                    letterData[activeIndex].viewMode = 'bento';
-                    renderLetter(activeIndex);
-                });
-
-                // New
-                document.getElementById('hudNew').addEventListener('click', function() {
-                    const c = document.getElementById('composer');
-                    c.classList.contains('open') ? closeComposer() : openComposer();
-                });
-
-                // Scroll settle
-                let settleTimer = null;
-                const track = document.getElementById('lettersTrack');
-                track.addEventListener('scroll', () => {
-                    clearTimeout(settleTimer);
-                    settleTimer = setTimeout(() => {
-                        const rect = track.getBoundingClientRect();
-                        const centerX = rect.left + rect.width / 2;
-                        let best = 0,
-                            bestDist = Infinity;
-                        Array.from(track.children).forEach((panel, i) => {
-                            const r = panel.getBoundingClientRect();
-                            const c = r.left + r.width / 2;
-                            const d = Math.abs(c - centerX);
-                            if (d < bestDist) { bestDist = d;
-                                best = i; }
-                        });
-                        if (best !== activeIndex) {
-                            const panels = track.querySelectorAll('.letter-panel');
-                            panels.forEach(p => p.classList.remove('active'));
-                            activeIndex = best;
-                            panels[best].classList.add('active');
-                            renderLetter(activeIndex);
-                        }
-                    }, 150);
-                }, { passive: true });
-
-                // Drag to scroll
-                let isDragging = false,
-                    dragStartX = 0,
-                    dragStartScroll = 0;
-                track.addEventListener('pointerdown', (e) => {
-                    if (e.pointerType === 'touch') return;
-                    if (e.target.closest('.letter-row, .grid-item, .card, button, a')) return;
-                    isDragging = true;
-                    dragStartX = e.clientX;
-                    dragStartScroll = track.scrollLeft;
-                    track.classList.add('dragging');
-                    track.setPointerCapture(e.pointerId);
-                });
-                track.addEventListener('pointermove', (e) => {
-                    if (!isDragging) return;
-                    track.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
-                });
-                track.addEventListener('pointerup', () => { isDragging = false;
-                    track.classList.remove('dragging'); });
-                track.addEventListener('pointercancel', () => { isDragging = false;
-                    track.classList.remove('dragging'); });
-
-                // Keyboard
-                document.addEventListener('keydown', (e) => {
-                    if (e.target.closest('.letter-row, .grid-item, .card, button, a, input, textarea'))
-                        return;
-                    if (e.key === 'ArrowLeft') { e.preventDefault();
-                        activatePanel(activeIndex - 1); }
-                    if (e.key === 'ArrowRight') { e.preventDefault();
-                        activatePanel(activeIndex + 1); }
-                    if (e.key === 'Escape' && focusMode) setFocusMode(false);
-                });
-
-                // Composer
-                document.getElementById('c-cancel').addEventListener('click', closeComposer);
-                document.getElementById('composerClose').addEventListener('click', closeComposer);
-                setupComposerDrag();
-                document.getElementById('c-post').addEventListener('click', () => {
-                    const authorId = document.getElementById('c-author-select').value;
-                    const tag = document.getElementById('c-tag').value.trim().toUpperCase();
-                    const mediaUrl = document.getElementById('c-media').value.trim();
-                    const text = document.getElementById('c-text').value.trim();
-                    if (!text || !authorId) return;
-                    statements.unshift({ id: uid(), authorId, time: Date.now(), tag, text, mediaUrl,
-                    replies: [] });
-                    saveData();
-                    closeComposer();
-                    renderLetter(activeIndex);
-                    document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
-                });
-
-                // Filters
-                document.getElementById('filterToggleBtn').addEventListener('click', openBento);
-                document.getElementById('bentoClose').addEventListener('click', closeBento);
-                document.getElementById('bentoOverlay').addEventListener('click', (e) => {
-                    if (e.target === e.currentTarget) closeBento();
-                });
-                document.getElementById('bentoClearAll').addEventListener('click', () => {
-                    clearFilters();
-                    populateBentoChips();
-                });
-                document.getElementById('bentoApply').addEventListener('click', () => {
-                    searchQuery = document.getElementById('bentoSearch').value.trim();
-                    closeBento();
-                    renderLetter(activeIndex);
-                });
-                document.getElementById('bentoSearch').addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') document.getElementById('bentoApply').click();
-                });
-                document.getElementById('hudClear').addEventListener('click', clearFilters);
-
-                // Logo tile — touch/tap toggle (desktop gets hover/focus for free via CSS)
-                const logoTile = document.getElementById('logoTile');
-                const logoReset = document.getElementById('logoReset');
-                function setLogoOpen(open) {
-                    logoTile.classList.toggle('open', open);
-                    logoTile.setAttribute('aria-expanded', String(open));
-                }
-                logoTile.addEventListener('click', (e) => {
-                    if (e.target.closest('#logoReset')) return;
-                    setLogoOpen(!logoTile.classList.contains('open'));
+                tile.addEventListener('click', (e) => {
+                    if (e.target.closest('.profile-menu-item')) return;
+                    setOpen(!tile.classList.contains('open'));
                 });
                 document.addEventListener('click', (e) => {
-                    if (!logoTile.contains(e.target)) setLogoOpen(false);
+                    if (!tile.contains(e.target)) setOpen(false);
                 });
-                logoReset.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    if (!confirm('Reset demo? This clears your cached statements and reseeds fresh sample content.')) return;
-                    await resetDemoContent();
-                    clearFilters();
-                    if (focusMode) setFocusMode(false);
-                    setLogoOpen(false);
-                });
-
-                // Conversation modal
-                document.getElementById('modalClose').addEventListener('click', closeConversation);
-                document.getElementById('conversationModal').addEventListener('click', (e) => {
-                    if (e.target === e.currentTarget) closeConversation();
-                });
-
-                // Activity log
-                document.getElementById('activityToggleBtn').addEventListener('click', openActivity);
-                document.getElementById('activityClose').addEventListener('click', closeActivity);
-                document.getElementById('activityOverlay').addEventListener('click', (e) => {
-                    if (e.target === e.currentTarget) closeActivity();
-                });
-                document.getElementById('activityClear').addEventListener('click', () => {
-                    if (!confirm('Clear the activity log? This cannot be undone.')) return;
-                    activityLog = [];
-                    saveActivityLog();
-                    updateActivityCount();
-                    renderActivityLog();
-                });
-                document.querySelectorAll('#activityFilterChips .chip').forEach(chip => {
-                    chip.addEventListener('click', () => {
-                        document.querySelectorAll('#activityFilterChips .chip').forEach(c => c.classList.remove('active'));
-                        chip.classList.add('active');
-                        activityFilter = chip.dataset.atype;
-                        renderActivityLog();
+                tile.querySelectorAll('.profile-menu-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const action = item.dataset.action;
+                        setOpen(false);
+                        if (action === 'activity') {
+                            openActivity();
+                        } else if (action === 'profile') {
+                            console.log('Profile — inert');
+                        } else if (action === 'settings') {
+                            console.log('Settings — inert');
+                        }
                     });
                 });
+            }
 
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        closeConversation();
-                        if (document.getElementById('bentoOverlay').classList.contains('open')) closeBento();
-                        if (document.getElementById('activityOverlay').classList.contains('open')) closeActivity();
+            // ── Topbar appearance controls ───────────────────────────
+            function setupTopbarAppearance() {
+                const fontSelect = document.getElementById('fontSelectTop');
+                const scaleGroup = document.getElementById('scaleGroupTop');
+
+                if (fontSelect) {
+                    fontSelect.value = document.body.getAttribute('data-font') || 'satoshi';
+                    fontSelect.addEventListener('change', function() {
+                        document.body.setAttribute('data-font', this.value);
+                    });
+                }
+
+                if (scaleGroup) {
+                    scaleGroup.querySelectorAll('.chip').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const scale = btn.dataset.scale;
+                            document.body.setAttribute('data-scale', scale);
+                            scaleGroup.querySelectorAll('.chip').forEach(b => {
+                                b.classList.toggle('active', b.dataset.scale === scale);
+                            });
+                        });
+                    });
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', async function() {
+                try {
+                    // Topbar appearance
+                    setupTopbarAppearance();
+                    setupProfileMenu();
+
+                    // Load data
+                    await loadData();
+                    loadActivity();
+                    updateActivityCount();
+                    if (new URLSearchParams(location.search).has('reset-demo')) {
+                        await resetDemoContent();
                     }
-                });
 
-                // Initial render
-                renderLetter(0);
-              } catch (err) {
-                // Fail loudly instead of silently — a single missing element
-                // used to abort init partway through and take the HUD,
-                // composer, and filters down with it with no visible sign.
-                console.error('neverever.land init failed:', err);
-              }
+                    letterData = [
+                        { title: 'The Feed', deck: 'All statements, unfiltered.', viewMode: 'bento' },
+                        { title: 'Open to Work', deck: 'People looking for their next role.', viewMode: 'list' },
+                        { title: 'Hiring', deck: 'Companies and teams looking for talent.', viewMode: 'list' },
+                        { title: 'Thoughts', deck: 'Ideas, observations, provocations.', viewMode: 'grid' }
+                    ];
+
+                    renderTrack();
+
+                    // ─── HUD controls ─────────────────────────────────────
+                    document.getElementById('hudPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
+                    document.getElementById('hudNext').addEventListener('click', () => activatePanel(activeIndex + 1));
+                    document.getElementById('letterHotspotPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
+                    document.getElementById('letterHotspotNext').addEventListener('click', () => activatePanel(activeIndex + 1));
+                    document.getElementById('focusExitBtn').addEventListener('click', () => setFocusMode(false));
+
+                    document.getElementById('hudViewList').addEventListener('click', function() {
+                        letterData[activeIndex].viewMode = 'list';
+                        renderLetter(activeIndex);
+                    });
+                    document.getElementById('hudViewGrid').addEventListener('click', function() {
+                        letterData[activeIndex].viewMode = 'grid';
+                        renderLetter(activeIndex);
+                    });
+                    document.getElementById('hudViewBento').addEventListener('click', function() {
+                        letterData[activeIndex].viewMode = 'bento';
+                        renderLetter(activeIndex);
+                    });
+
+                    document.getElementById('hudNew').addEventListener('click', function() {
+                        const c = document.getElementById('composer');
+                        c.classList.contains('open') ? closeComposer() : openComposer();
+                    });
+
+                    let settleTimer = null;
+                    const track = document.getElementById('lettersTrack');
+                    track.addEventListener('scroll', () => {
+                        clearTimeout(settleTimer);
+                        settleTimer = setTimeout(() => {
+                            const rect = track.getBoundingClientRect();
+                            const centerX = rect.left + rect.width / 2;
+                            let best = 0,
+                                bestDist = Infinity;
+                            Array.from(track.children).forEach((panel, i) => {
+                                const r = panel.getBoundingClientRect();
+                                const c = r.left + r.width / 2;
+                                const d = Math.abs(c - centerX);
+                                if (d < bestDist) { bestDist = d;
+                                    best = i; }
+                            });
+                            if (best !== activeIndex) {
+                                const panels = track.querySelectorAll('.letter-panel');
+                                panels.forEach(p => p.classList.remove('active'));
+                                activeIndex = best;
+                                panels[best].classList.add('active');
+                                renderLetter(activeIndex);
+                            }
+                        }, 150);
+                    }, { passive: true });
+
+                    let isDragging = false,
+                        dragStartX = 0,
+                        dragStartScroll = 0;
+                    track.addEventListener('pointerdown', (e) => {
+                        if (e.pointerType === 'touch') return;
+                        if (e.target.closest('.letter-row, .grid-item, .card, button, a')) return;
+                        isDragging = true;
+                        dragStartX = e.clientX;
+                        dragStartScroll = track.scrollLeft;
+                        track.classList.add('dragging');
+                        track.setPointerCapture(e.pointerId);
+                    });
+                    track.addEventListener('pointermove', (e) => {
+                        if (!isDragging) return;
+                        track.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
+                    });
+                    track.addEventListener('pointerup', () => { isDragging = false;
+                        track.classList.remove('dragging'); });
+                    track.addEventListener('pointercancel', () => { isDragging = false;
+                        track.classList.remove('dragging'); });
+
+                    document.addEventListener('keydown', (e) => {
+                        if (e.target.closest('.letter-row, .grid-item, .card, button, a, input, textarea'))
+                            return;
+                        if (e.key === 'ArrowLeft') { e.preventDefault();
+                            activatePanel(activeIndex - 1); }
+                        if (e.key === 'ArrowRight') { e.preventDefault();
+                            activatePanel(activeIndex + 1); }
+                        if (e.key === 'Escape' && focusMode) setFocusMode(false);
+                    });
+
+                    document.getElementById('c-cancel').addEventListener('click', closeComposer);
+                    document.getElementById('composerClose').addEventListener('click', closeComposer);
+                    setupComposerDrag();
+                    document.getElementById('c-post').addEventListener('click', () => {
+                        const authorId = document.getElementById('c-author-select').value;
+                        const tag = document.getElementById('c-tag').value.trim().toUpperCase();
+                        const mediaUrl = document.getElementById('c-media').value.trim();
+                        const text = document.getElementById('c-text').value.trim();
+                        if (!text || !authorId) return;
+                        statements.unshift({ id: uid(), authorId, time: Date.now(), tag, text, mediaUrl,
+                        replies: [] });
+                        saveData();
+                        closeComposer();
+                        renderLetter(activeIndex);
+                        document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
+                    });
+
+                    document.getElementById('filterToggleBtn').addEventListener('click', openBento);
+                    document.getElementById('bentoClose').addEventListener('click', closeBento);
+                    document.getElementById('bentoOverlay').addEventListener('click', (e) => {
+                        if (e.target === e.currentTarget) closeBento();
+                    });
+                    document.getElementById('bentoClearAll').addEventListener('click', () => {
+                        clearFilters();
+                        populateBentoChips();
+                    });
+                    document.getElementById('bentoApply').addEventListener('click', () => {
+                        searchQuery = document.getElementById('bentoSearch').value.trim();
+                        closeBento();
+                        renderLetter(activeIndex);
+                    });
+                    document.getElementById('bentoSearch').addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') document.getElementById('bentoApply').click();
+                    });
+                    document.getElementById('hudClear').addEventListener('click', clearFilters);
+
+                    const logoTile = document.getElementById('logoTile');
+                    const logoReset = document.getElementById('logoReset');
+                    function setLogoOpen(open) {
+                        logoTile.classList.toggle('open', open);
+                        logoTile.setAttribute('aria-expanded', String(open));
+                    }
+                    logoTile.addEventListener('click', (e) => {
+                        if (e.target.closest('#logoReset')) return;
+                        setLogoOpen(!logoTile.classList.contains('open'));
+                    });
+                    document.addEventListener('click', (e) => {
+                        if (!logoTile.contains(e.target)) setLogoOpen(false);
+                    });
+                    logoReset.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        if (!confirm('Reset demo? This clears your cached statements and reseeds fresh sample content.')) return;
+                        await resetDemoContent();
+                        clearFilters();
+                        if (focusMode) setFocusMode(false);
+                        setLogoOpen(false);
+                    });
+
+                    document.getElementById('modalClose').addEventListener('click', closeConversation);
+                    document.getElementById('conversationModal').addEventListener('click', (e) => {
+                        if (e.target === e.currentTarget) closeConversation();
+                    });
+
+                    document.getElementById('activityToggleBtn').addEventListener('click', openActivity);
+                    document.getElementById('activityClose').addEventListener('click', closeActivity);
+                    document.getElementById('activityOverlay').addEventListener('click', (e) => {
+                        if (e.target === e.currentTarget) closeActivity();
+                    });
+                    document.getElementById('activityClear').addEventListener('click', () => {
+                        if (!confirm('Clear the activity log? This cannot be undone.')) return;
+                        activityLog = [];
+                        saveActivityLog();
+                        updateActivityCount();
+                        renderActivityLog();
+                    });
+                    document.querySelectorAll('#activityFilterChips .chip').forEach(chip => {
+                        chip.addEventListener('click', () => {
+                            document.querySelectorAll('#activityFilterChips .chip').forEach(c => c.classList.remove('active'));
+                            chip.classList.add('active');
+                            activityFilter = chip.dataset.atype;
+                            renderActivityLog();
+                        });
+                    });
+
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') {
+                            closeConversation();
+                            if (document.getElementById('bentoOverlay').classList.contains('open')) closeBento();
+                            if (document.getElementById('activityOverlay').classList.contains('open')) closeActivity();
+                        }
+                    });
+
+                    renderLetter(0);
+                } catch (err) {
+                    console.error('neverever.land init failed:', err);
+                }
             });
         })();
 
-        // ── custom cursor — dot + inertia ellipse. Suppressed over real
-        // controls (buttons, links, drag handles, form fields) via
-        // body.write-native-cursor so those keep their native affordance.
+        // ── custom cursor ─────────────────────────────────────────────
         (function initWriteCursor(){
             const writeCursorDot = document.getElementById('writeCursorDot');
             const writeCursorEllipse = document.getElementById('writeCursorEllipse');
