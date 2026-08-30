@@ -37,25 +37,39 @@
         }
 
         @media (min-width: 640px) {
-            :root { --margin: 24px; --topbar-height: 64px; --hud-height: 70px; --hud-top-height: 48px; }
+            :root { --margin: 24px;
+                --topbar-height: 64px;
+                --hud-height: 70px;
+                --hud-top-height: 48px; }
         }
         @media (min-width: 1024px) {
-            :root { --margin: 32px; --topbar-height: 72px; --hud-height: 76px; --hud-top-height: 52px; }
+            :root { --margin: 32px;
+                --topbar-height: 72px;
+                --hud-height: 76px;
+                --hud-top-height: 52px; }
         }
 
-        body[data-scale="s"] { --fs-body: 12px; --fs-display: 40px; }
-        body[data-scale="m"] { --fs-body: 15px; --fs-display: 54px; }
-        body[data-scale="l"] { --fs-body: 18px; --fs-display: 68px; }
-        body[data-scale="xl"] { --fs-body: 21px; --fs-display: 82px; }
-        body[data-scale="xxl"] { --fs-body: 24px; --fs-display: 96px; }
+        body[data-scale="s"] { --fs-body: 12px;
+            --fs-display: 40px; }
+        body[data-scale="m"] { --fs-body: 15px;
+            --fs-display: 54px; }
+        body[data-scale="l"] { --fs-body: 18px;
+            --fs-display: 68px; }
+        body[data-scale="xl"] { --fs-body: 21px;
+            --fs-display: 82px; }
+        body[data-scale="xxl"] { --fs-body: 24px;
+            --fs-display: 96px; }
 
         body[data-font="satoshi"] { --font: 'Satoshi', sans-serif; }
         body[data-font="inter"] { --font: 'Inter', sans-serif; }
         body[data-font="serif"] { --font: 'EB Garamond', serif; }
         body[data-font="mono"] { --font: 'JetBrains Mono', monospace; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box;
+            margin: 0;
+            padding: 0; }
+        html { -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent; }
         body {
             background: var(--bg);
             color: var(--ink);
@@ -70,11 +84,15 @@
             transition: font-size 0.2s ease, font-family 0.2s ease;
             overflow-x: hidden;
         }
-        ::selection { background: var(--accent); color: var(--ink); }
+        ::selection { background: var(--accent);
+            color: var(--ink); }
 
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: var(--radius-sm); }
-        html { scrollbar-width: thin; scrollbar-color: var(--ink-lighter) transparent; }
+        ::-webkit-scrollbar { width: 4px;
+            height: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--ink-lighter);
+            border-radius: var(--radius-sm); }
+        html { scrollbar-width: thin;
+            scrollbar-color: var(--ink-lighter) transparent; }
 
         .t-micro {
             font-family: var(--font-mono);
@@ -106,15 +124,30 @@
             white-space: nowrap;
             gap: 6px;
         }
-        .btn:hover { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .btn:hover { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
         .btn:active { transform: scale(0.96); }
-        .btn.ghost { border-color: var(--border); color: var(--ink-light); }
-        .btn.ghost:hover { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .btn.small { padding: 3px 8px; font-size: 6px; min-height: 22px; }
-        .btn.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .btn-primary { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .btn-primary:hover { background: var(--ink-mid); border-color: var(--ink-mid); }
-        .btn-icon { width: 30px; padding: 0; justify-content: center; font-size: 14px; }
+        .btn.ghost { border-color: var(--border);
+            color: var(--ink-light); }
+        .btn.ghost:hover { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
+        .btn.small { padding: 3px 8px;
+            font-size: 6px;
+            min-height: 22px; }
+        .btn.active { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
+        .btn-primary { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
+        .btn-primary:hover { background: var(--ink-mid);
+            border-color: var(--ink-mid); }
+        .btn-icon { width: 30px;
+            padding: 0;
+            justify-content: center;
+            font-size: 14px; }
 
         /* ── topbar ── */
         .topbar {
@@ -159,10 +192,6 @@
             letter-spacing: 0.04em;
         }
 
-        /* ── logo tile: wordmark becomes a nav card on hover ──
-           Hover/focus (desktop) reveals a small philosophy-of-use
-           card anchored under the wordmark. Also toggles via .open
-           for touch, since touch devices have no hover. */
         .logo-tile {
             position: relative;
             cursor: pointer;
@@ -235,10 +264,7 @@
             transition: padding 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        /* ── LETTER CAROUSEL ──
-           Breaks out of .wrap's max-width/padding to span the true
-           viewport width, so the ambient (non-active) letters peeking
-           in from the sides aren't clipped by the content column. */
+        /* ── LETTER CAROUSEL ── */
         .letters-viewport {
             position: relative;
             overflow: hidden;
@@ -262,7 +288,9 @@
             user-select: none;
             box-sizing: border-box;
         }
-        .letters-track.dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; }
+        .letters-track.dragging { cursor: grabbing;
+            scroll-snap-type: none;
+            scroll-behavior: auto; }
         .letter-panel {
             flex: 0 0 auto;
             width: min(92vw, 1000px);
@@ -273,7 +301,9 @@
             transition: opacity .3s ease, transform .3s ease;
             cursor: pointer;
         }
-        .letter-panel.active { opacity: 1; cursor: auto; transform: scale(1); }
+        .letter-panel.active { opacity: 1;
+            cursor: auto;
+            transform: scale(1); }
 
         .letter-card-frame {
             border: 1px solid var(--border);
@@ -389,36 +419,44 @@
             transform: translateY(-2px);
         }
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0;
+                transform: translateY(16px); }
+            to { opacity: 1;
+                transform: translateY(0); }
         }
 
-        .letter-bento .card-dark { background: #1C1C1E; border-color: #1C1C1E; }
+        .letter-bento .card-dark { background: #1C1C1E;
+            border-color: #1C1C1E; }
         .letter-bento .card-dark .text-dark,
         .letter-bento .card-dark .text-mid,
         .letter-bento .card-dark .label-sm,
         .letter-bento .card-dark .label-xs { color: #ffffff; }
         .letter-bento .card-dark .text-light { color: rgba(255, 255, 255, 0.6); }
-        .letter-bento .card-mid { background: #3A3A3C; border-color: #3A3A3C; }
+        .letter-bento .card-mid { background: #3A3A3C;
+            border-color: #3A3A3C; }
         .letter-bento .card-mid .text-dark,
         .letter-bento .card-mid .text-mid,
         .letter-bento .card-mid .label-sm,
         .letter-bento .card-mid .label-xs { color: #ffffff; }
         .letter-bento .card-mid .text-light { color: rgba(255, 255, 255, 0.6); }
-        .letter-bento .card-accent { background: #E5E567; border-color: #E5E567; }
+        .letter-bento .card-accent { background: #E5E567;
+            border-color: #E5E567; }
         .letter-bento .card-accent .text-dark,
         .letter-bento .card-accent .text-mid,
         .letter-bento .card-accent .label-sm,
         .letter-bento .card-accent .label-xs { color: #1C1C1E; }
         .letter-bento .card-accent .text-light { color: rgba(28, 28, 30, 0.6); }
-        .letter-bento .card-accent-2 { background: #F5F557; border-color: #F5F557; }
+        .letter-bento .card-accent-2 { background: #F5F557;
+            border-color: #F5F557; }
         .letter-bento .card-accent-2 .text-dark,
         .letter-bento .card-accent-2 .text-mid,
         .letter-bento .card-accent-2 .label-sm,
         .letter-bento .card-accent-2 .label-xs { color: #1C1C1E; }
         .letter-bento .card-accent-2 .text-light { color: rgba(28, 28, 30, 0.6); }
-        .letter-bento .card-light { background: #f8f8fa; border-color: #e6e6e8; }
-        .letter-bento .card-white { background: #ffffff; border-color: #e6e6e8; }
+        .letter-bento .card-light { background: #f8f8fa;
+            border-color: #e6e6e8; }
+        .letter-bento .card-white { background: #ffffff;
+            border-color: #e6e6e8; }
 
         .letter-bento .label-sm {
             font-size: 0.65rem;
@@ -456,8 +494,12 @@
         .letter-bento .span-3 { grid-column: span 3; }
         .letter-bento .row-span-2 { grid-row: span 2; }
 
-        .letter-bento .dot-grid { display: flex; gap: 0.3rem; }
-        .letter-bento .dot-grid .dot { display: block; width: 8px; height: 8px; border-radius: 2px; }
+        .letter-bento .dot-grid { display: flex;
+            gap: 0.3rem; }
+        .letter-bento .dot-grid .dot { display: block;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px; }
         .letter-bento .hex-row {
             display: flex;
             gap: 0.4rem;
@@ -478,7 +520,8 @@
         .letter-bento .card-dark .icon-row { color: rgba(255, 255, 255, 0.4); }
 
         /* ── LIST & GRID VIEWS ── */
-        .letter-list { border-top: 1px solid var(--border); padding-top: 4px; }
+        .letter-list { border-top: 1px solid var(--border);
+            padding-top: 4px; }
         .letter-row {
             display: grid;
             grid-template-columns: 24px 32px 1fr auto;
@@ -489,10 +532,22 @@
             transition: background .12s ease;
         }
         .letter-row:hover { background: rgba(0, 0, 0, 0.02); }
-        .letter-row-idx { font-family: var(--font-mono); font-size: 9px; color: var(--ink-light); padding-top: 2px; }
-        .letter-row-avatar .avatar { width: 28px; height: 28px; font-size: 9px; }
-        .letter-row-text-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-        .letter-row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 9px; }
+        .letter-row-idx { font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--ink-light);
+            padding-top: 2px; }
+        .letter-row-avatar .avatar { width: 28px;
+            height: 28px;
+            font-size: 9px; }
+        .letter-row-text-wrap { display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0; }
+        .letter-row-meta { display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 2px 8px;
+            font-size: 9px; }
         .letter-row-author {
             font-family: var(--font);
             font-size: calc(var(--fs-body) * 0.8);
@@ -505,7 +560,10 @@
             white-space: nowrap;
             max-width: 120px;
         }
-        .letter-row-time { font-family: var(--font-mono); font-size: 7px; color: var(--ink-light); white-space: nowrap; }
+        .letter-row-time { font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light);
+            white-space: nowrap; }
         .letter-row-text {
             color: var(--ink-mid);
             font-size: calc(var(--fs-body) * 0.88);
@@ -541,7 +599,10 @@
             line-height: 0;
         }
         .thumb-sm img,
-        .thumb-sm video { display: block; width: 100%; height: 100%; object-fit: cover; }
+        .thumb-sm video { display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; }
 
         .letter-grid {
             display: grid;
@@ -561,10 +622,19 @@
             gap: 6px;
             min-height: 140px;
         }
-        .letter-grid .grid-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-        .letter-grid .grid-item .grid-top { display: flex; align-items: center; gap: 10px; }
-        .letter-grid .grid-item .grid-top .avatar { width: 32px; height: 32px; font-size: 10px; }
-        .letter-grid .grid-item .grid-meta { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+        .letter-grid .grid-item:hover { transform: translateY(-2px);
+            box-shadow: var(--shadow); }
+        .letter-grid .grid-item .grid-top { display: flex;
+            align-items: center;
+            gap: 10px; }
+        .letter-grid .grid-item .grid-top .avatar { width: 32px;
+            height: 32px;
+            font-size: 10px; }
+        .letter-grid .grid-item .grid-meta { display: flex;
+            flex-direction: column;
+            gap: 1px;
+            flex: 1;
+            min-width: 0; }
         .letter-grid .grid-item .grid-author {
             font-family: var(--font);
             font-size: calc(var(--fs-body) * 0.75);
@@ -576,7 +646,9 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        .letter-grid .grid-item .grid-time { font-family: var(--font-mono); font-size: 7px; color: var(--ink-light); }
+        .letter-grid .grid-item .grid-time { font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light); }
         .letter-grid .grid-item .grid-text {
             font-size: calc(var(--fs-body) * 0.88);
             line-height: 1.4;
@@ -608,7 +680,10 @@
             margin: 2px 0;
         }
         .letter-grid .grid-item .thumb-grid img,
-        .letter-grid .grid-item .thumb-grid video { display: block; width: 100%; height: 100%; object-fit: cover; }
+        .letter-grid .grid-item .thumb-grid video { display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; }
 
         /* ── avatar ── */
         .avatar {
@@ -626,14 +701,29 @@
             color: var(--ink);
             flex-shrink: 0;
         }
-        .avatar.sz-xs { width: 20px; height: 20px; font-size: 7px; }
-        .avatar.sz-sm { width: 28px; height: 28px; font-size: 9px; }
-        .avatar.sz-md { width: 40px; height: 40px; font-size: 13px; }
-        .avatar.sz-lg { width: 52px; height: 52px; font-size: 16px; }
-        .avatar.v0 { background: var(--accent); color: var(--ink); border-color: var(--accent); }
-        .avatar.v1 { background: var(--bg); color: var(--ink); }
-        .avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: var(--accent-2); }
-        .avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .avatar.sz-xs { width: 20px;
+            height: 20px;
+            font-size: 7px; }
+        .avatar.sz-sm { width: 28px;
+            height: 28px;
+            font-size: 9px; }
+        .avatar.sz-md { width: 40px;
+            height: 40px;
+            font-size: 13px; }
+        .avatar.sz-lg { width: 52px;
+            height: 52px;
+            font-size: 16px; }
+        .avatar.v0 { background: var(--accent);
+            color: var(--ink);
+            border-color: var(--accent); }
+        .avatar.v1 { background: var(--bg);
+            color: var(--ink); }
+        .avatar.v2 { background: var(--accent-2);
+            color: var(--ink);
+            border-color: var(--accent-2); }
+        .avatar.v3 { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
         .avatar.company::after {
             content: '';
             position: absolute;
@@ -646,10 +736,7 @@
             border-radius: 2px;
         }
 
-        /* ── composer: floating, draggable, persistent window ──
-           Fixed-positioned so it stays put over content regardless of
-           scroll, with no backdrop — everything behind it (hud, letters,
-           filters) stays fully clickable. */
+        /* ── composer ── */
         .composer {
             position: fixed;
             top: calc(var(--topbar-height) + 20px);
@@ -666,7 +753,9 @@
             transition: box-shadow .2s ease;
         }
         .composer.open { display: flex; }
-        .composer.dragging { transition: none; user-select: none; box-shadow: var(--shadow-hover); }
+        .composer.dragging { transition: none;
+            user-select: none;
+            box-shadow: var(--shadow-hover); }
 
         .composer-header {
             display: flex;
@@ -710,7 +799,8 @@
             align-items: center;
             justify-content: center;
         }
-        .composer-close:hover { background: var(--ink); color: var(--card); }
+        .composer-close:hover { background: var(--ink);
+            color: var(--card); }
 
         .composer-body {
             padding: 14px 16px;
@@ -719,9 +809,16 @@
             gap: 10px;
             overflow-y: auto;
         }
-        .field-row { display: flex; gap: 10px; flex-wrap: wrap; }
-        .field-row .field { flex: 1; min-width: 120px; }
-        label.t-micro { display: block; margin-bottom: 3px; font-size: 7px; letter-spacing: 0.1em; color: var(--ink-light); }
+        .field-row { display: flex;
+            gap: 10px;
+            flex-wrap: wrap; }
+        .field-row .field { flex: 1;
+            min-width: 120px; }
+        label.t-micro { display: block;
+            margin-bottom: 3px;
+            font-size: 7px;
+            letter-spacing: 0.1em;
+            color: var(--ink-light); }
         input[type=text],
         textarea,
         select {
@@ -740,8 +837,10 @@
         }
         input[type=text]:focus,
         textarea:focus,
-        select:focus { outline: none; border-color: var(--ink); }
-        textarea { min-height: 56px; line-height: 1.6; }
+        select:focus { outline: none;
+            border-color: var(--ink); }
+        textarea { min-height: 56px;
+            line-height: 1.6; }
         .composer-actions {
             display: flex;
             gap: 8px;
@@ -754,20 +853,15 @@
         }
 
         @media (max-width: 480px) {
-            .composer { top: auto; bottom: 16px; right: 12px; left: 12px; width: auto; }
+            .composer { top: auto;
+                bottom: 16px;
+                right: 12px;
+                left: 12px;
+                width: auto; }
         }
 
-        /* ── FLOATING HUD ──
-           Two independent floating pills. Everything inside a .hud is
-           deliberately set in fixed px sizes on --font-mono (never --font
-           or --fs-body) so the font/size appearance controls — which now
-           live inside the bottom hud itself — can never resize the hud
-           that hosts them. */
+        /* ── FLOATING HUD ── */
         .hud {
-            /* Sizing tokens — .hud-top keeps these defaults (compact: just
-               nav + new). .hud-bottom overrides them larger below for
-               readability/touch-target size, since it's the hud people
-               actually read and interact with most. */
             --hud-pad: 6px 12px;
             --hud-gap: 4px;
             --hud-min-h: 44px;
@@ -892,7 +986,6 @@
             text-align: center;
         }
 
-        /* Appearance controls (font / scale) — bottom hud only */
         .hud .hud-appearance {
             display: flex;
             align-items: center;
@@ -929,7 +1022,8 @@
             font-weight: 500;
             touch-action: manipulation;
         }
-        .hud .scale-group .chip.active { background: var(--ink); color: var(--card); }
+        .hud .scale-group .chip.active { background: var(--ink);
+            color: var(--card); }
         .hud .scale-group .chip:hover { color: var(--ink); }
 
         @media (max-width: 640px) {
@@ -1022,7 +1116,8 @@
             transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
         }
-        .bento-overlay.open { opacity: 1; pointer-events: auto; }
+        .bento-overlay.open { opacity: 1;
+            pointer-events: auto; }
         .bento-panel {
             width: 100vw;
             height: 100vh;
@@ -1040,7 +1135,8 @@
         }
         .bento-overlay.open .bento-panel { transform: scale(1); }
         .bento-panel::-webkit-scrollbar { width: 4px; }
-        .bento-panel::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: var(--radius-sm); }
+        .bento-panel::-webkit-scrollbar-thumb { background: var(--ink-lighter);
+            border-radius: var(--radius-sm); }
 
         .bento-header {
             display: flex;
@@ -1072,7 +1168,8 @@
             justify-content: center;
             transition: background 0.2s;
         }
-        .bento-header .close-btn:hover { background: var(--ink); color: var(--card); }
+        .bento-header .close-btn:hover { background: var(--ink);
+            color: var(--card); }
 
         .bento-grid {
             display: grid;
@@ -1080,7 +1177,9 @@
             gap: 16px;
             flex: 1;
         }
-        .bento-card { display: flex; flex-direction: column; gap: 8px; }
+        .bento-card { display: flex;
+            flex-direction: column;
+            gap: 8px; }
         .bento-card h4 {
             font-family: var(--font-mono);
             font-size: 8px;
@@ -1104,9 +1203,13 @@
             border-radius: var(--radius-sm);
             transition: border-color .2s ease, background .2s ease;
         }
-        .bento-card input[type="text"]:focus { outline: none; border-color: var(--ink); background: var(--card); }
+        .bento-card input[type="text"]:focus { outline: none;
+            border-color: var(--ink);
+            background: var(--card); }
 
-        .bento-card .chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+        .bento-card .chip-group { display: flex;
+            flex-wrap: wrap;
+            gap: 6px; }
         .bento-card .chip-group .chip {
             font-size: calc(var(--fs-body) * 0.7);
             padding: 4px 10px;
@@ -1122,8 +1225,11 @@
             touch-action: manipulation;
             font-size: 8px;
         }
-        .bento-card .chip-group .chip.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .bento-card .chip-group .chip:hover { border-color: var(--ink); color: var(--ink); }
+        .bento-card .chip-group .chip.active { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
+        .bento-card .chip-group .chip:hover { border-color: var(--ink);
+            color: var(--ink); }
 
         .bento-actions {
             display: flex;
@@ -1132,15 +1238,21 @@
             justify-content: flex-end;
             padding-top: 4px;
         }
-        .bento-actions .btn { width: 100%; text-align: center; padding: 12px 16px; font-size: 9px; min-height: 40px; }
+        .bento-actions .btn { width: 100%;
+            text-align: center;
+            padding: 12px 16px;
+            font-size: 9px;
+            min-height: 40px; }
 
         @media (min-width: 640px) {
-            .bento-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .bento-grid { grid-template-columns: repeat(2, 1fr);
+                gap: 20px; }
             .bento-panel { padding: 24px 32px 80px; }
             .bento-card-full { grid-column: 1 / -1; }
         }
         @media (min-width: 1024px) {
-            .bento-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; }
+            .bento-grid { grid-template-columns: repeat(4, 1fr);
+                gap: 24px; }
             .bento-panel { padding: 32px 48px 100px; }
             .bento-card-half { grid-column: span 2; }
             .bento-card-full { grid-column: 1 / -1; }
@@ -1148,12 +1260,16 @@
         @media (max-width: 480px) {
             .bento-panel { padding: 12px 12px 70px; }
             .bento-header h2 { font-size: calc(var(--fs-body) * 1.4); }
-            .bento-card input[type="text"] { padding: 10px 12px; font-size: calc(var(--fs-body) * 0.9); }
-            .bento-card .chip-group .chip { font-size: 7px; padding: 3px 8px; }
-            .bento-actions .btn { padding: 10px 12px; font-size: 8px; min-height: 36px; }
+            .bento-card input[type="text"] { padding: 10px 12px;
+                font-size: calc(var(--fs-body) * 0.9); }
+            .bento-card .chip-group .chip { font-size: 7px;
+                padding: 3px 8px; }
+            .bento-actions .btn { padding: 10px 12px;
+                font-size: 8px;
+                min-height: 36px; }
         }
 
-        /* ── focus mode — one letter takes over the full viewport ── */
+        /* ── focus mode ── */
         body.focus-mode .topbar,
         body.focus-mode .hud-top,
         body.focus-mode .hud-bottom { display: none; }
@@ -1205,7 +1321,9 @@
             box-shadow: var(--shadow);
             transition: color .15s ease, border-color .15s ease, transform .15s ease;
         }
-        .focus-exit-btn:hover { color: var(--ink); border-color: var(--ink); transform: scale(1.06); }
+        .focus-exit-btn:hover { color: var(--ink);
+            border-color: var(--ink);
+            transform: scale(1.06); }
         body.focus-mode .focus-exit-btn { display: flex; }
 
         .letter-card-focus-toggle {
@@ -1226,14 +1344,21 @@
             transition: all .2s ease;
             box-shadow: var(--shadow);
         }
-        .letter-card-focus-toggle:hover { color: var(--ink); border-color: var(--ink); }
-        .letter-card-focus-toggle.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .letter-card-focus-toggle:hover { color: var(--ink);
+            border-color: var(--ink); }
+        .letter-card-focus-toggle.active { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
         body.focus-mode .letter-card-focus-toggle { display: none; }
 
-        .empty-letter { padding: 40px 0; text-align: center; color: var(--ink-light); }
+        .empty-letter { padding: 40px 0;
+            text-align: center;
+            color: var(--ink-light); }
         .empty-letter .t-micro { margin-bottom: 6px; }
-        .empty-letter p { font-family: var(--font); font-size: calc(var(--fs-body) * 1.1); font-weight: 500; color: var(
-                --ink-mid); }
+        .empty-letter p { font-family: var(--font);
+            font-size: calc(var(--fs-body) * 1.1);
+            font-weight: 500;
+            color: var(--ink-mid); }
 
         .load-more-trigger {
             grid-column: 1 / -1;
@@ -1252,25 +1377,31 @@
         }
         .load-more-trigger:hover { color: var(--ink); }
 
-        /* ── responsive ── */
         @media (max-width: 1280px) {
-            .letter-bento { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+            .letter-bento { grid-template-columns: repeat(3, 1fr);
+                gap: 1rem; }
         }
         @media (max-width: 820px) {
             .letters-track { gap: 16px;
                 padding-left: max(2vw, calc(50% - 400px));
                 padding-right: max(2vw, calc(50% - 400px)); }
             .letter-panel { width: min(94vw, 800px); }
-            .letter-bento { grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+            .letter-bento { grid-template-columns: repeat(2, 1fr);
+                gap: 0.9rem; }
             .letter-bento .span-2,
             .letter-bento .span-3,
             .letter-bento .span-4 { grid-column: span 2; }
             .letter-bento .row-span-2,
             .letter-bento .row-span-3 { grid-row: span 1; }
-            .letter-bento .card { padding: 1.5rem; border-radius: 1.25rem; }
-            .letter-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-            .letter-row { grid-template-columns: 20px 28px 1fr auto; gap: 8px; padding: 10px 0; }
-            .letter-row-author { font-size: calc(var(--fs-body) * 0.7); max-width: 80px; }
+            .letter-bento .card { padding: 1.5rem;
+                border-radius: 1.25rem; }
+            .letter-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 12px; }
+            .letter-row { grid-template-columns: 20px 28px 1fr auto;
+                gap: 8px;
+                padding: 10px 0; }
+            .letter-row-author { font-size: calc(var(--fs-body) * 0.7);
+                max-width: 80px; }
             .letter-row-text { font-size: calc(var(--fs-body) * 0.82); }
         }
         @media (max-width: 540px) {
@@ -1283,23 +1414,37 @@
                 padding-right: 8px;
             }
             .letter-panel { width: 94vw; }
-            .letter-card-frame { padding: 16px 14px 28px; border-radius: var(--radius-sm); }
-            .letter-cover { padding-bottom: 12px; margin-bottom: 16px; }
+            .letter-card-frame { padding: 16px 14px 28px;
+                border-radius: var(--radius-sm); }
+            .letter-cover { padding-bottom: 12px;
+                margin-bottom: 16px; }
             .letter-cover-name { font-size: clamp(18px, 2.5vw, 24px); }
-            .letter-bento { grid-template-columns: 1fr; gap: 0.75rem; }
+            .letter-bento { grid-template-columns: 1fr;
+                gap: 0.75rem; }
             .letter-bento .span-2,
             .letter-bento .span-3,
             .letter-bento .span-4 { grid-column: span 1; }
-            .letter-bento .card { padding: 1.25rem; border-radius: 1rem; min-height: 100px; }
-            .letter-grid { grid-template-columns: 1fr; gap: 10px; }
-            .letter-grid .grid-item { padding: 12px 14px 14px; min-height: 100px; }
-            .letter-row { grid-template-columns: 16px 24px 1fr auto; gap: 6px; padding: 8px 0; }
-            .letter-row-avatar .avatar { width: 24px; height: 24px; font-size: 8px; }
-            .letter-row-author { font-size: calc(var(--fs-body) * 0.65); max-width: 60px; }
-            .letter-row-text { font-size: calc(var(--fs-body) * 0.78); -webkit-line-clamp: 2; }
+            .letter-bento .card { padding: 1.25rem;
+                border-radius: 1rem;
+                min-height: 100px; }
+            .letter-grid { grid-template-columns: 1fr;
+                gap: 10px; }
+            .letter-grid .grid-item { padding: 12px 14px 14px;
+                min-height: 100px; }
+            .letter-row { grid-template-columns: 16px 24px 1fr auto;
+                gap: 6px;
+                padding: 8px 0; }
+            .letter-row-avatar .avatar { width: 24px;
+                height: 24px;
+                font-size: 8px; }
+            .letter-row-author { font-size: calc(var(--fs-body) * 0.65);
+                max-width: 60px; }
+            .letter-row-text { font-size: calc(var(--fs-body) * 0.78);
+                -webkit-line-clamp: 2; }
             .letter-row-time { font-size: 6px; }
             .letter-row-idx { font-size: 8px; }
-            .letter-toolbar .view-toggle .chip { font-size: 6px; padding: 2px 8px; }
+            .letter-toolbar .view-toggle .chip { font-size: 6px;
+                padding: 2px 8px; }
             .letter-toolbar .letter-count { font-size: 7px; }
             .topbar .wrap { padding: 0 8px; }
             .wordmark { font-size: clamp(10px, 3vw, 14px); }
@@ -1323,7 +1468,8 @@
             transition: opacity 0.35s ease;
             overflow: hidden;
         }
-        .conversation-modal.open { opacity: 1; pointer-events: auto; }
+        .conversation-modal.open { opacity: 1;
+            pointer-events: auto; }
         .conversation-modal .modal-card {
             width: 100vw;
             height: 100vh;
@@ -1341,8 +1487,8 @@
             flex-direction: column;
         }
         .conversation-modal .modal-card::-webkit-scrollbar { width: 4px; }
-        .conversation-modal .modal-card::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: var(
-                --radius-sm); }
+        .conversation-modal .modal-card::-webkit-scrollbar-thumb { background: var(--ink-lighter);
+            border-radius: var(--radius-sm); }
         .conversation-modal .close-btn {
             position: sticky;
             top: 0;
@@ -1365,12 +1511,25 @@
             z-index: 10;
             box-shadow: var(--shadow);
         }
-        .conversation-modal .close-btn:hover { background: var(--ink); color: var(--card); }
-        .conversation-modal #modalContent { flex: 1; max-width: 780px; width: 100%; margin: 0 auto; padding-bottom: 60px; }
+        .conversation-modal .close-btn:hover { background: var(--ink);
+            color: var(--card); }
+        .conversation-modal #modalContent { flex: 1;
+            max-width: 780px;
+            width: 100%;
+            margin: 0 auto;
+            padding-bottom: 60px; }
 
-        .modal-statement { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
-        .modal-statement .card-who { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
-        .modal-statement .card-author-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+        .modal-statement { margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border); }
+        .modal-statement .card-who { display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px; }
+        .modal-statement .card-author-row { display: flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-wrap: wrap; }
         .modal-statement .card-author {
             font-family: var(--font);
             font-size: calc(var(--fs-body) * 1.1);
@@ -1381,7 +1540,8 @@
             color: var(--ink);
         }
         .modal-statement .card-author:hover { opacity: 0.7; }
-        .modal-statement .card-role { font-size: calc(var(--fs-body) * 0.8); color: var(--ink-light); }
+        .modal-statement .card-role { font-size: calc(var(--fs-body) * 0.8);
+            color: var(--ink-light); }
         .modal-statement .card-time,
         .modal-statement .card-tag {
             font-family: var(--font-mono);
@@ -1406,13 +1566,18 @@
             color: var(--ink);
         }
 
-        .modal-thread { display: flex; flex-direction: column; margin-top: 6px; }
+        .modal-thread { display: flex;
+            flex-direction: column;
+            margin-top: 6px; }
         .modal-node {
             position: relative;
             padding: 8px 0 8px 14px;
             border-left: 1px solid var(--border);
         }
-        .modal-node-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .modal-node-head { display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap; }
         .modal-node-author {
             font-family: var(--font);
             font-size: calc(var(--fs-body) * 0.75);
@@ -1423,7 +1588,9 @@
             color: var(--ink);
         }
         .modal-node-author:hover { opacity: 0.7; }
-        .modal-node-time { font-family: var(--font-mono); font-size: 8px; color: var(--ink-light); }
+        .modal-node-time { font-family: var(--font-mono);
+            font-size: 8px;
+            color: var(--ink-light); }
         .modal-node-toggle {
             font-family: var(--font-mono);
             font-size: 8px;
@@ -1442,7 +1609,9 @@
             white-space: pre-wrap;
             color: var(--ink-mid);
         }
-        .modal-node-actions { display: flex; gap: 12px; margin-left: 24px; }
+        .modal-node-actions { display: flex;
+            gap: 12px;
+            margin-left: 24px; }
         .modal-node-link {
             font-family: var(--font-mono);
             font-size: 7px;
@@ -1456,7 +1625,8 @@
             transition: color .2s ease;
         }
         .modal-node-link:hover { color: var(--ink); }
-        .modal-node-children { display: flex; flex-direction: column; }
+        .modal-node-children { display: flex;
+            flex-direction: column; }
         .modal-reply-form {
             margin: 6px 0 4px 24px;
             padding: 0;
@@ -1474,37 +1644,46 @@
             .bento-panel { padding-bottom: env(safe-area-inset-bottom); }
             .conversation-modal .modal-card { padding-bottom: env(safe-area-inset-bottom); }
         }
-        /* ── custom cursor — dot + trailing inertia ellipse.
-           Suppressed over real controls (buttons, links, drag handles,
-           form fields) via body.write-native-cursor so those keep
-           their own affordance instead of fighting the overlay. */
+
         body.custom-cursor-active { cursor: none; }
         .write-cursor-dot,
         .write-cursor-ellipse {
-            position: fixed; top: 0; left: 0; z-index: 400; pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 400;
+            pointer-events: none;
             transform: translate(-9999px, -9999px);
-            opacity: 0; transition: opacity .18s ease; will-change: transform;
+            opacity: 0;
+            transition: opacity .18s ease;
+            will-change: transform;
         }
         .write-cursor-dot.visible,
         .write-cursor-ellipse.visible { opacity: 1; }
         .write-cursor-dot {
-            width: 6px; height: 6px; margin: -3px 0 0 -3px;
-            border-radius: 50%; background: var(--ink);
+            width: 6px;
+            height: 6px;
+            margin: -3px 0 0 -3px;
+            border-radius: 50%;
+            background: var(--ink);
         }
         .write-cursor-ellipse {
-            width: 34px; height: 34px; margin: -17px 0 0 -17px;
-            border: 1.5px solid var(--ink); border-radius: 50%; opacity: 0;
+            width: 34px;
+            height: 34px;
+            margin: -17px 0 0 -17px;
+            border: 1.5px solid var(--ink);
+            border-radius: 50%;
+            opacity: 0;
         }
         .write-cursor-ellipse.visible { opacity: .32; }
         body.custom-cursor-active.write-native-cursor { cursor: auto; }
         .write-native-cursor .write-cursor-dot,
         .write-native-cursor .write-cursor-ellipse { opacity: 0 !important; }
 
-        /* ── click hotspots — thin edge zones over the letters viewport
-           so paging between letters is a single low-effort click near
-           either side, with a directional cursor to signal it. ── */
         .letter-hotspot {
-            position: absolute; top: 0; bottom: 0;
+            position: absolute;
+            top: 0;
+            bottom: 0;
             width: clamp(56px, 9vw, 180px);
             z-index: 20;
         }
@@ -1520,9 +1699,9 @@
 </head>
 <body data-scale="m" data-font="satoshi">
 
-<div class="write-cursor-ellipse" id="writeCursorEllipse" aria-hidden="true"></div>
-<div class="write-cursor-dot" id="writeCursorDot" aria-hidden="true"></div>
-<button class="focus-exit-btn" id="focusExitBtn" type="button" aria-label="Exit focus mode" title="Exit focus (Esc)">×</button>
+    <div class="write-cursor-ellipse" id="writeCursorEllipse" aria-hidden="true"></div>
+    <div class="write-cursor-dot" id="writeCursorDot" aria-hidden="true"></div>
+    <button class="focus-exit-btn" id="focusExitBtn" type="button" aria-label="Exit focus mode" title="Exit focus (Esc)">×</button>
 
     <!-- ─── TOPBAR ─── -->
     <div class="topbar">
@@ -1538,19 +1717,17 @@
         </div>
     </div>
 
-    <!-- ─── TOP HUD (navigation + create) ─── -->
+    <!-- ─── TOP HUD ─── -->
     <div class="hud hud-top" id="hudTop">
         <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
         <span class="hud-position" id="hudPosition">1 / 4</span>
         <button class="btn btn-icon" id="hudNext" title="Next">›</button>
-
         <div class="hud-divider"></div>
-
         <button class="btn btn-primary" id="hudNew">+ New</button>
     </div>
 
     <div class="wrap">
-        <!-- ─── COMPOSER (floating, draggable) ─── -->
+        <!-- ─── COMPOSER ─── -->
         <div class="composer" id="composer">
             <div class="composer-header" id="composerHeader">
                 <span class="composer-title"><span class="grip">⠿⠿</span> New statement</span>
@@ -1590,26 +1767,19 @@
         </div>
     </div>
 
-    <!-- ─── BOTTOM HUD (appearance + filters) ─── -->
+    <!-- ─── BOTTOM HUD ─── -->
     <div class="hud hud-bottom" id="hud">
-        <!-- Filter -->
         <button class="btn" id="filterToggleBtn">
             <span>Filters</span>
             <span class="filter-count" id="filterCount">0</span>
         </button>
         <button class="btn ghost" id="hudClear" hidden>Clear</button>
-
         <div class="hud-divider"></div>
-
-        <!-- View -->
         <span class="hud-label">View</span>
         <button class="btn active" id="hudViewList">List</button>
         <button class="btn" id="hudViewGrid">Grid</button>
         <button class="btn" id="hudViewBento">Bento</button>
-
         <div class="hud-divider"></div>
-
-        <!-- Appearance: font / size (does not affect the hud itself) -->
         <div class="hud-appearance">
             <select class="font-select" id="fontSelect">
                 <option value="satoshi">Satoshi</option>
@@ -1625,8 +1795,6 @@
                 <button class="chip" data-scale="xxl">XXL</button>
             </div>
         </div>
-
-        <!-- Summary -->
         <span class="filter-summary" id="activeFilterSummary">No filters active</span>
     </div>
 
@@ -1677,20 +1845,27 @@
         (function() {
             'use strict';
 
-            // ── Constants ─────────────────────────────────────────────
             const STORAGE_KEY = 'neverever-statements-v9';
             const PAGE_SIZE = 12;
+
+            // ── Rich AVIF image pool ──────────────────────────────────
             const AVIF_IMAGES = [
                 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?fm=avif&w=800&h=450&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?fm=avif&w=800&h=450&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1485550409059-9afb054cada4?fm=avif&w=800&h=450&fit=crop&q=80',
                 'https://images.unsplash.com/photo-1519681393784-d120267933ba?fm=avif&w=800&h=450&fit=crop&q=80',
-                'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?fm=avif&w=800&h=450&fit=crop&q=80'
+                'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1522071820081-009f0129c71c?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1497366216548-37526070297c?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1497366811353-6870744d04b2?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1551836022-d5d88e9218df?fm=avif&w=800&h=450&fit=crop&q=80',
+                'https://images.unsplash.com/photo-1559136553-1d87d45f00b7?fm=avif&w=800&h=450&fit=crop&q=80'
             ];
 
-            // ── Helpers ──────────────────────────────────────────────
             const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
-            const hash = str => { let h = 0; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0; return h; };
+            const hash = str => { let h = 0; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>>
+                0; return h; };
             const avatarVariant = id => 'v' + (hash(id) % 4);
             const initialsFor = a => {
                 const parts = a.name.replace(/[^A-Za-z ]/g, '').trim().split(/\s+/).filter(Boolean);
@@ -1702,7 +1877,7 @@
             const randAVIF = () => AVIF_IMAGES[Math.floor(Math.random() * AVIF_IMAGES.length)];
             const isVideo = url => /\.(mp4|webm|mov)(\?|$)/i.test(url);
             const escapeHtml = s => (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;',
-                '"': '&quot;', "'": '&#39;' } [c]));
+                    '"': '&quot;', "'": '&#39;' } [c]));
 
             function fmtTime(ts) {
                 const d = new Date(ts),
@@ -1745,101 +1920,235 @@
                 return `<div style="margin-top:0.3rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);"><${tag} src="${escapeHtml(url)}" ${attrs} loading="lazy" style="display:block;width:100%;height:auto;max-height:200px;object-fit:cover;" /></div>`;
             }
 
-            // ── Seed data ─────────────────────────────────────────────
+            // ── Seed: Authors ──────────────────────────────────────────
             function seedAuthors() {
                 return [
+                    // People
                     { id: 'zack', kind: 'person', discipline: 'DESIGN', name: 'Zack Gort',
-                    role: 'Product / UX Designer', tagline: 'Six years freelance.' },
+                        role: 'Product / UX Designer', tagline: 'Six years freelance, fintech + health.' },
                     { id: 'maya', kind: 'person', discipline: 'DESIGN', name: 'Maya Chen', role: 'Creative Director',
-                        tagline: 'Ex-agency.' },
+                        tagline: 'Ex-agency, now independent.' },
                     { id: 'tom', kind: 'person', discipline: 'ENGINEERING', name: 'Tom Okafor', role: 'ML Engineer',
-                        tagline: 'Infra and eval.' },
+                        tagline: 'Infra + eval, 7 years.' },
                     { id: 'ria', kind: 'person', discipline: 'BRAND', name: 'Ria Patel', role: 'Brand Strategist',
-                        tagline: 'Naming, systems.' },
+                        tagline: 'Naming, systems, positioning.' },
                     { id: 'dev', kind: 'person', discipline: 'ENGINEERING', name: 'Dev Singh',
-                        role: 'Frontend Engineer', tagline: 'React / Swift.' },
+                        role: 'Frontend Engineer', tagline: 'React / Swift / design systems.' },
                     { id: 'elena', kind: 'person', discipline: 'DESIGN', name: 'Elena Vogt', role: 'Design Director',
-                        tagline: 'Design systems.' },
+                        tagline: 'Design systems at scale.' },
                     { id: 'james', kind: 'person', discipline: 'ENGINEERING', name: 'James Kwon',
-                        role: 'Staff Engineer', tagline: 'Distributed systems.' },
+                        role: 'Staff Engineer', tagline: 'Distributed systems, 12 years.' },
                     { id: 'sophie', kind: 'person', discipline: 'BRAND', name: 'Sophie Laurent',
-                        role: 'Brand Director', tagline: 'Finding voice.' },
+                        role: 'Brand Director', tagline: 'Finding voice in chaos.' },
                     { id: 'marco', kind: 'person', discipline: 'ENGINEERING', name: 'Marco Rossi',
-                        role: 'VP Engineering', tagline: 'Scaled teams.' },
+                        role: 'VP Engineering', tagline: 'Scaled teams from 5 to 150.' },
                     { id: 'aisha', kind: 'person', discipline: 'DESIGN', name: 'Aisha Okonkwo',
-                        role: 'Product Designer', tagline: 'Fintech, healthtech.' },
+                        role: 'Product Designer', tagline: 'Fintech, healthtech, civic.' },
                     { id: 'liam', kind: 'person', discipline: 'ENGINEERING', name: 'Liam O\'Brien',
-                        role: 'DevOps Lead', tagline: 'Kubernetes.' },
+                        role: 'DevOps Lead', tagline: 'Kubernetes, observability, SRE.' },
                     { id: 'nina', kind: 'person', discipline: 'BRAND', name: 'Nina Chen', role: 'Creative Director',
-                        tagline: 'Climate tech.' },
+                        tagline: 'Climate tech + culture.' },
                     { id: 'peter', kind: 'person', discipline: 'DESIGN', name: 'Peter Malkin', role: 'Design Lead',
-                        tagline: 'UX research.' },
+                        tagline: 'UX research, product strategy.' },
                     { id: 'clara', kind: 'person', discipline: 'ENGINEERING', name: 'Clara Fischer',
-                        role: 'Backend Engineer', tagline: 'Go, Rust.' },
+                        role: 'Backend Engineer', tagline: 'Go, Rust, distributed systems.' },
+                    { id: 'julian', kind: 'person', discipline: 'ENGINEERING', name: 'Julian Park',
+                        role: 'Platform Engineer', tagline: 'Developer experience, internal tools.' },
+                    { id: 'priya', kind: 'person', discipline: 'BRAND', name: 'Priya Sharma', role: 'Brand Lead',
+                        tagline: 'Storytelling + strategy.' },
+                    { id: 'daniel', kind: 'person', discipline: 'DESIGN', name: 'Daniel Okafor',
+                        role: 'Senior Product Designer', tagline: 'AI products, enterprise.' },
+                    { id: 'yuki', kind: 'person', discipline: 'ENGINEERING', name: 'Yuki Tanaka',
+                        role: 'Research Engineer', tagline: 'NLP, LLM eval, safety.' },
+                    { id: 'fatima', kind: 'person', discipline: 'BRAND', name: 'Fatima Al-Hassan',
+                        role: 'Brand Designer', tagline: 'Identity, type, motion.' },
+                    { id: 'oscar', kind: 'person', discipline: 'ENGINEERING', name: 'Oscar Nilsson',
+                        role: 'Infrastructure Engineer', tagline: 'Cloud, security, automation.' },
+                    { id: 'leila', kind: 'person', discipline: 'DESIGN', name: 'Leila Kone', role: 'Design Researcher',
+                        tagline: 'Ethnography, service design.' },
+                    { id: 'hugo', kind: 'person', discipline: 'ENGINEERING', name: 'Hugo Meyer',
+                        role: 'Full Stack Engineer', tagline: 'React, Node, Postgres.' },
+                    // Companies
                     { id: 'studio-north', kind: 'company', discipline: 'DESIGN', name: 'Studio North',
-                        role: 'Design studio, 12 people', tagline: 'Systems-heavy.' },
+                        role: 'Design studio · 12 people', tagline: 'Systems-heavy, product-first.' },
                     { id: 'forge-labs', kind: 'company', discipline: 'ENGINEERING', name: 'Forge Labs',
-                        role: 'Inference infra', tagline: 'Model deployment.' },
+                        role: 'Inference infra · 40 people', tagline: 'Model deployment at scale.' },
                     { id: 'hollow-co', kind: 'company', discipline: 'BRAND', name: 'Hollow & Co',
-                        role: 'Branding agency', tagline: 'Portfolio reviews.' },
+                        role: 'Branding agency · 8 people', tagline: 'Portfolio reviews, positioning.' },
                     { id: 'strata', kind: 'company', discipline: 'ENGINEERING', name: 'Strata',
-                        role: 'Cloud infrastructure', tagline: 'Multi-cloud.' },
+                        role: 'Cloud infrastructure · 200 people', tagline: 'Multi-cloud, Kubernetes.' },
                     { id: 'fieldwork', kind: 'company', discipline: 'DESIGN', name: 'Fieldwork',
-                        role: 'Product design consultancy', tagline: 'Founders.' },
+                        role: 'Product design consultancy · 15 people', tagline: 'Founders, early-stage.' },
                     { id: 'catalyst', kind: 'company', discipline: 'BRAND', name: 'Catalyst',
-                        role: 'Brand + comms', tagline: 'Say something real.' }
+                        role: 'Brand + comms · 6 people', tagline: 'Say something real.' },
+                    { id: 'apex', kind: 'company', discipline: 'ENGINEERING', name: 'Apex Systems',
+                        role: 'Dev tooling · 60 people', tagline: 'CI/CD, observability.' },
+                    { id: 'palette', kind: 'company', discipline: 'DESIGN', name: 'Palette Studio',
+                        role: 'Design + research · 9 people', tagline: 'Human-centered, always.' }
                 ];
             }
 
+            // ── Seed: Statements with rich conversations ──────────────
             function seedStatements(authorsList) {
                 const now = Date.now(),
                     day = 24 * 60 * 60 * 1000;
+                const tags = ['OPEN TO WORK', 'HIRING', 'THOUGHTS', 'BRAND', 'COMMUNITY', 'LEADERSHIP', 'DESIGN',
+                    'ENGINEERING'
+                ];
+
                 const texts = [
-                    'Looking for staff-level product work. Six years freelance, shipped 20+ products.',
-                    'Left my agency job today. No regrets yet — ask me in a month.',
-                    'A staff title means nothing if the team around it is broken.',
-                    'Rebranded three companies this year. None needed it.',
-                    'Design systems are not about consistency. They\'re about enabling speed.',
+                    // OPEN TO WORK
+                    'Looking for staff-level product work. Six years freelance, shipped 20+ products across fintech and health.',
+                    'Open to fractional brand roles. I help founders find their voice and tell stories that actually land.',
+                    'Senior ML Engineer seeking inference-infra roles. 7 years, PyTorch, Triton, Kubernetes.',
+                    'Product Designer (8 years) — open to remote roles in climate tech or civic tech.',
+                    'Brand strategist available for projects. Naming, positioning, identity systems.',
+                    'Frontend engineer looking for teams building design systems. React, Swift, web components.',
+                    'Open to CTO or VP Eng roles. I\'ve scaled teams from 5 to 150, rebuilt infra twice.',
+                    'Design researcher looking for UX research lead roles. Ethnography, service design, 6 years.',
+                    'Staff engineer — distributed systems, 12 years. Open to advisory or full-time.',
+                    'Creative director available for brand overhauls. Climate, culture, and community work.',
+                    // HIRING
+                    'Hiring a Senior Product Designer at Studio North. Remote-first, 12-person team, systems-heavy.',
+                    'Forge Labs is looking for an ML Engineer. Inference optimization, PyTorch, Triton. Remote.',
+                    'Strata is hiring a Staff Platform Engineer. Kubernetes, multi-cloud, 200-person team.',
+                    'Hollow & Co is looking for a Brand Designer. 8-person agency, remote, portfolio reviews.',
+                    'Fieldwork is hiring a Product Designer for early-stage founders. 15-person consultancy.',
+                    'Catalyst is looking for a Brand Strategist. 6-person team, comms + positioning.',
+                    'Apex Systems is hiring a Senior DevOps Engineer. CI/CD, observability, 60-person team.',
+                    'Palette Studio is looking for a Design Researcher. 9-person studio, human-centered work.',
+                    // THOUGHTS
+                    'Design systems are not about consistency. They\'re about enabling speed and reducing cognitive load.',
                     'Distributed systems are hard because we\'re trying to make unreliable things reliable.',
                     'Your brand isn\'t your logo. It\'s what people say about you when you\'re not in the room.',
-                    'Leadership is about creating conditions for others to succeed.',
-                    'I care about the details that make products feel human.',
+                    'Leadership is about creating conditions for others to succeed, not about being right.',
+                    'I care about the details that make products feel human. The gap between "works" and "feels good" is everything.',
                     'Observability isn\'t about dashboards. It\'s about answering questions you didn\'t know you\'d need to ask.',
-                    'Go is the best programming language for infrastructure work.',
-                    'Building inference tooling for teams shipping models to production.',
-                    'Senior Product Designer. Remote-first. We build systems for regulated industries.',
-                    'Free brand strategy workshop next week. 2 hours, 20 people max.',
-                    'Portfolio reviews back. Every Friday, 5 portfolios, honest feedback.',
-                    'The real system is the culture around it.',
-                    'Best systems I\'ve built had failure as first-class concern.',
-                    'UX researcher + product designer, 8 years. Looking for role where research drives decisions.',
-                    'If you\'re in climate tech and hiring — please post roles here.'
+                    'The best products are built by teams that trust each other. Culture is not a perk.',
+                    'Go is the best language for infrastructure work. Simple, fast, and the tooling is mature.',
+                    'Inference is the new frontier. Models are commodities; serving them well is the moat.',
+                    'Brand is behavior, not a deck. What you do when no one is watching is the brand.',
+                    'The real system is the culture around it. You can\'t engineer your way out of a bad team culture.',
+                    'Portfolio reviews are back. Honest feedback, no sugarcoating. Every Friday.',
+                    'UX researcher + product designer, 8 years. Looking for roles where research drives decisions.',
+                    'If you\'re in climate tech and hiring — please post roles here. We need more people working on this.',
+                    'I left my agency job today. No regrets yet. Ask me in a month.',
+                    'A staff title means nothing if the team around it is broken. I\'ve seen both sides.',
+                    'Rebranded three companies this year. None needed it. They needed to fix their product.',
+                    'Best systems I\'ve built had failure as a first-class concern. Plan for it.',
+                    'Free brand strategy workshop next week. 2 hours, 20 people max. DM for invite.',
+                    'The future of work is asynchronous, distributed, and trust-based. We\'re not there yet.'
                 ];
-                const tags = ['OPEN TO WORK', 'HIRING', 'CAREER', 'THOUGHTS', 'BRAND', 'COMMUNITY', 'LEADERSHIP'];
+
+                // Build base statements
                 const result = [];
-                for (let i = 0; i < 24; i++) {
+                for (let i = 0; i < 52; i++) {
                     const a = authorsList[Math.floor(Math.random() * authorsList.length)];
+                    const tag = tags[Math.floor(Math.random() * tags.length)];
+                    const textIdx = i % texts.length;
+                    const media = Math.random() > 0.55 ? randAVIF() : '';
                     result.push({
                         id: uid(),
                         authorId: a.id,
-                        time: now - (Math.random() * 14 * day),
-                        tag: tags[Math.floor(Math.random() * tags.length)],
-                        text: texts[i % texts.length],
-                        mediaUrl: Math.random() > 0.6 ? randAVIF() : '',
+                        time: now - (Math.random() * 21 * day),
+                        tag: tag,
+                        text: texts[textIdx] + (i > 30 ? ' — ' + ['Perspective.', 'Thought.', 'Note.', 'Signal.'][
+                            Math.floor(Math.random() * 4)
+                        ] : ''),
+                        mediaUrl: media,
                         replies: []
                     });
                 }
+
+                // ── Add rich conversational threads to ~80% of statements ──
+                const replyAuthors = authorsList.filter(a => a.kind === 'person');
+                const replyTexts = [
+                    'Agree completely. The gap is real and most teams don\'t even see it.',
+                    'This resonates. I\'ve been thinking about this a lot lately.',
+                    'Can we talk more about this? I\'d love to hear your perspective.',
+                    'Yes! This is exactly what I\'ve been trying to articulate.',
+                    'Hard disagree. I think consistency is the foundation.',
+                    'Interesting take. What about the role of iteration?',
+                    'I\'ve seen this play out both ways. Culture eats strategy for breakfast.',
+                    'Let\'s continue this thread — I have thoughts.',
+                    'This is the kind of clarity we need more of.',
+                    'Beautifully said. Thank you for putting this into words.',
+                    'Building on that — I think the key is…',
+                    'Could you elaborate on the systems part? I\'m curious.',
+                    'I\'ve been in that position. It\'s tough but worth it.',
+                    'This is why I love this community. Real talk.',
+                    'Would you be open to a quick chat about this?',
+                    'I\'ve seen this approach fail before. Careful with assumptions.',
+                    'Yes, and I\'d add that trust is the real currency.',
+                    'This is the most honest thing I\'ve read today.',
+                    'I\'m saving this. Brilliant.',
+                    'Let\'s test this hypothesis — I\'m in.'
+                ];
+
+                // For each statement, decide if it gets replies (prob 0.8)
+                result.forEach((stmt, idx) => {
+                    if (Math.random() > 0.2) { // 80% get threads
+                        const numReplies = 1 + Math.floor(Math.random() * 4); // 1-4 replies
+                        const usedAuthors = new Set();
+                        usedAuthors.add(stmt.authorId);
+                        for (let r = 0; r < numReplies; r++) {
+                            // pick a different author
+                            let replyAuthor;
+                            let attempts = 0;
+                            do {
+                                replyAuthor = replyAuthors[Math.floor(Math.random() * replyAuthors.length)];
+                                attempts++;
+                            } while ((usedAuthors.has(replyAuthor.id) || replyAuthor.id === stmt.authorId) &&
+                                attempts < 10);
+                            usedAuthors.add(replyAuthor.id);
+
+                            const replyText = replyTexts[(idx + r * 7) % replyTexts.length];
+                            const replyTime = stmt.time + (r + 1) * (30 + Math.floor(Math.random() * 120)) * 60000; // 30min-2h apart
+                            const reply = {
+                                id: uid(),
+                                authorId: replyAuthor.id,
+                                time: replyTime,
+                                text: replyText,
+                                replies: []
+                            };
+                            stmt.replies.push(reply);
+
+                            // Occasionally add a sub-reply (nested) to this reply (prob 0.3)
+                            if (Math.random() > 0.7) {
+                                let subAuthor;
+                                attempts = 0;
+                                do {
+                                    subAuthor = replyAuthors[Math.floor(Math.random() * replyAuthors.length)];
+                                    attempts++;
+                                } while ((usedAuthors.has(subAuthor.id) || subAuthor.id === stmt.authorId) &&
+                                    attempts < 10);
+                                usedAuthors.add(subAuthor.id);
+                                const subText = 'Exactly! And I’d add that ' + ['timing matters.', 'people need to feel heard.',
+                                    'execution is everything.', 'trust is earned.', 'clarity is power.'
+                                ][Math.floor(Math.random() * 5)];
+                                const subTime = replyTime + (15 + Math.floor(Math.random() * 45)) * 60000;
+                                reply.replies.push({
+                                    id: uid(),
+                                    authorId: subAuthor.id,
+                                    time: subTime,
+                                    text: subText,
+                                    replies: []
+                                });
+                            }
+                        }
+                    }
+                });
+
                 return result;
             }
 
             // ── Storage ──────────────────────────────────────────────
             const storage = {
-                get: async key => { try { const v = localStorage.getItem(key); return v !== null ? { value: v } : null; }
-                    catch (e) { return null; } },
+                get: async key => { try { const v = localStorage.getItem(key); return v !== null ? { value: v } :
+                        null; } catch (e) { return null; } },
                 set: async (key, val) => { try { localStorage.setItem(key, val); return true; } catch (e) { return false; } }
             };
 
-            // ── State ─────────────────────────────────────────────────
             let authors = [];
             let statements = [];
             let letterData = [];
@@ -1894,9 +2203,6 @@
                 saveInFlight = false;
             }
 
-            // ── DEV: wipe saved statements and reseed fresh demo content ──
-            // Console: resetDemoContent()
-            // URL, once: yourfile.html?reset-demo
             async function resetDemoContent() {
                 try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
                 authors = seedAuthors();
@@ -1904,7 +2210,6 @@
                 await saveData();
                 activeIndex = 0;
                 renderTrack();
-                console.log('resetDemoContent: reseeded', authors.length, 'authors /', statements.length, 'statements');
             }
             window.resetDemoContent = resetDemoContent;
 
@@ -1925,10 +2230,6 @@
 
             function getFiltered() { return statements.filter(passesFilters); }
 
-            function filtersActive() {
-                return activeTags.size > 0 || activeKinds.size > 0 || activeDisciplines.size > 0 || searchQuery.length > 0;
-            }
-
             function clearFilters() {
                 activeTags.clear();
                 activeKinds.clear();
@@ -1941,7 +2242,7 @@
 
             function updateFilterUI() {
                 const count = activeTags.size + activeKinds.size + activeDisciplines.size + (searchQuery.length > 0 ? 1 :
-                0);
+                    0);
                 document.getElementById('filterCount').textContent = count;
                 const summary = document.getElementById('activeFilterSummary');
                 if (count === 0) summary.textContent = 'No filters active';
@@ -1994,7 +2295,8 @@
                 wrap.innerHTML = headHtml;
 
                 const head = wrap.querySelector('.modal-node-head');
-                head.querySelector('[data-author-id]').addEventListener('click', e => e.stopPropagation());
+                const authEl = head.querySelector('[data-author-id]');
+                if (authEl) authEl.addEventListener('click', e => e.stopPropagation());
 
                 if (hasChildren) {
                     const toggle = head.querySelector('.modal-node-toggle');
@@ -2174,7 +2476,7 @@
                 return card;
             }
 
-            // ── Item builders (list, grid) ───────────────────────────
+            // ── Item builders ─────────────────────────────────────────
             function buildRow(s, idx) {
                 const a = authorById(s.authorId);
                 const row = document.createElement('div');
@@ -2238,7 +2540,6 @@
                 const frame = panel.querySelector('.letter-card-frame');
                 if (!frame) return;
 
-                // Update cover
                 const cover = frame.querySelector('.letter-cover');
                 if (cover) {
                     const kicker = cover.querySelector('.letter-cover-kicker');
@@ -2249,7 +2550,6 @@
                     if (deck) deck.textContent = data.deck || '';
                 }
 
-                // Update toolbar
                 const toolbar = frame.querySelector('.letter-toolbar');
                 const mode = data.viewMode || 'list';
                 const filtered = getFiltered();
@@ -2265,7 +2565,6 @@
                 const countEl = toolbar?.querySelector('.letter-count');
                 if (countEl) countEl.textContent = filtered.length + ' statements';
 
-                // Remove old content
                 const oldContent = frame.querySelector('.letter-content');
                 if (oldContent) oldContent.remove();
 
@@ -2326,12 +2625,10 @@
 
                 frame.appendChild(content);
 
-                // Update UI
                 document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
                 document.getElementById('hudPosition').textContent = (index + 1) + ' / ' + letterData.length;
                 updateFilterUI();
 
-                // Update HUD view buttons
                 ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.classList.toggle('active', id === 'hudView' + mode.charAt(0).toUpperCase() + mode
@@ -2351,7 +2648,6 @@
                 const frame = document.createElement('div');
                 frame.className = 'letter-card-frame';
 
-                // Focus toggle
                 const focusBtn = document.createElement('button');
                 focusBtn.className = 'letter-card-focus-toggle';
                 focusBtn.textContent = 'Focus';
@@ -2361,7 +2657,6 @@
                 });
                 frame.appendChild(focusBtn);
 
-                // Cover
                 const cover = document.createElement('div');
                 cover.className = 'letter-cover';
                 cover.innerHTML = `
@@ -2371,7 +2666,6 @@
             `;
                 frame.appendChild(cover);
 
-                // Toolbar
                 const toolbar = document.createElement('div');
                 toolbar.className = 'letter-toolbar';
                 const toggle = document.createElement('div');
@@ -2396,7 +2690,6 @@
                 toolbar.appendChild(countEl);
                 frame.appendChild(toolbar);
 
-                // Content
                 const content = document.createElement('div');
                 content.className = 'letter-content';
                 frame.appendChild(content);
@@ -2482,10 +2775,6 @@
                 document.getElementById('c-text').value = '';
             }
 
-            // Drag the composer by its header. Position persists across
-            // close/reopen (same DOM node, inline style just stays put)
-            // and across navigation — dragging never touches .open, so
-            // moving the window doesn't close it or block anything behind it.
             function setupComposerDrag() {
                 const composer = document.getElementById('composer');
                 const header = document.getElementById('composerHeader');
@@ -2523,7 +2812,6 @@
                 header.addEventListener('pointerup', endDrag);
                 header.addEventListener('pointercancel', endDrag);
 
-                // Keep the window on-screen if the viewport shrinks (e.g. rotation).
                 window.addEventListener('resize', () => {
                     if (composer.style.left === '' || composer.style.top === '') return;
                     const maxX = Math.max(8, window.innerWidth - composer.offsetWidth - 8);
@@ -2589,215 +2877,208 @@
             window.__clearFilters = clearFilters;
 
             document.addEventListener('DOMContentLoaded', async function() {
-              try {
-                // Font & scale
-                document.getElementById('fontSelect').addEventListener('change', function() {
-                    document.body.setAttribute('data-font', this.value);
-                });
-                document.querySelectorAll('.scale-group .chip').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const scale = btn.dataset.scale;
-                        document.body.setAttribute('data-scale', scale);
-                        document.querySelectorAll('.scale-group .chip').forEach(b => {
-                            b.classList.toggle('active', b.dataset.scale === scale);
+                try {
+                    document.getElementById('fontSelect').addEventListener('change', function() {
+                        document.body.setAttribute('data-font', this.value);
+                    });
+                    document.querySelectorAll('.scale-group .chip').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const scale = btn.dataset.scale;
+                            document.body.setAttribute('data-scale', scale);
+                            document.querySelectorAll('.scale-group .chip').forEach(b => {
+                                b.classList.toggle('active', b.dataset.scale === scale);
+                            });
                         });
                     });
-                });
 
-                // Load data
-                await loadData();
-                if (new URLSearchParams(location.search).has('reset-demo')) {
-                    await resetDemoContent();
-                }
-
-                // Letter data
-                letterData = [
-                    { title: 'The Feed', deck: 'All statements, unfiltered.', viewMode: 'bento' },
-                    { title: 'Open to Work', deck: 'People looking for their next role.', viewMode: 'list' },
-                    { title: 'Hiring', deck: 'Companies and teams looking for talent.', viewMode: 'list' },
-                    { title: 'Thoughts', deck: 'Ideas, observations, provocations.', viewMode: 'grid' }
-                ];
-
-                // Build track
-                renderTrack();
-
-                // ─── HUD controls ─────────────────────────────────────
-                // Navigation
-                document.getElementById('hudPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
-                document.getElementById('hudNext').addEventListener('click', () => activatePanel(activeIndex + 1));
-                document.getElementById('letterHotspotPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
-                document.getElementById('letterHotspotNext').addEventListener('click', () => activatePanel(activeIndex + 1));
-                document.getElementById('focusExitBtn').addEventListener('click', () => setFocusMode(false));
-
-                // View mode
-                document.getElementById('hudViewList').addEventListener('click', function() {
-                    letterData[activeIndex].viewMode = 'list';
-                    renderLetter(activeIndex);
-                });
-                document.getElementById('hudViewGrid').addEventListener('click', function() {
-                    letterData[activeIndex].viewMode = 'grid';
-                    renderLetter(activeIndex);
-                });
-                document.getElementById('hudViewBento').addEventListener('click', function() {
-                    letterData[activeIndex].viewMode = 'bento';
-                    renderLetter(activeIndex);
-                });
-
-                // New
-                document.getElementById('hudNew').addEventListener('click', function() {
-                    const c = document.getElementById('composer');
-                    c.classList.contains('open') ? closeComposer() : openComposer();
-                });
-
-                // Scroll settle
-                let settleTimer = null;
-                const track = document.getElementById('lettersTrack');
-                track.addEventListener('scroll', () => {
-                    clearTimeout(settleTimer);
-                    settleTimer = setTimeout(() => {
-                        const rect = track.getBoundingClientRect();
-                        const centerX = rect.left + rect.width / 2;
-                        let best = 0,
-                            bestDist = Infinity;
-                        Array.from(track.children).forEach((panel, i) => {
-                            const r = panel.getBoundingClientRect();
-                            const c = r.left + r.width / 2;
-                            const d = Math.abs(c - centerX);
-                            if (d < bestDist) { bestDist = d;
-                                best = i; }
-                        });
-                        if (best !== activeIndex) {
-                            const panels = track.querySelectorAll('.letter-panel');
-                            panels.forEach(p => p.classList.remove('active'));
-                            activeIndex = best;
-                            panels[best].classList.add('active');
-                            renderLetter(activeIndex);
-                        }
-                    }, 150);
-                }, { passive: true });
-
-                // Drag to scroll
-                let isDragging = false,
-                    dragStartX = 0,
-                    dragStartScroll = 0;
-                track.addEventListener('pointerdown', (e) => {
-                    if (e.pointerType === 'touch') return;
-                    if (e.target.closest('.letter-row, .grid-item, .card, button, a')) return;
-                    isDragging = true;
-                    dragStartX = e.clientX;
-                    dragStartScroll = track.scrollLeft;
-                    track.classList.add('dragging');
-                    track.setPointerCapture(e.pointerId);
-                });
-                track.addEventListener('pointermove', (e) => {
-                    if (!isDragging) return;
-                    track.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
-                });
-                track.addEventListener('pointerup', () => { isDragging = false;
-                    track.classList.remove('dragging'); });
-                track.addEventListener('pointercancel', () => { isDragging = false;
-                    track.classList.remove('dragging'); });
-
-                // Keyboard
-                document.addEventListener('keydown', (e) => {
-                    if (e.target.closest('.letter-row, .grid-item, .card, button, a, input, textarea'))
-                        return;
-                    if (e.key === 'ArrowLeft') { e.preventDefault();
-                        activatePanel(activeIndex - 1); }
-                    if (e.key === 'ArrowRight') { e.preventDefault();
-                        activatePanel(activeIndex + 1); }
-                    if (e.key === 'Escape' && focusMode) setFocusMode(false);
-                });
-
-                // Composer
-                document.getElementById('c-cancel').addEventListener('click', closeComposer);
-                document.getElementById('composerClose').addEventListener('click', closeComposer);
-                setupComposerDrag();
-                document.getElementById('c-post').addEventListener('click', () => {
-                    const authorId = document.getElementById('c-author-select').value;
-                    const tag = document.getElementById('c-tag').value.trim().toUpperCase();
-                    const mediaUrl = document.getElementById('c-media').value.trim();
-                    const text = document.getElementById('c-text').value.trim();
-                    if (!text || !authorId) return;
-                    statements.unshift({ id: uid(), authorId, time: Date.now(), tag, text, mediaUrl,
-                    replies: [] });
-                    saveData();
-                    closeComposer();
-                    renderLetter(activeIndex);
-                    document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
-                });
-
-                // Filters
-                document.getElementById('filterToggleBtn').addEventListener('click', openBento);
-                document.getElementById('bentoClose').addEventListener('click', closeBento);
-                document.getElementById('bentoOverlay').addEventListener('click', (e) => {
-                    if (e.target === e.currentTarget) closeBento();
-                });
-                document.getElementById('bentoClearAll').addEventListener('click', () => {
-                    clearFilters();
-                    populateBentoChips();
-                });
-                document.getElementById('bentoApply').addEventListener('click', () => {
-                    searchQuery = document.getElementById('bentoSearch').value.trim();
-                    closeBento();
-                    renderLetter(activeIndex);
-                });
-                document.getElementById('bentoSearch').addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') document.getElementById('bentoApply').click();
-                });
-                document.getElementById('hudClear').addEventListener('click', clearFilters);
-
-                // Logo tile — touch/tap toggle (desktop gets hover/focus for free via CSS)
-                const logoTile = document.getElementById('logoTile');
-                const logoReset = document.getElementById('logoReset');
-                function setLogoOpen(open) {
-                    logoTile.classList.toggle('open', open);
-                    logoTile.setAttribute('aria-expanded', String(open));
-                }
-                logoTile.addEventListener('click', (e) => {
-                    if (e.target.closest('#logoReset')) return;
-                    setLogoOpen(!logoTile.classList.contains('open'));
-                });
-                document.addEventListener('click', (e) => {
-                    if (!logoTile.contains(e.target)) setLogoOpen(false);
-                });
-                logoReset.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    if (!confirm('Reset demo? This clears your cached statements and reseeds fresh sample content.')) return;
-                    await resetDemoContent();
-                    clearFilters();
-                    if (focusMode) setFocusMode(false);
-                    setLogoOpen(false);
-                });
-
-                // Conversation modal
-                document.getElementById('modalClose').addEventListener('click', closeConversation);
-                document.getElementById('conversationModal').addEventListener('click', (e) => {
-                    if (e.target === e.currentTarget) closeConversation();
-                });
-
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        closeConversation();
-                        if (document.getElementById('bentoOverlay').classList.contains('open')) closeBento();
+                    await loadData();
+                    if (new URLSearchParams(location.search).has('reset-demo')) {
+                        await resetDemoContent();
                     }
-                });
 
-                // Initial render
-                renderLetter(0);
-              } catch (err) {
-                // Fail loudly instead of silently — a single missing element
-                // used to abort init partway through and take the HUD,
-                // composer, and filters down with it with no visible sign.
-                console.error('neverever.land init failed:', err);
-              }
+                    letterData = [
+                        { title: 'The Feed', deck: 'All statements, unfiltered — a living pulse of the community.',
+                            viewMode: 'bento' },
+                        { title: 'Open to Work', deck: 'People looking for their next role.',
+                            viewMode: 'list' },
+                        { title: 'Hiring', deck: 'Companies and teams looking for talent.',
+                            viewMode: 'list' },
+                        { title: 'Thoughts', deck: 'Ideas, observations, provocations from the edge.',
+                            viewMode: 'grid' }
+                    ];
+
+                    renderTrack();
+
+                    // ─── HUD controls ─────────────────────────────────────
+                    document.getElementById('hudPrev').addEventListener('click', () => activatePanel(activeIndex -
+                    1));
+                    document.getElementById('hudNext').addEventListener('click', () => activatePanel(activeIndex +
+                    1));
+                    document.getElementById('letterHotspotPrev').addEventListener('click', () => activatePanel(
+                        activeIndex - 1));
+                    document.getElementById('letterHotspotNext').addEventListener('click', () => activatePanel(
+                        activeIndex + 1));
+                    document.getElementById('focusExitBtn').addEventListener('click', () => setFocusMode(false));
+
+                    document.getElementById('hudViewList').addEventListener('click', function() {
+                        letterData[activeIndex].viewMode = 'list';
+                        renderLetter(activeIndex);
+                    });
+                    document.getElementById('hudViewGrid').addEventListener('click', function() {
+                        letterData[activeIndex].viewMode = 'grid';
+                        renderLetter(activeIndex);
+                    });
+                    document.getElementById('hudViewBento').addEventListener('click', function() {
+                        letterData[activeIndex].viewMode = 'bento';
+                        renderLetter(activeIndex);
+                    });
+
+                    document.getElementById('hudNew').addEventListener('click', function() {
+                        const c = document.getElementById('composer');
+                        c.classList.contains('open') ? closeComposer() : openComposer();
+                    });
+
+                    let settleTimer = null;
+                    const track = document.getElementById('lettersTrack');
+                    track.addEventListener('scroll', () => {
+                        clearTimeout(settleTimer);
+                        settleTimer = setTimeout(() => {
+                            const rect = track.getBoundingClientRect();
+                            const centerX = rect.left + rect.width / 2;
+                            let best = 0,
+                                bestDist = Infinity;
+                            Array.from(track.children).forEach((panel, i) => {
+                                const r = panel.getBoundingClientRect();
+                                const c = r.left + r.width / 2;
+                                const d = Math.abs(c - centerX);
+                                if (d < bestDist) { bestDist = d;
+                                    best = i; }
+                            });
+                            if (best !== activeIndex) {
+                                const panels = track.querySelectorAll('.letter-panel');
+                                panels.forEach(p => p.classList.remove('active'));
+                                activeIndex = best;
+                                panels[best].classList.add('active');
+                                renderLetter(activeIndex);
+                            }
+                        }, 150);
+                    }, { passive: true });
+
+                    let isDragging = false,
+                        dragStartX = 0,
+                        dragStartScroll = 0;
+                    track.addEventListener('pointerdown', (e) => {
+                        if (e.pointerType === 'touch') return;
+                        if (e.target.closest('.letter-row, .grid-item, .card, button, a')) return;
+                        isDragging = true;
+                        dragStartX = e.clientX;
+                        dragStartScroll = track.scrollLeft;
+                        track.classList.add('dragging');
+                        track.setPointerCapture(e.pointerId);
+                    });
+                    track.addEventListener('pointermove', (e) => {
+                        if (!isDragging) return;
+                        track.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
+                    });
+                    track.addEventListener('pointerup', () => { isDragging = false;
+                        track.classList.remove('dragging'); });
+                    track.addEventListener('pointercancel', () => { isDragging = false;
+                        track.classList.remove('dragging'); });
+
+                    document.addEventListener('keydown', (e) => {
+                        if (e.target.closest('.letter-row, .grid-item, .card, button, a, input, textarea'))
+                            return;
+                        if (e.key === 'ArrowLeft') { e.preventDefault();
+                            activatePanel(activeIndex - 1); }
+                        if (e.key === 'ArrowRight') { e.preventDefault();
+                            activatePanel(activeIndex + 1); }
+                        if (e.key === 'Escape' && focusMode) setFocusMode(false);
+                    });
+
+                    document.getElementById('c-cancel').addEventListener('click', closeComposer);
+                    document.getElementById('composerClose').addEventListener('click', closeComposer);
+                    setupComposerDrag();
+                    document.getElementById('c-post').addEventListener('click', () => {
+                        const authorId = document.getElementById('c-author-select').value;
+                        const tag = document.getElementById('c-tag').value.trim().toUpperCase();
+                        const mediaUrl = document.getElementById('c-media').value.trim();
+                        const text = document.getElementById('c-text').value.trim();
+                        if (!text || !authorId) return;
+                        statements.unshift({ id: uid(), authorId, time: Date.now(), tag, text, mediaUrl,
+                            replies: [] });
+                        saveData();
+                        closeComposer();
+                        renderLetter(activeIndex);
+                        document.getElementById('topCount').textContent = String(statements.length).padStart(3,
+                            '0');
+                    });
+
+                    document.getElementById('filterToggleBtn').addEventListener('click', openBento);
+                    document.getElementById('bentoClose').addEventListener('click', closeBento);
+                    document.getElementById('bentoOverlay').addEventListener('click', (e) => {
+                        if (e.target === e.currentTarget) closeBento();
+                    });
+                    document.getElementById('bentoClearAll').addEventListener('click', () => {
+                        clearFilters();
+                        populateBentoChips();
+                    });
+                    document.getElementById('bentoApply').addEventListener('click', () => {
+                        searchQuery = document.getElementById('bentoSearch').value.trim();
+                        closeBento();
+                        renderLetter(activeIndex);
+                    });
+                    document.getElementById('bentoSearch').addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') document.getElementById('bentoApply').click();
+                    });
+                    document.getElementById('hudClear').addEventListener('click', clearFilters);
+
+                    const logoTile = document.getElementById('logoTile');
+                    const logoReset = document.getElementById('logoReset');
+
+                    function setLogoOpen(open) {
+                        logoTile.classList.toggle('open', open);
+                        logoTile.setAttribute('aria-expanded', String(open));
+                    }
+                    logoTile.addEventListener('click', (e) => {
+                        if (e.target.closest('#logoReset')) return;
+                        setLogoOpen(!logoTile.classList.contains('open'));
+                    });
+                    document.addEventListener('click', (e) => {
+                        if (!logoTile.contains(e.target)) setLogoOpen(false);
+                    });
+                    logoReset.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        if (!confirm(
+                            'Reset demo? This clears your cached statements and reseeds fresh sample content.'
+                            )) return;
+                        await resetDemoContent();
+                        clearFilters();
+                        if (focusMode) setFocusMode(false);
+                        setLogoOpen(false);
+                    });
+
+                    document.getElementById('modalClose').addEventListener('click', closeConversation);
+                    document.getElementById('conversationModal').addEventListener('click', (e) => {
+                        if (e.target === e.currentTarget) closeConversation();
+                    });
+
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') {
+                            closeConversation();
+                            if (document.getElementById('bentoOverlay').classList.contains('open'))
+                                closeBento();
+                        }
+                    });
+
+                    renderLetter(0);
+                } catch (err) {
+                    console.error('neverever.land init failed:', err);
+                }
             });
         })();
 
-        // ── custom cursor — dot + inertia ellipse. Suppressed over real
-        // controls (buttons, links, drag handles, form fields) via
-        // body.write-native-cursor so those keep their native affordance.
-        (function initWriteCursor(){
+        // ── custom cursor ─────────────────────────────────────────────
+        (function initWriteCursor() {
             const writeCursorDot = document.getElementById('writeCursorDot');
             const writeCursorEllipse = document.getElementById('writeCursorEllipse');
             if (!writeCursorDot || !writeCursorEllipse) return;
@@ -2812,21 +3093,29 @@
             const SPEED_SATURATE = 34;
             const MAX_STRETCH = 0.6;
 
-            let ptrX = 0, ptrY = 0;
-            let prevFrameX = 0, prevFrameY = 0, frameInit = false;
-            let ellAngle = 0, ellScaleX = 1, ellScaleY = 1;
+            let ptrX = 0,
+                ptrY = 0;
+            let prevFrameX = 0,
+                prevFrameY = 0,
+                frameInit = false;
+            let ellAngle = 0,
+                ellScaleX = 1,
+                ellScaleY = 1;
             let rafId = null;
 
-            function shortAngleLerp(current, target, factor){
+            function shortAngleLerp(current, target, factor) {
                 const diff = ((target - current + 540) % 360) - 180;
                 return current + diff * factor;
             }
 
-            function step(){
-                if (!frameInit){ prevFrameX = ptrX; prevFrameY = ptrY; frameInit = true; }
+            function step() {
+                if (!frameInit) { prevFrameX = ptrX;
+                    prevFrameY = ptrY;
+                    frameInit = true; }
                 const dx = ptrX - prevFrameX;
                 const dy = ptrY - prevFrameY;
-                prevFrameX = ptrX; prevFrameY = ptrY;
+                prevFrameX = ptrX;
+                prevFrameY = ptrY;
 
                 const speed = Math.hypot(dx, dy);
                 const angleTarget = speed > 0.4 ? Math.atan2(dy, dx) * (180 / Math.PI) : ellAngle;
@@ -2837,14 +3126,18 @@
                 ellScaleY += ((1 - stretch * 0.45) - ellScaleY) * ELLIPSE_LERP;
 
                 writeCursorEllipse.style.transform =
-                    'translate(' + ptrX + 'px,' + ptrY + 'px) rotate(' + ellAngle + 'deg) scale(' + ellScaleX + ',' + ellScaleY + ')';
+                    'translate(' + ptrX + 'px,' + ptrY + 'px) rotate(' + ellAngle + 'deg) scale(' + ellScaleX +
+                    ',' + ellScaleY + ')';
 
                 rafId = requestAnimationFrame(step);
             }
-            function startLoop(){ if (!rafId) rafId = requestAnimationFrame(step); }
-            function stopLoop(){ if (rafId){ cancelAnimationFrame(rafId); rafId = null; } }
 
-            function hideAll(){
+            function startLoop() { if (!rafId) rafId = requestAnimationFrame(step); }
+
+            function stopLoop() { if (rafId) { cancelAnimationFrame(rafId);
+                    rafId = null; } }
+
+            function hideAll() {
                 writeCursorDot.classList.remove('visible');
                 writeCursorEllipse.classList.remove('visible');
                 document.body.classList.remove('write-native-cursor', 'custom-cursor-active');
@@ -2856,7 +3149,8 @@
                 document.body.classList.add('custom-cursor-active');
                 document.body.classList.toggle('write-native-cursor', overNative);
 
-                ptrX = e.clientX; ptrY = e.clientY;
+                ptrX = e.clientX;
+                ptrY = e.clientY;
 
                 writeCursorDot.style.transform = 'translate(' + ptrX + 'px,' + ptrY + 'px)';
                 writeCursorDot.classList.add('visible');
