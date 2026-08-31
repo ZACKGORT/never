@@ -1003,6 +1003,26 @@
             flex-shrink: 0;
         }
 
+        .composer-preview-wrap {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px;
+            background: var(--bg);
+            overflow: hidden;
+            max-height: 168px;
+        }
+        .composer-preview-grid.letter-bento {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.9rem;
+            padding-top: 0;
+            transform: scale(0.36);
+            transform-origin: top left;
+            width: 277.8%;
+            pointer-events: none;
+        }
+        .composer-preview-grid.letter-bento .card { cursor: default; animation: none; }
+        .composer-preview-grid.letter-bento .card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02); transform: none; }
+
         @media (max-width: 480px) {
             .composer { top: auto; bottom: 16px; right: 12px; left: 12px; width: auto; }
         }
@@ -1101,16 +1121,55 @@
             min-width: var(--hud-minw-count);
             text-align: center;
         }
-        .hud .filter-summary {
+        .filter-toast {
+            position: fixed;
+            left: 50%;
+            bottom: calc(var(--hud-height) + 24px + var(--scrollbar-height));
+            transform: translateX(-50%) translateY(8px);
+            z-index: 99;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-dark);
+            color: var(--card);
+            padding: 8px 8px 8px 14px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-floating);
             font-family: var(--font-mono);
-            font-size: var(--hud-fs-summary);
-            color: var(--ink-light);
-            max-width: var(--hud-maxw-summary);
+            font-size: 11px;
+            max-width: min(320px, calc(100vw - 32px));
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s ease, transform .25s ease;
+        }
+        .filter-toast.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+        .filter-toast-text {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            padding: 0 4px;
         }
+        .filter-toast-dismiss {
+            background: transparent;
+            border: none;
+            color: var(--card);
+            opacity: 0.6;
+            cursor: pointer;
+            font-size: 11px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: opacity .2s ease, background .2s ease;
+        }
+        .filter-toast-dismiss:hover { opacity: 1; background: rgba(255, 255, 255, 0.15); }
+        body.focus-mode .filter-toast { display: none; }
         .hud .hud-label {
             font-family: var(--font-mono);
             font-size: var(--hud-fs-label);
@@ -1214,6 +1273,10 @@
             }
         }
         /* ── Bento Filter Modal ── */
+        /* ── Bento Filter Modal ── */
+        /* Standard modal size, shared by the filter and activity overlays.
+           Mobile: full-screen for maximum tap-target room.
+           640px+: a centered medium-large modal card. */
         .bento-overlay {
             position: fixed;
             inset: 0;
@@ -1238,16 +1301,16 @@
             background: var(--card);
             border: none;
             border-radius: 0;
-            padding: 16px 16px 80px;
+            padding: 20px 20px 96px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 24px;
             transform: scale(0.98);
             transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .bento-overlay.open .bento-panel { transform: scale(1); }
-        .bento-panel::-webkit-scrollbar { width: 4px; }
+        .bento-panel::-webkit-scrollbar { width: 6px; }
         .bento-panel::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: var(--radius-sm); }
 
         .bento-header {
@@ -1255,12 +1318,12 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 12px;
+            padding-bottom: 16px;
             flex-shrink: 0;
         }
         .bento-header h2 {
             font-family: var(--font);
-            font-size: calc(var(--fs-body) * 1.6);
+            font-size: calc(var(--fs-body) * 1.9);
             font-weight: 700;
             letter-spacing: -0.02em;
             margin: 0;
@@ -1270,14 +1333,15 @@
             background: transparent;
             border: 1px solid var(--border);
             color: var(--ink);
-            width: 36px;
-            height: 36px;
-            font-size: 18px;
+            width: 44px;
+            height: 44px;
+            font-size: 20px;
             cursor: pointer;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
             transition: background 0.2s;
         }
         .bento-header .close-btn:hover { background: var(--ink); color: var(--card); }
@@ -1285,18 +1349,18 @@
         .bento-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
+            gap: 20px;
             flex: 1;
         }
-        .bento-card { display: flex; flex-direction: column; gap: 8px; }
+        .bento-card { display: flex; flex-direction: column; gap: 12px; }
         .bento-card h4 {
             font-family: var(--font-mono);
-            font-size: 8px;
+            font-size: 11px;
             letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--ink-light);
             border-bottom: 1px solid var(--border);
-            padding-bottom: 6px;
+            padding-bottom: 8px;
             margin-bottom: 2px;
         }
         .bento-card-full { grid-column: 1 / -1; }
@@ -1306,18 +1370,22 @@
             background: var(--bg);
             border: 1px solid var(--border);
             color: var(--ink);
-            padding: 12px 16px;
-            font-size: calc(var(--fs-body) * 1.0);
+            padding: 15px 20px;
+            font-size: calc(var(--fs-body) * 1.05);
             font-family: var(--font);
             border-radius: var(--radius-sm);
+            min-height: 50px;
             transition: border-color .2s ease, background .2s ease;
         }
         .bento-card input[type="text"]:focus { outline: none; border-color: var(--ink); background: var(--card); }
 
-        .bento-card .chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+        .bento-card .chip-group { display: flex; flex-wrap: wrap; gap: 10px; }
         .bento-card .chip-group .chip {
-            font-size: calc(var(--fs-body) * 0.7);
-            padding: 4px 10px;
+            font-size: calc(var(--fs-body) * 0.9);
+            padding: 12px 20px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
             border: 1px solid var(--border);
             background: var(--bg);
             color: var(--ink-mid);
@@ -1325,10 +1393,9 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: var(--font);
-            letter-spacing: 0.02em;
+            letter-spacing: 0.01em;
             font-weight: 500;
             touch-action: manipulation;
-            font-size: 8px;
         }
         .bento-card .chip-group .chip.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
         .bento-card .chip-group .chip:hover { border-color: var(--ink); color: var(--ink); }
@@ -1336,11 +1403,17 @@
         .bento-actions {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             justify-content: flex-end;
-            padding-top: 4px;
+            padding-top: 6px;
         }
-        .bento-actions .btn { width: 100%; text-align: center; padding: 12px 16px; font-size: 9px; min-height: 40px; }
+        .bento-actions .btn {
+            width: 100%;
+            text-align: center;
+            padding: 15px 20px;
+            font-size: 11px;
+            min-height: 48px;
+        }
 
         /* ── activity log ── */
         .activity-list {
@@ -1352,27 +1425,27 @@
         }
         .activity-empty {
             font-family: var(--font-mono);
-            font-size: 9px;
+            font-size: 11px;
             letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--ink-lighter);
             text-align: center;
-            padding: 32px 0;
+            padding: 48px 0;
         }
         .activity-row {
             display: grid;
-            grid-template-columns: 8px 1fr auto;
+            grid-template-columns: 10px 1fr auto;
             align-items: start;
-            gap: 12px;
-            padding: 10px 2px;
+            gap: 16px;
+            padding: 15px 4px;
             border-bottom: 1px solid var(--border);
         }
         .activity-row:last-child { border-bottom: none; }
         .activity-dot {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            margin-top: 5px;
+            margin-top: 6px;
             background: var(--ink-lighter);
             flex-shrink: 0;
         }
@@ -1383,45 +1456,47 @@
         .activity-main { min-width: 0; }
         .activity-type {
             font-family: var(--font-mono);
-            font-size: 7px;
+            font-size: 10px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: var(--ink-light);
         }
         .activity-snippet {
-            font-size: calc(var(--fs-body) * 0.85);
+            font-size: calc(var(--fs-body) * 1.0);
             color: var(--ink);
-            margin-top: 2px;
+            margin-top: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .activity-meta {
             font-family: var(--font-mono);
-            font-size: 7px;
+            font-size: 10px;
             color: var(--ink-light);
             white-space: nowrap;
             text-align: right;
-            padding-top: 1px;
+            padding-top: 2px;
         }
 
+        /* Medium-large centered modal, standard for both overlays. */
         @media (min-width: 640px) {
-            .bento-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-            .bento-panel { padding: 24px 32px 80px; }
+            .bento-overlay { align-items: center; padding: 32px; }
+            .bento-panel {
+                width: min(92vw, 880px);
+                height: auto;
+                max-height: min(88vh, 820px);
+                border-radius: var(--radius);
+                box-shadow: var(--shadow-floating);
+                padding: 40px 44px 44px;
+                gap: 28px;
+            }
+            .bento-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
             .bento-card-full { grid-column: 1 / -1; }
+            .bento-actions { flex-direction: row; padding-top: 8px; }
+            .bento-actions .btn { width: auto; flex: 1; }
         }
         @media (min-width: 1024px) {
-            .bento-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; }
-            .bento-panel { padding: 32px 48px 100px; }
-            .bento-card-half { grid-column: span 2; }
-            .bento-card-full { grid-column: 1 / -1; }
-        }
-        @media (max-width: 480px) {
-            .bento-panel { padding: 12px 12px 70px; }
-            .bento-header h2 { font-size: calc(var(--fs-body) * 1.4); }
-            .bento-card input[type="text"] { padding: 10px 12px; font-size: calc(var(--fs-body) * 0.9); }
-            .bento-card .chip-group .chip { font-size: 7px; padding: 3px 8px; }
-            .bento-actions .btn { padding: 10px 12px; font-size: 8px; min-height: 36px; }
+            .bento-panel { width: min(88vw, 960px); padding: 48px 52px 52px; }
         }
 
         /* ── focus mode ── */
@@ -2044,7 +2119,7 @@
         }
     </style>
 </head>
-<body data-scale="m" data-font="satoshi">
+<body data-scale="l" data-font="satoshi">
 
     <div class="write-cursor-ellipse" id="writeCursorEllipse" aria-hidden="true"></div>
     <div class="write-cursor-dot" id="writeCursorDot" aria-hidden="true"></div>
@@ -2129,6 +2204,12 @@
                     <label class="t-micro">Statement</label>
                     <textarea id="c-text" placeholder="Open to staff-level product roles."></textarea>
                 </div>
+                <div class="field">
+                    <label class="t-micro">Preview</label>
+                    <div class="composer-preview-wrap">
+                        <div class="letter-bento composer-preview-grid" id="c-preview"></div>
+                    </div>
+                </div>
             </div>
             <div class="composer-actions">
                 <button class="btn ghost small" id="c-cancel">Cancel</button>
@@ -2165,11 +2246,12 @@
 
         <!-- New -->
         <button class="btn btn-primary" id="hudNew">+ New</button>
+    </div>
 
-        <div class="hud-divider"></div>
-
-        <!-- Summary -->
-        <span class="filter-summary" id="activeFilterSummary">No filters active</span>
+    <!-- ─── FILTER TOAST (dismissable, auto-timeout) ─── -->
+    <div class="filter-toast" id="filterToast" role="status" aria-live="polite">
+        <span class="filter-toast-text" id="filterToastText"></span>
+        <button class="filter-toast-dismiss" id="filterToastDismiss" aria-label="Dismiss">✕</button>
     </div>
 
     <!-- ─── BENTO FILTER MODAL ─── -->
@@ -2295,6 +2377,10 @@
             const isVideo = url => /\.(mp4|webm|mov)(\?|$)/i.test(url);
             const escapeHtml = s => (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;',
                 '"': '&quot;', "'": '&#39;' } [c]));
+            // Some event targets (text nodes, or exotic targets from native form
+            // controls) don't implement .closest — guard every lookup through this.
+            const closestSafe = (node, selector) => (node && node.nodeType === 1 && node.closest) ?
+                node.closest(selector) : null;
 
             function fmtTime(ts) {
                 const d = new Date(ts),
@@ -2375,6 +2461,14 @@
                         tagline: 'UX research.' },
                     { id: 'clara', kind: 'person', discipline: 'ENGINEERING', name: 'Clara Fischer',
                         role: 'Backend Engineer', tagline: 'Go, Rust.' },
+                    { id: 'priya', kind: 'person', discipline: 'BRAND', name: 'Priya Nair',
+                        role: 'Brand Strategist', tagline: 'B2B, mostly.' },
+                    { id: 'owen', kind: 'person', discipline: 'BRAND', name: 'Owen Fitch',
+                        role: 'Brand Designer', tagline: 'Type nerd.' },
+                    { id: 'yuki', kind: 'person', discipline: 'ENGINEERING', name: 'Yuki Tanaka',
+                        role: 'Engineering Manager', tagline: 'Platform teams.' },
+                    { id: 'dara', kind: 'person', discipline: 'DESIGN', name: 'Dara Osei',
+                        role: 'UX Researcher', tagline: 'Talks to users.' },
                     { id: 'studio-north', kind: 'company', discipline: 'DESIGN', name: 'Studio North',
                         role: 'Design studio, 12 people', tagline: 'Systems-heavy.' },
                     { id: 'forge-labs', kind: 'company', discipline: 'ENGINEERING', name: 'Forge Labs',
@@ -2386,48 +2480,221 @@
                     { id: 'fieldwork', kind: 'company', discipline: 'DESIGN', name: 'Fieldwork',
                         role: 'Product design consultancy', tagline: 'Founders.' },
                     { id: 'catalyst', kind: 'company', discipline: 'BRAND', name: 'Catalyst',
-                        role: 'Brand + comms', tagline: 'Say something real.' }
+                        role: 'Brand + comms', tagline: 'Say something real.' },
+                    { id: 'bright-machine', kind: 'company', discipline: 'DESIGN', name: 'Bright Machine',
+                        role: 'Hardware + software studio, 8 people', tagline: 'Physical products.' },
+                    { id: 'wayfinder', kind: 'company', discipline: 'DESIGN', name: 'Wayfinder',
+                        role: 'Product design collective', tagline: 'No offices, ever.' },
+                    { id: 'lattice', kind: 'company', discipline: 'ENGINEERING', name: 'Lattice Systems',
+                        role: 'Data platform', tagline: 'Pipelines at scale.' },
+                    { id: 'ionpath', kind: 'company', discipline: 'ENGINEERING', name: 'Ionpath',
+                        role: 'Developer tools', tagline: 'Build systems.' },
+                    { id: 'northweather', kind: 'company', discipline: 'BRAND', name: 'Northweather',
+                        role: 'Brand studio', tagline: 'Slow, deliberate.' },
+                    { id: 'signal-house', kind: 'company', discipline: 'BRAND', name: 'Signal House',
+                        role: 'Naming + verbal identity', tagline: 'Words first.' }
                 ];
             }
 
             function seedStatements(authorsList) {
                 const now = Date.now(),
-                    day = 24 * 60 * 60 * 1000;
-                const texts = [
-                    'Looking for staff-level product work. Six years freelance, shipped 20+ products.',
-                    'Left my agency job today. No regrets yet — ask me in a month.',
-                    'A staff title means nothing if the team around it is broken.',
-                    'Rebranded three companies this year. None needed it.',
-                    'Design systems are not about consistency. They\'re about enabling speed.',
-                    'Distributed systems are hard because we\'re trying to make unreliable things reliable.',
-                    'Your brand isn\'t your logo. It\'s what people say about you when you\'re not in the room.',
-                    'Leadership is about creating conditions for others to succeed.',
-                    'I care about the details that make products feel human.',
-                    'Observability isn\'t about dashboards. It\'s about answering questions you didn\'t know you\'d need to ask.',
-                    'Go is the best programming language for infrastructure work.',
-                    'Building inference tooling for teams shipping models to production.',
-                    'Senior Product Designer. Remote-first. We build systems for regulated industries.',
-                    'Free brand strategy workshop next week. 2 hours, 20 people max.',
-                    'Portfolio reviews back. Every Friday, 5 portfolios, honest feedback.',
-                    'The real system is the culture around it.',
-                    'Best systems I\'ve built had failure as first-class concern.',
-                    'UX researcher + product designer, 8 years. Looking for role where research drives decisions.',
-                    'If you\'re in climate tech and hiring — please post roles here.'
-                ];
-                const tags = ['OPEN TO WORK', 'HIRING', 'CAREER', 'THOUGHTS', 'BRAND', 'COMMUNITY', 'LEADERSHIP'];
+                    day = 24 * 60 * 60 * 1000,
+                    hour = 60 * 60 * 1000;
+                const authorById = id => authorsList.find(a => a.id === id);
                 const result = [];
-                for (let i = 0; i < 24; i++) {
-                    const a = authorsList[Math.floor(Math.random() * authorsList.length)];
+
+                // ── job listings, hand-written per company ─────────────
+                const JOB_LISTINGS = {
+                    'studio-north': [
+                        'Studio North is hiring a Senior Product Designer. Remote-first, occasional NYC. $140k–$175k. Send a portfolio, not a resume.',
+                        'Studio North · Design Lead. Run a team of 4. Hybrid, NYC. $165k–$195k. Systems thinking, light on ego.'
+                    ],
+                    'forge-labs': [
+                        'Forge Labs is hiring a Staff ML Infra Engineer. Remote (US/EU). $180k–$220k. You\'ve run inference at scale before.',
+                        'Forge Labs · Platform Engineer, deployment tooling. Remote. $150k–$180k. Kubernetes and Go, no exceptions.'
+                    ],
+                    'hollow-co': [
+                        'Hollow & Co is hiring a Brand Strategist. Onsite, Chicago. $95k–$120k. You write better than you design, and that\'s fine.',
+                        'Hollow & Co · Junior Copywriter. Hybrid, Chicago. $65k–$80k. Send three lines that made someone feel something.'
+                    ],
+                    'strata': [
+                        'Strata is hiring a Site Reliability Engineer. Remote. $160k–$190k. On-call rotation, real pager, real ownership.',
+                        'Strata · Cloud Infrastructure Engineer, multi-cloud team. Remote (US). $145k–$175k. Terraform fluency required.'
+                    ],
+                    'fieldwork': [
+                        'Fieldwork is hiring a Product Designer for founder-stage clients. Remote. $120k–$150k. You ship fast and explain your reasoning.',
+                        'Fieldwork · Design Researcher, part-time to start. Remote. $70/hr. Comfortable running discovery with zero-to-one teams.'
+                    ],
+                    'catalyst': [
+                        'Catalyst is hiring a Brand Director. Onsite, LA. $150k–$180k. You\'ve turned a company\'s reputation around before.',
+                        'Catalyst · Comms Lead, climate + energy clients. Remote. $110k–$135k. Op-eds and crisis response both count as writing.'
+                    ],
+                    'bright-machine': [
+                        'Bright Machine is hiring an Industrial Designer. Onsite, Oakland. $110k–$140k. Hardware background preferred, not required.',
+                        'Bright Machine · Product Designer, software side of a hardware company. Onsite, Oakland. $130k–$160k.'
+                    ],
+                    'wayfinder': [
+                        'Wayfinder is hiring a Senior Designer. Fully remote, always. $135k–$165k. We\'ve never had an office and never will.',
+                        'Wayfinder · Design Ops lead. Remote. $115k–$140k. Keep 14 designers across 9 time zones pointed the same direction.'
+                    ],
+                    'lattice': [
+                        'Lattice Systems is hiring a Data Platform Engineer. Remote (US/Canada). $155k–$185k. Pipelines that don\'t page you at 3am.',
+                        'Lattice Systems · Senior Backend Engineer, Rust. Remote. $170k–$200k. We\'re small and we like it that way.'
+                    ],
+                    'ionpath': [
+                        'Ionpath is hiring a Developer Experience Engineer. Remote. $145k–$175k. Build the tools our own team complains about not having.',
+                        'Ionpath · Founding Engineer #4. Remote or SF. $140k–$170k + equity. Early enough that titles are still made up.'
+                    ],
+                    'northweather': [
+                        'Northweather is hiring an Art Director. Onsite, Portland. $105k–$130k. Slow work, real craft, clients who wait for it.',
+                        'Northweather · Junior Designer, first role considered. Onsite, Portland. $60k–$75k. We\'ll teach you the rest.'
+                    ],
+                    'signal-house': [
+                        'Signal House is hiring a Namer / Verbal Identity Lead. Remote. $115k–$145k. If you\'ve ever named a product, send it.',
+                        'Signal House · Content Strategist. Remote. $95k–$115k. You think in sentences before you think in decks.'
+                    ]
+                };
+
+                // ── open-to-work, one per person, tailored to their role ─
+                const OPEN_TO_WORK = {
+                    zack: 'Looking for staff-level product work. Six years freelance, shipped 20+ products.',
+                    maya: 'Ex-agency Creative Director, open to in-house roles. I don\'t want to pitch anymore, I want to build one thing.',
+                    tom: 'ML engineer, infra and eval background. Looking for a team that ships models, not just papers.',
+                    ria: 'Brand strategist, naming and systems. Open to fractional work, 2–3 days a week.',
+                    dev: 'Frontend engineer, React and Swift. Six years in, want my next role to be the last generalist one.',
+                    elena: 'Design Director coming off a design-systems rebuild. Open to roles where systems work is valued, not tolerated.',
+                    james: 'Staff Engineer, distributed systems. Looking for a smaller team where I can still write code.',
+                    sophie: 'Brand Director, finding voice for companies that don\'t have one yet. Open to consulting or full-time.',
+                    marco: 'VP Engineering, scaled two teams from 8 to 60. Looking for something earlier stage this time.',
+                    aisha: 'Product Designer, fintech and healthtech. Open to remote roles, regulated industries a plus.',
+                    liam: 'DevOps Lead, Kubernetes and on-call culture that doesn\'t burn people out. Open to new roles.',
+                    nina: 'Creative Director, climate tech background. Looking for a mission I can actually defend at dinner.',
+                    peter: 'Design Lead, UX research heavy. Open to roles where research actually drives roadmap, not just validates it.',
+                    clara: 'Backend Engineer, Go and Rust. Looking for a team that cares about the boring parts as much as the fun ones.',
+                    priya: 'Brand Strategist, mostly B2B. Open to fractional or full-time, no more agency hours.',
+                    owen: 'Brand Designer, type-obsessed. Portfolio\'s mostly typefaces I designed for one client each. Open to work.',
+                    yuki: 'Engineering Manager, platform teams. Looking for an org that still lets managers write code sometimes.',
+                    dara: 'UX Researcher, eight years, mostly qualitative. Looking for a role where research drives decisions, not just decks.'
+                };
+
+                // ── general pool: thoughts, career, brand, community, leadership ─
+                const GENERAL = [
+                    { tag: 'CAREER', text: 'Left my agency job today. No regrets yet — ask me in a month.' },
+                    { tag: 'CAREER', text: 'A staff title means nothing if the team around it is broken.' },
+                    { tag: 'CAREER', text: 'Nobody tells you the hardest part of freelancing is saying no to bad-fit work.' },
+                    { tag: 'CAREER', text: 'Took a pay cut to join a smaller team. Best decision in five years.' },
+                    { tag: 'CAREER', text: 'Your first ten years should be spent collecting problems, not titles.' },
+                    { tag: 'THOUGHTS', text: 'Design systems are not about consistency. They\'re about enabling speed.' },
+                    { tag: 'THOUGHTS', text: 'Distributed systems are hard because we\'re trying to make unreliable things reliable.' },
+                    { tag: 'THOUGHTS', text: 'I care about the details that make products feel human.' },
+                    { tag: 'THOUGHTS', text: 'Observability isn\'t about dashboards. It\'s about answering questions you didn\'t know you\'d need to ask.' },
+                    { tag: 'THOUGHTS', text: 'Go is the best programming language for infrastructure work.' },
+                    { tag: 'THOUGHTS', text: 'The real system is the culture around it.' },
+                    { tag: 'THOUGHTS', text: 'Best systems I\'ve built had failure as first-class concern.' },
+                    { tag: 'THOUGHTS', text: 'Most roadmaps are just a list of things nobody wanted to say no to.' },
+                    { tag: 'THOUGHTS', text: 'A prototype that lies about performance is worse than no prototype.' },
+                    { tag: 'THOUGHTS', text: 'The best code review comment is a question, not a correction.' },
+                    { tag: 'BRAND', text: 'Your brand isn\'t your logo. It\'s what people say about you when you\'re not in the room.' },
+                    { tag: 'BRAND', text: 'Rebranded three companies this year. None needed it.' },
+                    { tag: 'BRAND', text: 'A tagline is not a strategy. Most companies stop after the tagline.' },
+                    { tag: 'BRAND', text: 'If your brand voice sounds like everyone else\'s, it\'s not a voice, it\'s a template.' },
+                    { tag: 'COMMUNITY', text: 'Free brand strategy workshop next week. 2 hours, 20 people max.' },
+                    { tag: 'COMMUNITY', text: 'Portfolio reviews back. Every Friday, 5 portfolios, honest feedback.' },
+                    { tag: 'COMMUNITY', text: 'If you\'re in climate tech and hiring — please post roles here.' },
+                    { tag: 'COMMUNITY', text: 'Running an informal coffee chat for anyone laid off this quarter. DM me.' },
+                    { tag: 'COMMUNITY', text: 'Open critique night, bring anything you\'re stuck on. No RSVP needed.' },
+                    { tag: 'LEADERSHIP', text: 'Leadership is about creating conditions for others to succeed.' },
+                    { tag: 'LEADERSHIP', text: 'The best managers I\'ve had disagreed with me in private and backed me in public.' },
+                    { tag: 'LEADERSHIP', text: 'If you\'re the smartest person in every meeting, you\'ve built the wrong team.' },
+                    { tag: 'LEADERSHIP', text: 'Most reorgs are a confession that the first org chart was wrong.' },
+                    { tag: 'LEADERSHIP', text: 'Firing someone well is a skill nobody trains you for and everybody needs.' }
+                ];
+
+                function push(authorId, tag, text, ageMs, mediaChance) {
                     result.push({
                         id: uid(),
-                        authorId: a.id,
-                        time: now - (Math.random() * 14 * day),
-                        tag: tags[Math.floor(Math.random() * tags.length)],
-                        text: texts[i % texts.length],
-                        mediaUrl: Math.random() > 0.6 ? randAVIF() : '',
+                        authorId,
+                        time: now - ageMs,
+                        tag,
+                        text,
+                        mediaUrl: Math.random() < (mediaChance != null ? mediaChance : 0.35) ? randAVIF() : '',
                         replies: []
                     });
+                    return result[result.length - 1];
                 }
+
+                Object.entries(JOB_LISTINGS).forEach(([companyId, posts]) => {
+                    posts.forEach(text => push(companyId, 'HIRING', text, Math.random() * 14 * day, 0.15));
+                });
+
+                Object.entries(OPEN_TO_WORK).forEach(([personId, text]) => {
+                    push(personId, 'OPEN TO WORK', text, Math.random() * 14 * day, 0.15);
+                });
+
+                for (let i = 0; i < 38; i++) {
+                    const a = authorsList[Math.floor(Math.random() * authorsList.length)];
+                    const g = GENERAL[i % GENERAL.length];
+                    push(a.id, g.tag, g.text, Math.random() * 14 * day, 0.4);
+                }
+
+                // ── active conversations: attach nested reply threads ────
+                const REPLY_TEXTS = [
+                    'This resonates. We hit the same wall last quarter.',
+                    'Strong disagree — but I like where your head\'s at.',
+                    'Following up here: what stack are you using?',
+                    'Sent you a note — let\'s talk.',
+                    'This is the whole thread in one line.',
+                    'Yes. Everyone who\'s shipped knows this.',
+                    'Curious how this holds up at scale though.',
+                    'Been saying this for years. Nice to see it in writing.',
+                    'What\'s the counter-argument here?',
+                    'Bookmarking. Going to steal this framing.',
+                    'Respectfully, I think this undersells the risk.',
+                    'We tried this. Took six months to unwind.',
+                    'Can you say more about how you measured that?',
+                    'This is exactly why I left agency work.',
+                    'Hard same.',
+                    'Not sure I agree but I respect the conviction.',
+                    'DMing you about this.',
+                    'This tracks with what we\'re seeing on our team.',
+                    'The replies here are better than the post.',
+                    'Following.',
+                    'Would love to hear how this plays out in six months.',
+                    'This is a hiring pitch disguised as a thought and it\'s working on me.',
+                    'Saved. Sending to my team.',
+                    'Counterpoint: sometimes the boring answer is just correct.',
+                    'What changed your mind on this?',
+                    'This is the take, honestly.'
+                ];
+
+                function makeReplies(parentTime, depth, excludeId) {
+                    if (depth > 2) return [];
+                    const chance = depth === 0 ? 0.85 : depth === 1 ? 0.45 : 0.2;
+                    if (Math.random() > chance) return [];
+                    const n = depth === 0 ? (1 + Math.floor(Math.random() * 3)) : 1;
+                    const out = [];
+                    for (let i = 0; i < n; i++) {
+                        const candidates = authorsList.filter(a => a.id !== excludeId);
+                        const author = candidates[Math.floor(Math.random() * candidates.length)];
+                        const t = parentTime + hour * (1 + Math.random() * 30);
+                        if (t > now) continue;
+                        out.push({
+                            id: uid(),
+                            authorId: author.id,
+                            time: t,
+                            text: REPLY_TEXTS[Math.floor(Math.random() * REPLY_TEXTS.length)],
+                            replies: makeReplies(t, depth + 1, author.id)
+                        });
+                    }
+                    return out;
+                }
+
+                result.forEach(s => {
+                    if (Math.random() < 0.55) {
+                        s.replies = makeReplies(s.time, 0, s.authorId);
+                    }
+                });
+
                 return result;
             }
 
@@ -2450,7 +2717,8 @@
             let modalResponded = false;
             const collapsed = new Set();
             const activeTags = new Set();
-            const activeKinds = new Set();
+            const activePeople = new Set();
+            const activeCompanies = new Set();
             const activeDisciplines = new Set();
             let searchQuery = '';
 
@@ -2564,7 +2832,7 @@
 
                 list.querySelectorAll('.attention-item').forEach(el => {
                     el.addEventListener('click', (e) => {
-                        if (e.target.closest('.item-dismiss')) return;
+                        if (closestSafe(e.target, '.item-dismiss')) return;
                         const type = el.dataset.type;
                         const id = el.dataset.id;
                         openProfileModal(type, id);
@@ -2805,9 +3073,9 @@
 
             function setupDelegatedEvents() {
                 document.addEventListener('pointerenter', (e) => {
-                    const item = e.target.closest('[data-statement-id]');
+                    const item = closestSafe(e.target, '[data-statement-id]');
                     if (!item) return;
-                    const panel = item.closest('.letter-panel.active');
+                    const panel = closestSafe(item, '.letter-panel.active');
                     if (!panel) return;
                     const sid = item.dataset.statementId;
                     if (!sid) return;
@@ -2816,9 +3084,9 @@
                 }, true);
 
                 document.addEventListener('pointerleave', (e) => {
-                    const item = e.target.closest('[data-statement-id]');
+                    const item = closestSafe(e.target, '[data-statement-id]');
                     if (!item) return;
-                    const panel = item.closest('.letter-panel.active');
+                    const panel = closestSafe(item, '.letter-panel.active');
                     if (!panel) return;
                     const sid = item.dataset.statementId;
                     if (!sid) return;
@@ -2832,9 +3100,9 @@
                 }, true);
 
                 document.addEventListener('click', (e) => {
-                    const item = e.target.closest('[data-statement-id]');
+                    const item = closestSafe(e.target, '[data-statement-id]');
                     if (!item) return;
-                    const panel = item.closest('.letter-panel.active');
+                    const panel = closestSafe(item, '.letter-panel.active');
                     if (!panel) return;
                     const sid = item.dataset.statementId;
                     if (!sid) return;
@@ -2843,9 +3111,9 @@
                 }, true);
 
                 document.addEventListener('contextmenu', (e) => {
-                    const item = e.target.closest('[data-statement-id]');
+                    const item = closestSafe(e.target, '[data-statement-id]');
                     if (!item) return;
-                    const panel = item.closest('.letter-panel.active');
+                    const panel = closestSafe(item, '.letter-panel.active');
                     if (!panel) return;
                     const sid = item.dataset.statementId;
                     if (!sid) return;
@@ -2956,16 +3224,20 @@
                             .toLowerCase().includes(q))) return false;
                 }
                 const tagOk = activeTags.size === 0 || (s.tag && activeTags.has(s.tag));
-                const kindOk = activeKinds.size === 0 || activeKinds.has(a.kind);
+                const authorOk = (activePeople.size === 0 && activeCompanies.size === 0) ||
+                    activePeople.has(a.id) || activeCompanies.has(a.id);
                 const discOk = activeDisciplines.size === 0 || activeDisciplines.has(a.discipline);
-                return tagOk && kindOk && discOk;
+                return tagOk && authorOk && discOk;
             }
 
-            function getFiltered() { return statements.filter(passesFilters); }
+            function getFiltered(extraTag) {
+                return statements.filter(s => passesFilters(s) && (!extraTag || s.tag === extraTag));
+            }
 
             function clearFilters() {
                 activeTags.clear();
-                activeKinds.clear();
+                activePeople.clear();
+                activeCompanies.clear();
                 activeDisciplines.clear();
                 searchQuery = '';
                 document.getElementById('bentoSearch').value = '';
@@ -2973,18 +3245,38 @@
                 updateFilterUI();
             }
 
+            let filterToastTimeout = null;
+
+            function showFilterToast(text) {
+                const toast = document.getElementById('filterToast');
+                const textEl = document.getElementById('filterToastText');
+                if (!toast || !textEl) return;
+                textEl.textContent = text;
+                toast.classList.add('open');
+                if (filterToastTimeout) clearTimeout(filterToastTimeout);
+                filterToastTimeout = setTimeout(hideFilterToast, 4000);
+            }
+
+            function hideFilterToast() {
+                const toast = document.getElementById('filterToast');
+                if (toast) toast.classList.remove('open');
+                if (filterToastTimeout) { clearTimeout(filterToastTimeout);
+                    filterToastTimeout = null; }
+            }
+
             function updateFilterUI() {
-                const count = activeTags.size + activeKinds.size + activeDisciplines.size + (searchQuery.length > 0 ? 1 : 0);
+                const count = activeTags.size + activePeople.size + activeCompanies.size + activeDisciplines.size + (searchQuery.length > 0 ? 1 : 0);
                 document.getElementById('filterCount').textContent = count;
-                const summary = document.getElementById('activeFilterSummary');
-                if (count === 0) summary.textContent = 'No filters active';
-                else {
+                if (count === 0) {
+                    hideFilterToast();
+                } else {
                     const parts = [];
                     if (searchQuery) parts.push(`"${searchQuery}"`);
                     if (activeTags.size) parts.push(`${activeTags.size} tag${activeTags.size>1?'s':''}`);
-                    if (activeKinds.size) parts.push(`${activeKinds.size} kind${activeKinds.size>1?'s':''}`);
+                    if (activePeople.size) parts.push(`${activePeople.size} ${activePeople.size>1?'people':'person'}`);
+                    if (activeCompanies.size) parts.push(`${activeCompanies.size} compan${activeCompanies.size>1?'ies':'y'}`);
                     if (activeDisciplines.size) parts.push(`${activeDisciplines.size} discipline${activeDisciplines.size>1?'s':''}`);
-                    summary.textContent = `Active: ${parts.join(', ')}`;
+                    showFilterToast(`Active: ${parts.join(', ')}`);
                 }
                 document.getElementById('hudClear').hidden = count === 0;
             }
@@ -2992,7 +3284,7 @@
             // ── Conversation modal ───────────────────────────────────
             function openConversation(id) {
                 modalStatementId = id;
-                modalReplyTargetId = null;
+                modalReplyTargetId = id;
                 modalOpenTime = Date.now();
                 modalResponded = false;
                 logActivity('click', id);
@@ -3247,18 +3539,20 @@
             }
 
             // ── Bento card builder ───────────────────────────────────
-            function buildBentoCard(s) {
+            function buildBentoCard(s, opts = {}) {
                 const a = authorById(s.authorId);
                 const variants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
-                const variant = variants[Math.floor(Math.random() * variants.length)];
+                const variant = opts.variant || variants[Math.floor(Math.random() * variants.length)];
                 let spans = '';
-                const r = Math.random();
-                if (r < 0.2) spans = 'span-2';
-                else if (r < 0.3) spans = 'row-span-2';
+                if (!opts.noSpan) {
+                    const r = Math.random();
+                    if (r < 0.2) spans = 'span-2';
+                    else if (r < 0.3) spans = 'row-span-2';
+                }
 
                 const card = document.createElement('div');
                 card.className = ['card', variant, spans].filter(Boolean).join(' ');
-                card.style.animationDelay = (Math.random() * 0.2) + 's';
+                card.style.animationDelay = opts.static ? '0s' : (Math.random() * 0.2) + 's';
                 card.dataset.statementId = s.id;
 
                 const isDark = variant.includes('dark') || variant.includes('mid');
@@ -3288,28 +3582,32 @@
               `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
             `;
 
-                card.querySelectorAll('[data-author-id]').forEach(el => {
-                    el.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const id = el.dataset.authorId;
-                        const obj = authorById(id);
-                        if (obj) {
-                            const type = obj.kind === 'company' ? 'company' : 'person';
-                            openProfileModal(type, id);
-                        }
+                if (!opts.static) {
+                    card.querySelectorAll('[data-author-id]').forEach(el => {
+                        el.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const id = el.dataset.authorId;
+                            const obj = authorById(id);
+                            if (obj) {
+                                const type = obj.kind === 'company' ? 'company' : 'person';
+                                openProfileModal(type, id);
+                            }
+                        });
                     });
-                });
-                const avatarEl = card.querySelector('.avatar');
-                if (avatarEl) {
-                    avatarEl.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const id = s.authorId;
-                        const obj = authorById(id);
-                        if (obj) {
-                            const type = obj.kind === 'company' ? 'company' : 'person';
-                            openProfileModal(type, id);
-                        }
-                    });
+                    const avatarEl = card.querySelector('.avatar');
+                    if (avatarEl) {
+                        avatarEl.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const id = s.authorId;
+                            const obj = authorById(id);
+                            if (obj) {
+                                const type = obj.kind === 'company' ? 'company' : 'person';
+                                openProfileModal(type, id);
+                            }
+                        });
+                    }
+                } else {
+                    card.style.cursor = 'default';
                 }
 
                 return card;
@@ -3447,7 +3745,7 @@
 
                 const toolbar = frame.querySelector('.letter-toolbar');
                 const mode = data.viewMode || 'list';
-                const filtered = getFiltered();
+                const filtered = getFiltered(data.filterTag);
 
                 const toggle = toolbar?.querySelector('.view-toggle');
                 if (toggle) {
@@ -3685,9 +3983,26 @@
                 sel.value = authors[0]?.id || '';
             }
 
+            function renderComposerPreview() {
+                const container = document.getElementById('c-preview');
+                if (!container) return;
+                const authorSel = document.getElementById('c-author-select');
+                const authorId = authorSel?.value || authors[0]?.id;
+                const tag = document.getElementById('c-tag').value.trim().toUpperCase();
+                const mediaUrl = document.getElementById('c-media').value.trim();
+                const text = document.getElementById('c-text').value.trim() || 'Your statement will appear here.';
+                const fakeStatement = { id: 'preview', authorId, tag, mediaUrl, text, time: Date.now(), replies: [] };
+                const previewVariants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
+                container.innerHTML = '';
+                previewVariants.forEach(variant => {
+                    container.appendChild(buildBentoCard(fakeStatement, { variant, noSpan: true, static: true }));
+                });
+            }
+
             function openComposer() {
                 document.getElementById('composer').classList.add('open');
                 populateAuthorSelects();
+                renderComposerPreview();
                 document.getElementById('c-text').focus();
             }
 
@@ -3707,7 +4022,7 @@
                     offsetY = 0;
 
                 header.addEventListener('pointerdown', (e) => {
-                    if (e.target.closest('.composer-close')) return;
+                    if (closestSafe(e.target, '.composer-close')) return;
                     const rect = composer.getBoundingClientRect();
                     composer.style.left = rect.left + 'px';
                     composer.style.top = rect.top + 'px';
@@ -3762,9 +4077,9 @@
                     { id: 'bentoTags', items: statements.reduce((acc, s) => { if (s.tag) acc[s.tag] = (acc[s.tag] ||
                             0) + 1; return acc; }, {}), type: 'tag', active: activeTags },
                     { id: 'bentoPeople', items: authors.filter(a => a.kind === 'person'), type: 'person',
-                    active: activeKinds },
+                    active: activePeople },
                     { id: 'bentoCompanies', items: authors.filter(a => a.kind === 'company'), type: 'company',
-                        active: activeKinds },
+                        active: activeCompanies },
                     { id: 'bentoDisciplines', items: authors.reduce((acc, a) => { if (a.discipline) acc[a.discipline] = (
                             acc[a.discipline] || 0) + 1; return acc; }, {}), type: 'discipline',
                     active: activeDisciplines }
@@ -3774,17 +4089,15 @@
                     const container = document.querySelector(`#${section.id} .chip-group`);
                     if (!container) return;
                     container.innerHTML = '';
-                    const entries = typeof section.items === 'object' && !Array.isArray(section.items) ?
-                        Object.entries(section.items) :
-                        section.items.map(a => [a.id, a.name]);
-                    entries.sort((a, b) => a[1].localeCompare(b[1]));
-                    entries.forEach(([key, label]) => {
+                    const isObj = typeof section.items === 'object' && !Array.isArray(section.items);
+                    const entries = isObj ? Object.entries(section.items) : section.items.map(a => [a.id, a.name]);
+                    entries.sort((a, b) => String(isObj ? a[0] : a[1]).localeCompare(String(isObj ? b[0] : b[1])));
+                    entries.forEach(([key, value]) => {
                         const chip = document.createElement('button');
                         const isActive = section.active.has(key);
                         chip.className = 'chip' + (isActive ? ' active' : '');
-                        const count = typeof section.items === 'object' && !Array.isArray(section.items) ?
-                            ` (${section.items[key]})` :
-                            '';
+                        const label = isObj ? key : value;
+                        const count = isObj ? ` (${value})` : '';
                         chip.textContent = label + count;
                         chip.addEventListener('click', () => {
                             if (section.active.has(key)) section.active.delete(key);
@@ -3811,7 +4124,7 @@
 
                 function renderMenu() {
                     const currentFont = document.body.getAttribute('data-font') || 'satoshi';
-                    const currentScale = document.body.getAttribute('data-scale') || 'm';
+                    const currentScale = document.body.getAttribute('data-scale') || 'xl';
                     dropdown.innerHTML = '';
 
                     fonts.forEach(font => {
@@ -3902,8 +4215,10 @@
 
                     letterData = [
                         { title: 'The Feed', deck: 'All statements, unfiltered.', viewMode: 'bento' },
-                        { title: 'Open to Work', deck: 'People looking for their next role.', viewMode: 'list' },
-                        { title: 'Hiring', deck: 'Companies and teams looking for talent.', viewMode: 'list' },
+                        { title: 'Open to Work', deck: 'People looking for their next role.', viewMode: 'list',
+                            filterTag: 'OPEN TO WORK' },
+                        { title: 'Hiring', deck: 'Companies and teams looking for talent.', viewMode: 'list',
+                            filterTag: 'HIRING' },
                         { title: 'Thoughts', deck: 'Ideas, observations, provocations.', viewMode: 'grid' }
                     ];
 
@@ -3969,7 +4284,7 @@
                         dragStartScroll = 0;
                     track.addEventListener('pointerdown', (e) => {
                         if (e.pointerType === 'touch') return;
-                        if (e.target.closest('.letter-row, .grid-item, .card, button, a')) return;
+                        if (closestSafe(e.target, '.letter-row, .grid-item, .card, button, a')) return;
                         isDragging = true;
                         dragStartX = e.clientX;
                         dragStartScroll = track.scrollLeft;
@@ -3986,7 +4301,7 @@
                         track.classList.remove('dragging'); });
 
                     document.addEventListener('keydown', (e) => {
-                        if (e.target.closest('.letter-row, .grid-item, .card, button, a, input, textarea'))
+                        if (closestSafe(e.target, '.letter-row, .grid-item, .card, button, a, input, textarea'))
                             return;
                         if (e.key === 'ArrowLeft') { e.preventDefault();
                             activatePanel(activeIndex - 1); }
@@ -4009,6 +4324,10 @@
 
                     document.getElementById('c-cancel').addEventListener('click', closeComposer);
                     document.getElementById('composerClose').addEventListener('click', closeComposer);
+                    ['c-tag', 'c-media', 'c-text'].forEach(id => {
+                        document.getElementById(id).addEventListener('input', renderComposerPreview);
+                    });
+                    document.getElementById('c-author-select').addEventListener('change', renderComposerPreview);
                     setupComposerDrag();
                     document.getElementById('c-post').addEventListener('click', () => {
                         const authorId = document.getElementById('c-author-select').value;
@@ -4042,6 +4361,7 @@
                         if (e.key === 'Enter') document.getElementById('bentoApply').click();
                     });
                     document.getElementById('hudClear').addEventListener('click', clearFilters);
+                    document.getElementById('filterToastDismiss').addEventListener('click', hideFilterToast);
 
                     const logoTile = document.getElementById('logoTile');
                     const logoReset = document.getElementById('logoReset');
@@ -4051,7 +4371,7 @@
                         logoTile.setAttribute('aria-expanded', String(open));
                     }
                     logoTile.addEventListener('click', (e) => {
-                        if (e.target.closest('#logoReset')) return;
+                        if (closestSafe(e.target, '#logoReset')) return;
                         setLogoOpen(!logoTile.classList.contains('open'));
                     });
                     document.addEventListener('click', (e) => {
@@ -4189,7 +4509,7 @@
             }
 
             window.addEventListener('mousemove', (e) => {
-                const overNative = !!e.target.closest(NATIVE_SELECTOR);
+                const overNative = !!(e.target && e.target.nodeType === 1 && e.target.closest(NATIVE_SELECTOR));
                 document.body.classList.add('custom-cursor-active');
                 document.body.classList.toggle('write-native-cursor', overNative);
 
