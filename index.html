@@ -1075,21 +1075,17 @@
         .composer-preview-wrap {
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 8px;
+            padding: 12px;
             background: var(--bg);
             overflow: hidden;
-            max-height: 168px;
         }
         .composer-preview-grid.letter-bento {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.9rem;
+            grid-template-columns: 1fr;
+            gap: 0;
             padding-top: 0;
-            transform: scale(0.36);
-            transform-origin: top left;
-            width: 277.8%;
             pointer-events: none;
         }
-        .composer-preview-grid.letter-bento .card { cursor: default; animation: none; }
+        .composer-preview-grid.letter-bento .card { cursor: default; animation: none; min-height: 100px; }
         .composer-preview-grid.letter-bento .card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02); transform: none; }
 
         @media (max-width: 480px) {
@@ -1507,9 +1503,52 @@
             min-height: 48px;
         }
 
+        /* ── ROLLOUT MENUS (edit reviews / chips / activity log) ── */
+        .bento-overlay.rollout {
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding: calc(var(--topbar-height) + 12px) 16px 16px 0;
+        }
+        .bento-overlay.rollout .bento-panel {
+            width: min(400px, calc(100vw - 32px));
+            height: auto;
+            max-height: calc(100vh - var(--topbar-height) - 40px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-floating);
+            padding: 20px;
+            gap: 16px;
+            transform: translateY(-8px) scale(0.98);
+            transform-origin: top right;
+            opacity: 0;
+            transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s ease;
+        }
+        .bento-overlay.rollout.open .bento-panel { transform: translateY(0) scale(1); opacity: 1; }
+        .bento-overlay.rollout .bento-header { padding-bottom: 12px; }
+        .bento-overlay.rollout .bento-header h2 { font-size: calc(var(--fs-body) * 1.4); }
+        .bento-overlay.rollout .bento-header .close-btn { width: 36px; height: 36px; font-size: 16px; }
+        @media (max-width: 480px) {
+            .bento-overlay.rollout {
+                align-items: flex-end;
+                justify-content: stretch;
+                padding: 0;
+            }
+            .bento-overlay.rollout .bento-panel {
+                width: 100%;
+                max-height: 76vh;
+                border-radius: var(--radius) var(--radius) 0 0;
+                transform: translateY(16px);
+                transform-origin: bottom center;
+            }
+            .bento-overlay.rollout.open .bento-panel { transform: translateY(0); }
+        }
+
         @media (min-width: 640px) {
-            .bento-overlay { align-items: stretch; padding: 0; }
-            .bento-panel {
+            .bento-overlay:not(.rollout) { align-items: stretch; padding: 0; }
+            .bento-overlay:not(.rollout) .bento-panel {
                 width: 100vw;
                 height: 100vh;
                 border-radius: 0;
@@ -2714,7 +2753,7 @@
     </div>
 
     <!-- ─── ACTION LOG MODAL ─── -->
-    <div class="bento-overlay" id="activityOverlay">
+    <div class="bento-overlay rollout" id="activityOverlay">
         <div class="bento-panel">
             <div class="bento-header">
                 <h2>Action Log</h2>
@@ -2763,7 +2802,7 @@
     </div>
 
     <!-- ─── REVIEW MODAL ─── -->
-    <div class="bento-overlay" id="reviewOverlay">
+    <div class="bento-overlay rollout" id="reviewOverlay">
         <div class="bento-panel">
             <div class="bento-header">
                 <h2>Edit reviews</h2>
@@ -2777,7 +2816,7 @@
     </div>
 
     <!-- ─── CHIP MANAGEMENT MODAL ─── -->
-    <div class="bento-overlay" id="chipsOverlay">
+    <div class="bento-overlay rollout" id="chipsOverlay">
         <div class="bento-panel">
             <div class="bento-header">
                 <h2>Manage chips</h2>
@@ -3193,6 +3232,7 @@
 
             // ── Rapid Respond State ──────────────────────────────────
             let rapidTarget = null;
+            let composerPreviewVariant = 'card-white';
 
             // ── Interactions ──────────────────────────────────────────
             function loadInteractions() {
@@ -4823,15 +4863,14 @@
                 const text = document.getElementById('c-text').value.trim() || 'Your statement will appear here.';
                 const fakeStatement = { id: 'preview', authorId, tag, mediaUrl, text, time: Date.now(), replies: [],
                     editState: 'original', editHistory: [], muteState: 'visible' };
-                const previewVariants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
                 container.innerHTML = '';
-                previewVariants.forEach(variant => {
-                    container.appendChild(buildBentoCard(fakeStatement, { variant, noSpan: true, static: true }));
-                });
+                container.appendChild(buildBentoCard(fakeStatement, { variant: composerPreviewVariant, noSpan: true, static: true }));
             }
 
             function openComposer() {
                 document.getElementById('composer').classList.add('open');
+                const previewVariants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
+                composerPreviewVariant = previewVariants[Math.floor(Math.random() * previewVariants.length)];
                 populateAuthorSelects();
                 renderComposerPreview();
                 document.getElementById('c-text').focus();
