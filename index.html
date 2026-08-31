@@ -119,8 +119,27 @@
         .btn-primary { background: var(--ink); color: var(--card); border-color: var(--ink); }
         .btn-primary:hover { background: var(--ink-mid); border-color: var(--ink-mid); }
         .btn-icon { width: 30px; padding: 0; justify-content: center; font-size: 14px; }
+        .btn-badge { position: relative; }
+        .btn-badge .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--ink);
+            color: var(--card);
+            font-family: var(--font-mono);
+            font-size: 6px;
+            font-weight: 600;
+            min-width: 14px;
+            height: 14px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 1px solid var(--card);
+        }
 
-        /* ── topbar (invisible/frameless — see .viewport-blur for the fade) ── */
+        /* ── topbar ── */
         .topbar {
             position: sticky;
             top: 0;
@@ -142,9 +161,7 @@
             width: 100%;
         }
 
-        /* ── viewport edge blur — replaces the topbar's solid bar; content
-           fades/blurs as it scrolls under the very top and very bottom
-           edges of the screen instead of hitting a hard frame ── */
+        /* ── viewport edge blur ── */
         .viewport-blur {
             position: fixed;
             left: 0;
@@ -254,63 +271,15 @@
         }
         .logo-card-home { width: 100%; }
 
-        /* ── topbar right: appearance + attention ── */
+        /* ── topbar right ── */
         .topbar-right {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-shrink: 0;
         }
-        .topbar-appearance-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        .topbar-appearance-wrapper .btn {
-            font-size: 8px;
-            min-height: 28px;
-            padding: 2px 10px;
-        }
-        .topbar-appearance-dropdown {
-            position: absolute;
-            top: calc(100% + 6px);
-            right: 0;
-            min-width: 100px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-floating);
-            padding: 4px 0;
-            z-index: 200;
-            display: none;
-            flex-direction: column;
-        }
-        .topbar-appearance-dropdown.open { display: flex; }
-        .topbar-appearance-dropdown .menu-item {
-            padding: 4px 12px;
-            font-family: var(--font-mono);
-            font-size: 8px;
-            letter-spacing: 0.04em;
-            color: var(--ink-mid);
-            cursor: pointer;
-            transition: background .12s ease, color .12s ease;
-            border: none;
-            background: none;
-            text-align: left;
-            width: 100%;
-            white-space: nowrap;
-        }
-        .topbar-appearance-dropdown .menu-item:hover {
-            background: var(--bg);
-            color: var(--ink);
-        }
-        .topbar-appearance-dropdown .menu-item.active {
-            background: var(--ink);
-            color: var(--card);
-        }
-        @media (max-width: 640px) {
-            .topbar-appearance-dropdown .menu-item { font-size: 7px; padding: 3px 10px; }
-        }
+        .topbar-right .btn { font-size: 7px; min-height: 26px; padding: 2px 8px; }
+        .topbar-right .btn-icon { width: 26px; padding: 0; font-size: 12px; }
 
         /* ── Attention ── */
         .attention-wrapper {
@@ -364,7 +333,7 @@
             position: absolute;
             top: calc(100% + 8px);
             right: -8px;
-            width: 280px;
+            width: 300px;
             max-height: 340px;
             overflow-y: auto;
             background: var(--card);
@@ -378,13 +347,8 @@
             scrollbar-width: thin;
             scrollbar-color: var(--ink-lighter) transparent;
         }
-        .attention-dropdown::-webkit-scrollbar {
-            width: 3px;
-        }
-        .attention-dropdown::-webkit-scrollbar-thumb {
-            background: var(--ink-lighter);
-            border-radius: 4px;
-        }
+        .attention-dropdown::-webkit-scrollbar { width: 3px; }
+        .attention-dropdown::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: 4px; }
         .attention-dropdown.open { display: flex; }
         .attention-dropdown .dropdown-header {
             padding: 6px 14px 4px;
@@ -435,7 +399,6 @@
         .attention-item .item-avatar.v1 { background: var(--bg); color: var(--ink); }
         .attention-item .item-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: var(--accent-2); }
         .attention-item .item-avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .attention-item .item-avatar.company { position: relative; }
         .attention-item .item-avatar.company::after {
             content: '';
             position: absolute;
@@ -453,13 +416,22 @@
         }
         .attention-item .item-name {
             font-family: var(--font);
-            font-size: calc(var(--fs-body) * 0.8);
+            font-size: calc(var(--fs-body) * 0.75);
             font-weight: 600;
             letter-spacing: -0.01em;
             color: var(--ink);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+        .attention-item .item-snippet {
+            font-family: var(--font);
+            font-size: calc(var(--fs-body) * 0.65);
+            color: var(--ink-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 1px;
         }
         .attention-item .item-type {
             font-family: var(--font-mono);
@@ -491,11 +463,7 @@
         }
 
         @media (max-width: 480px) {
-            .attention-dropdown {
-                width: 260px;
-                right: -12px;
-                max-height: 280px;
-            }
+            .attention-dropdown { width: 260px; right: -12px; max-height: 280px; }
             .attention-btn { width: 26px; height: 26px; font-size: 12px; }
         }
 
@@ -543,6 +511,25 @@
             cursor: pointer;
         }
         .letter-panel.active { opacity: 1; cursor: auto; transform: scale(1); }
+
+        /* letter-hotspot had no size/position rules, so it was a 0×0 element
+           and the click listeners on it could never fire — this is what makes
+           the edge click zones (and their cursor state) "not work". */
+        .letter-hotspot {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: clamp(56px, 9vw, 180px);
+            z-index: 20;
+        }
+        .letter-hotspot-prev {
+            left: 0;
+            cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2744%27%20height%3D%2744%27%3E%3Ccircle%20cx%3D%2722%27%20cy%3D%2722%27%20r%3D%2720%27%20fill%3D%27rgba%2820%2C20%2C20%2C0.55%29%27/%3E%3Cpath%20d%3D%27M26%2012%20L16%2022%20L26%2032%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3C/svg%3E") 22 22, w-resize;
+        }
+        .letter-hotspot-next {
+            right: 0;
+            cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2744%27%20height%3D%2744%27%3E%3Ccircle%20cx%3D%2722%27%20cy%3D%2722%27%20r%3D%2720%27%20fill%3D%27rgba%2820%2C20%2C20%2C0.55%29%27/%3E%3Cpath%20d%3D%27M18%2012%20L28%2022%20L18%2032%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3C/svg%3E") 22 22, e-resize;
+        }
 
         .letter-card-frame {
             border: 1px solid var(--border);
@@ -772,7 +759,6 @@
             letter-spacing: 0.02em;
             text-transform: uppercase;
             color: var(--ink);
-            /* No truncation: full name visible */
             overflow: visible;
             white-space: normal;
             max-width: none;
@@ -1202,7 +1188,6 @@
             transition: opacity .2s ease, background .2s ease;
         }
         .filter-toast-dismiss:hover { opacity: 1; background: rgba(255, 255, 255, 0.15); }
-        body.focus-mode .filter-toast { display: none; }
         .hud .hud-label {
             font-family: var(--font-mono);
             font-size: var(--hud-fs-label);
@@ -1212,7 +1197,6 @@
             opacity: 0.5;
             margin-right: 2px;
         }
-        .hud .hud-position { display: none; }
 
         @media (max-width: 640px) {
             .hud-bottom {
@@ -1296,20 +1280,13 @@
             transition: width 0.1s ease;
             border-radius: 0 2px 2px 0;
         }
-        .scroll-progress-fill.dim {
-            opacity: 0.5;
-        }
+        .scroll-progress-fill.dim { opacity: 0.5; }
 
         @media (prefers-color-scheme: dark) {
-            .scroll-progress-bar {
-                background: rgba(255, 255, 255, 0.08);
-            }
+            .scroll-progress-bar { background: rgba(255, 255, 255, 0.08); }
         }
+
         /* ── Bento Filter Modal ── */
-        /* ── Bento Filter Modal ── */
-        /* Standard modal size, shared by the filter and activity overlays.
-           Mobile: full-screen for maximum tap-target room.
-           640px+: a centered medium-large modal card. */
         .bento-overlay {
             position: fixed;
             inset: 0;
@@ -1448,70 +1425,6 @@
             min-height: 48px;
         }
 
-        /* ── activity log ── */
-        .activity-list {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            overflow-y: auto;
-            min-height: 0;
-        }
-        .activity-empty {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--ink-lighter);
-            text-align: center;
-            padding: 48px 0;
-        }
-        .activity-row {
-            display: grid;
-            grid-template-columns: 10px 1fr auto;
-            align-items: start;
-            gap: 16px;
-            padding: 15px 4px;
-            border-bottom: 1px solid var(--border);
-        }
-        .activity-row:last-child { border-bottom: none; }
-        .activity-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-top: 6px;
-            background: var(--ink-lighter);
-            flex-shrink: 0;
-        }
-        .activity-row[data-type="click"] .activity-dot { background: var(--ink-mid); }
-        .activity-row[data-type="abandon"] .activity-dot { background: transparent; border: 1px solid var(--ink-lighter); }
-        .activity-row[data-type="abandon"] .activity-snippet { opacity: 0.5; text-decoration: line-through; text-decoration-color: var(--ink-lighter); }
-        .activity-row[data-type="respond"] .activity-dot { background: var(--accent); }
-        .activity-main { min-width: 0; }
-        .activity-type {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--ink-light);
-        }
-        .activity-snippet {
-            font-size: calc(var(--fs-body) * 1.0);
-            color: var(--ink);
-            margin-top: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .activity-meta {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--ink-light);
-            white-space: nowrap;
-            text-align: right;
-            padding-top: 2px;
-        }
-
-        /* Medium-large centered modal, standard for both overlays. */
         @media (min-width: 640px) {
             .bento-overlay { align-items: center; padding: 32px; }
             .bento-panel {
@@ -1649,7 +1562,6 @@
             .letter-row { grid-template-columns: 20px 28px 1fr auto; gap: 8px; padding: 10px 0; }
             .letter-row-author {
                 font-size: calc(var(--fs-body) * 0.7);
-                /* remove truncation overrides */
                 max-width: none;
                 white-space: normal;
                 overflow: visible;
@@ -1694,7 +1606,7 @@
             .wordmark .count { font-size: 7px; }
         }
 
-        /* ── conversation modal ── */
+        /* ── conversation modal – polished ── */
         .conversation-modal {
             position: fixed;
             inset: 0;
@@ -1753,12 +1665,33 @@
             box-shadow: var(--shadow);
         }
         .conversation-modal .close-btn:hover { background: var(--ink); color: var(--card); }
-        .conversation-modal #modalContent { flex: 1; max-width: 780px; width: 100%; margin: 0 auto; padding-bottom: 60px; }
+        .conversation-modal #modalContent {
+            flex: 1;
+            max-width: 780px;
+            width: 100%;
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
 
-        .modal-statement { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
-        .modal-statement .card-who { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; cursor: pointer; }
-        .modal-statement .card-who:hover .card-author { opacity: 0.7; }
-        .modal-statement .card-author-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+        /* main statement in modal */
+        .modal-statement {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .modal-statement .card-who {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .modal-statement .card-who .avatar { cursor: pointer; }
+        .modal-statement .card-author-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
         .modal-statement .card-author {
             font-family: var(--font);
             font-size: calc(var(--fs-body) * 1.1);
@@ -1769,7 +1702,10 @@
             color: var(--ink);
         }
         .modal-statement .card-author:hover { opacity: 0.7; }
-        .modal-statement .card-role { font-size: calc(var(--fs-body) * 0.8); color: var(--ink-light); }
+        .modal-statement .card-role {
+            font-size: calc(var(--fs-body) * 0.8);
+            color: var(--ink-light);
+        }
         .modal-statement .card-time,
         .modal-statement .card-tag {
             font-family: var(--font-mono);
@@ -1793,18 +1729,37 @@
             white-space: pre-wrap;
             color: var(--ink);
         }
-        .modal-statement .card-who .avatar { cursor: pointer; }
 
-        .modal-thread { display: flex; flex-direction: column; margin-top: 6px; }
+        /* thread nodes */
+        .modal-thread {
+            display: flex;
+            flex-direction: column;
+            margin-top: 8px;
+        }
         .modal-node {
             position: relative;
-            padding: 8px 0 8px 14px;
-            border-left: 1px solid var(--border);
+            padding: 10px 0 10px 20px;
+            border-left: 2px solid var(--border);
+            margin-left: 0;
+            transition: border-color 0.2s;
         }
-        .modal-node-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .modal-node:hover { border-left-color: var(--ink-light); }
+        .modal-node-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 2px;
+        }
+        .modal-node-head .avatar {
+            width: 22px;
+            height: 22px;
+            font-size: 8px;
+            flex-shrink: 0;
+        }
         .modal-node-author {
             font-family: var(--font);
-            font-size: calc(var(--fs-body) * 0.75);
+            font-size: calc(var(--fs-body) * 0.8);
             font-weight: 600;
             letter-spacing: 0.02em;
             text-transform: uppercase;
@@ -1812,7 +1767,11 @@
             color: var(--ink);
         }
         .modal-node-author:hover { opacity: 0.7; }
-        .modal-node-time { font-family: var(--font-mono); font-size: 8px; color: var(--ink-light); }
+        .modal-node-time {
+            font-family: var(--font-mono);
+            font-size: 8px;
+            color: var(--ink-light);
+        }
         .modal-node-toggle {
             font-family: var(--font-mono);
             font-size: 8px;
@@ -1827,11 +1786,16 @@
             font-family: var(--font);
             font-size: calc(var(--fs-body) * 0.92);
             line-height: 1.6;
-            margin: 4px 0 4px 24px;
+            margin: 4px 0 4px 30px;
             white-space: pre-wrap;
             color: var(--ink-mid);
         }
-        .modal-node-actions { display: flex; gap: 12px; margin-left: 24px; }
+        .modal-node-actions {
+            display: flex;
+            gap: 12px;
+            margin-left: 30px;
+            margin-top: 4px;
+        }
         .modal-node-link {
             font-family: var(--font-mono);
             font-size: 7px;
@@ -1845,81 +1809,79 @@
             transition: color .2s ease;
         }
         .modal-node-link:hover { color: var(--ink); }
-        .modal-node-children { display: flex; flex-direction: column; }
-        .modal-reply-form {
-            margin: 6px 0 4px 24px;
-            padding: 0;
+        .modal-node-children {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            margin-left: 4px;
+        }
+        /* deeper nesting: increase indent */
+        .modal-node .modal-node {
+            padding-left: 24px;
+            border-left-color: var(--border);
+        }
+        .modal-node .modal-node .modal-node {
+            padding-left: 28px;
+        }
+        .modal-node .modal-node .modal-node .modal-node {
+            padding-left: 32px;
+        }
+
+        /* reply form inside modal */
+        .modal-reply-form {
+            margin: 8px 0 4px 30px;
+            padding: 12px 14px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
             max-width: 100%;
+            border: 1px solid var(--border);
         }
-        .modal-reply-form select { max-width: 160px; }
-        .modal-reply-trigger { margin: 4px 0 8px 0; }
+        .modal-reply-form select {
+            max-width: 160px;
+            padding: 4px 8px;
+            font-size: calc(var(--fs-body) * 0.8);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--ink);
+        }
+        .modal-reply-form textarea {
+            width: 100%;
+            min-height: 50px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 10px;
+            font-family: var(--font);
+            font-size: calc(var(--fs-body) * 0.85);
+            color: var(--ink);
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+        .modal-reply-form textarea:focus {
+            outline: none;
+            border-color: var(--ink);
+        }
+        .modal-reply-form .composer-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            padding: 0;
+            border-top: none;
+        }
+        .modal-reply-form .composer-actions .btn {
+            min-height: 28px;
+            font-size: 7px;
+            padding: 3px 12px;
+        }
 
-        /* modal avatar clickable */
-        .modal-statement .card-who .avatar,
-        .modal-node-head .avatar { cursor: pointer; }
-
-        [hidden] { display: none !important; }
-        @supports (padding-bottom: env(safe-area-inset-bottom)) {
-            .hud-bottom { margin-bottom: env(safe-area-inset-bottom); }
-            .bento-panel { padding-bottom: env(safe-area-inset-bottom); }
-            .conversation-modal .modal-card { padding-bottom: env(safe-area-inset-bottom); }
-            .scroll-progress-bar { bottom: env(safe-area-inset-bottom, 0); }
+        .modal-reply-trigger {
+            margin: 8px 0 4px 0;
         }
-
-        /* ── custom cursor ── */
-        body.custom-cursor-active { cursor: none; }
-        .write-cursor-dot,
-        .write-cursor-ellipse {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 500;
-            pointer-events: none;
-            transform: translate(-9999px, -9999px);
-            opacity: 0;
-            transition: opacity .18s ease;
-            will-change: transform;
-        }
-        .write-cursor-dot.visible,
-        .write-cursor-ellipse.visible { opacity: 1; }
-        .write-cursor-dot {
-            width: 6px;
-            height: 6px;
-            margin: -3px 0 0 -3px;
-            border-radius: 50%;
-            background: var(--ink);
-        }
-        .write-cursor-ellipse {
-            width: 34px;
-            height: 34px;
-            margin: -17px 0 0 -17px;
-            border: 1.5px solid var(--ink);
-            border-radius: 50%;
-            opacity: 0;
-        }
-        .write-cursor-ellipse.visible { opacity: .32; }
-        body.custom-cursor-active.write-native-cursor { cursor: auto; }
-        .write-native-cursor .write-cursor-dot,
-        .write-native-cursor .write-cursor-ellipse { opacity: 0 !important; }
-
-        /* ── click hotspots ── */
-        .letter-hotspot {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: clamp(56px, 9vw, 180px);
-            z-index: 20;
-        }
-        .letter-hotspot-prev {
-            left: 0;
-            cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2744%27%20height%3D%2744%27%3E%3Ccircle%20cx%3D%2722%27%20cy%3D%2722%27%20r%3D%2720%27%20fill%3D%27rgba%2820%2C20%2C20%2C0.55%29%27/%3E%3Cpath%20d%3D%27M26%2012%20L16%2022%20L26%2032%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3C/svg%3E") 22 22, w-resize;
-        }
-        .letter-hotspot-next {
-            right: 0;
-            cursor: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2744%27%20height%3D%2744%27%3E%3Ccircle%20cx%3D%2722%27%20cy%3D%2722%27%20r%3D%2720%27%20fill%3D%27rgba%2820%2C20%2C20%2C0.55%29%27/%3E%3Cpath%20d%3D%27M18%2012%20L28%2022%20L18%2032%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3C/svg%3E") 22 22, e-resize;
+        .modal-reply-trigger .modal-node-link {
+            font-size: 8px;
         }
 
         /* ── Profile Modal ── */
@@ -2010,7 +1972,6 @@
         .profile-card-stat .label { font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-light); }
         .profile-card-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-        /* ── Co badge ── */
         .co-badge {
             font-family: var(--font-mono);
             font-size: 6px;
@@ -2141,21 +2102,297 @@
         }
         .rapid-respond .rapid-bubble-preview.has-text { display: block; }
 
+        .rapid-respond .rapid-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 2px;
+        }
+        .rapid-respond .rapid-chips .chip {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-family: var(--font-mono);
+            font-size: 6px;
+            letter-spacing: 0.04em;
+            color: var(--ink-mid);
+            cursor: pointer;
+            transition: all .15s ease;
+            white-space: nowrap;
+        }
+        .rapid-respond .rapid-chips .chip:hover {
+            background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink);
+        }
+        .rapid-respond .rapid-chips .chip .uses {
+            font-size: 5px;
+            opacity: 0.5;
+            margin-left: 2px;
+        }
+
         @media (max-width: 480px) {
-            .rapid-respond {
-                min-width: 180px;
-                max-width: 300px;
-                padding: 10px 12px;
-            }
+            .rapid-respond { min-width: 180px; max-width: 300px; padding: 10px 12px; }
             .rapid-respond .rapid-input-wrap textarea { font-size: calc(var(--fs-body) * 0.8); min-height: 30px; }
             .rapid-respond .rapid-input-wrap .rapid-send { font-size: 6px; padding: 4px 10px; min-height: 30px; }
         }
+
+        /* ── Edit & Mute buttons on statements ── */
+        .statement-actions {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            margin-top: 6px;
+        }
+        .statement-actions .action-btn {
+            background: transparent;
+            border: none;
+            color: var(--ink-light);
+            font-size: 10px;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: all .15s ease;
+            font-family: var(--font-mono);
+            font-size: 7px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .statement-actions .action-btn:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+        .statement-actions .action-btn.muted {
+            color: var(--accent);
+        }
+        .statement-actions .action-btn.in-attention {
+            color: var(--accent);
+        }
+        .statement-edit-marker {
+            font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light);
+            margin-top: 4px;
+            border-top: 1px dashed var(--border);
+            padding-top: 4px;
+        }
+        .statement-edit-marker a {
+            color: var(--ink-light);
+            text-decoration: underline dotted;
+            cursor: pointer;
+        }
+        .statement-edit-marker a:hover { color: var(--ink); }
+        .statement-edit-marker.denied {
+            color: #d43a3a;
+            border-color: #d43a3a;
+        }
+        .statement-edit-marker.denied a { color: #d43a3a; }
+        .statement-edit-marker.denied a:hover { color: #a00; }
+
+        /* ── Edit inline form ── */
+        .edit-inline {
+            margin-top: 8px;
+            padding: 8px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .edit-inline textarea {
+            width: 100%;
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 6px 8px;
+            font-family: var(--font);
+            font-size: calc(var(--fs-body) * 0.85);
+            border-radius: var(--radius-sm);
+            resize: vertical;
+            min-height: 40px;
+        }
+        .edit-inline .edit-actions {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .edit-inline .edit-actions label {
+            font-family: var(--font-mono);
+            font-size: 6px;
+            letter-spacing: 0.06em;
+            color: var(--ink-light);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .edit-inline .edit-actions label input[type="checkbox"] {
+            margin: 0;
+            accent-color: var(--ink);
+        }
+
+        /* ── Review modal ── */
+        .review-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .review-item .review-diff {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: calc(var(--fs-body)*0.8);
+            background: var(--bg);
+            padding: 6px;
+            border-radius: var(--radius-sm);
+        }
+        .review-item .review-diff .old { text-decoration: line-through; color: var(--ink-light); }
+        .review-item .review-diff .new { font-weight: 500; }
+        .review-item .review-meta {
+            font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .review-item .review-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .review-item .review-actions .btn { font-size: 6px; padding: 2px 8px; min-height: 20px; }
+
+        /* ── Chips modal ── */
+        .chip-manage-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .chip-manage-item .chip-text {
+            flex: 1;
+            font-family: var(--font);
+            font-size: calc(var(--fs-body)*0.85);
+        }
+        .chip-manage-item .chip-uses {
+            font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light);
+        }
+        .chip-manage-item .chip-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .chip-manage-item .chip-actions .btn { font-size: 6px; padding: 2px 6px; min-height: 20px; }
+
+        .add-chip-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .add-chip-row input[type="text"] {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: calc(var(--fs-body)*0.85);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            color: var(--ink);
+            font-family: var(--font);
+        }
+        .add-chip-row input[type="text"]:focus { outline: none; border-color: var(--ink); }
+
+        /* ── Muted / Archive styling ── */
+        .letter-panel[data-archive="true"] .statement-archive-muted {
+            opacity: 0.5;
+            filter: grayscale(0.3);
+        }
+        .letter-panel[data-archive="true"] .card {
+            opacity: 0.6;
+            filter: grayscale(0.3);
+        }
+        .letter-panel[data-archive="true"] .card:hover {
+            opacity: 0.9;
+            filter: none;
+        }
+
+        /* ── Activity filter (half-life) chips ── */
+        .activity-filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 4px 0 8px;
+        }
+        .activity-filter-group .chip {
+            font-size: 7px;
+            padding: 4px 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg);
+            color: var(--ink-mid);
+            font-family: var(--font-mono);
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .activity-filter-group .chip.active {
+            background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink);
+        }
+        .activity-filter-group .chip:hover:not(.active) {
+            border-color: var(--ink);
+            color: var(--ink);
+        }
+
+        /* ── custom cursor (FIXED) ── */
+        body.custom-cursor-active { cursor: none; }
+        .write-cursor-dot,
+        .write-cursor-ellipse {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 500;
+            pointer-events: none;
+            transform: translate(-9999px, -9999px);
+            opacity: 0;
+            transition: opacity .18s ease;
+            will-change: transform;
+        }
+        .write-cursor-dot.visible,
+        .write-cursor-ellipse.visible { opacity: 1; }
+        .write-cursor-dot {
+            width: 6px;
+            height: 6px;
+            margin: -3px 0 0 -3px;
+            border-radius: 50%;
+            background: var(--ink);
+        }
+        .write-cursor-ellipse {
+            width: 34px;
+            height: 34px;
+            margin: -17px 0 0 -17px;
+            border: 1.5px solid var(--ink);
+            border-radius: 50%;
+            opacity: 0;
+        }
+        .write-cursor-ellipse.visible { opacity: .32; }
+        body.custom-cursor-active.write-native-cursor { cursor: auto; }
+        .write-native-cursor .write-cursor-dot,
+        .write-native-cursor .write-cursor-ellipse { opacity: 0 !important; }
     </style>
 </head>
 <body data-scale="l" data-font="satoshi">
 
+    <!-- ─── CURSOR ELEMENTS (FIXED) ─── -->
     <div class="write-cursor-ellipse" id="writeCursorEllipse" aria-hidden="true"></div>
     <div class="write-cursor-dot" id="writeCursorDot" aria-hidden="true"></div>
+
     <button class="focus-exit-btn" id="focusExitBtn" type="button" aria-label="Exit focus mode" title="Exit focus (Esc)">×</button>
 
     <!-- ─── SCROLL PROGRESS BAR ─── -->
@@ -2163,7 +2400,7 @@
         <div class="scroll-progress-fill" id="scrollProgressFill"></div>
     </div>
 
-    <!-- ─── VIEWPORT EDGE BLUR (top/bottom fade, topbar itself is frameless) ─── -->
+    <!-- ─── VIEWPORT EDGE BLUR ─── -->
     <div class="viewport-blur viewport-blur-top" id="viewportBlurTop" aria-hidden="true"></div>
     <div class="viewport-blur viewport-blur-bottom" id="viewportBlurBottom" aria-hidden="true"></div>
 
@@ -2179,13 +2416,22 @@
                 </div>
             </div>
 
-            <!-- Right: appearance + attention -->
+            <!-- Right: appearance, reviews, chips, attention -->
             <div class="topbar-right">
                 <!-- Appearance -->
                 <div class="topbar-appearance-wrapper">
                     <button class="btn" id="appearanceTrigger">Aa</button>
                     <div class="topbar-appearance-dropdown" id="appearanceDropdown"></div>
                 </div>
+
+                <!-- Reviews (edit review) -->
+                <button class="btn btn-badge" id="reviewToggleBtn" title="Pending edit reviews">
+                    <span>✎</span>
+                    <span class="badge" id="reviewBadge" style="display:none;">0</span>
+                </button>
+
+                <!-- Chips -->
+                <button class="btn" id="chipsToggleBtn" title="Manage chips">⌨</button>
 
                 <!-- Attention -->
                 <div class="attention-wrapper" id="attentionWrapper">
@@ -2202,13 +2448,11 @@
         </div>
     </div>
 
-    <!-- ─── TOP HUD (navigation + view) ─── -->
+    <!-- ─── TOP HUD ─── -->
     <div class="hud hud-top" id="hudTop">
         <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
         <button class="btn btn-icon" id="hudNext" title="Next">›</button>
-
         <div class="hud-divider"></div>
-
         <span class="hud-label">View</span>
         <button class="btn active" id="hudViewList">List</button>
         <button class="btn" id="hudViewGrid">Grid</button>
@@ -2216,7 +2460,7 @@
     </div>
 
     <div class="wrap">
-        <!-- ─── COMPOSER (floating, draggable) ─── -->
+        <!-- ─── COMPOSER ─── -->
         <div class="composer" id="composer">
             <div class="composer-header" id="composerHeader">
                 <span class="composer-title"><span class="grip">⠿⠿</span> New statement</span>
@@ -2262,30 +2506,18 @@
         </div>
     </div>
 
-    <!-- ─── BOTTOM HUD (filters + activity + new) ─── -->
+    <!-- ─── BOTTOM HUD ─── -->
     <div class="hud hud-bottom" id="hud">
-        <!-- Filter -->
         <button class="btn" id="filterToggleBtn">
             <span>Filters</span>
             <span class="filter-count" id="filterCount">0</span>
         </button>
         <button class="btn ghost" id="hudClear" hidden>Clear</button>
-
         <div class="hud-divider"></div>
-
-        <!-- Activity -->
-        <button class="btn" id="activityToggleBtn">
-            <span>Activity</span>
-            <span class="filter-count" id="activityCount">0</span>
-        </button>
-
-        <div class="hud-divider"></div>
-
-        <!-- New -->
         <button class="btn btn-primary" id="hudNew">+ New</button>
     </div>
 
-    <!-- ─── FILTER TOAST (dismissable, auto-timeout) ─── -->
+    <!-- ─── FILTER TOAST ─── -->
     <div class="filter-toast" id="filterToast" role="status" aria-live="polite">
         <span class="filter-toast-text" id="filterToastText"></span>
         <button class="filter-toast-dismiss" id="filterToastDismiss" aria-label="Dismiss">✕</button>
@@ -2301,6 +2533,16 @@
             <div class="bento-grid">
                 <div class="bento-card bento-card-full">
                     <input type="text" id="bentoSearch" placeholder="Search statements or authors…" />
+                </div>
+                <div class="bento-card bento-card-full">
+                    <h4>Activity half-life</h4>
+                    <div class="activity-filter-group" id="activityFilterGroup">
+                        <button class="chip active" data-days="0">All</button>
+                        <button class="chip" data-days="1">Today</button>
+                        <button class="chip" data-days="7">7 days</button>
+                        <button class="chip" data-days="14">14 days</button>
+                        <button class="chip" data-days="21">21 days</button>
+                    </div>
                 </div>
                 <div class="bento-card bento-card-half" id="bentoTags">
                     <h4>Tags</h4>
@@ -2334,30 +2576,6 @@
         </div>
     </div>
 
-    <!-- ─── ACTIVITY LOG ─── -->
-    <div class="bento-overlay" id="activityOverlay">
-        <div class="bento-panel">
-            <div class="bento-header">
-                <h2>Activity Log</h2>
-                <button class="close-btn" id="activityClose">✕</button>
-            </div>
-            <div class="bento-card">
-                <h4>Filter</h4>
-                <div class="chip-group" id="activityFilterChips">
-                    <button class="chip active" data-atype="all">All</button>
-                    <button class="chip" data-atype="hover">Hovered</button>
-                    <button class="chip" data-atype="click">Clicked</button>
-                    <button class="chip" data-atype="abandon">Abandoned</button>
-                    <button class="chip" data-atype="respond">Responded</button>
-                </div>
-            </div>
-            <div class="activity-list" id="activityList"></div>
-            <div class="bento-actions">
-                <button class="btn ghost" id="activityClear">Clear log</button>
-            </div>
-        </div>
-    </div>
-
     <!-- ─── PROFILE MODAL ─── -->
     <div class="profile-modal" id="profileModal">
         <div class="profile-card" id="profileCard">
@@ -2379,6 +2597,39 @@
             <button class="rapid-send" id="rapidSend">→</button>
         </div>
         <div class="rapid-bubble-preview" id="rapidBubblePreview"></div>
+        <div class="rapid-chips" id="rapidChips"></div>
+    </div>
+
+    <!-- ─── REVIEW MODAL ─── -->
+    <div class="bento-overlay" id="reviewOverlay">
+        <div class="bento-panel">
+            <div class="bento-header">
+                <h2>Edit reviews</h2>
+                <button class="close-btn" id="reviewClose">✕</button>
+            </div>
+            <div class="bento-card bento-card-full">
+                <h4>Pending cosmetic reviews</h4>
+                <div id="reviewList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── CHIP MANAGEMENT MODAL ─── -->
+    <div class="bento-overlay" id="chipsOverlay">
+        <div class="bento-panel">
+            <div class="bento-header">
+                <h2>Manage chips</h2>
+                <button class="close-btn" id="chipsClose">✕</button>
+            </div>
+            <div class="bento-card bento-card-full">
+                <h4>Your chips</h4>
+                <div id="chipList"></div>
+                <div class="add-chip-row">
+                    <input type="text" id="chipAddInput" placeholder="New chip text…" />
+                    <button class="btn btn-primary" id="chipAddBtn">Add</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -2386,9 +2637,9 @@
             'use strict';
 
             // ── Constants ─────────────────────────────────────────────
-            const STORAGE_KEY = 'neverever-statements-v9';
-            const ATTENTION_KEY = 'neverever-attention-v1';
-            const ACTIVITY_KEY = 'neverever-activity-v1';
+            const STORAGE_KEY = 'neverever-statements-v10';
+            const ATTENTION_KEY = 'neverever-attention-v2';
+            const CHIPS_KEY = 'neverever-chips-v1';
             const PAGE_SIZE = 12;
             const MAX_ATTENTION = 20;
             const AVIF_IMAGES = [
@@ -2414,8 +2665,6 @@
             const isVideo = url => /\.(mp4|webm|mov)(\?|$)/i.test(url);
             const escapeHtml = s => (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;',
                 '"': '&quot;', "'": '&#39;' } [c]));
-            // Some event targets (text nodes, or exotic targets from native form
-            // controls) don't implement .closest — guard every lookup through this.
             const closestSafe = (node, selector) => (node && node.nodeType === 1 && node.closest) ?
                 node.closest(selector) : null;
 
@@ -2537,10 +2786,9 @@
                 const now = Date.now(),
                     day = 24 * 60 * 60 * 1000,
                     hour = 60 * 60 * 1000;
-                const authorById = id => authorsList.find(a => a.id === id);
                 const result = [];
 
-                // ── job listings, hand-written per company ─────────────
+                // ── job listings ──────────────────────────────────────
                 const JOB_LISTINGS = {
                     'studio-north': [
                         'Studio North is hiring a Senior Product Designer. Remote-first, occasional NYC. $140k–$175k. Send a portfolio, not a resume.',
@@ -2592,7 +2840,6 @@
                     ]
                 };
 
-                // ── open-to-work, one per person, tailored to their role ─
                 const OPEN_TO_WORK = {
                     zack: 'Looking for staff-level product work. Six years freelance, shipped 20+ products.',
                     maya: 'Ex-agency Creative Director, open to in-house roles. I don\'t want to pitch anymore, I want to build one thing.',
@@ -2614,7 +2861,6 @@
                     dara: 'UX Researcher, eight years, mostly qualitative. Looking for a role where research drives decisions, not just decks.'
                 };
 
-                // ── general pool: thoughts, career, brand, community, leadership ─
                 const GENERAL = [
                     { tag: 'CAREER', text: 'Left my agency job today. No regrets yet — ask me in a month.' },
                     { tag: 'CAREER', text: 'A staff title means nothing if the team around it is broken.' },
@@ -2655,7 +2901,10 @@
                         tag,
                         text,
                         mediaUrl: Math.random() < (mediaChance != null ? mediaChance : 0.35) ? randAVIF() : '',
-                        replies: []
+                        replies: [],
+                        editState: 'original',
+                        editHistory: [],
+                        muteState: 'visible'
                     });
                     return result[result.length - 1];
                 }
@@ -2674,7 +2923,7 @@
                     push(a.id, g.tag, g.text, Math.random() * 14 * day, 0.4);
                 }
 
-                // ── active conversations: attach nested reply threads ────
+                // ── active conversations ──────────────────────────────
                 const REPLY_TEXTS = [
                     'This resonates. We hit the same wall last quarter.',
                     'Strong disagree — but I like where your head\'s at.',
@@ -2720,14 +2969,12 @@
                     }];
                 }
 
-                // Every thread gets at least one reply. Counts are weighted
-                // so most threads are light-to-medium, a handful run long.
                 function pickReplyCount() {
                     const r = Math.random();
-                    if (r < 0.3) return 1 + Math.floor(Math.random() * 2); // 1–2
-                    if (r < 0.7) return 3 + Math.floor(Math.random() * 3); // 3–5
-                    if (r < 0.92) return 6 + Math.floor(Math.random() * 5); // 6–10
-                    return 11 + Math.floor(Math.random() * 8); // 11–18
+                    if (r < 0.3) return 1 + Math.floor(Math.random() * 2);
+                    if (r < 0.7) return 3 + Math.floor(Math.random() * 3);
+                    if (r < 0.92) return 6 + Math.floor(Math.random() * 5);
+                    return 11 + Math.floor(Math.random() * 8);
                 }
 
                 function makeTopLevelReplies(parentTime, excludeId) {
@@ -2771,14 +3018,14 @@
             let focusMode = false;
             let modalStatementId = null;
             let modalReplyTargetId = null;
-            let modalOpenTime = null;
-            let modalResponded = false;
             const collapsed = new Set();
             const activeTags = new Set();
             const activePeople = new Set();
             const activeCompanies = new Set();
             const activeDisciplines = new Set();
             let searchQuery = '';
+            let chips = [];
+            let activityDays = 0; // 0 = all, 1, 7, 14, 21
 
             // ── Rapid Respond State ──────────────────────────────────
             let rapidTarget = null;
@@ -2795,15 +3042,16 @@
                         if (item.objectType === 'person' || item.objectType === 'company') {
                             return authors.some(a => a.id === item.objectId);
                         }
+                        if (item.objectType === 'statement') {
+                            return statements.some(s => s.id === item.objectId);
+                        }
                         return true;
                     });
                 } catch (e) { attentionItems = []; }
             }
 
             function saveAttention() {
-                try {
-                    localStorage.setItem(ATTENTION_KEY, JSON.stringify(attentionItems));
-                } catch (e) {}
+                try { localStorage.setItem(ATTENTION_KEY, JSON.stringify(attentionItems)); } catch (e) {}
                 renderAttention();
             }
 
@@ -2851,6 +3099,9 @@
                 if (item.objectType === 'person' || item.objectType === 'company') {
                     return authors.find(a => a.id === item.objectId);
                 }
+                if (item.objectType === 'statement') {
+                    return statements.find(s => s.id === item.objectId);
+                }
                 return null;
             }
 
@@ -2873,14 +3124,28 @@
                 list.innerHTML = activeItems.map(item => {
                     const obj = getAttentionObject(item);
                     if (!obj) return '';
-                    const varClass = avatarVariant(obj.id);
-                    const typeLabel = item.objectType === 'person' ? 'person' : 'company';
-                    const initials = initialsFor(obj);
+                    const isStatement = item.objectType === 'statement';
+                    let displayName, displaySnippet, typeLabel, avatarContent;
+                    if (isStatement) {
+                        const a = authorById(obj.authorId);
+                        displayName = a ? a.name : 'Unknown';
+                        displaySnippet = obj.text;
+                        typeLabel = 'statement';
+                        avatarContent = a ? initialsFor(a) : '?';
+                    } else {
+                        displayName = obj.name;
+                        displaySnippet = obj.role || '';
+                        typeLabel = obj.kind === 'company' ? 'company' : 'person';
+                        avatarContent = initialsFor(obj);
+                    }
+                    const varClass = avatarVariant(isStatement ? obj.authorId : obj.id);
+                    const isCompany = obj.kind === 'company';
                     return `
                         <div class="attention-item" data-type="${item.objectType}" data-id="${item.objectId}">
-                            <div class="item-avatar ${varClass}${obj.kind === 'company' ? ' company' : ''}">${escapeHtml(initials)}</div>
+                            <div class="item-avatar ${varClass}${isCompany ? ' company' : ''}">${escapeHtml(avatarContent)}</div>
                             <div class="item-info">
-                                <span class="item-name">${escapeHtml(obj.name)}</span>
+                                <span class="item-name">${escapeHtml(displayName)}</span>
+                                ${displaySnippet ? `<div class="item-snippet">${escapeHtml(displaySnippet.slice(0, 60))}</div>` : ''}
                                 <span class="item-type">${typeLabel}</span>
                             </div>
                             <button class="item-dismiss" data-type="${item.objectType}" data-id="${item.objectId}" title="Dismiss">×</button>
@@ -2893,7 +3158,11 @@
                         if (closestSafe(e.target, '.item-dismiss')) return;
                         const type = el.dataset.type;
                         const id = el.dataset.id;
-                        openProfileModal(type, id);
+                        if (type === 'statement') {
+                            openConversation(id);
+                        } else {
+                            openProfileModal(type, id);
+                        }
                         document.getElementById('attentionDropdown').classList.remove('open');
                     });
                     const dismiss = el.querySelector('.item-dismiss');
@@ -2968,6 +3237,233 @@
                 document.getElementById('profileModal').classList.remove('open');
             }
 
+            // ── Chips ─────────────────────────────────────────────────
+            function loadChips() {
+                try {
+                    const raw = localStorage.getItem(CHIPS_KEY);
+                    chips = raw ? JSON.parse(raw) : [];
+                } catch (e) { chips = []; }
+            }
+
+            function saveChips() {
+                try { localStorage.setItem(CHIPS_KEY, JSON.stringify(chips)); } catch (e) {}
+                renderChipsUI();
+                renderRapidChips();
+            }
+
+            function addChip(text) {
+                if (!text.trim()) return;
+                chips.push({ id: uid(), text: text.trim(), useCount: 0, createdAt: Date.now() });
+                saveChips();
+            }
+
+            function deleteChip(id) {
+                chips = chips.filter(c => c.id !== id);
+                saveChips();
+            }
+
+            function editChip(id, newText) {
+                const c = chips.find(ch => ch.id === id);
+                if (c) { c.text = newText.trim();
+                    saveChips(); }
+            }
+
+            function useChip(id) {
+                const c = chips.find(ch => ch.id === id);
+                if (c) { c.useCount = (c.useCount || 0) + 1;
+                    saveChips(); }
+            }
+
+            function renderChipsUI() {
+                const list = document.getElementById('chipList');
+                if (!list) return;
+                if (!chips.length) {
+                    list.innerHTML = `<div class="dropdown-empty">No chips saved.</div>`;
+                    return;
+                }
+                list.innerHTML = chips.map(c => `
+                    <div class="chip-manage-item">
+                        <span class="chip-text">${escapeHtml(c.text)}</span>
+                        <span class="chip-uses">${c.useCount || 0} uses</span>
+                        <div class="chip-actions">
+                            <button class="btn ghost small chip-edit" data-id="${c.id}">✎</button>
+                            <button class="btn ghost small chip-delete" data-id="${c.id}">×</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                list.querySelectorAll('.chip-edit').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.id;
+                        const c = chips.find(ch => ch.id === id);
+                        if (!c) return;
+                        const newText = prompt('Edit chip text:', c.text);
+                        if (newText !== null && newText.trim()) {
+                            editChip(id, newText.trim());
+                        }
+                    });
+                });
+                list.querySelectorAll('.chip-delete').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        if (confirm('Delete this chip?')) deleteChip(btn.dataset.id);
+                    });
+                });
+            }
+
+            function renderRapidChips() {
+                const container = document.getElementById('rapidChips');
+                if (!container) return;
+                if (!chips.length) { container.innerHTML = ''; return; }
+                container.innerHTML = chips.map(c => `
+                    <button class="chip chip-use" data-id="${c.id}">${escapeHtml(c.text)} <span class="uses">(${c.useCount||0})</span></button>
+                `).join('');
+                container.querySelectorAll('.chip-use').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const c = chips.find(ch => ch.id === btn.dataset.id);
+                        if (c) {
+                            const ta = document.getElementById('rapidText');
+                            ta.value = c.text;
+                            ta.dispatchEvent(new Event('input'));
+                            useChip(c.id);
+                        }
+                    });
+                });
+            }
+
+            // ── Edit / Review ────────────────────────────────────────
+            function getPendingReviews() {
+                return statements.filter(s => s.editState === 'pending-review');
+            }
+
+            function renderReviewBadge() {
+                const badge = document.getElementById('reviewBadge');
+                const pending = getPendingReviews();
+                if (pending.length) {
+                    badge.style.display = 'flex';
+                    badge.textContent = String(pending.length);
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            function openReviewModal() {
+                const overlay = document.getElementById('reviewOverlay');
+                overlay.classList.add('open');
+                renderReviewList();
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeReviewModal() {
+                document.getElementById('reviewOverlay').classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            function renderReviewList() {
+                const list = document.getElementById('reviewList');
+                if (!list) return;
+                const pending = getPendingReviews();
+                if (!pending.length) {
+                    list.innerHTML = `<div class="dropdown-empty">No pending reviews.</div>`;
+                    return;
+                }
+                list.innerHTML = pending.map(s => {
+                    const lastEdit = s.editHistory[s.editHistory.length - 1];
+                    const a = authorById(s.authorId);
+                    return `
+                        <div class="review-item">
+                            <div class="review-meta">
+                                <span>${a ? escapeHtml(a.name) : 'Unknown'}</span>
+                                <span>${fmtTime(lastEdit ? lastEdit.timestamp : s.time)}</span>
+                            </div>
+                            <div class="review-diff">
+                                <div class="old">${escapeHtml(lastEdit ? lastEdit.oldText : '')}</div>
+                                <div class="new">${escapeHtml(lastEdit ? lastEdit.newText : '')}</div>
+                            </div>
+                            <div class="review-actions">
+                                <button class="btn btn-primary review-approve" data-id="${s.id}">Approve (cosmetic)</button>
+                                <button class="btn ghost review-deny" data-id="${s.id}">Deny</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                list.querySelectorAll('.review-approve').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const s = statements.find(st => st.id === btn.dataset.id);
+                        if (s && s.editState === 'pending-review') {
+                            s.editState = 'edited-canonical';
+                            saveData();
+                            renderReviewList();
+                            renderReviewBadge();
+                            renderLetter(activeIndex);
+                            if (modalStatementId === s.id) renderModalContent(s.id);
+                        }
+                    });
+                });
+                list.querySelectorAll('.review-deny').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const s = statements.find(st => st.id === btn.dataset.id);
+                        if (s && s.editState === 'pending-review') {
+                            s.editState = 'edit-denied';
+                            saveData();
+                            renderReviewList();
+                            renderReviewBadge();
+                            renderLetter(activeIndex);
+                            if (modalStatementId === s.id) renderModalContent(s.id);
+                        }
+                    });
+                });
+            }
+
+            function initiateEdit(s) {
+                const container = document.getElementById('editFormContainer');
+                if (!container) return;
+                container.innerHTML = '';
+                const form = document.createElement('div');
+                form.className = 'edit-inline';
+                form.innerHTML = `
+                    <textarea id="editText" rows="2">${escapeHtml(s.text)}</textarea>
+                    <div class="edit-actions">
+                        <label><input type="checkbox" id="editCosmetic" /> Request cosmetic review</label>
+                        <button class="btn ghost small" id="editCancel">Cancel</button>
+                        <button class="btn btn-primary small" id="editSubmit">Submit edit</button>
+                    </div>
+                `;
+                container.appendChild(form);
+
+                document.getElementById('editSubmit').addEventListener('click', () => {
+                    const newText = document.getElementById('editText').value.trim();
+                    if (!newText || newText === s.text) {
+                        container.innerHTML = '';
+                        return;
+                    }
+                    const cosmetic = document.getElementById('editCosmetic').checked;
+                    s.editHistory.push({
+                        timestamp: Date.now(),
+                        oldText: s.text,
+                        newText: newText,
+                    });
+                    s.text = newText;
+                    s.editState = cosmetic ? 'pending-review' : 'edited';
+                    saveData();
+                    container.innerHTML = '';
+                    renderLetter(activeIndex);
+                    if (modalStatementId === s.id) renderModalContent(s.id);
+                    renderReviewBadge();
+                });
+                document.getElementById('editCancel').addEventListener('click', () => {
+                    container.innerHTML = '';
+                });
+            }
+
+            // ── Mute ──────────────────────────────────────────────────
+            function toggleMute(s) {
+                s.muteState = s.muteState === 'muted' ? 'visible' : 'muted';
+                saveData();
+                renderLetter(activeIndex);
+                if (modalStatementId === s.id) renderModalContent(s.id);
+            }
+
             // ── Data loading ──────────────────────────────────────────
             async function loadData() {
                 try {
@@ -2977,6 +3473,11 @@
                         if (parsed.authors?.length && parsed.statements?.length) {
                             authors = parsed.authors;
                             statements = parsed.statements;
+                            statements.forEach(s => {
+                                if (!s.editState) s.editState = 'original';
+                                if (!s.editHistory) s.editHistory = [];
+                                if (!s.muteState) s.muteState = 'visible';
+                            });
                             return;
                         }
                     }
@@ -3005,6 +3506,7 @@
                 try {
                     await storage.set(STORAGE_KEY, JSON.stringify({ authors, statements }));
                     setSaveStatus('ok');
+                    renderReviewBadge();
                 } catch (e) { setSaveStatus('err'); }
                 saveInFlight = false;
             }
@@ -3013,15 +3515,14 @@
             async function resetDemoContent() {
                 try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
                 try { localStorage.removeItem(ATTENTION_KEY); } catch (e) {}
+                try { localStorage.removeItem(CHIPS_KEY); } catch (e) {}
                 authors = seedAuthors();
                 statements = seedStatements(authors);
                 await saveData();
                 attentionItems = [];
                 saveAttention();
-                activityLog = [];
-                saveActivityLog();
-                updateActivityCount();
-                renderActivityLog();
+                chips = [];
+                saveChips();
                 activeIndex = 0;
                 renderTrack();
                 renderAttention();
@@ -3029,144 +3530,63 @@
             }
             window.resetDemoContent = resetDemoContent;
 
-            // ── Activity log ────────────────────────────────────────
-            let activityLog = [];
-            let activityFilter = 'all';
-            const ACTIVITY_LABELS = { hover: 'HOVERED', click: 'CLICKED', abandon: 'ABANDONED', respond: 'RESPONDED' };
-
-            function loadActivity() {
-                try {
-                    const raw = localStorage.getItem(ACTIVITY_KEY);
-                    activityLog = raw ? JSON.parse(raw) : [];
-                } catch (e) { activityLog = []; }
-            }
-
-            function saveActivityLog() {
-                try { localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activityLog.slice(0, 300))); }
-                catch (e) {}
-            }
-
-            function updateActivityCount() {
-                const el = document.getElementById('activityCount');
-                if (el) el.textContent = String(activityLog.length);
-            }
-
-            // ── Performance: batched activity logging ──────────────
-            let logQueue = [];
-            let logScheduled = false;
-
-            function enqueueLog(entry) {
-                logQueue.push(entry);
-                if (!logScheduled) {
-                    logScheduled = true;
-                    requestIdleCallback(() => {
-                        if (logQueue.length) {
-                            activityLog.unshift(...logQueue);
-                            if (activityLog.length > 300) activityLog.length = 300;
-                            saveActivityLog();
-                            updateActivityCount();
-                            if (document.getElementById('activityOverlay')?.classList.contains('open'))
-                                renderActivityLog();
-                        }
-                        logQueue = [];
-                        logScheduled = false;
-                    }, { timeout: 200 });
-                }
-            }
-
-            function logActivity(type, statementId, extra) {
-                const s = statements.find(st => st.id === statementId);
-                const a = s ? authorById(s.authorId) : null;
-                enqueueLog({
-                    id: uid(),
-                    type,
-                    statementId,
-                    time: Date.now(),
-                    authorName: a ? a.name : 'Unknown',
-                    tag: s && s.tag ? s.tag : '',
-                    snippet: s ? s.text : '',
-                    ...(extra || {})
-                });
-            }
-
-            function fmtAgo(ts) {
-                const diff = Date.now() - ts;
-                if (diff < 60000) return Math.max(1, Math.round(diff / 1000)) + 's ago';
-                if (diff < 3600000) return Math.round(diff / 60000) + 'm ago';
-                if (diff < 86400000) return Math.round(diff / 3600000) + 'h ago';
-                return Math.round(diff / 86400000) + 'd ago';
-            }
-
-            function renderActivityLog() {
-                const list = document.getElementById('activityList');
-                if (!list) return;
-                const items = activityFilter === 'all' ? activityLog : activityLog.filter(e => e.type === activityFilter);
-                if (!items.length) {
-                    list.innerHTML = `<div class="activity-empty">Nothing here yet — hover, open, or reply to a statement.</div>`;
-                    return;
-                }
-                list.innerHTML = items.slice(0, 150).map(e => `
-              <div class="activity-row" data-type="${e.type}">
-                <span class="activity-dot"></span>
-                <div class="activity-main">
-                  <div class="activity-type">${ACTIVITY_LABELS[e.type] || e.type} · ${escapeHtml(e.authorName || 'Unknown')}${e.tag ? ' · ' + escapeHtml(e.tag) : ''}</div>
-                  <div class="activity-snippet">${escapeHtml((e.snippet || '').slice(0, 90))}</div>
-                </div>
-                <div class="activity-meta">${fmtAgo(e.time)}${e.durationMs != null ? ' · ' + (e.durationMs / 1000).toFixed(1) + 's' : ''}</div>
-              </div>
-            `).join('');
-            }
-
-            function openActivity() {
-                renderActivityLog();
-                document.getElementById('activityOverlay').classList.add('open');
-            }
-
-            function closeActivity() {
-                document.getElementById('activityOverlay').classList.remove('open');
-            }
-
-            // ── Delegated event handling for interactions ────────────
-            const hoverStartMap = new Map();
-
+            // ── Delegated events ─────────────────────────────────────
             function setupDelegatedEvents() {
-                document.addEventListener('pointerenter', (e) => {
-                    const item = closestSafe(e.target, '[data-statement-id]');
-                    if (!item) return;
-                    const panel = closestSafe(item, '.letter-panel.active');
-                    if (!panel) return;
-                    const sid = item.dataset.statementId;
-                    if (!sid) return;
-                    if (hoverStartMap.has(sid)) return;
-                    hoverStartMap.set(sid, Date.now());
-                }, true);
-
-                document.addEventListener('pointerleave', (e) => {
-                    const item = closestSafe(e.target, '[data-statement-id]');
-                    if (!item) return;
-                    const panel = closestSafe(item, '.letter-panel.active');
-                    if (!panel) return;
-                    const sid = item.dataset.statementId;
-                    if (!sid) return;
-                    const start = hoverStartMap.get(sid);
-                    if (start == null) return;
-                    hoverStartMap.delete(sid);
-                    const dwell = Date.now() - start;
-                    if (dwell >= 250) {
-                        logActivity('hover', sid, { durationMs: dwell });
-                    }
-                }, true);
-
                 document.addEventListener('click', (e) => {
                     const item = closestSafe(e.target, '[data-statement-id]');
-                    if (!item) return;
-                    const panel = closestSafe(item, '.letter-panel.active');
-                    if (!panel) return;
-                    const sid = item.dataset.statementId;
-                    if (!sid) return;
-                    e.preventDefault();
-                    openConversation(sid);
-                }, true);
+                    if (item && !closestSafe(e.target, '.action-btn, .edit-inline, .statement-edit-marker a')) {
+                        const panel = closestSafe(item, '.letter-panel.active');
+                        if (!panel) return;
+                        const sid = item.dataset.statementId;
+                        if (sid) {
+                            e.preventDefault();
+                            openConversation(sid);
+                        }
+                    }
+                    const editBtn = closestSafe(e.target, '.action-btn[data-action="edit"]');
+                    if (editBtn) {
+                        e.stopPropagation();
+                        const sid = editBtn.dataset.statementId;
+                        const s = statements.find(st => st.id === sid);
+                        if (s) {
+                            const container = document.getElementById('editFormContainer');
+                            if (container) {
+                                container.innerHTML = '';
+                                initiateEdit(s);
+                            }
+                        }
+                    }
+                    const muteBtn = closestSafe(e.target, '.action-btn[data-action="mute"]');
+                    if (muteBtn) {
+                        e.stopPropagation();
+                        const sid = muteBtn.dataset.statementId;
+                        const s = statements.find(st => st.id === sid);
+                        if (s) toggleMute(s);
+                    }
+                    const attnBtn = closestSafe(e.target, '.action-btn[data-action="attention"]');
+                    if (attnBtn) {
+                        e.stopPropagation();
+                        const sid = attnBtn.dataset.statementId;
+                        const s = statements.find(st => st.id === sid);
+                        if (s) {
+                            const nowIn = toggleAttention('statement', s.id);
+                            attnBtn.classList.toggle('in-attention', nowIn);
+                            renderAttention();
+                        }
+                    }
+                    const histLink = closestSafe(e.target, '.statement-edit-marker a');
+                    if (histLink) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const sid = histLink.dataset.statementId;
+                        const s = statements.find(st => st.id === sid);
+                        if (s && s.editHistory.length) {
+                            alert('Edit history:\n' + s.editHistory.map((h, i) =>
+                                `#${i+1} ${fmtTime(h.timestamp)}\nOLD: ${h.oldText}\nNEW: ${h.newText}`).join(
+                                '\n\n'));
+                        }
+                    }
+                });
 
                 document.addEventListener('contextmenu', (e) => {
                     const item = closestSafe(e.target, '[data-statement-id]');
@@ -3178,7 +3598,7 @@
                     e.preventDefault();
                     e.stopPropagation();
                     openRapidRespond(sid, e.clientX, e.clientY);
-                }, true);
+                });
             }
 
             // ── Rapid Respond ─────────────────────────────────────────
@@ -3235,6 +3655,8 @@
                         document.getElementById('rapidSend').click();
                     }
                 };
+
+                renderRapidChips();
             }
 
             function closeRapidRespond() {
@@ -3263,8 +3685,6 @@
 
                 saveData();
                 renderLetter(activeIndex);
-                logActivity('respond', rapidTarget.statementId, { rapid: true });
-
                 if (modalStatementId === rapidTarget.statementId) {
                     renderModalContent(modalStatementId);
                 }
@@ -3288,8 +3708,58 @@
                 return tagOk && authorOk && discOk;
             }
 
-            function getFiltered(extraTag) {
-                return statements.filter(s => passesFilters(s) && (!extraTag || s.tag === extraTag));
+            function getFiltered(extraTag, includeMuted) {
+                const now = Date.now();
+                return statements.filter(s => {
+                    if (!passesFilters(s)) return false;
+                    if (extraTag && s.tag !== extraTag) return false;
+                    if (!includeMuted && s.muteState === 'muted') return false;
+
+                    // Half-life filter: only include statements that have at least one reply
+                    // within the activity window, sorted by reply count.
+                    if (activityDays > 0) {
+                        const cutoff = now - activityDays * 24 * 60 * 60 * 1000;
+                        // Check if any reply (including nested) is within the window
+                        let hasRecentReply = false;
+                        const checkReplies = (replies) => {
+                            for (let r of replies) {
+                                if (r.time >= cutoff) { hasRecentReply = true; return true; }
+                                if (checkReplies(r.replies)) return true;
+                            }
+                            return false;
+                        };
+                        // Also check the statement itself? No, the statement's own time is not a "reply".
+                        // We only care about replies.
+                        if (!checkReplies(s.replies)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                });
+            }
+
+            function sortByActivity(list) {
+                // Sort by number of replies in the activity window (if activityDays > 0)
+                // Otherwise sort by total reply count, then by time.
+                const now = Date.now();
+                const cutoff = activityDays > 0 ? now - activityDays * 24 * 60 * 60 * 1000 : 0;
+
+                const countRepliesInWindow = (replies) => {
+                    let count = 0;
+                    for (let r of replies) {
+                        if (activityDays === 0 || r.time >= cutoff) count++;
+                        count += countRepliesInWindow(r.replies);
+                    }
+                    return count;
+                };
+
+                return list.sort((a, b) => {
+                    const aCount = activityDays > 0 ? countRepliesInWindow(a.replies) : countReplies(a);
+                    const bCount = activityDays > 0 ? countRepliesInWindow(b.replies) : countReplies(b);
+                    if (aCount !== bCount) return bCount - aCount;
+                    return b.time - a.time;
+                });
             }
 
             function clearFilters() {
@@ -3298,7 +3768,10 @@
                 activeCompanies.clear();
                 activeDisciplines.clear();
                 searchQuery = '';
+                activityDays = 0;
                 document.getElementById('bentoSearch').value = '';
+                document.querySelectorAll('#activityFilterGroup .chip').forEach(c => c.classList.remove('active'));
+                document.querySelector('#activityFilterGroup .chip[data-days="0"]').classList.add('active');
                 renderLetter(activeIndex);
                 updateFilterUI();
             }
@@ -3323,13 +3796,15 @@
             }
 
             function updateFilterUI() {
-                const count = activeTags.size + activePeople.size + activeCompanies.size + activeDisciplines.size + (searchQuery.length > 0 ? 1 : 0);
+                const count = activeTags.size + activePeople.size + activeCompanies.size + activeDisciplines.size + (searchQuery.length > 0 ? 1 : 0) + (activityDays > 0 ?
+                    1 : 0);
                 document.getElementById('filterCount').textContent = count;
                 if (count === 0) {
                     hideFilterToast();
                 } else {
                     const parts = [];
                     if (searchQuery) parts.push(`"${searchQuery}"`);
+                    if (activityDays > 0) parts.push(`${activityDays}d activity`);
                     if (activeTags.size) parts.push(`${activeTags.size} tag${activeTags.size>1?'s':''}`);
                     if (activePeople.size) parts.push(`${activePeople.size} ${activePeople.size>1?'people':'person'}`);
                     if (activeCompanies.size) parts.push(`${activeCompanies.size} compan${activeCompanies.size>1?'ies':'y'}`);
@@ -3342,46 +3817,40 @@
             // ── Conversation modal ───────────────────────────────────
             function openConversation(id) {
                 modalStatementId = id;
-                modalReplyTargetId = id;
-                modalOpenTime = Date.now();
-                modalResponded = false;
-                logActivity('click', id);
+                modalReplyTargetId = null;
                 document.getElementById('conversationModal').classList.add('open');
                 document.body.style.overflow = 'hidden';
                 renderModalContent(id);
             }
 
             function closeConversation() {
-                if (modalStatementId && modalOpenTime != null) {
-                    const elapsed = Date.now() - modalOpenTime;
-                    if (!modalResponded && elapsed < 3000) {
-                        logActivity('abandon', modalStatementId, { durationMs: elapsed });
-                    }
-                }
                 document.getElementById('conversationModal').classList.remove('open');
                 document.body.style.overflow = '';
                 modalStatementId = null;
                 modalReplyTargetId = null;
-                modalOpenTime = null;
-                modalResponded = false;
             }
 
             function renderModalNode(node, statement, depth) {
                 const hasChildren = node.replies.length > 0;
                 const isCollapsed = collapsed.has(node.id);
                 const a = authorById(node.authorId);
-                const wrap = document.createElement('div');
+                const wrap = document.createElement('article');
                 wrap.className = 'modal-node';
                 wrap.dataset.nodeId = node.id;
+                wrap.setAttribute('itemscope', '');
+                wrap.setAttribute('itemtype', 'https://schema.org/CreativeWork');
+                if (statement) wrap.setAttribute('itemprop', 'isPartOf');
 
                 let headHtml =
                     `
               <div class="modal-node-head">
                 ${hasChildren ? `<button class="modal-node-toggle" data-node-id="${node.id}">${isCollapsed ? '[+]' : '[–]'}</button>` : ''}
                 ${avatarHtml(node.authorId,'xs', true)}
-                <span class="modal-node-author" data-author-id="${node.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
+                <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
+                  <span class="modal-node-author" data-author-id="${node.authorId}" itemprop="name">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
+                </address>
                 ${a && a.kind==='company' ? '<span class="co-badge">CO</span>' : ''}
-                <span class="modal-node-time">${fmtTime(node.time)}</span>
+                <time class="modal-node-time" datetime="${new Date(node.time).toISOString()}" itemprop="dateCreated">${fmtTime(node.time)}</time>
                 ${isCollapsed ? `<span style="font-family:var(--font-mono);font-size:8px;color:var(--ink-light);">(${countReplies(node)+1} hidden)</span>` : ''}
               </div>
             `;
@@ -3495,11 +3964,9 @@
                     if (!text || !authorId) return;
                     target.replies.push({ id: uid(), authorId, time: Date.now(), text, replies: [] });
                     modalReplyTargetId = null;
-                    modalResponded = true;
                     saveData();
                     renderModalContent(modalStatementId);
                     renderLetter(activeIndex);
-                    logActivity('respond', modalStatementId, { targetNodeId: target.id });
                 });
 
                 actions.appendChild(cancelBtn);
@@ -3518,22 +3985,26 @@
 
                 let html =
                     `
-              <div class="modal-statement">
+              <article class="modal-statement" itemscope itemtype="https://schema.org/CreativeWork">
                 <div class="card-who">
                   ${avatarHtml(s.authorId,'md', true)}
                   <div>
                     <div class="card-author-row">
-                      <span class="card-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
+                      <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
+                        <span class="card-author" data-author-id="${s.authorId}" itemprop="name">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
+                      </address>
                       ${a && a.kind==='company' ? '<span class="co-badge">CO</span>' : ''}
-                      <span class="card-time">${fmtTime(s.time)}</span>
-                      ${s.tag ? `<span class="card-tag">${escapeHtml(s.tag)}</span>` : ''}
+                      <time class="card-time" datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
+                      ${s.tag ? `<span class="card-tag" itemprop="keywords">${escapeHtml(s.tag)}</span>` : ''}
                     </div>
                     <div class="card-role">${a ? escapeHtml(a.role||'') : ''}</div>
                   </div>
                 </div>
                 ${renderMediaHero(s.mediaUrl)}
-                <div class="card-text">${escapeHtml(s.text)}</div>
-              </div>
+                <div class="card-text" itemprop="text">${escapeHtml(s.text)}</div>
+                ${renderEditMarker(s)}
+                ${renderStatementActions(s, true)}
+              </article>
               <div class="t-micro" style="margin-bottom:10px;">REPLIES (${countReplies(s)})</div>
               <div class="modal-thread" id="modalThread"></div>
               <div class="modal-reply-trigger" id="modalReplyTrigger"></div>
@@ -3596,7 +4067,28 @@
                 }
             }
 
-            // ── Bento card builder ───────────────────────────────────
+            function renderEditMarker(s) {
+                if (s.editState === 'original' || s.editState === 'edited-canonical') return '';
+                const denied = s.editState === 'edit-denied';
+                const label = denied ? 'Edit denied (cosmetic review refused)' : 'Edited';
+                const cls = 'statement-edit-marker' + (denied ? ' denied' : '');
+                return `<div class="${cls}"><span>${label}</span> <a href="#" data-statement-id="${s.id}">view history</a></div>`;
+            }
+
+            function renderStatementActions(s, inModal) {
+                const inAttn = isInAttention('statement', s.id);
+                const muted = s.muteState === 'muted';
+                return `
+                    <div class="statement-actions">
+                        <button class="action-btn" data-action="edit" data-statement-id="${s.id}">✎ Edit</button>
+                        <button class="action-btn ${muted ? 'muted' : ''}" data-action="mute" data-statement-id="${s.id}">${muted ? 'Unmute' : 'Mute'}</button>
+                        <button class="action-btn ${inAttn ? 'in-attention' : ''}" data-action="attention" data-statement-id="${s.id}">${inAttn ? '👁' : '◯'}</button>
+                    </div>
+                    <div id="editFormContainer"></div>
+                `;
+            }
+
+            // ── Bento card builder (semantic) ─────────────────────────
             function buildBentoCard(s, opts = {}) {
                 const a = authorById(s.authorId);
                 const variants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
@@ -3608,10 +4100,12 @@
                     else if (r < 0.3) spans = 'row-span-2';
                 }
 
-                const card = document.createElement('div');
+                const card = document.createElement('article');
                 card.className = ['card', variant, spans].filter(Boolean).join(' ');
                 card.style.animationDelay = opts.static ? '0s' : (Math.random() * 0.2) + 's';
                 card.dataset.statementId = s.id;
+                card.setAttribute('itemscope', '');
+                card.setAttribute('itemtype', 'https://schema.org/CreativeWork');
 
                 const isDark = variant.includes('dark') || variant.includes('mid');
                 const textColor = isDark ? '#fff' : 'var(--ink)';
@@ -3623,17 +4117,24 @@
 
                 card.innerHTML = `
               <div>
-                <div class="label-sm">${escapeHtml(s.tag || 'STATEMENT')}</div>
+                <div class="label-sm" itemprop="keywords">${escapeHtml(s.tag || 'STATEMENT')}</div>
                 <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};display:flex;align-items:center;gap:6px;">
                   ${avatarStr}
-                  <span style="cursor:pointer;" data-author-id="${s.authorId}">${escapeHtml(a ? a.name : 'Unknown')}</span>
+                  <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
+                    <span style="cursor:pointer;" data-author-id="${s.authorId}" itemprop="name">${escapeHtml(a ? a.name : 'Unknown')}</span>
+                  </address>
                 </div>
-                ${a?.role ? `<div class="body-xs" style="color:${lightColor};">${escapeHtml(a.role)}</div>` : ''}
+                ${a?.role ? `<div class="body-xs" style="color:${lightColor};" itemprop="jobTitle">${escapeHtml(a.role)}</div>` : ''}
               </div>
               <div class="mt-auto">
-                <p class="body-sm" style="max-width:30ch;margin-top:0.2rem;color:${bodyColor};">${escapeHtml(s.text)}</p>
-                ${s.mediaUrl ? `<div style="margin-top:0.4rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);max-height:80px;"><img src="${escapeHtml(s.mediaUrl)}" alt="" style="display:block;width:100%;height:auto;object-fit:cover;" loading="lazy" /></div>` : ''}
-                <div class="label-xs" style="margin-top:0.3rem;color:${metaColor};">${fmtTime(s.time)} · ${countReplies(s)} repl${countReplies(s)===1?'y':'ies'}</div>
+                <p class="body-sm" style="max-width:30ch;margin-top:0.2rem;color:${bodyColor};" itemprop="text">${escapeHtml(s.text)}</p>
+                ${s.mediaUrl ? `<div style="margin-top:0.4rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);max-height:80px;" itemprop="image"><img src="${escapeHtml(s.mediaUrl)}" alt="" style="display:block;width:100%;height:auto;object-fit:cover;" loading="lazy" /></div>` : ''}
+                <div class="label-xs" style="margin-top:0.3rem;color:${metaColor};">
+                  <time datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
+                  · ${countReplies(s)} repl${countReplies(s)===1?'y':'ies'}
+                </div>
+                ${renderEditMarker(s)}
+                ${opts.static ? '' : renderStatementActions(s)}
               </div>
               ${isDark ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>` :
               variant.includes('accent') ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>` :
@@ -3671,13 +4172,15 @@
                 return card;
             }
 
-            // ── Item builders ─────────────────────────────────────────
+            // ── Item builders (semantic) ─────────────────────────────
             function buildRow(s, idx) {
                 const a = authorById(s.authorId);
-                const row = document.createElement('div');
+                const row = document.createElement('article');
                 row.className = 'letter-row';
                 row.dataset.id = s.id;
                 row.dataset.statementId = s.id;
+                row.setAttribute('itemscope', '');
+                row.setAttribute('itemtype', 'https://schema.org/CreativeWork');
 
                 const avatarStr = avatarHtml(s.authorId, 'sm', true);
 
@@ -3687,11 +4190,15 @@
               <div class="letter-row-avatar">${avatarStr}</div>
               <div class="letter-row-text-wrap">
                 <div class="letter-row-meta">
-                  <span class="letter-row-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
-                  <span class="letter-row-time">${fmtTime(s.time)}</span>
-                  ${s.tag ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;">${escapeHtml(s.tag)}</span>` : ''}
+                  <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
+                    <span class="letter-row-author" data-author-id="${s.authorId}" itemprop="name">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
+                  </address>
+                  <time class="letter-row-time" datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
+                  ${s.tag ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;" itemprop="keywords">${escapeHtml(s.tag)}</span>` : ''}
                 </div>
-                <div class="letter-row-text">${escapeHtml(s.text)}</div>
+                <div class="letter-row-text" itemprop="text">${escapeHtml(s.text)}</div>
+                ${renderEditMarker(s)}
+                ${renderStatementActions(s)}
               </div>
               <div class="letter-row-marker">
                 ${s.mediaUrl ? renderMediaThumb(s.mediaUrl) : ''}
@@ -3728,10 +4235,12 @@
 
             function buildGridItem(s) {
                 const a = authorById(s.authorId);
-                const item = document.createElement('div');
+                const item = document.createElement('article');
                 item.className = 'grid-item';
                 item.dataset.id = s.id;
                 item.dataset.statementId = s.id;
+                item.setAttribute('itemscope', '');
+                item.setAttribute('itemtype', 'https://schema.org/CreativeWork');
 
                 const avatarStr = avatarHtml(s.authorId, 'sm', true);
 
@@ -3740,15 +4249,19 @@
               <div class="grid-top">
                 ${avatarStr}
                 <div class="grid-meta">
-                  <span class="grid-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
-                  <span class="grid-time">${fmtTime(s.time)}</span>
+                  <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
+                    <span class="grid-author" data-author-id="${s.authorId}" itemprop="name">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
+                  </address>
+                  <time class="grid-time" datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
                 </div>
               </div>
-              ${s.mediaUrl ? `<div class="thumb-grid"><img src="${escapeHtml(s.mediaUrl)}" alt="" loading="lazy" /></div>` : ''}
-              <div class="grid-text">${escapeHtml(s.text)}</div>
+              ${s.mediaUrl ? `<div class="thumb-grid" itemprop="image"><img src="${escapeHtml(s.mediaUrl)}" alt="" loading="lazy" /></div>` : ''}
+              <div class="grid-text" itemprop="text">${escapeHtml(s.text)}</div>
+              ${renderEditMarker(s)}
+              ${renderStatementActions(s)}
               <div class="grid-footer">
                 <span>${countReplies(s)} replies</span>
-                ${s.tag ? `<span class="grid-tag" style="font-family:var(--font-mono);font-size:6px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-light);border:1px solid var(--border);padding:1px 8px;border-radius:var(--radius-sm);">${escapeHtml(s.tag)}</span>` : ''}
+                ${s.tag ? `<span class="grid-tag" style="font-family:var(--font-mono);font-size:6px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-light);border:1px solid var(--border);padding:1px 8px;border-radius:var(--radius-sm);" itemprop="keywords">${escapeHtml(s.tag)}</span>` : ''}
               </div>
             `;
 
@@ -3803,7 +4316,9 @@
 
                 const toolbar = frame.querySelector('.letter-toolbar');
                 const mode = data.viewMode || 'list';
-                const filtered = getFiltered(data.filterTag);
+                const includeMuted = data.includeMuted || false;
+                let filtered = getFiltered(data.filterTag, includeMuted);
+                filtered = sortByActivity(filtered);
 
                 const toggle = toolbar?.querySelector('.view-toggle');
                 if (toggle) {
@@ -3827,7 +4342,7 @@
                         `
                     <div class="empty-letter">
                       <div class="t-micro">NO STATEMENTS</div>
-                      <p>Nothing matches these filters.</p>
+                      <p>Nothing matches these filters${includeMuted ? ' (including muted)' : ''}.</p>
                       <button class="btn ghost small" onclick="window.__clearFilters()" style="margin-top:8px;">Clear filters</button>
                     </div>
                   `;
@@ -3836,12 +4351,18 @@
                     container.className = mode === 'list' ? 'letter-list' : mode === 'grid' ? 'letter-grid' :
                         'letter-bento';
 
+                    if (includeMuted) panel.dataset.archive = 'true';
+                    else panel.dataset.archive = 'false';
+
                     const endIdx = Math.min(PAGE_SIZE, filtered.length);
                     for (let i = 0; i < endIdx; i++) {
                         const s = filtered[i];
                         const idx = String(statements.length - statements.indexOf(s)).padStart(3, '0');
                         const el = mode === 'list' ? buildRow(s, idx) : mode === 'grid' ? buildGridItem(s) :
                             buildBentoCard(s);
+                        if (s.muteState === 'muted') {
+                            el.classList.add('statement-archive-muted');
+                        }
                         container.appendChild(el);
                     }
                     content.appendChild(container);
@@ -3861,6 +4382,7 @@
                                 '0');
                                 const el = mode === 'list' ? buildRow(s, idx) : mode === 'grid' ?
                                     buildGridItem(s) : buildBentoCard(s);
+                                if (s.muteState === 'muted') el.classList.add('statement-archive-muted');
                                 container.appendChild(el);
                             }
                             if (nextBatch >= filtered.length) {
@@ -3886,14 +4408,16 @@
                 });
 
                 updateProgressBar();
+                renderReviewBadge();
             }
 
-            // ── Viewport edge blur (top/bottom fade) + top HUD docking ──
+            // ── Viewport blur etc. ──────────────────────────────────
             function setupViewportBlur() {
                 const top = document.getElementById('viewportBlurTop');
                 const bottom = document.getElementById('viewportBlurBottom');
                 const hudTop = document.getElementById('hudTop');
                 if (!top || !bottom) return;
+
                 function update() {
                     const scrollY = window.scrollY || window.pageYOffset || 0;
                     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -3925,9 +4449,7 @@
                 fill.classList.remove('dim');
 
                 const bar = document.getElementById('scrollProgressBar');
-                if (bar) {
-                    bar.setAttribute('aria-valuenow', String(percent));
-                }
+                if (bar) bar.setAttribute('aria-valuenow', String(percent));
             }
 
             // ── Letter panel building ────────────────────────────────
@@ -4067,7 +4589,8 @@
                 const tag = document.getElementById('c-tag').value.trim().toUpperCase();
                 const mediaUrl = document.getElementById('c-media').value.trim();
                 const text = document.getElementById('c-text').value.trim() || 'Your statement will appear here.';
-                const fakeStatement = { id: 'preview', authorId, tag, mediaUrl, text, time: Date.now(), replies: [] };
+                const fakeStatement = { id: 'preview', authorId, tag, mediaUrl, text, time: Date.now(), replies: [],
+                    editState: 'original', editHistory: [], muteState: 'visible' };
                 const previewVariants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
                 container.innerHTML = '';
                 previewVariants.forEach(variant => {
@@ -4119,10 +4642,8 @@
                     composer.style.left = x + 'px';
                     composer.style.top = y + 'px';
                 });
-                const endDrag = () => {
-                    dragging = false;
-                    composer.classList.remove('dragging');
-                };
+                const endDrag = () => { dragging = false;
+                    composer.classList.remove('dragging'); };
                 header.addEventListener('pointerup', endDrag);
                 header.addEventListener('pointercancel', endDrag);
 
@@ -4140,6 +4661,9 @@
                 document.getElementById('bentoOverlay').classList.add('open');
                 populateBentoChips();
                 document.getElementById('bentoSearch').value = searchQuery;
+                document.querySelectorAll('#activityFilterGroup .chip').forEach(c => {
+                    c.classList.toggle('active', parseInt(c.dataset.days) === activityDays);
+                });
                 document.body.style.overflow = 'hidden';
             }
 
@@ -4284,23 +4808,28 @@
 
                     await loadData();
                     loadAttention();
-                    loadActivity();
-                    updateActivityCount();
+                    loadChips();
+
                     if (new URLSearchParams(location.search).has('reset-demo')) {
                         await resetDemoContent();
                     }
 
                     letterData = [
-                        { title: 'The Feed', deck: 'All statements, unfiltered.', viewMode: 'bento' },
+                        { title: 'The Feed', deck: 'All statements, unfiltered.', viewMode: 'bento',
+                        includeMuted: false },
                         { title: 'Open to Work', deck: 'People looking for their next role.', viewMode: 'list',
-                            filterTag: 'OPEN TO WORK' },
+                            filterTag: 'OPEN TO WORK', includeMuted: false },
                         { title: 'Hiring', deck: 'Companies and teams looking for talent.', viewMode: 'list',
-                            filterTag: 'HIRING' },
-                        { title: 'Thoughts', deck: 'Ideas, observations, provocations.', viewMode: 'grid' }
+                            filterTag: 'HIRING', includeMuted: false },
+                        { title: 'Thoughts', deck: 'Ideas, observations, provocations.', viewMode: 'grid',
+                            includeMuted: false },
+                        { title: 'Archive', deck: 'Muted statements.', viewMode: 'list', includeMuted: true }
                     ];
 
                     renderTrack();
                     renderAttention();
+                    renderChipsUI();
+                    renderRapidChips();
 
                     // ─── HUD controls ─────────────────────────────────────
                     document.getElementById('hudPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
@@ -4325,6 +4854,18 @@
                     document.getElementById('hudNew').addEventListener('click', function() {
                         const c = document.getElementById('composer');
                         c.classList.contains('open') ? closeComposer() : openComposer();
+                    });
+
+                    // Activity filter chips in the modal
+                    document.querySelectorAll('#activityFilterGroup .chip').forEach(chip => {
+                        chip.addEventListener('click', () => {
+                            document.querySelectorAll('#activityFilterGroup .chip').forEach(c => c.classList
+                                .remove('active'));
+                            chip.classList.add('active');
+                            activityDays = parseInt(chip.dataset.days);
+                            renderLetter(activeIndex);
+                            updateFilterUI();
+                        });
                     });
 
                     let settleTimer = null;
@@ -4392,8 +4933,11 @@
                                 closeConversation();
                             if (document.getElementById('bentoOverlay').classList.contains('open'))
                                 closeBento();
-                            if (document.getElementById('activityOverlay').classList.contains('open'))
-                                closeActivity();
+                            if (document.getElementById('reviewOverlay').classList.contains('open'))
+                                closeReviewModal();
+                            if (document.getElementById('chipsOverlay').classList.contains('open')) {
+                                document.getElementById('chipsOverlay').classList.remove('open');
+                            }
                             document.getElementById('attentionDropdown').classList.remove('open');
                             closeRapidRespond();
                         }
@@ -4412,8 +4956,18 @@
                         const mediaUrl = document.getElementById('c-media').value.trim();
                         const text = document.getElementById('c-text').value.trim();
                         if (!text || !authorId) return;
-                        statements.unshift({ id: uid(), authorId, time: Date.now(), tag, text, mediaUrl,
-                            replies: [] });
+                        statements.unshift({
+                            id: uid(),
+                            authorId,
+                            time: Date.now(),
+                            tag,
+                            text,
+                            mediaUrl,
+                            replies: [],
+                            editState: 'original',
+                            editHistory: [],
+                            muteState: 'visible'
+                        });
                         saveData();
                         closeComposer();
                         renderLetter(activeIndex);
@@ -4468,34 +5022,11 @@
                         if (e.target === e.currentTarget) closeConversation();
                     });
 
-                    document.getElementById('activityToggleBtn').addEventListener('click', openActivity);
-                    document.getElementById('activityClose').addEventListener('click', closeActivity);
-                    document.getElementById('activityOverlay').addEventListener('click', (e) => {
-                        if (e.target === e.currentTarget) closeActivity();
-                    });
-                    document.getElementById('activityClear').addEventListener('click', () => {
-                        if (!confirm('Clear the activity log? This cannot be undone.')) return;
-                        activityLog = [];
-                        saveActivityLog();
-                        updateActivityCount();
-                        renderActivityLog();
-                    });
-                    document.querySelectorAll('#activityFilterChips .chip').forEach(chip => {
-                        chip.addEventListener('click', () => {
-                            document.querySelectorAll('#activityFilterChips .chip').forEach(c => c.classList.remove('active'));
-                            chip.classList.add('active');
-                            activityFilter = chip.dataset.atype;
-                            renderActivityLog();
-                        });
-                    });
-
-                    // Profile modal
                     document.getElementById('profileModalClose').addEventListener('click', closeProfileModal);
                     document.getElementById('profileModal').addEventListener('click', (e) => {
                         if (e.target === e.currentTarget) closeProfileModal();
                     });
 
-                    // Rapid Respond
                     document.getElementById('rapidClose').addEventListener('click', closeRapidRespond);
                     document.getElementById('rapidSend').addEventListener('click', submitRapidReply);
                     document.addEventListener('click', (e) => {
@@ -4507,8 +5038,46 @@
                     document.addEventListener('keydown', (e) => {
                         if (e.key === 'Escape') closeRapidRespond();
                     });
-
                     document.getElementById('rapidText').addEventListener('click', (e) => e.stopPropagation());
+
+                    document.getElementById('reviewToggleBtn').addEventListener('click', openReviewModal);
+                    document.getElementById('reviewClose').addEventListener('click', closeReviewModal);
+                    document.getElementById('reviewOverlay').addEventListener('click', (e) => {
+                        if (e.target === e.currentTarget) closeReviewModal();
+                    });
+
+                    document.getElementById('chipsToggleBtn').addEventListener('click', () => {
+                        const overlay = document.getElementById('chipsOverlay');
+                        overlay.classList.toggle('open');
+                        if (overlay.classList.contains('open')) {
+                            renderChipsUI();
+                            document.body.style.overflow = 'hidden';
+                        } else {
+                            document.body.style.overflow = '';
+                        }
+                    });
+                    document.getElementById('chipsClose').addEventListener('click', () => {
+                        document.getElementById('chipsOverlay').classList.remove('open');
+                        document.body.style.overflow = '';
+                    });
+                    document.getElementById('chipsOverlay').addEventListener('click', (e) => {
+                        if (e.target === e.currentTarget) {
+                            document.getElementById('chipsOverlay').classList.remove('open');
+                            document.body.style.overflow = '';
+                        }
+                    });
+                    document.getElementById('chipAddBtn').addEventListener('click', () => {
+                        const input = document.getElementById('chipAddInput');
+                        const text = input.value.trim();
+                        if (text) {
+                            addChip(text);
+                            input.value = '';
+                            renderChipsUI();
+                        }
+                    });
+                    document.getElementById('chipAddInput').addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') document.getElementById('chipAddBtn').click();
+                    });
 
                     setTimeout(updateProgressBar, 100);
                     renderLetter(0);
@@ -4518,7 +5087,7 @@
             });
         })();
 
-        // ── custom cursor ─────────────────────────────────────────────
+        // ── custom cursor (FIXED) ─────────────────────────────────────
         (function initWriteCursor() {
             const writeCursorDot = document.getElementById('writeCursorDot');
             const writeCursorEllipse = document.getElementById('writeCursorEllipse');
