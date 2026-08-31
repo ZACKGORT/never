@@ -142,9 +142,7 @@
             width: 100%;
         }
 
-        /* ── viewport edge blur — replaces the topbar's solid bar; content
-           fades/blurs as it scrolls under the very top and very bottom
-           edges of the screen instead of hitting a hard frame ── */
+        /* ── viewport edge blur ── */
         .viewport-blur {
             position: fixed;
             left: 0;
@@ -254,7 +252,7 @@
         }
         .logo-card-home { width: 100%; }
 
-        /* ── topbar right: appearance + attention ── */
+        /* ── topbar right ── */
         .topbar-right {
             display: flex;
             align-items: center;
@@ -435,7 +433,6 @@
         .attention-item .item-avatar.v1 { background: var(--bg); color: var(--ink); }
         .attention-item .item-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: var(--accent-2); }
         .attention-item .item-avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .attention-item .item-avatar.company { position: relative; }
         .attention-item .item-avatar.company::after {
             content: '';
             position: absolute;
@@ -658,6 +655,66 @@
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.02);
             transform: translateY(-2px);
         }
+        .letter-bento .card.muted-card {
+            opacity: 0.4;
+            filter: grayscale(0.6);
+            border-color: var(--ink-lighter);
+        }
+        .letter-bento .card.muted-card:hover {
+            transform: none;
+            box-shadow: var(--shadow);
+        }
+        .letter-bento .card .mute-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-family: var(--font-mono);
+            font-size: 6px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            opacity: 0.6;
+        }
+        .letter-bento .card .action-btns {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            display: flex;
+            gap: 3px;
+            opacity: 0;
+            transition: opacity .2s ease;
+        }
+        .letter-bento .card:hover .action-btns,
+        .letter-bento .card:focus-within .action-btns {
+            opacity: 1;
+        }
+        .letter-bento .card .action-btns .btn {
+            padding: 2px 6px;
+            font-size: 6px;
+            min-height: 18px;
+            border-radius: var(--radius-sm);
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--ink-light);
+            cursor: pointer;
+            line-height: 1;
+        }
+        .letter-bento .card .action-btns .btn:hover {
+            background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink);
+        }
+        .letter-bento .card .action-btns .btn.muted {
+            background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink);
+            opacity: 0.7;
+        }
+
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
@@ -760,6 +817,57 @@
             position: relative;
         }
         .letter-row:hover { background: rgba(0, 0, 0, 0.02); }
+        .letter-row.muted-row {
+            opacity: 0.4;
+            filter: grayscale(0.6);
+        }
+        .letter-row .row-actions {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            opacity: 0;
+            transition: opacity .2s ease;
+        }
+        .letter-row:hover .row-actions,
+        .letter-row:focus-within .row-actions {
+            opacity: 1;
+        }
+        .letter-row .row-actions .btn {
+            padding: 2px 6px;
+            font-size: 6px;
+            min-height: 18px;
+            border-radius: var(--radius-sm);
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--ink-light);
+            cursor: pointer;
+            line-height: 1;
+        }
+        .letter-row .row-actions .btn:hover {
+            background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink);
+        }
+        .letter-row .row-actions .btn.muted {
+            background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink);
+            opacity: 0.7;
+        }
+        .letter-row .mute-badge {
+            font-family: var(--font-mono);
+            font-size: 6px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            opacity: 0.6;
+            margin-right: 4px;
+        }
+
         .letter-row-idx { font-family: var(--font-mono); font-size: 9px; color: var(--ink-light); padding-top: 2px; }
         .letter-row-avatar .avatar { width: 28px; height: 28px; font-size: 9px; cursor: pointer; }
         .letter-row-text-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -772,7 +880,6 @@
             letter-spacing: 0.02em;
             text-transform: uppercase;
             color: var(--ink);
-            /* No truncation: full name visible */
             overflow: visible;
             white-space: normal;
             max-width: none;
@@ -839,6 +946,61 @@
             position: relative;
         }
         .letter-grid .grid-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .letter-grid .grid-item.muted-grid {
+            opacity: 0.4;
+            filter: grayscale(0.6);
+        }
+        .letter-grid .grid-item .grid-actions {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            display: flex;
+            gap: 3px;
+            opacity: 0;
+            transition: opacity .2s ease;
+        }
+        .letter-grid .grid-item:hover .grid-actions,
+        .letter-grid .grid-item:focus-within .grid-actions {
+            opacity: 1;
+        }
+        .letter-grid .grid-item .grid-actions .btn {
+            padding: 2px 6px;
+            font-size: 6px;
+            min-height: 18px;
+            border-radius: var(--radius-sm);
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--ink-light);
+            cursor: pointer;
+            line-height: 1;
+        }
+        .letter-grid .grid-item .grid-actions .btn:hover {
+            background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink);
+        }
+        .letter-grid .grid-item .grid-actions .btn.muted {
+            background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink);
+            opacity: 0.7;
+        }
+        .letter-grid .grid-item .mute-badge {
+            font-family: var(--font-mono);
+            font-size: 6px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            background: var(--bg);
+            padding: 1px 6px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            opacity: 0.6;
+            position: absolute;
+            top: 6px;
+            left: 6px;
+        }
+
         .letter-grid .grid-item .grid-top { display: flex; align-items: center; gap: 10px; }
         .letter-grid .grid-item .grid-top .avatar { width: 32px; height: 32px; font-size: 10px; cursor: pointer; }
         .letter-grid .grid-item .grid-meta { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
@@ -1305,11 +1467,8 @@
                 background: rgba(255, 255, 255, 0.08);
             }
         }
+
         /* ── Bento Filter Modal ── */
-        /* ── Bento Filter Modal ── */
-        /* Standard modal size, shared by the filter and activity overlays.
-           Mobile: full-screen for maximum tap-target room.
-           640px+: a centered medium-large modal card. */
         .bento-overlay {
             position: fixed;
             inset: 0;
@@ -1649,7 +1808,6 @@
             .letter-row { grid-template-columns: 20px 28px 1fr auto; gap: 8px; padding: 10px 0; }
             .letter-row-author {
                 font-size: calc(var(--fs-body) * 0.7);
-                /* remove truncation overrides */
                 max-width: none;
                 white-space: normal;
                 overflow: visible;
@@ -1794,6 +1952,61 @@
             color: var(--ink);
         }
         .modal-statement .card-who .avatar { cursor: pointer; }
+        .modal-statement .edited-badge {
+            font-family: var(--font-mono);
+            font-size: 7px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            background: var(--bg);
+            padding: 1px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            display: inline-block;
+        }
+        .modal-statement .edit-history {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-size: calc(var(--fs-body) * 0.8);
+            color: var(--ink-mid);
+        }
+        .modal-statement .edit-history .edit-entry {
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            font-size: calc(var(--fs-body) * 0.75);
+        }
+        .modal-statement .edit-history .edit-entry:last-child { border-bottom: none; }
+        .modal-statement .edit-history .edit-time {
+            font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .modal-statement .edit-history .edit-text {
+            color: var(--ink-mid);
+            font-style: italic;
+        }
+        .modal-statement .edit-form {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .modal-statement .edit-form textarea {
+            min-height: 60px;
+            width: 100%;
+        }
+        .modal-statement .edit-form .edit-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
 
         .modal-thread { display: flex; flex-direction: column; margin-top: 6px; }
         .modal-node {
@@ -1869,7 +2082,7 @@
             .scroll-progress-bar { bottom: env(safe-area-inset-bottom, 0); }
         }
 
-        /* ── custom cursor ── */
+        /* ── custom cursor (disabled on touch) ── */
         body.custom-cursor-active { cursor: none; }
         .write-cursor-dot,
         .write-cursor-ellipse {
@@ -1904,6 +2117,10 @@
         body.custom-cursor-active.write-native-cursor { cursor: auto; }
         .write-native-cursor .write-cursor-dot,
         .write-native-cursor .write-cursor-ellipse { opacity: 0 !important; }
+        /* disable custom cursor on touch devices */
+        body.touch-device .write-cursor-dot,
+        body.touch-device .write-cursor-ellipse { display: none !important; }
+        body.touch-device.custom-cursor-active { cursor: auto; }
 
         /* ── click hotspots ── */
         .letter-hotspot {
@@ -2150,6 +2367,50 @@
             .rapid-respond .rapid-input-wrap textarea { font-size: calc(var(--fs-body) * 0.8); min-height: 30px; }
             .rapid-respond .rapid-input-wrap .rapid-send { font-size: 6px; padding: 4px 10px; min-height: 30px; }
         }
+
+        /* ── filter modal: show muted toggle ── */
+        .muted-toggle-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+        }
+        .muted-toggle-wrap .toggle-label {
+            font-family: var(--font-mono);
+            font-size: 8px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+        }
+        .toggle-switch {
+            position: relative;
+            width: 36px;
+            height: 20px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background .2s ease, border-color .2s ease;
+            flex-shrink: 0;
+        }
+        .toggle-switch.active {
+            background: var(--ink);
+            border-color: var(--ink);
+        }
+        .toggle-switch .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            background: var(--card);
+            border-radius: 50%;
+            transition: transform .2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(16px);
+        }
     </style>
 </head>
 <body data-scale="l" data-font="satoshi">
@@ -2163,7 +2424,7 @@
         <div class="scroll-progress-fill" id="scrollProgressFill"></div>
     </div>
 
-    <!-- ─── VIEWPORT EDGE BLUR (top/bottom fade, topbar itself is frameless) ─── -->
+    <!-- ─── VIEWPORT EDGE BLUR ─── -->
     <div class="viewport-blur viewport-blur-top" id="viewportBlurTop" aria-hidden="true"></div>
     <div class="viewport-blur viewport-blur-bottom" id="viewportBlurBottom" aria-hidden="true"></div>
 
@@ -2202,7 +2463,7 @@
         </div>
     </div>
 
-    <!-- ─── TOP HUD (navigation + view) ─── -->
+    <!-- ─── TOP HUD ─── -->
     <div class="hud hud-top" id="hudTop">
         <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
         <button class="btn btn-icon" id="hudNext" title="Next">›</button>
@@ -2216,7 +2477,7 @@
     </div>
 
     <div class="wrap">
-        <!-- ─── COMPOSER (floating, draggable) ─── -->
+        <!-- ─── COMPOSER ─── -->
         <div class="composer" id="composer">
             <div class="composer-header" id="composerHeader">
                 <span class="composer-title"><span class="grip">⠿⠿</span> New statement</span>
@@ -2262,9 +2523,8 @@
         </div>
     </div>
 
-    <!-- ─── BOTTOM HUD (filters + activity + new) ─── -->
+    <!-- ─── BOTTOM HUD ─── -->
     <div class="hud hud-bottom" id="hud">
-        <!-- Filter -->
         <button class="btn" id="filterToggleBtn">
             <span>Filters</span>
             <span class="filter-count" id="filterCount">0</span>
@@ -2273,7 +2533,6 @@
 
         <div class="hud-divider"></div>
 
-        <!-- Activity -->
         <button class="btn" id="activityToggleBtn">
             <span>Activity</span>
             <span class="filter-count" id="activityCount">0</span>
@@ -2281,11 +2540,10 @@
 
         <div class="hud-divider"></div>
 
-        <!-- New -->
         <button class="btn btn-primary" id="hudNew">+ New</button>
     </div>
 
-    <!-- ─── FILTER TOAST (dismissable, auto-timeout) ─── -->
+    <!-- ─── FILTER TOAST ─── -->
     <div class="filter-toast" id="filterToast" role="status" aria-live="polite">
         <span class="filter-toast-text" id="filterToastText"></span>
         <button class="filter-toast-dismiss" id="filterToastDismiss" aria-label="Dismiss">✕</button>
@@ -2301,6 +2559,14 @@
             <div class="bento-grid">
                 <div class="bento-card bento-card-full">
                     <input type="text" id="bentoSearch" placeholder="Search statements or authors…" />
+                </div>
+                <div class="bento-card bento-card-full">
+                    <div class="muted-toggle-wrap">
+                        <span class="toggle-label">Show muted</span>
+                        <div class="toggle-switch" id="showMutedToggle" role="button" tabindex="0" aria-label="Toggle show muted statements">
+                            <span class="toggle-knob"></span>
+                        </div>
+                    </div>
                 </div>
                 <div class="bento-card bento-card-half" id="bentoTags">
                     <h4>Tags</h4>
@@ -2386,9 +2652,10 @@
             'use strict';
 
             // ── Constants ─────────────────────────────────────────────
-            const STORAGE_KEY = 'neverever-statements-v9';
+            const STORAGE_KEY = 'neverever-statements-v10';
             const ATTENTION_KEY = 'neverever-attention-v1';
             const ACTIVITY_KEY = 'neverever-activity-v1';
+            const MUTED_KEY = 'neverever-muted-v1';
             const PAGE_SIZE = 12;
             const MAX_ATTENTION = 20;
             const AVIF_IMAGES = [
@@ -2414,10 +2681,10 @@
             const isVideo = url => /\.(mp4|webm|mov)(\?|$)/i.test(url);
             const escapeHtml = s => (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;',
                 '"': '&quot;', "'": '&#39;' } [c]));
-            // Some event targets (text nodes, or exotic targets from native form
-            // controls) don't implement .closest — guard every lookup through this.
-            const closestSafe = (node, selector) => (node && node.nodeType === 1 && node.closest) ?
-                node.closest(selector) : null;
+
+            function closestSafe(node, selector) {
+                return (node && node.nodeType === 1 && node.closest) ? node.closest(selector) : null;
+            }
 
             function fmtTime(ts) {
                 const d = new Date(ts),
@@ -2540,7 +2807,7 @@
                 const authorById = id => authorsList.find(a => a.id === id);
                 const result = [];
 
-                // ── job listings, hand-written per company ─────────────
+                // ── job listings ──
                 const JOB_LISTINGS = {
                     'studio-north': [
                         'Studio North is hiring a Senior Product Designer. Remote-first, occasional NYC. $140k–$175k. Send a portfolio, not a resume.',
@@ -2592,7 +2859,7 @@
                     ]
                 };
 
-                // ── open-to-work, one per person, tailored to their role ─
+                // ── open-to-work ──
                 const OPEN_TO_WORK = {
                     zack: 'Looking for staff-level product work. Six years freelance, shipped 20+ products.',
                     maya: 'Ex-agency Creative Director, open to in-house roles. I don\'t want to pitch anymore, I want to build one thing.',
@@ -2614,7 +2881,7 @@
                     dara: 'UX Researcher, eight years, mostly qualitative. Looking for a role where research drives decisions, not just decks.'
                 };
 
-                // ── general pool: thoughts, career, brand, community, leadership ─
+                // ── general pool ──
                 const GENERAL = [
                     { tag: 'CAREER', text: 'Left my agency job today. No regrets yet — ask me in a month.' },
                     { tag: 'CAREER', text: 'A staff title means nothing if the team around it is broken.' },
@@ -2655,7 +2922,9 @@
                         tag,
                         text,
                         mediaUrl: Math.random() < (mediaChance != null ? mediaChance : 0.35) ? randAVIF() : '',
-                        replies: []
+                        replies: [],
+                        editHistory: [],
+                        editedAt: null
                     });
                     return result[result.length - 1];
                 }
@@ -2674,7 +2943,7 @@
                     push(a.id, g.tag, g.text, Math.random() * 14 * day, 0.4);
                 }
 
-                // ── active conversations: attach nested reply threads ────
+                // ── replies ──
                 const REPLY_TEXTS = [
                     'This resonates. We hit the same wall last quarter.',
                     'Strong disagree — but I like where your head\'s at.',
@@ -2720,14 +2989,12 @@
                     }];
                 }
 
-                // Every thread gets at least one reply. Counts are weighted
-                // so most threads are light-to-medium, a handful run long.
                 function pickReplyCount() {
                     const r = Math.random();
-                    if (r < 0.3) return 1 + Math.floor(Math.random() * 2); // 1–2
-                    if (r < 0.7) return 3 + Math.floor(Math.random() * 3); // 3–5
-                    if (r < 0.92) return 6 + Math.floor(Math.random() * 5); // 6–10
-                    return 11 + Math.floor(Math.random() * 8); // 11–18
+                    if (r < 0.3) return 1 + Math.floor(Math.random() * 2);
+                    if (r < 0.7) return 3 + Math.floor(Math.random() * 3);
+                    if (r < 0.92) return 6 + Math.floor(Math.random() * 5);
+                    return 11 + Math.floor(Math.random() * 8);
                 }
 
                 function makeTopLevelReplies(parentTime, excludeId) {
@@ -2779,9 +3046,41 @@
             const activeCompanies = new Set();
             const activeDisciplines = new Set();
             let searchQuery = '';
+            let showMuted = false;
 
-            // ── Rapid Respond State ──────────────────────────────────
-            let rapidTarget = null;
+            // ── Muting ────────────────────────────────────────────────
+            let mutedSet = new Set();
+
+            function loadMuted() {
+                try {
+                    const raw = localStorage.getItem(MUTED_KEY);
+                    if (raw) {
+                        const arr = JSON.parse(raw);
+                        mutedSet = new Set(arr);
+                    } else {
+                        mutedSet = new Set();
+                    }
+                } catch (e) { mutedSet = new Set(); }
+            }
+
+            function saveMuted() {
+                try {
+                    localStorage.setItem(MUTED_KEY, JSON.stringify(Array.from(mutedSet)));
+                } catch (e) {}
+            }
+
+            function isMuted(id) { return mutedSet.has(id); }
+
+            function toggleMute(id) {
+                if (mutedSet.has(id)) {
+                    mutedSet.delete(id);
+                } else {
+                    mutedSet.add(id);
+                }
+                saveMuted();
+                renderLetter(activeIndex);
+                updateFilterUI();
+            }
 
             // ── Attention ─────────────────────────────────────────────
             let attentionItems = [];
@@ -2977,6 +3276,8 @@
                         if (parsed.authors?.length && parsed.statements?.length) {
                             authors = parsed.authors;
                             statements = parsed.statements;
+                            // ensure editHistory exists on each statement
+                            statements.forEach(s => { if (!s.editHistory) s.editHistory = []; });
                             return;
                         }
                     }
@@ -3009,15 +3310,19 @@
                 saveInFlight = false;
             }
 
-            // ── DEV: reset ──
+            // ── Reset ──
             async function resetDemoContent() {
                 try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
                 try { localStorage.removeItem(ATTENTION_KEY); } catch (e) {}
+                try { localStorage.removeItem(MUTED_KEY); } catch (e) {}
                 authors = seedAuthors();
                 statements = seedStatements(authors);
+                statements.forEach(s => { if (!s.editHistory) s.editHistory = []; });
                 await saveData();
                 attentionItems = [];
                 saveAttention();
+                mutedSet = new Set();
+                saveMuted();
                 activityLog = [];
                 saveActivityLog();
                 updateActivityCount();
@@ -3051,7 +3356,6 @@
                 if (el) el.textContent = String(activityLog.length);
             }
 
-            // ── Performance: batched activity logging ──────────────
             let logQueue = [];
             let logScheduled = false;
 
@@ -3126,7 +3430,7 @@
                 document.getElementById('activityOverlay').classList.remove('open');
             }
 
-            // ── Delegated event handling for interactions ────────────
+            // ── Delegated events ──────────────────────────────────────
             const hoverStartMap = new Map();
 
             function setupDelegatedEvents() {
@@ -3158,6 +3462,20 @@
                 }, true);
 
                 document.addEventListener('click', (e) => {
+                    // check if click is on a mute/edit button
+                    const muteBtn = closestSafe(e.target, '[data-mute-id]');
+                    if (muteBtn) {
+                        e.stopPropagation();
+                        toggleMute(muteBtn.dataset.muteId);
+                        return;
+                    }
+                    const editBtn = closestSafe(e.target, '[data-edit-id]');
+                    if (editBtn) {
+                        e.stopPropagation();
+                        const sid = editBtn.dataset.editId;
+                        if (sid) startEditing(sid);
+                        return;
+                    }
                     const item = closestSafe(e.target, '[data-statement-id]');
                     if (!item) return;
                     const panel = closestSafe(item, '.letter-panel.active');
@@ -3181,7 +3499,42 @@
                 }, true);
             }
 
+            // ── Editing ──────────────────────────────────────────────
+            let editingStatementId = null;
+
+            function startEditing(statementId) {
+                const s = statements.find(st => st.id === statementId);
+                if (!s) return;
+                // Check if the current user is the author — in this demo, we allow editing by anyone
+                // but in practice you'd check auth. We'll allow it for demo purposes.
+                editingStatementId = statementId;
+                renderModalContent(statementId);
+            }
+
+            function submitEdit(statementId, newText) {
+                const s = statements.find(st => st.id === statementId);
+                if (!s || !newText.trim()) return;
+                // Save current text to history
+                if (s.text !== newText.trim()) {
+                    if (!s.editHistory) s.editHistory = [];
+                    s.editHistory.push({ time: Date.now(), text: s.text });
+                    s.text = newText.trim();
+                    s.editedAt = Date.now();
+                    saveData();
+                    renderLetter(activeIndex);
+                    if (modalStatementId === statementId) renderModalContent(statementId);
+                }
+                editingStatementId = null;
+            }
+
+            function cancelEdit() {
+                editingStatementId = null;
+                if (modalStatementId) renderModalContent(modalStatementId);
+            }
+
             // ── Rapid Respond ─────────────────────────────────────────
+            let rapidTarget = null;
+
             function openRapidRespond(statementId, x, y) {
                 const s = statements.find(st => st.id === statementId);
                 if (!s) return;
@@ -3276,6 +3629,8 @@
             function passesFilters(s) {
                 const a = authorById(s.authorId);
                 if (!a) return false;
+                // Muting: if muted and not showing muted, skip
+                if (isMuted(s.id) && !showMuted) return false;
                 if (searchQuery) {
                     const q = searchQuery.toLowerCase();
                     if (!s.text.toLowerCase().includes(q) && !a.name.toLowerCase().includes(q) && !(s.tag && s.tag
@@ -3364,6 +3719,7 @@
                 modalReplyTargetId = null;
                 modalOpenTime = null;
                 modalResponded = false;
+                editingStatementId = null;
             }
 
             function renderModalNode(node, statement, depth) {
@@ -3515,6 +3871,8 @@
                 if (!s) return;
                 const container = document.getElementById('modalContent');
                 const a = authorById(s.authorId);
+                const isEditing = editingStatementId === s.id;
+                const hasEdits = s.editHistory && s.editHistory.length > 0;
 
                 let html =
                     `
@@ -3527,12 +3885,40 @@
                       ${a && a.kind==='company' ? '<span class="co-badge">CO</span>' : ''}
                       <span class="card-time">${fmtTime(s.time)}</span>
                       ${s.tag ? `<span class="card-tag">${escapeHtml(s.tag)}</span>` : ''}
+                      ${s.editedAt ? `<span class="edited-badge">edited</span>` : ''}
                     </div>
                     <div class="card-role">${a ? escapeHtml(a.role||'') : ''}</div>
                   </div>
                 </div>
                 ${renderMediaHero(s.mediaUrl)}
-                <div class="card-text">${escapeHtml(s.text)}</div>
+                ${isEditing ? `
+                  <div class="edit-form">
+                    <textarea id="editTextarea">${escapeHtml(s.text)}</textarea>
+                    <div class="edit-actions">
+                      <button class="btn ghost small" id="editCancel">Cancel</button>
+                      <button class="btn btn-primary small" id="editSave">Save</button>
+                    </div>
+                  </div>
+                ` : `
+                  <div class="card-text">${escapeHtml(s.text)}</div>
+                `}
+                ${!isEditing && hasEdits ? `
+                  <div class="edit-history">
+                    <div class="t-micro" style="margin-bottom:4px;">Edit history</div>
+                    ${s.editHistory.map(e => `
+                      <div class="edit-entry">
+                        <span class="edit-time">${fmtTime(e.time)}</span>
+                        <span class="edit-text">${escapeHtml(e.text)}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                ` : ''}
+                ${!isEditing ? `
+                  <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="btn small" id="editStmtBtn" data-edit-id="${s.id}">✎ Edit</button>
+                    <button class="btn small ${isMuted(s.id) ? 'active' : ''}" id="muteStmtBtn" data-mute-id="${s.id}">${isMuted(s.id) ? 'UNMUTE' : 'MUTE'}</button>
+                  </div>
+                ` : ''}
               </div>
               <div class="t-micro" style="margin-bottom:10px;">REPLIES (${countReplies(s)})</div>
               <div class="modal-thread" id="modalThread"></div>
@@ -3540,6 +3926,52 @@
             `;
 
                 container.innerHTML = html;
+
+                // Wire up edit and mute buttons
+                const editBtn = document.getElementById('editStmtBtn');
+                if (editBtn) {
+                    editBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const sid = editBtn.dataset.editId;
+                        if (sid) startEditing(sid);
+                    });
+                }
+                const muteBtn = document.getElementById('muteStmtBtn');
+                if (muteBtn) {
+                    muteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const sid = muteBtn.dataset.muteId;
+                        if (sid) {
+                            toggleMute(sid);
+                            muteBtn.textContent = isMuted(sid) ? 'UNMUTE' : 'MUTE';
+                            muteBtn.classList.toggle('active', isMuted(sid));
+                            // re-render the main view
+                            renderLetter(activeIndex);
+                            updateFilterUI();
+                        }
+                    });
+                }
+
+                // Edit form handlers
+                if (isEditing) {
+                    const saveBtn = document.getElementById('editSave');
+                    const cancelBtn = document.getElementById('editCancel');
+                    const ta = document.getElementById('editTextarea');
+                    if (saveBtn) {
+                        saveBtn.addEventListener('click', () => {
+                            if (ta) submitEdit(s.id, ta.value);
+                        });
+                    }
+                    if (cancelBtn) {
+                        cancelBtn.addEventListener('click', cancelEdit);
+                    }
+                    if (ta) {
+                        ta.addEventListener('keydown', (e) => {
+                            if (e.key === 'Escape') cancelEdit();
+                            if (e.key === 'Enter' && e.metaKey) submitEdit(s.id, ta.value);
+                        });
+                    }
+                }
 
                 const stmtEl = container.querySelector('.modal-statement');
                 if (stmtEl) {
@@ -3609,7 +4041,9 @@
                 }
 
                 const card = document.createElement('div');
-                card.className = ['card', variant, spans].filter(Boolean).join(' ');
+                const cls = ['card', variant, spans].filter(Boolean).join(' ');
+                card.className = cls;
+                if (isMuted(s.id)) card.classList.add('muted-card');
                 card.style.animationDelay = opts.static ? '0s' : (Math.random() * 0.2) + 's';
                 card.dataset.statementId = s.id;
 
@@ -3620,10 +4054,11 @@
                 const metaColor = isDark ? 'rgba(255,255,255,0.4)' : 'var(--ink-light)';
 
                 const avatarStr = avatarHtml(s.authorId, 'sm', true);
+                const hasEdits = s.editHistory && s.editHistory.length > 0;
 
                 card.innerHTML = `
               <div>
-                <div class="label-sm">${escapeHtml(s.tag || 'STATEMENT')}</div>
+                <div class="label-sm">${escapeHtml(s.tag || 'STATEMENT')}${hasEdits ? ' · edited' : ''}</div>
                 <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};display:flex;align-items:center;gap:6px;">
                   ${avatarStr}
                   <span style="cursor:pointer;" data-author-id="${s.authorId}">${escapeHtml(a ? a.name : 'Unknown')}</span>
@@ -3638,6 +4073,11 @@
               ${isDark ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>` :
               variant.includes('accent') ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>` :
               `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
+              <div class="action-btns">
+                <button class="btn ${isMuted(s.id) ? 'muted' : ''}" data-mute-id="${s.id}" title="${isMuted(s.id) ? 'Unmute' : 'Mute'}">${isMuted(s.id) ? '⊘' : '⊘'}</button>
+                <button class="btn" data-edit-id="${s.id}" title="Edit">✎</button>
+              </div>
+              ${isMuted(s.id) ? '<span class="mute-badge">muted</span>' : ''}
             `;
 
                 if (!opts.static) {
@@ -3664,6 +4104,7 @@
                             }
                         });
                     }
+                    // Mute and edit buttons are handled by delegation
                 } else {
                     card.style.cursor = 'default';
                 }
@@ -3676,10 +4117,12 @@
                 const a = authorById(s.authorId);
                 const row = document.createElement('div');
                 row.className = 'letter-row';
+                if (isMuted(s.id)) row.classList.add('muted-row');
                 row.dataset.id = s.id;
                 row.dataset.statementId = s.id;
 
                 const avatarStr = avatarHtml(s.authorId, 'sm', true);
+                const hasEdits = s.editHistory && s.editHistory.length > 0;
 
                 row.innerHTML =
                     `
@@ -3690,12 +4133,18 @@
                   <span class="letter-row-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
                   <span class="letter-row-time">${fmtTime(s.time)}</span>
                   ${s.tag ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;">${escapeHtml(s.tag)}</span>` : ''}
+                  ${hasEdits ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;">edited</span>` : ''}
+                  ${isMuted(s.id) ? '<span class="mute-badge">muted</span>' : ''}
                 </div>
                 <div class="letter-row-text">${escapeHtml(s.text)}</div>
               </div>
               <div class="letter-row-marker">
                 ${s.mediaUrl ? renderMediaThumb(s.mediaUrl) : ''}
                 ${countReplies(s)} replies
+                <span class="row-actions">
+                  <button class="btn ${isMuted(s.id) ? 'muted' : ''}" data-mute-id="${s.id}" title="${isMuted(s.id) ? 'Unmute' : 'Mute'}">⊘</button>
+                  <button class="btn" data-edit-id="${s.id}" title="Edit">✎</button>
+                </span>
               </div>
             `;
 
@@ -3730,10 +4179,12 @@
                 const a = authorById(s.authorId);
                 const item = document.createElement('div');
                 item.className = 'grid-item';
+                if (isMuted(s.id)) item.classList.add('muted-grid');
                 item.dataset.id = s.id;
                 item.dataset.statementId = s.id;
 
                 const avatarStr = avatarHtml(s.authorId, 'sm', true);
+                const hasEdits = s.editHistory && s.editHistory.length > 0;
 
                 item.innerHTML =
                     `
@@ -3741,7 +4192,7 @@
                 ${avatarStr}
                 <div class="grid-meta">
                   <span class="grid-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
-                  <span class="grid-time">${fmtTime(s.time)}</span>
+                  <span class="grid-time">${fmtTime(s.time)}${hasEdits ? ' · edited' : ''}</span>
                 </div>
               </div>
               ${s.mediaUrl ? `<div class="thumb-grid"><img src="${escapeHtml(s.mediaUrl)}" alt="" loading="lazy" /></div>` : ''}
@@ -3749,6 +4200,11 @@
               <div class="grid-footer">
                 <span>${countReplies(s)} replies</span>
                 ${s.tag ? `<span class="grid-tag" style="font-family:var(--font-mono);font-size:6px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-light);border:1px solid var(--border);padding:1px 8px;border-radius:var(--radius-sm);">${escapeHtml(s.tag)}</span>` : ''}
+              </div>
+              ${isMuted(s.id) ? '<span class="mute-badge">muted</span>' : ''}
+              <div class="grid-actions">
+                <button class="btn ${isMuted(s.id) ? 'muted' : ''}" data-mute-id="${s.id}" title="${isMuted(s.id) ? 'Unmute' : 'Mute'}">⊘</button>
+                <button class="btn" data-edit-id="${s.id}" title="Edit">✎</button>
               </div>
             `;
 
@@ -3888,12 +4344,13 @@
                 updateProgressBar();
             }
 
-            // ── Viewport edge blur (top/bottom fade) + top HUD docking ──
+            // ── Viewport edge blur ────────────────────────────────────
             function setupViewportBlur() {
                 const top = document.getElementById('viewportBlurTop');
                 const bottom = document.getElementById('viewportBlurBottom');
                 const hudTop = document.getElementById('hudTop');
                 if (!top || !bottom) return;
+
                 function update() {
                     const scrollY = window.scrollY || window.pageYOffset || 0;
                     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -4067,7 +4524,8 @@
                 const tag = document.getElementById('c-tag').value.trim().toUpperCase();
                 const mediaUrl = document.getElementById('c-media').value.trim();
                 const text = document.getElementById('c-text').value.trim() || 'Your statement will appear here.';
-                const fakeStatement = { id: 'preview', authorId, tag, mediaUrl, text, time: Date.now(), replies: [] };
+                const fakeStatement = { id: 'preview', authorId, tag, mediaUrl, text, time: Date.now(), replies: [],
+                    editHistory: [] };
                 const previewVariants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
                 container.innerHTML = '';
                 previewVariants.forEach(variant => {
@@ -4140,6 +4598,9 @@
                 document.getElementById('bentoOverlay').classList.add('open');
                 populateBentoChips();
                 document.getElementById('bentoSearch').value = searchQuery;
+                // toggle state
+                const toggle = document.getElementById('showMutedToggle');
+                if (toggle) toggle.classList.toggle('active', showMuted);
                 document.body.style.overflow = 'hidden';
             }
 
@@ -4269,11 +4730,22 @@
                         dropdown.classList.remove('open');
                     }
                 });
+
+                // Touch-friendly: also handle touch
+                btn.addEventListener('touchstart', (e) => {
+                    // Let click handle it; but ensure it works on mobile
+                }, { passive: true });
             }
 
             // ── Init ──────────────────────────────────────────────────
             window.__clearFilters = clearFilters;
             window.openProfileModal = openProfileModal;
+
+            // Detect touch device
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (isTouchDevice) {
+                document.body.classList.add('touch-device');
+            }
 
             document.addEventListener('DOMContentLoaded', async function() {
                 try {
@@ -4285,7 +4757,12 @@
                     await loadData();
                     loadAttention();
                     loadActivity();
+                    loadMuted();
                     updateActivityCount();
+
+                    // ensure all statements have editHistory
+                    statements.forEach(s => { if (!s.editHistory) s.editHistory = []; });
+
                     if (new URLSearchParams(location.search).has('reset-demo')) {
                         await resetDemoContent();
                     }
@@ -4396,6 +4873,7 @@
                                 closeActivity();
                             document.getElementById('attentionDropdown').classList.remove('open');
                             closeRapidRespond();
+                            if (editingStatementId) cancelEdit();
                         }
                     });
 
@@ -4413,7 +4891,7 @@
                         const text = document.getElementById('c-text').value.trim();
                         if (!text || !authorId) return;
                         statements.unshift({ id: uid(), authorId, time: Date.now(), tag, text, mediaUrl,
-                            replies: [] });
+                            replies: [], editHistory: [], editedAt: null });
                         saveData();
                         closeComposer();
                         renderLetter(activeIndex);
@@ -4439,6 +4917,23 @@
                     });
                     document.getElementById('hudClear').addEventListener('click', clearFilters);
                     document.getElementById('filterToastDismiss').addEventListener('click', hideFilterToast);
+
+                    // Toggle for showing muted
+                    const muteToggle = document.getElementById('showMutedToggle');
+                    if (muteToggle) {
+                        muteToggle.addEventListener('click', () => {
+                            showMuted = !showMuted;
+                            muteToggle.classList.toggle('active', showMuted);
+                            renderLetter(activeIndex);
+                            updateFilterUI();
+                        });
+                        muteToggle.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                muteToggle.click();
+                            }
+                        });
+                    }
 
                     const logoTile = document.getElementById('logoTile');
                     const logoReset = document.getElementById('logoReset');
@@ -4518,11 +5013,17 @@
             });
         })();
 
-        // ── custom cursor ─────────────────────────────────────────────
+        // ── custom cursor (disabled on touch) ─────────────────────────
         (function initWriteCursor() {
             const writeCursorDot = document.getElementById('writeCursorDot');
             const writeCursorEllipse = document.getElementById('writeCursorEllipse');
             if (!writeCursorDot || !writeCursorEllipse) return;
+
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (isTouchDevice) {
+                document.body.classList.add('touch-device');
+                return;
+            }
 
             const NATIVE_SELECTOR = [
                 'button', 'a', 'input', 'textarea', 'select', 'label',
