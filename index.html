@@ -194,25 +194,24 @@
             width: 100%;
         }
 
-        .topbar .profile-back {
-            display: none;
+        .profile-exit-btn {
+            display: flex;
             align-items: center;
-            gap: 6px;
-            font-family: var(--font-mono);
-            font-size: 8px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--ink-light);
-            cursor: pointer;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            margin-left: 2px;
+            font-size: 11px;
+            line-height: 1;
             background: transparent;
-            border: none;
-            padding: 4px 8px;
-            border-radius: var(--radius-sm);
-            transition: background .15s ease, color .15s ease;
+            border: 1px solid var(--border);
+            color: var(--ink-mid);
+            cursor: pointer;
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: background .15s ease, color .15s ease, border-color .15s ease;
         }
-        .topbar .profile-back:hover { background: var(--bg);
-            color: var(--ink); }
-        body.profile-view .topbar .profile-back { display: inline-flex; }
+        .profile-exit-btn:hover { background: var(--ink); color: var(--card); border-color: var(--ink); }
 
         .viewport-blur {
             position: fixed;
@@ -361,9 +360,7 @@
             padding: 4px 12px;
         }
         .topbar-appearance-dropdown {
-            position: absolute;
-            top: calc(100% + 6px);
-            right: 0;
+            position: fixed;
             min-width: 100px;
             background: var(--card);
             border: 1px solid var(--border);
@@ -452,9 +449,7 @@
             transform: scale(0.8); }
 
         .attention-dropdown {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: -8px;
+            position: fixed;
             width: 300px;
             max-height: 340px;
             overflow-y: auto;
@@ -2908,6 +2903,13 @@
         body.profile-view .wordmark .profile-label { display: inline-block; }
         .wordmark .profile-label { display: none; }
 
+        @media (max-width: 480px) {
+            body.profile-view .wordmark-logo-text,
+            body.profile-view .wordmark .profile-label { display: none; }
+            body.profile-view .profile-user-badge { margin-left: 0;
+                padding: 0; }
+        }
+
         .profile-letter-count {
             font-family: var(--font-mono);
             font-size: 8px;
@@ -2938,14 +2940,14 @@
         <div class="wrap">
             <div class="logo-tile" id="logoTile" tabindex="0" aria-haspopup="true" aria-expanded="false">
                 <div class="wordmark">
-                    <button class="profile-back" id="profileBackBtn" type="button">← Back</button>
-                    <span>NEVEREVER.LAND</span>
+                    <span class="wordmark-logo-text">NEVEREVER.LAND</span>
                     <span class="count t-data" id="topCount"></span>
                     <span class="profile-label" id="profileLabel">Profile</span>
                     <span class="save-status" id="saveStatus"></span>
                     <span class="profile-user-badge" id="profileUserBadge">
                         <span class="avatar sz-xs" id="profileBadgeAvatar">?</span>
                         <span id="profileBadgeName"></span>
+                        <button class="profile-exit-btn" id="profileExitBtn" type="button" aria-label="Exit profile" title="Exit profile">✕</button>
                     </span>
                 </div>
                 <div class="logo-card" id="logoCard">
@@ -2971,12 +2973,6 @@
 
                 <!-- Chips -->
                 <button class="btn" id="chipsToggleBtn" title="Manage chips">⌨</button>
-
-                <!-- Action log -->
-                <button class="btn btn-badge" id="actionToggleBtn" title="Action log">
-                    <span>⚡</span>
-                    <span class="badge" id="actionBadge" style="display:none;">0</span>
-                </button>
 
                 <!-- Attention -->
                 <div class="attention-wrapper" id="attentionWrapper">
@@ -3056,6 +3052,10 @@
         <button class="btn" id="filterToggleBtn">
             <span>Filters</span>
             <span class="filter-count" id="filterCount">0</span>
+        </button>
+        <button class="btn btn-badge" id="actionToggleBtn" title="Action log">
+            <span>⚡</span>
+            <span class="badge" id="actionBadge" style="display:none;">0</span>
         </button>
         <div class="hud-divider"></div>
         <button class="btn btn-primary" id="hudNew">+ New</button>
@@ -3262,6 +3262,57 @@
                 const cls = ['avatar', 'sz-' + size, avatarVariant(obj.id)];
                 if (obj.kind === 'company') cls.push('company');
                 return `<div class="${cls.join(' ')}">${escapeHtml(initialsFor(obj))}</div>`;
+            }
+
+            // ── Floating panel positioning (dropdowns / rollout menus) ──
+            // Anchors a fixed-position panel near the trigger that opened it,
+            // flipping above/below and clamping horizontally so it never
+            // clips off the edge of the viewport.
+            function positionFloatingPanel(panel, trigger, opts = {}) {
+                if (!panel || !trigger) return;
+                const margin = opts.margin ?? 10;
+                const gap = opts.gap ?? 8;
+                const align = opts.align || 'right';
+                const triggerRect = trigger.getBoundingClientRect();
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                panel.style.position = 'fixed';
+                panel.style.right = 'auto';
+                panel.style.bottom = 'auto';
+                const panelRect = panel.getBoundingClientRect();
+                const pw = panelRect.width;
+                const ph = panelRect.height;
+
+                const spaceBelow = vh - triggerRect.bottom - gap;
+                const spaceAbove = triggerRect.top - gap;
+                let top = (ph <= spaceBelow || spaceBelow >= spaceAbove)
+                    ? triggerRect.bottom + gap
+                    : triggerRect.top - gap - ph;
+                top = Math.max(margin, Math.min(top, vh - ph - margin));
+
+                let left = align === 'left' ? triggerRect.left : triggerRect.right - pw;
+                left = Math.max(margin, Math.min(left, vw - pw - margin));
+
+                panel.style.top = top + 'px';
+                panel.style.left = left + 'px';
+            }
+
+            // Positions a rollout overlay's panel relative to its trigger button.
+            // On narrow viewports the panel is a full-width bottom sheet instead
+            // (handled entirely by CSS), so JS positioning is skipped there.
+            function positionRolloutPanel(overlayId, trigger) {
+                const overlay = document.getElementById(overlayId);
+                const panel = overlay && overlay.querySelector('.bento-panel');
+                if (!panel) return;
+                if (window.innerWidth <= 480) {
+                    panel.style.position = '';
+                    panel.style.top = '';
+                    panel.style.left = '';
+                    panel.style.right = '';
+                    panel.style.bottom = '';
+                    return;
+                }
+                positionFloatingPanel(panel, trigger, { align: 'right', gap: 12 });
             }
 
             function renderMediaThumb(url) {
@@ -3978,8 +4029,10 @@
                 }
             }
 
-            function openReviewModal() {
+            function openReviewModal(e) {
                 const overlay = document.getElementById('reviewOverlay');
+                const trigger = (e && e.currentTarget) || document.getElementById('reviewToggleBtn');
+                positionRolloutPanel('reviewOverlay', trigger);
                 overlay.classList.add('open');
                 renderReviewList();
                 document.body.style.overflow = 'hidden';
@@ -5760,6 +5813,7 @@
                     if (!isOpen) {
                         renderMenu();
                         dropdown.classList.add('open');
+                        positionFloatingPanel(dropdown, trigger, { align: 'right' });
                     } else {
                         dropdown.classList.remove('open');
                     }
@@ -5787,6 +5841,7 @@
                     if (!isOpen) {
                         renderAttention();
                         dropdown.classList.add('open');
+                        positionFloatingPanel(dropdown, btn, { align: 'right' });
                     } else {
                         dropdown.classList.remove('open');
                     }
@@ -5837,8 +5892,10 @@
                 }
             }
 
-            function openActivity() {
+            function openActivity(e) {
                 renderActivityLog();
+                const trigger = (e && e.currentTarget) || document.getElementById('actionToggleBtn');
+                positionRolloutPanel('activityOverlay', trigger);
                 document.getElementById('activityOverlay').classList.add('open');
                 document.body.style.overflow = 'hidden';
             }
@@ -6080,8 +6137,8 @@
                         setLogoOpen(false);
                     });
 
-                    // Profile back button
-                    document.getElementById('profileBackBtn').addEventListener('click', (e) => {
+                    // Profile exit button
+                    document.getElementById('profileExitBtn').addEventListener('click', (e) => {
                         e.stopPropagation();
                         if (isProfileView) exitProfileView();
                     });
@@ -6115,10 +6172,11 @@
                         if (e.target === e.currentTarget) closeReviewModal();
                     });
 
-                    document.getElementById('chipsToggleBtn').addEventListener('click', () => {
+                    document.getElementById('chipsToggleBtn').addEventListener('click', (e) => {
                         const overlay = document.getElementById('chipsOverlay');
                         overlay.classList.toggle('open');
                         if (overlay.classList.contains('open')) {
+                            positionRolloutPanel('chipsOverlay', e.currentTarget);
                             renderChipsUI();
                             document.body.style.overflow = 'hidden';
                         } else {
