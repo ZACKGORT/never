@@ -365,6 +365,7 @@
             width: 280px;
             max-height: 340px;
             overflow-y: auto;
+            overflow-x: hidden;
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
@@ -410,6 +411,8 @@
             cursor: pointer;
             transition: background .12s ease;
             border-bottom: 1px solid var(--border);
+            overflow: hidden;
+            min-width: 0;
         }
         .attention-item:last-child { border-bottom: none; }
         .attention-item:hover { background: var(--bg); }
@@ -447,6 +450,7 @@
         .attention-item .item-info {
             flex: 1;
             min-width: 0;
+            overflow: hidden;
         }
         .attention-item .item-name {
             font-family: var(--font);
@@ -457,6 +461,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            width: 100%;
         }
         .attention-item .item-type {
             font-family: var(--font-mono);
@@ -465,6 +470,7 @@
             text-transform: uppercase;
             color: var(--ink-light);
             margin-left: 4px;
+            flex-shrink: 0;
         }
         .attention-item .item-dismiss {
             background: none;
@@ -481,6 +487,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
         .attention-item .item-dismiss:hover {
             color: var(--ink);
@@ -655,30 +662,6 @@
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.02);
             transform: translateY(-2px);
         }
-        .letter-bento .card.muted-card {
-            opacity: 0.4;
-            filter: grayscale(0.6);
-            border-color: var(--ink-lighter);
-        }
-        .letter-bento .card.muted-card:hover {
-            transform: none;
-            box-shadow: var(--shadow);
-        }
-        .letter-bento .card .mute-badge {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            font-family: var(--font-mono);
-            font-size: 6px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--ink-light);
-            background: var(--bg);
-            padding: 1px 6px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            opacity: 0.6;
-        }
         .letter-bento .card .action-btns {
             position: absolute;
             top: 6px;
@@ -691,28 +674,6 @@
         .letter-bento .card:hover .action-btns,
         .letter-bento .card:focus-within .action-btns {
             opacity: 1;
-        }
-        .letter-bento .card .action-btns .btn {
-            padding: 2px 6px;
-            font-size: 6px;
-            min-height: 18px;
-            border-radius: var(--radius-sm);
-            background: var(--card);
-            border: 1px solid var(--border);
-            color: var(--ink-light);
-            cursor: pointer;
-            line-height: 1;
-        }
-        .letter-bento .card .action-btns .btn:hover {
-            background: var(--ink);
-            color: var(--card);
-            border-color: var(--ink);
-        }
-        .letter-bento .card .action-btns .btn.muted {
-            background: var(--ink);
-            color: var(--card);
-            border-color: var(--ink);
-            opacity: 0.7;
         }
 
         @keyframes fadeUp {
@@ -817,10 +778,6 @@
             position: relative;
         }
         .letter-row:hover { background: rgba(0, 0, 0, 0.02); }
-        .letter-row.muted-row {
-            opacity: 0.4;
-            filter: grayscale(0.6);
-        }
         .letter-row .row-actions {
             display: flex;
             gap: 4px;
@@ -831,41 +788,6 @@
         .letter-row:hover .row-actions,
         .letter-row:focus-within .row-actions {
             opacity: 1;
-        }
-        .letter-row .row-actions .btn {
-            padding: 2px 6px;
-            font-size: 6px;
-            min-height: 18px;
-            border-radius: var(--radius-sm);
-            background: var(--card);
-            border: 1px solid var(--border);
-            color: var(--ink-light);
-            cursor: pointer;
-            line-height: 1;
-        }
-        .letter-row .row-actions .btn:hover {
-            background: var(--ink);
-            color: var(--card);
-            border-color: var(--ink);
-        }
-        .letter-row .row-actions .btn.muted {
-            background: var(--ink);
-            color: var(--card);
-            border-color: var(--ink);
-            opacity: 0.7;
-        }
-        .letter-row .mute-badge {
-            font-family: var(--font-mono);
-            font-size: 6px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--ink-light);
-            background: var(--bg);
-            padding: 1px 6px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            opacity: 0.6;
-            margin-right: 4px;
         }
 
         .letter-row-idx { font-family: var(--font-mono); font-size: 9px; color: var(--ink-light); padding-top: 2px; }
@@ -946,10 +868,6 @@
             position: relative;
         }
         .letter-grid .grid-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-        .letter-grid .grid-item.muted-grid {
-            opacity: 0.4;
-            filter: grayscale(0.6);
-        }
         .letter-grid .grid-item .grid-actions {
             position: absolute;
             top: 6px;
@@ -962,43 +880,6 @@
         .letter-grid .grid-item:hover .grid-actions,
         .letter-grid .grid-item:focus-within .grid-actions {
             opacity: 1;
-        }
-        .letter-grid .grid-item .grid-actions .btn {
-            padding: 2px 6px;
-            font-size: 6px;
-            min-height: 18px;
-            border-radius: var(--radius-sm);
-            background: var(--card);
-            border: 1px solid var(--border);
-            color: var(--ink-light);
-            cursor: pointer;
-            line-height: 1;
-        }
-        .letter-grid .grid-item .grid-actions .btn:hover {
-            background: var(--ink);
-            color: var(--card);
-            border-color: var(--ink);
-        }
-        .letter-grid .grid-item .grid-actions .btn.muted {
-            background: var(--ink);
-            color: var(--card);
-            border-color: var(--ink);
-            opacity: 0.7;
-        }
-        .letter-grid .grid-item .mute-badge {
-            font-family: var(--font-mono);
-            font-size: 6px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--ink-light);
-            background: var(--bg);
-            padding: 1px 6px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            opacity: 0.6;
-            position: absolute;
-            top: 6px;
-            left: 6px;
         }
 
         .letter-grid .grid-item .grid-top { display: flex; align-items: center; gap: 10px; }
@@ -1952,60 +1833,11 @@
             color: var(--ink);
         }
         .modal-statement .card-who .avatar { cursor: pointer; }
-        .modal-statement .edited-badge {
-            font-family: var(--font-mono);
-            font-size: 7px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--ink-light);
-            background: var(--bg);
-            padding: 1px 8px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            display: inline-block;
-        }
-        .modal-statement .edit-history {
+        .modal-statement .edit-demo-wrap {
             margin-top: 8px;
-            padding: 8px 12px;
-            background: var(--bg);
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            font-size: calc(var(--fs-body) * 0.8);
-            color: var(--ink-mid);
-        }
-        .modal-statement .edit-history .edit-entry {
-            padding: 4px 0;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            gap: 12px;
-            font-size: calc(var(--fs-body) * 0.75);
-        }
-        .modal-statement .edit-history .edit-entry:last-child { border-bottom: none; }
-        .modal-statement .edit-history .edit-time {
-            font-family: var(--font-mono);
-            font-size: 7px;
-            color: var(--ink-light);
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .modal-statement .edit-history .edit-text {
-            color: var(--ink-mid);
-            font-style: italic;
-        }
-        .modal-statement .edit-form {
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .modal-statement .edit-form textarea {
-            min-height: 60px;
-            width: 100%;
-        }
-        .modal-statement .edit-form .edit-actions {
             display: flex;
             gap: 8px;
-            justify-content: flex-end;
+            flex-wrap: wrap;
         }
 
         .modal-thread { display: flex; flex-direction: column; margin-top: 6px; }
@@ -2368,48 +2200,67 @@
             .rapid-respond .rapid-input-wrap .rapid-send { font-size: 6px; padding: 4px 10px; min-height: 30px; }
         }
 
-        /* ── filter modal: show muted toggle ── */
-        .muted-toggle-wrap {
-            display: flex;
+        /* ── Micro Tooltip ── */
+        .micro-tooltip {
+            position: relative;
+            cursor: help;
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 6px 0;
         }
-        .muted-toggle-wrap .toggle-label {
+        .micro-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 180px;
+            background-color: var(--card-dark);
+            color: var(--card);
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
             font-family: var(--font-mono);
-            font-size: 8px;
+            font-size: 6px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -90px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            border: 1px solid var(--border);
+        }
+        .micro-tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--card-dark) transparent transparent transparent;
+        }
+        .micro-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .action-edit-demo {
+            font-family: var(--font-mono);
+            font-size: 6px;
             letter-spacing: 0.06em;
             text-transform: uppercase;
             color: var(--ink-light);
-        }
-        .toggle-switch {
-            position: relative;
-            width: 36px;
-            height: 20px;
-            background: var(--bg);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background .2s ease, border-color .2s ease;
-            flex-shrink: 0;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            cursor: help;
+            background: var(--bg);
+            transition: background .15s ease, color .15s ease;
+            line-height: 1.4;
         }
-        .toggle-switch.active {
+        .action-edit-demo:hover {
             background: var(--ink);
+            color: var(--card);
             border-color: var(--ink);
-        }
-        .toggle-switch .toggle-knob {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 14px;
-            height: 14px;
-            background: var(--card);
-            border-radius: 50%;
-            transition: transform .2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-        }
-        .toggle-switch.active .toggle-knob {
-            transform: translateX(16px);
         }
     </style>
 </head>
@@ -2560,14 +2411,6 @@
                 <div class="bento-card bento-card-full">
                     <input type="text" id="bentoSearch" placeholder="Search statements or authors…" />
                 </div>
-                <div class="bento-card bento-card-full">
-                    <div class="muted-toggle-wrap">
-                        <span class="toggle-label">Show muted</span>
-                        <div class="toggle-switch" id="showMutedToggle" role="button" tabindex="0" aria-label="Toggle show muted statements">
-                            <span class="toggle-knob"></span>
-                        </div>
-                    </div>
-                </div>
                 <div class="bento-card bento-card-half" id="bentoTags">
                     <h4>Tags</h4>
                     <div class="chip-group"></div>
@@ -2652,10 +2495,9 @@
             'use strict';
 
             // ── Constants ─────────────────────────────────────────────
-            const STORAGE_KEY = 'neverever-statements-v10';
+            const STORAGE_KEY = 'neverever-statements-v12';
             const ATTENTION_KEY = 'neverever-attention-v1';
             const ACTIVITY_KEY = 'neverever-activity-v1';
-            const MUTED_KEY = 'neverever-muted-v1';
             const PAGE_SIZE = 12;
             const MAX_ATTENTION = 20;
             const AVIF_IMAGES = [
@@ -3046,41 +2888,6 @@
             const activeCompanies = new Set();
             const activeDisciplines = new Set();
             let searchQuery = '';
-            let showMuted = false;
-
-            // ── Muting ────────────────────────────────────────────────
-            let mutedSet = new Set();
-
-            function loadMuted() {
-                try {
-                    const raw = localStorage.getItem(MUTED_KEY);
-                    if (raw) {
-                        const arr = JSON.parse(raw);
-                        mutedSet = new Set(arr);
-                    } else {
-                        mutedSet = new Set();
-                    }
-                } catch (e) { mutedSet = new Set(); }
-            }
-
-            function saveMuted() {
-                try {
-                    localStorage.setItem(MUTED_KEY, JSON.stringify(Array.from(mutedSet)));
-                } catch (e) {}
-            }
-
-            function isMuted(id) { return mutedSet.has(id); }
-
-            function toggleMute(id) {
-                if (mutedSet.has(id)) {
-                    mutedSet.delete(id);
-                } else {
-                    mutedSet.add(id);
-                }
-                saveMuted();
-                renderLetter(activeIndex);
-                updateFilterUI();
-            }
 
             // ── Attention ─────────────────────────────────────────────
             let attentionItems = [];
@@ -3276,7 +3083,6 @@
                         if (parsed.authors?.length && parsed.statements?.length) {
                             authors = parsed.authors;
                             statements = parsed.statements;
-                            // ensure editHistory exists on each statement
                             statements.forEach(s => { if (!s.editHistory) s.editHistory = []; });
                             return;
                         }
@@ -3314,15 +3120,12 @@
             async function resetDemoContent() {
                 try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
                 try { localStorage.removeItem(ATTENTION_KEY); } catch (e) {}
-                try { localStorage.removeItem(MUTED_KEY); } catch (e) {}
                 authors = seedAuthors();
                 statements = seedStatements(authors);
                 statements.forEach(s => { if (!s.editHistory) s.editHistory = []; });
                 await saveData();
                 attentionItems = [];
                 saveAttention();
-                mutedSet = new Set();
-                saveMuted();
                 activityLog = [];
                 saveActivityLog();
                 updateActivityCount();
@@ -3462,20 +3265,6 @@
                 }, true);
 
                 document.addEventListener('click', (e) => {
-                    // check if click is on a mute/edit button
-                    const muteBtn = closestSafe(e.target, '[data-mute-id]');
-                    if (muteBtn) {
-                        e.stopPropagation();
-                        toggleMute(muteBtn.dataset.muteId);
-                        return;
-                    }
-                    const editBtn = closestSafe(e.target, '[data-edit-id]');
-                    if (editBtn) {
-                        e.stopPropagation();
-                        const sid = editBtn.dataset.editId;
-                        if (sid) startEditing(sid);
-                        return;
-                    }
                     const item = closestSafe(e.target, '[data-statement-id]');
                     if (!item) return;
                     const panel = closestSafe(item, '.letter-panel.active');
@@ -3497,39 +3286,6 @@
                     e.stopPropagation();
                     openRapidRespond(sid, e.clientX, e.clientY);
                 }, true);
-            }
-
-            // ── Editing ──────────────────────────────────────────────
-            let editingStatementId = null;
-
-            function startEditing(statementId) {
-                const s = statements.find(st => st.id === statementId);
-                if (!s) return;
-                // Check if the current user is the author — in this demo, we allow editing by anyone
-                // but in practice you'd check auth. We'll allow it for demo purposes.
-                editingStatementId = statementId;
-                renderModalContent(statementId);
-            }
-
-            function submitEdit(statementId, newText) {
-                const s = statements.find(st => st.id === statementId);
-                if (!s || !newText.trim()) return;
-                // Save current text to history
-                if (s.text !== newText.trim()) {
-                    if (!s.editHistory) s.editHistory = [];
-                    s.editHistory.push({ time: Date.now(), text: s.text });
-                    s.text = newText.trim();
-                    s.editedAt = Date.now();
-                    saveData();
-                    renderLetter(activeIndex);
-                    if (modalStatementId === statementId) renderModalContent(statementId);
-                }
-                editingStatementId = null;
-            }
-
-            function cancelEdit() {
-                editingStatementId = null;
-                if (modalStatementId) renderModalContent(modalStatementId);
             }
 
             // ── Rapid Respond ─────────────────────────────────────────
@@ -3629,8 +3385,6 @@
             function passesFilters(s) {
                 const a = authorById(s.authorId);
                 if (!a) return false;
-                // Muting: if muted and not showing muted, skip
-                if (isMuted(s.id) && !showMuted) return false;
                 if (searchQuery) {
                     const q = searchQuery.toLowerCase();
                     if (!s.text.toLowerCase().includes(q) && !a.name.toLowerCase().includes(q) && !(s.tag && s.tag
@@ -3719,7 +3473,6 @@
                 modalReplyTargetId = null;
                 modalOpenTime = null;
                 modalResponded = false;
-                editingStatementId = null;
             }
 
             function renderModalNode(node, statement, depth) {
@@ -3871,8 +3624,10 @@
                 if (!s) return;
                 const container = document.getElementById('modalContent');
                 const a = authorById(s.authorId);
-                const isEditing = editingStatementId === s.id;
+
                 const hasEdits = s.editHistory && s.editHistory.length > 0;
+                const demoEditBtn =
+                    `<span class="micro-tooltip action-edit-demo">edit <span class="tooltip-text">demo: you needn't edit anything</span></span>`;
 
                 let html =
                     `
@@ -3891,18 +3646,8 @@
                   </div>
                 </div>
                 ${renderMediaHero(s.mediaUrl)}
-                ${isEditing ? `
-                  <div class="edit-form">
-                    <textarea id="editTextarea">${escapeHtml(s.text)}</textarea>
-                    <div class="edit-actions">
-                      <button class="btn ghost small" id="editCancel">Cancel</button>
-                      <button class="btn btn-primary small" id="editSave">Save</button>
-                    </div>
-                  </div>
-                ` : `
-                  <div class="card-text">${escapeHtml(s.text)}</div>
-                `}
-                ${!isEditing && hasEdits ? `
+                <div class="card-text">${escapeHtml(s.text)}</div>
+                ${hasEdits ? `
                   <div class="edit-history">
                     <div class="t-micro" style="margin-bottom:4px;">Edit history</div>
                     ${s.editHistory.map(e => `
@@ -3913,12 +3658,9 @@
                     `).join('')}
                   </div>
                 ` : ''}
-                ${!isEditing ? `
-                  <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
-                    <button class="btn small" id="editStmtBtn" data-edit-id="${s.id}">✎ Edit</button>
-                    <button class="btn small ${isMuted(s.id) ? 'active' : ''}" id="muteStmtBtn" data-mute-id="${s.id}">${isMuted(s.id) ? 'UNMUTE' : 'MUTE'}</button>
-                  </div>
-                ` : ''}
+                <div class="edit-demo-wrap">
+                  ${demoEditBtn}
+                </div>
               </div>
               <div class="t-micro" style="margin-bottom:10px;">REPLIES (${countReplies(s)})</div>
               <div class="modal-thread" id="modalThread"></div>
@@ -3926,52 +3668,6 @@
             `;
 
                 container.innerHTML = html;
-
-                // Wire up edit and mute buttons
-                const editBtn = document.getElementById('editStmtBtn');
-                if (editBtn) {
-                    editBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const sid = editBtn.dataset.editId;
-                        if (sid) startEditing(sid);
-                    });
-                }
-                const muteBtn = document.getElementById('muteStmtBtn');
-                if (muteBtn) {
-                    muteBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const sid = muteBtn.dataset.muteId;
-                        if (sid) {
-                            toggleMute(sid);
-                            muteBtn.textContent = isMuted(sid) ? 'UNMUTE' : 'MUTE';
-                            muteBtn.classList.toggle('active', isMuted(sid));
-                            // re-render the main view
-                            renderLetter(activeIndex);
-                            updateFilterUI();
-                        }
-                    });
-                }
-
-                // Edit form handlers
-                if (isEditing) {
-                    const saveBtn = document.getElementById('editSave');
-                    const cancelBtn = document.getElementById('editCancel');
-                    const ta = document.getElementById('editTextarea');
-                    if (saveBtn) {
-                        saveBtn.addEventListener('click', () => {
-                            if (ta) submitEdit(s.id, ta.value);
-                        });
-                    }
-                    if (cancelBtn) {
-                        cancelBtn.addEventListener('click', cancelEdit);
-                    }
-                    if (ta) {
-                        ta.addEventListener('keydown', (e) => {
-                            if (e.key === 'Escape') cancelEdit();
-                            if (e.key === 'Enter' && e.metaKey) submitEdit(s.id, ta.value);
-                        });
-                    }
-                }
 
                 const stmtEl = container.querySelector('.modal-statement');
                 if (stmtEl) {
@@ -4029,6 +3725,9 @@
             }
 
             // ── Bento card builder ───────────────────────────────────
+            const DEMO_EDIT_BTN =
+                `<span class="micro-tooltip action-edit-demo">edit <span class="tooltip-text">demo: you needn't edit anything</span></span>`;
+
             function buildBentoCard(s, opts = {}) {
                 const a = authorById(s.authorId);
                 const variants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
@@ -4043,7 +3742,6 @@
                 const card = document.createElement('div');
                 const cls = ['card', variant, spans].filter(Boolean).join(' ');
                 card.className = cls;
-                if (isMuted(s.id)) card.classList.add('muted-card');
                 card.style.animationDelay = opts.static ? '0s' : (Math.random() * 0.2) + 's';
                 card.dataset.statementId = s.id;
 
@@ -4074,10 +3772,8 @@
               variant.includes('accent') ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>` :
               `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
               <div class="action-btns">
-                <button class="btn ${isMuted(s.id) ? 'muted' : ''}" data-mute-id="${s.id}" title="${isMuted(s.id) ? 'Unmute' : 'Mute'}">${isMuted(s.id) ? '⊘' : '⊘'}</button>
-                <button class="btn" data-edit-id="${s.id}" title="Edit">✎</button>
+                ${DEMO_EDIT_BTN}
               </div>
-              ${isMuted(s.id) ? '<span class="mute-badge">muted</span>' : ''}
             `;
 
                 if (!opts.static) {
@@ -4104,7 +3800,6 @@
                             }
                         });
                     }
-                    // Mute and edit buttons are handled by delegation
                 } else {
                     card.style.cursor = 'default';
                 }
@@ -4117,7 +3812,6 @@
                 const a = authorById(s.authorId);
                 const row = document.createElement('div');
                 row.className = 'letter-row';
-                if (isMuted(s.id)) row.classList.add('muted-row');
                 row.dataset.id = s.id;
                 row.dataset.statementId = s.id;
 
@@ -4134,7 +3828,6 @@
                   <span class="letter-row-time">${fmtTime(s.time)}</span>
                   ${s.tag ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;">${escapeHtml(s.tag)}</span>` : ''}
                   ${hasEdits ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;">edited</span>` : ''}
-                  ${isMuted(s.id) ? '<span class="mute-badge">muted</span>' : ''}
                 </div>
                 <div class="letter-row-text">${escapeHtml(s.text)}</div>
               </div>
@@ -4142,8 +3835,7 @@
                 ${s.mediaUrl ? renderMediaThumb(s.mediaUrl) : ''}
                 ${countReplies(s)} replies
                 <span class="row-actions">
-                  <button class="btn ${isMuted(s.id) ? 'muted' : ''}" data-mute-id="${s.id}" title="${isMuted(s.id) ? 'Unmute' : 'Mute'}">⊘</button>
-                  <button class="btn" data-edit-id="${s.id}" title="Edit">✎</button>
+                  ${DEMO_EDIT_BTN}
                 </span>
               </div>
             `;
@@ -4179,7 +3871,6 @@
                 const a = authorById(s.authorId);
                 const item = document.createElement('div');
                 item.className = 'grid-item';
-                if (isMuted(s.id)) item.classList.add('muted-grid');
                 item.dataset.id = s.id;
                 item.dataset.statementId = s.id;
 
@@ -4201,10 +3892,8 @@
                 <span>${countReplies(s)} replies</span>
                 ${s.tag ? `<span class="grid-tag" style="font-family:var(--font-mono);font-size:6px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-light);border:1px solid var(--border);padding:1px 8px;border-radius:var(--radius-sm);">${escapeHtml(s.tag)}</span>` : ''}
               </div>
-              ${isMuted(s.id) ? '<span class="mute-badge">muted</span>' : ''}
               <div class="grid-actions">
-                <button class="btn ${isMuted(s.id) ? 'muted' : ''}" data-mute-id="${s.id}" title="${isMuted(s.id) ? 'Unmute' : 'Mute'}">⊘</button>
-                <button class="btn" data-edit-id="${s.id}" title="Edit">✎</button>
+                ${DEMO_EDIT_BTN}
               </div>
             `;
 
@@ -4598,9 +4287,6 @@
                 document.getElementById('bentoOverlay').classList.add('open');
                 populateBentoChips();
                 document.getElementById('bentoSearch').value = searchQuery;
-                // toggle state
-                const toggle = document.getElementById('showMutedToggle');
-                if (toggle) toggle.classList.toggle('active', showMuted);
                 document.body.style.overflow = 'hidden';
             }
 
@@ -4731,17 +4417,13 @@
                     }
                 });
 
-                // Touch-friendly: also handle touch
-                btn.addEventListener('touchstart', (e) => {
-                    // Let click handle it; but ensure it works on mobile
-                }, { passive: true });
+                btn.addEventListener('touchstart', (e) => {}, { passive: true });
             }
 
             // ── Init ──────────────────────────────────────────────────
             window.__clearFilters = clearFilters;
             window.openProfileModal = openProfileModal;
 
-            // Detect touch device
             const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             if (isTouchDevice) {
                 document.body.classList.add('touch-device');
@@ -4757,10 +4439,7 @@
                     await loadData();
                     loadAttention();
                     loadActivity();
-                    loadMuted();
-                    updateActivityCount();
 
-                    // ensure all statements have editHistory
                     statements.forEach(s => { if (!s.editHistory) s.editHistory = []; });
 
                     if (new URLSearchParams(location.search).has('reset-demo')) {
@@ -4873,7 +4552,6 @@
                                 closeActivity();
                             document.getElementById('attentionDropdown').classList.remove('open');
                             closeRapidRespond();
-                            if (editingStatementId) cancelEdit();
                         }
                     });
 
@@ -4917,23 +4595,6 @@
                     });
                     document.getElementById('hudClear').addEventListener('click', clearFilters);
                     document.getElementById('filterToastDismiss').addEventListener('click', hideFilterToast);
-
-                    // Toggle for showing muted
-                    const muteToggle = document.getElementById('showMutedToggle');
-                    if (muteToggle) {
-                        muteToggle.addEventListener('click', () => {
-                            showMuted = !showMuted;
-                            muteToggle.classList.toggle('active', showMuted);
-                            renderLetter(activeIndex);
-                            updateFilterUI();
-                        });
-                        muteToggle.addEventListener('keydown', (e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                muteToggle.click();
-                            }
-                        });
-                    }
 
                     const logoTile = document.getElementById('logoTile');
                     const logoReset = document.getElementById('logoReset');
@@ -4984,13 +4645,11 @@
                         });
                     });
 
-                    // Profile modal
                     document.getElementById('profileModalClose').addEventListener('click', closeProfileModal);
                     document.getElementById('profileModal').addEventListener('click', (e) => {
                         if (e.target === e.currentTarget) closeProfileModal();
                     });
 
-                    // Rapid Respond
                     document.getElementById('rapidClose').addEventListener('click', closeRapidRespond);
                     document.getElementById('rapidSend').addEventListener('click', submitRapidReply);
                     document.addEventListener('click', (e) => {
