@@ -43,23 +43,37 @@
         }
 
         @media (min-width: 640px) {
-            :root { --margin: 24px; --topbar-height: 64px; --hud-height: 70px; --hud-top-height: 48px; }
+            :root { --margin: 24px;
+                --topbar-height: 64px;
+                --hud-height: 70px;
+                --hud-top-height: 48px; }
         }
         @media (min-width: 1024px) {
-            :root { --margin: 32px; --topbar-height: 72px; --hud-height: 76px; --hud-top-height: 52px; }
+            :root { --margin: 32px;
+                --topbar-height: 72px;
+                --hud-height: 76px;
+                --hud-top-height: 52px; }
         }
 
-        body[data-scale="s"] { --fs-body: 12px; --fs-display: 40px; }
-        body[data-scale="m"] { --fs-body: 15px; --fs-display: 54px; }
-        body[data-scale="l"] { --fs-body: 18px; --fs-display: 68px; }
-        body[data-scale="xl"] { --fs-body: 21px; --fs-display: 82px; }
-        body[data-scale="xxl"] { --fs-body: 24px; --fs-display: 96px; }
+        body[data-scale="s"] { --fs-body: 12px;
+            --fs-display: 40px; }
+        body[data-scale="m"] { --fs-body: 15px;
+            --fs-display: 54px; }
+        body[data-scale="l"] { --fs-body: 18px;
+            --fs-display: 68px; }
+        body[data-scale="xl"] { --fs-body: 21px;
+            --fs-display: 82px; }
+        body[data-scale="xxl"] { --fs-body: 24px;
+            --fs-display: 96px; }
 
         body[data-font="satoshi"] { --font: 'Satoshi', sans-serif; }
         body[data-font="serif"] { --font: 'EB Garamond', serif; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box;
+            margin: 0;
+            padding: 0; }
+        html { -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent; }
         body {
             background: var(--bg);
             color: var(--ink);
@@ -74,11 +88,15 @@
             transition: font-size 0.2s ease, font-family 0.2s ease;
             overflow-x: hidden;
         }
-        ::selection { background: var(--accent); color: var(--ink); }
+        ::selection { background: var(--accent);
+            color: var(--ink); }
 
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: var(--radius-sm); }
-        html { scrollbar-width: thin; scrollbar-color: var(--ink-lighter) transparent; }
+        ::-webkit-scrollbar { width: 4px;
+            height: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--ink-lighter);
+            border-radius: var(--radius-sm); }
+        html { scrollbar-width: thin;
+            scrollbar-color: var(--ink-lighter) transparent; }
 
         .t-micro {
             font-family: var(--font-mono);
@@ -110,15 +128,30 @@
             white-space: nowrap;
             gap: 6px;
         }
-        .btn:hover { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .btn:hover { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
         .btn:active { transform: scale(0.96); }
-        .btn.ghost { border-color: var(--border); color: var(--ink-light); }
-        .btn.ghost:hover { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .btn.small { padding: 3px 8px; font-size: 6px; min-height: 22px; }
-        .btn.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .btn-primary { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .btn-primary:hover { background: var(--ink-mid); border-color: var(--ink-mid); }
-        .btn-icon { width: 30px; padding: 0; justify-content: center; font-size: 14px; }
+        .btn.ghost { border-color: var(--border);
+            color: var(--ink-light); }
+        .btn.ghost:hover { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
+        .btn.small { padding: 3px 8px;
+            font-size: 6px;
+            min-height: 22px; }
+        .btn.active { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
+        .btn-primary { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
+        .btn-primary:hover { background: var(--ink-mid);
+            border-color: var(--ink-mid); }
+        .btn-icon { width: 30px;
+            padding: 0;
+            justify-content: center;
+            font-size: 14px; }
         .btn-badge { position: relative; }
         .btn-badge .badge {
             position: absolute;
@@ -161,7 +194,26 @@
             width: 100%;
         }
 
-        /* ── viewport edge blur ── */
+        .topbar .profile-back {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 8px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: background .15s ease, color .15s ease;
+        }
+        .topbar .profile-back:hover { background: var(--bg);
+            color: var(--ink); }
+        body.profile-view .topbar .profile-back { display: inline-flex; }
+
         .viewport-blur {
             position: fixed;
             left: 0;
@@ -207,6 +259,18 @@
             font-weight: 400;
             color: var(--ink-light);
             letter-spacing: 0.04em;
+        }
+        .wordmark .profile-label {
+            font-family: var(--font-mono);
+            font-size: 7px;
+            font-weight: 400;
+            color: var(--ink-light);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
         }
         .save-status {
             font-family: var(--font-mono);
@@ -278,8 +342,12 @@
             gap: 6px;
             flex-shrink: 0;
         }
-        .topbar-right .btn { font-size: 9px; min-height: 32px; padding: 4px 10px; }
-        .topbar-right .btn-icon { width: 32px; padding: 0; font-size: 15px; }
+        .topbar-right .btn { font-size: 9px;
+            min-height: 32px;
+            padding: 4px 10px; }
+        .topbar-right .btn-icon { width: 32px;
+            padding: 0;
+            font-size: 15px; }
 
         /* ── font/scale ramp (appearance) dropdown ── */
         .topbar-appearance-wrapper {
@@ -330,7 +398,8 @@
             color: var(--card);
         }
         @media (max-width: 640px) {
-            .topbar-appearance-dropdown .menu-item { font-size: 7px; padding: 3px 10px; }
+            .topbar-appearance-dropdown .menu-item { font-size: 7px;
+                padding: 3px 10px; }
         }
 
         /* ── Attention ── */
@@ -379,7 +448,8 @@
             transition: opacity .2s ease;
             pointer-events: none;
         }
-        .attention-badge.hidden { opacity: 0; transform: scale(0.8); }
+        .attention-badge.hidden { opacity: 0;
+            transform: scale(0.8); }
 
         .attention-dropdown {
             position: absolute;
@@ -401,7 +471,8 @@
             scrollbar-color: var(--ink-lighter) transparent;
         }
         .attention-dropdown::-webkit-scrollbar { width: 3px; }
-        .attention-dropdown::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: 4px; }
+        .attention-dropdown::-webkit-scrollbar-thumb { background: var(--ink-lighter);
+            border-radius: 4px; }
         .attention-dropdown.open { display: flex; }
         .attention-dropdown .dropdown-header {
             padding: 6px 14px 4px;
@@ -449,10 +520,17 @@
             border: 1px solid var(--border);
             flex-shrink: 0;
         }
-        .attention-item .item-avatar.v0 { background: var(--accent); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
-        .attention-item .item-avatar.v1 { background: var(--bg); color: var(--ink); }
-        .attention-item .item-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
-        .attention-item .item-avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .attention-item .item-avatar.v0 { background: var(--accent);
+            color: var(--ink);
+            border-color: rgba(28, 28, 30, 0.18); }
+        .attention-item .item-avatar.v1 { background: var(--bg);
+            color: var(--ink); }
+        .attention-item .item-avatar.v2 { background: var(--accent-2);
+            color: var(--ink);
+            border-color: rgba(28, 28, 30, 0.18); }
+        .attention-item .item-avatar.v3 { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
         .attention-item .item-avatar.company::after {
             content: '';
             position: absolute;
@@ -517,8 +595,12 @@
         }
 
         @media (max-width: 480px) {
-            .attention-dropdown { width: 260px; right: -12px; max-height: 280px; }
-            .attention-btn { width: 30px; height: 30px; font-size: 14px; }
+            .attention-dropdown { width: 260px;
+                right: -12px;
+                max-height: 280px; }
+            .attention-btn { width: 30px;
+                height: 30px;
+                font-size: 14px; }
         }
 
         /* ── main wrap ── */
@@ -553,7 +635,9 @@
             user-select: none;
             box-sizing: border-box;
         }
-        .letters-track.dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; }
+        .letters-track.dragging { cursor: grabbing;
+            scroll-snap-type: none;
+            scroll-behavior: auto; }
         .letter-panel {
             flex: 0 0 auto;
             width: min(92vw, 1000px);
@@ -564,11 +648,10 @@
             transition: opacity .3s ease, transform .3s ease;
             cursor: pointer;
         }
-        .letter-panel.active { opacity: 1; cursor: auto; transform: scale(1); }
+        .letter-panel.active { opacity: 1;
+            cursor: auto;
+            transform: scale(1); }
 
-        /* letter-hotspot had no size/position rules, so it was a 0×0 element
-           and the click listeners on it could never fire — this is what makes
-           the edge click zones (and their cursor state) "not work". */
         .letter-hotspot {
             position: absolute;
             top: 0;
@@ -700,36 +783,44 @@
             transform: translateY(-2px);
         }
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0;
+                transform: translateY(16px); }
+            to { opacity: 1;
+                transform: translateY(0); }
         }
 
-        .letter-bento .card-dark { background: #1C1C1E; border-color: #1C1C1E; }
+        .letter-bento .card-dark { background: #1C1C1E;
+            border-color: #1C1C1E; }
         .letter-bento .card-dark .text-dark,
         .letter-bento .card-dark .text-mid,
         .letter-bento .card-dark .label-sm,
         .letter-bento .card-dark .label-xs { color: #ffffff; }
         .letter-bento .card-dark .text-light { color: rgba(255, 255, 255, 0.6); }
-        .letter-bento .card-mid { background: #3A3A3C; border-color: #3A3A3C; }
+        .letter-bento .card-mid { background: #3A3A3C;
+            border-color: #3A3A3C; }
         .letter-bento .card-mid .text-dark,
         .letter-bento .card-mid .text-mid,
         .letter-bento .card-mid .label-sm,
         .letter-bento .card-mid .label-xs { color: #ffffff; }
         .letter-bento .card-mid .text-light { color: rgba(255, 255, 255, 0.6); }
-        .letter-bento .card-accent { background: #E5E567; border-color: #E5E567; }
+        .letter-bento .card-accent { background: #E5E567;
+            border-color: #E5E567; }
         .letter-bento .card-accent .text-dark,
         .letter-bento .card-accent .text-mid,
         .letter-bento .card-accent .label-sm,
         .letter-bento .card-accent .label-xs { color: #1C1C1E; }
         .letter-bento .card-accent .text-light { color: rgba(28, 28, 30, 0.6); }
-        .letter-bento .card-accent-2 { background: #F5F557; border-color: #F5F557; }
+        .letter-bento .card-accent-2 { background: #F5F557;
+            border-color: #F5F557; }
         .letter-bento .card-accent-2 .text-dark,
         .letter-bento .card-accent-2 .text-mid,
         .letter-bento .card-accent-2 .label-sm,
         .letter-bento .card-accent-2 .label-xs { color: #1C1C1E; }
         .letter-bento .card-accent-2 .text-light { color: rgba(28, 28, 30, 0.6); }
-        .letter-bento .card-light { background: #f8f8fa; border-color: #e6e6e8; }
-        .letter-bento .card-white { background: #ffffff; border-color: #e6e6e8; }
+        .letter-bento .card-light { background: #f8f8fa;
+            border-color: #e6e6e8; }
+        .letter-bento .card-white { background: #ffffff;
+            border-color: #e6e6e8; }
 
         .letter-bento .label-sm {
             font-size: 0.65rem;
@@ -767,8 +858,12 @@
         .letter-bento .span-3 { grid-column: span 3; }
         .letter-bento .row-span-2 { grid-row: span 2; }
 
-        .letter-bento .dot-grid { display: flex; gap: 0.3rem; }
-        .letter-bento .dot-grid .dot { display: block; width: 8px; height: 8px; border-radius: 2px; }
+        .letter-bento .dot-grid { display: flex;
+            gap: 0.3rem; }
+        .letter-bento .dot-grid .dot { display: block;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px; }
         .letter-bento .hex-row {
             display: flex;
             gap: 0.4rem;
@@ -789,7 +884,8 @@
         .letter-bento .card-dark .icon-row { color: rgba(255, 255, 255, 0.4); }
 
         /* ── LIST & GRID VIEWS ── */
-        .letter-list { border-top: 1px solid var(--border); padding-top: 4px; }
+        .letter-list { border-top: 1px solid var(--border);
+            padding-top: 4px; }
         .letter-row {
             display: grid;
             grid-template-columns: 24px 32px 1fr auto;
@@ -801,10 +897,23 @@
             position: relative;
         }
         .letter-row:hover { background: rgba(0, 0, 0, 0.02); }
-        .letter-row-idx { font-family: var(--font-mono); font-size: 9px; color: var(--ink-light); padding-top: 2px; }
-        .letter-row-avatar .avatar { width: 28px; height: 28px; font-size: 9px; cursor: pointer; }
-        .letter-row-text-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-        .letter-row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 9px; }
+        .letter-row-idx { font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--ink-light);
+            padding-top: 2px; }
+        .letter-row-avatar .avatar { width: 28px;
+            height: 28px;
+            font-size: 9px;
+            cursor: pointer; }
+        .letter-row-text-wrap { display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0; }
+        .letter-row-meta { display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 2px 8px;
+            font-size: 9px; }
 
         .letter-row-author {
             font-family: var(--font);
@@ -821,7 +930,10 @@
         }
         .letter-row-author:hover { opacity: 0.7; }
 
-        .letter-row-time { font-family: var(--font-mono); font-size: 7px; color: var(--ink-light); white-space: nowrap; }
+        .letter-row-time { font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light);
+            white-space: nowrap; }
         .letter-row-text {
             color: var(--ink-mid);
             font-size: calc(var(--fs-body) * 0.88);
@@ -857,7 +969,10 @@
             line-height: 0;
         }
         .thumb-sm img,
-        .thumb-sm video { display: block; width: 100%; height: 100%; object-fit: cover; }
+        .thumb-sm video { display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; }
 
         .letter-grid {
             display: grid;
@@ -878,10 +993,20 @@
             min-height: 140px;
             position: relative;
         }
-        .letter-grid .grid-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-        .letter-grid .grid-item .grid-top { display: flex; align-items: center; gap: 10px; }
-        .letter-grid .grid-item .grid-top .avatar { width: 32px; height: 32px; font-size: 10px; cursor: pointer; }
-        .letter-grid .grid-item .grid-meta { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+        .letter-grid .grid-item:hover { transform: translateY(-2px);
+            box-shadow: var(--shadow); }
+        .letter-grid .grid-item .grid-top { display: flex;
+            align-items: center;
+            gap: 10px; }
+        .letter-grid .grid-item .grid-top .avatar { width: 32px;
+            height: 32px;
+            font-size: 10px;
+            cursor: pointer; }
+        .letter-grid .grid-item .grid-meta { display: flex;
+            flex-direction: column;
+            gap: 1px;
+            flex: 1;
+            min-width: 0; }
         .letter-grid .grid-item .grid-author {
             font-family: var(--font);
             font-size: calc(var(--fs-body) * 0.75);
@@ -895,7 +1020,9 @@
             cursor: pointer;
         }
         .letter-grid .grid-item .grid-author:hover { opacity: 0.7; }
-        .letter-grid .grid-item .grid-time { font-family: var(--font-mono); font-size: 7px; color: var(--ink-light); }
+        .letter-grid .grid-item .grid-time { font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light); }
         .letter-grid .grid-item .grid-text {
             font-size: calc(var(--fs-body) * 0.88);
             line-height: 1.4;
@@ -927,7 +1054,10 @@
             margin: 2px 0;
         }
         .letter-grid .grid-item .thumb-grid img,
-        .letter-grid .grid-item .thumb-grid video { display: block; width: 100%; height: 100%; object-fit: cover; }
+        .letter-grid .grid-item .thumb-grid video { display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; }
 
         /* ── avatar ── */
         .avatar {
@@ -947,15 +1077,31 @@
             cursor: pointer;
             transition: transform .15s ease, border-color .15s ease;
         }
-        .avatar:hover { transform: scale(1.04); border-color: var(--ink); }
-        .avatar.sz-xs { width: 20px; height: 20px; font-size: 7px; }
-        .avatar.sz-sm { width: 28px; height: 28px; font-size: 9px; }
-        .avatar.sz-md { width: 40px; height: 40px; font-size: 13px; }
-        .avatar.sz-lg { width: 52px; height: 52px; font-size: 16px; }
-        .avatar.v0 { background: var(--accent); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
-        .avatar.v1 { background: var(--bg); color: var(--ink); }
-        .avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
-        .avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .avatar:hover { transform: scale(1.04);
+            border-color: var(--ink); }
+        .avatar.sz-xs { width: 20px;
+            height: 20px;
+            font-size: 7px; }
+        .avatar.sz-sm { width: 28px;
+            height: 28px;
+            font-size: 9px; }
+        .avatar.sz-md { width: 40px;
+            height: 40px;
+            font-size: 13px; }
+        .avatar.sz-lg { width: 52px;
+            height: 52px;
+            font-size: 16px; }
+        .avatar.v0 { background: var(--accent);
+            color: var(--ink);
+            border-color: rgba(28, 28, 30, 0.18); }
+        .avatar.v1 { background: var(--bg);
+            color: var(--ink); }
+        .avatar.v2 { background: var(--accent-2);
+            color: var(--ink);
+            border-color: rgba(28, 28, 30, 0.18); }
+        .avatar.v3 { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
         .avatar.company::after {
             content: '';
             position: absolute;
@@ -985,7 +1131,9 @@
             transition: box-shadow .2s ease;
         }
         .composer.open { display: flex; }
-        .composer.dragging { transition: none; user-select: none; box-shadow: var(--shadow-hover); }
+        .composer.dragging { transition: none;
+            user-select: none;
+            box-shadow: var(--shadow-hover); }
 
         .composer-header {
             display: flex;
@@ -1029,7 +1177,8 @@
             align-items: center;
             justify-content: center;
         }
-        .composer-close:hover { background: var(--ink); color: var(--card); }
+        .composer-close:hover { background: var(--ink);
+            color: var(--card); }
 
         .composer-body {
             padding: 14px 16px;
@@ -1038,9 +1187,16 @@
             gap: 10px;
             overflow-y: auto;
         }
-        .field-row { display: flex; gap: 10px; flex-wrap: wrap; }
-        .field-row .field { flex: 1; min-width: 120px; }
-        label.t-micro { display: block; margin-bottom: 3px; font-size: 7px; letter-spacing: 0.1em; color: var(--ink-light); }
+        .field-row { display: flex;
+            gap: 10px;
+            flex-wrap: wrap; }
+        .field-row .field { flex: 1;
+            min-width: 120px; }
+        label.t-micro { display: block;
+            margin-bottom: 3px;
+            font-size: 7px;
+            letter-spacing: 0.1em;
+            color: var(--ink-light); }
         input[type=text],
         textarea,
         select {
@@ -1059,8 +1215,10 @@
         }
         input[type=text]:focus,
         textarea:focus,
-        select:focus { outline: none; border-color: var(--ink); }
-        textarea { min-height: 56px; line-height: 1.6; }
+        select:focus { outline: none;
+            border-color: var(--ink); }
+        textarea { min-height: 56px;
+            line-height: 1.6; }
         .composer-actions {
             display: flex;
             gap: 8px;
@@ -1085,11 +1243,18 @@
             padding-top: 0;
             pointer-events: none;
         }
-        .composer-preview-grid.letter-bento .card { cursor: default; animation: none; min-height: 100px; }
-        .composer-preview-grid.letter-bento .card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02); transform: none; }
+        .composer-preview-grid.letter-bento .card { cursor: default;
+            animation: none;
+            min-height: 100px; }
+        .composer-preview-grid.letter-bento .card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            transform: none; }
 
         @media (max-width: 480px) {
-            .composer { top: auto; bottom: 16px; right: 12px; left: 12px; width: auto; }
+            .composer { top: auto;
+                bottom: 16px;
+                right: 12px;
+                left: 12px;
+                width: auto; }
         }
 
         /* ── FLOATING HUD ── */
@@ -1237,7 +1402,8 @@
             flex-shrink: 0;
             transition: opacity .2s ease, background .2s ease;
         }
-        .filter-toast-dismiss:hover { opacity: 1; background: rgba(255, 255, 255, 0.15); }
+        .filter-toast-dismiss:hover { opacity: 1;
+            background: rgba(255, 255, 255, 0.15); }
         .hud .hud-label {
             font-family: var(--font-mono);
             font-size: var(--hud-fs-label);
@@ -1353,7 +1519,8 @@
             transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
         }
-        .bento-overlay.open { opacity: 1; pointer-events: auto; }
+        .bento-overlay.open { opacity: 1;
+            pointer-events: auto; }
         .bento-panel {
             width: 100vw;
             height: 100vh;
@@ -1370,7 +1537,8 @@
         }
         .bento-overlay.open .bento-panel { transform: none; }
         .bento-panel::-webkit-scrollbar { width: 6px; }
-        .bento-panel::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: var(--radius-sm); }
+        .bento-panel::-webkit-scrollbar-thumb { background: var(--ink-lighter);
+            border-radius: var(--radius-sm); }
 
         .bento-header {
             display: flex;
@@ -1403,7 +1571,8 @@
             flex-shrink: 0;
             transition: background 0.2s;
         }
-        .bento-header .close-btn:hover { background: var(--ink); color: var(--card); }
+        .bento-header .close-btn:hover { background: var(--ink);
+            color: var(--card); }
 
         .bento-grid {
             display: grid;
@@ -1411,7 +1580,9 @@
             gap: 20px;
             flex: 1;
         }
-        .bento-card { display: flex; flex-direction: column; gap: 12px; }
+        .bento-card { display: flex;
+            flex-direction: column;
+            gap: 12px; }
         .bento-card h4 {
             font-family: var(--font-mono);
             font-size: 11px;
@@ -1436,7 +1607,9 @@
             min-height: 50px;
             transition: border-color .2s ease, background .2s ease;
         }
-        .bento-card input[type="text"]:focus { outline: none; border-color: var(--ink); background: var(--card); }
+        .bento-card input[type="text"]:focus { outline: none;
+            border-color: var(--ink);
+            background: var(--card); }
 
         .bento-card .chip-group {
             display: flex;
@@ -1461,8 +1634,11 @@
             font-weight: 500;
             touch-action: manipulation;
         }
-        .bento-card .chip-group .chip.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
-        .bento-card .chip-group .chip:hover { border-color: var(--ink); color: var(--ink); }
+        .bento-card .chip-group .chip.active { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
+        .bento-card .chip-group .chip:hover { border-color: var(--ink);
+            color: var(--ink); }
         .bento-card .chip-group .chip-empty {
             font-family: var(--font-mono);
             font-size: 8px;
@@ -1526,10 +1702,13 @@
             opacity: 0;
             transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s ease;
         }
-        .bento-overlay.rollout.open .bento-panel { transform: translateY(0) scale(1); opacity: 1; }
+        .bento-overlay.rollout.open .bento-panel { transform: translateY(0) scale(1);
+            opacity: 1; }
         .bento-overlay.rollout .bento-header { padding-bottom: 12px; }
         .bento-overlay.rollout .bento-header h2 { font-size: calc(var(--fs-body) * 1.4); }
-        .bento-overlay.rollout .bento-header .close-btn { width: 36px; height: 36px; font-size: 16px; }
+        .bento-overlay.rollout .bento-header .close-btn { width: 36px;
+            height: 36px;
+            font-size: 16px; }
         @media (max-width: 480px) {
             .bento-overlay.rollout {
                 align-items: flex-end;
@@ -1547,7 +1726,8 @@
         }
 
         @media (min-width: 640px) {
-            .bento-overlay:not(.rollout) { align-items: stretch; padding: 0; }
+            .bento-overlay:not(.rollout) { align-items: stretch;
+                padding: 0; }
             .bento-overlay:not(.rollout) .bento-panel {
                 width: 100vw;
                 height: 100vh;
@@ -1556,10 +1736,13 @@
                 max-height: none;
                 gap: 28px;
             }
-            .bento-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+            .bento-grid { grid-template-columns: repeat(2, 1fr);
+                gap: 24px; }
             .bento-card-full { grid-column: 1 / -1; }
-            .bento-actions { flex-direction: row; padding-top: 8px; }
-            .bento-actions .btn { width: auto; flex: 1; }
+            .bento-actions { flex-direction: row;
+                padding-top: 8px; }
+            .bento-actions .btn { width: auto;
+                flex: 1; }
         }
 
         /* ── focus mode ── */
@@ -1614,7 +1797,9 @@
             box-shadow: var(--shadow);
             transition: color .15s ease, border-color .15s ease, transform .15s ease;
         }
-        .focus-exit-btn:hover { color: var(--ink); border-color: var(--ink); transform: scale(1.06); }
+        .focus-exit-btn:hover { color: var(--ink);
+            border-color: var(--ink);
+            transform: scale(1.06); }
         body.focus-mode .focus-exit-btn { display: flex; }
 
         .letter-card-focus-toggle {
@@ -1635,13 +1820,21 @@
             transition: all .2s ease;
             box-shadow: var(--shadow);
         }
-        .letter-card-focus-toggle:hover { color: var(--ink); border-color: var(--ink); }
-        .letter-card-focus-toggle.active { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .letter-card-focus-toggle:hover { color: var(--ink);
+            border-color: var(--ink); }
+        .letter-card-focus-toggle.active { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
         body.focus-mode .letter-card-focus-toggle { display: none; }
 
-        .empty-letter { padding: 40px 0; text-align: center; color: var(--ink-light); }
+        .empty-letter { padding: 40px 0;
+            text-align: center;
+            color: var(--ink-light); }
         .empty-letter .t-micro { margin-bottom: 6px; }
-        .empty-letter p { font-family: var(--font); font-size: calc(var(--fs-body) * 1.1); font-weight: 500; color: var(--ink-mid); }
+        .empty-letter p { font-family: var(--font);
+            font-size: calc(var(--fs-body) * 1.1);
+            font-weight: 500;
+            color: var(--ink-mid); }
 
         .load-more-trigger {
             grid-column: 1 / -1;
@@ -1661,22 +1854,28 @@
         .load-more-trigger:hover { color: var(--ink); }
 
         @media (max-width: 1280px) {
-            .letter-bento { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+            .letter-bento { grid-template-columns: repeat(3, 1fr);
+                gap: 1rem; }
         }
         @media (max-width: 820px) {
             .letters-track { gap: 16px;
                 padding-left: max(2vw, calc(50% - 400px));
                 padding-right: max(2vw, calc(50% - 400px)); }
             .letter-panel { width: min(94vw, 800px); }
-            .letter-bento { grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+            .letter-bento { grid-template-columns: repeat(2, 1fr);
+                gap: 0.9rem; }
             .letter-bento .span-2,
             .letter-bento .span-3,
             .letter-bento .span-4 { grid-column: span 2; }
             .letter-bento .row-span-2,
             .letter-bento .row-span-3 { grid-row: span 1; }
-            .letter-bento .card { padding: 1.5rem; border-radius: 1.25rem; }
-            .letter-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-            .letter-row { grid-template-columns: 20px 28px 1fr auto; gap: 8px; padding: 10px 0; }
+            .letter-bento .card { padding: 1.5rem;
+                border-radius: 1.25rem; }
+            .letter-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 12px; }
+            .letter-row { grid-template-columns: 20px 28px 1fr auto;
+                gap: 8px;
+                padding: 10px 0; }
             .letter-row-author {
                 font-size: calc(var(--fs-body) * 0.7);
                 max-width: none;
@@ -1695,28 +1894,41 @@
                 padding-right: 8px;
             }
             .letter-panel { width: 94vw; }
-            .letter-card-frame { padding: 16px 14px 28px; border-radius: var(--radius-sm); }
-            .letter-cover { padding-bottom: 12px; margin-bottom: 16px; }
+            .letter-card-frame { padding: 16px 14px 28px;
+                border-radius: var(--radius-sm); }
+            .letter-cover { padding-bottom: 12px;
+                margin-bottom: 16px; }
             .letter-cover-name { font-size: clamp(18px, 2.5vw, 24px); }
-            .letter-bento { grid-template-columns: 1fr; gap: 0.75rem; }
+            .letter-bento { grid-template-columns: 1fr;
+                gap: 0.75rem; }
             .letter-bento .span-2,
             .letter-bento .span-3,
             .letter-bento .span-4 { grid-column: span 1; }
-            .letter-bento .card { padding: 1.25rem; border-radius: 1rem; min-height: 100px; }
-            .letter-grid { grid-template-columns: 1fr; gap: 10px; }
-            .letter-grid .grid-item { padding: 12px 14px 14px; min-height: 100px; }
-            .letter-row { grid-template-columns: 16px 24px 1fr auto; gap: 6px; padding: 8px 0; }
-            .letter-row-avatar .avatar { width: 24px; height: 24px; font-size: 8px; }
+            .letter-bento .card { padding: 1.25rem;
+                border-radius: 1rem;
+                min-height: 100px; }
+            .letter-grid { grid-template-columns: 1fr;
+                gap: 10px; }
+            .letter-grid .grid-item { padding: 12px 14px 14px;
+                min-height: 100px; }
+            .letter-row { grid-template-columns: 16px 24px 1fr auto;
+                gap: 6px;
+                padding: 8px 0; }
+            .letter-row-avatar .avatar { width: 24px;
+                height: 24px;
+                font-size: 8px; }
             .letter-row-author {
                 font-size: calc(var(--fs-body) * 0.65);
                 max-width: none;
                 white-space: normal;
                 overflow: visible;
             }
-            .letter-row-text { font-size: calc(var(--fs-body) * 0.78); -webkit-line-clamp: 2; }
+            .letter-row-text { font-size: calc(var(--fs-body) * 0.78);
+                -webkit-line-clamp: 2; }
             .letter-row-time { font-size: 6px; }
             .letter-row-idx { font-size: 8px; }
-            .letter-toolbar .view-toggle .chip { font-size: 6px; padding: 2px 8px; }
+            .letter-toolbar .view-toggle .chip { font-size: 6px;
+                padding: 2px 8px; }
             .letter-toolbar .letter-count { font-size: 7px; }
             .topbar .wrap { padding: 0 8px; }
             .wordmark { font-size: clamp(10px, 3vw, 14px); }
@@ -1740,7 +1952,8 @@
             transition: opacity 0.35s ease;
             overflow: hidden;
         }
-        .conversation-modal.open { opacity: 1; pointer-events: auto; }
+        .conversation-modal.open { opacity: 1;
+            pointer-events: auto; }
         .conversation-modal .modal-card {
             width: 100vw;
             height: 100vh;
@@ -1758,7 +1971,8 @@
             flex-direction: column;
         }
         .conversation-modal .modal-card::-webkit-scrollbar { width: 4px; }
-        .conversation-modal .modal-card::-webkit-scrollbar-thumb { background: var(--ink-lighter); border-radius: var(--radius-sm); }
+        .conversation-modal .modal-card::-webkit-scrollbar-thumb { background: var(--ink-lighter);
+            border-radius: var(--radius-sm); }
         .conversation-modal .close-btn {
             position: sticky;
             top: 0;
@@ -1781,7 +1995,8 @@
             z-index: 10;
             box-shadow: var(--shadow);
         }
-        .conversation-modal .close-btn:hover { background: var(--ink); color: var(--card); }
+        .conversation-modal .close-btn:hover { background: var(--ink);
+            color: var(--card); }
         .conversation-modal #modalContent {
             flex: 1;
             max-width: 780px;
@@ -2017,7 +2232,8 @@
             pointer-events: none;
             transition: opacity 0.35s ease;
         }
-        .profile-modal.open { opacity: 1; pointer-events: auto; }
+        .profile-modal.open { opacity: 1;
+            pointer-events: auto; }
         .profile-card {
             max-width: 420px;
             width: 100%;
@@ -2045,8 +2261,12 @@
             transition: background .15s ease, color .15s ease;
             line-height: 1;
         }
-        .profile-card-close:hover { background: var(--bg); color: var(--ink); }
-        .profile-card-header { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px; }
+        .profile-card-close:hover { background: var(--bg);
+            color: var(--ink); }
+        .profile-card-header { display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            margin-bottom: 16px; }
         .profile-card-avatar {
             position: relative;
             width: 56px;
@@ -2064,10 +2284,17 @@
             background: var(--bg);
             color: var(--ink);
         }
-        .profile-card-avatar.v0 { background: var(--accent); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
-        .profile-card-avatar.v1 { background: var(--bg); color: var(--ink); }
-        .profile-card-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
-        .profile-card-avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .profile-card-avatar.v0 { background: var(--accent);
+            color: var(--ink);
+            border-color: rgba(28, 28, 30, 0.18); }
+        .profile-card-avatar.v1 { background: var(--bg);
+            color: var(--ink); }
+        .profile-card-avatar.v2 { background: var(--accent-2);
+            color: var(--ink);
+            border-color: rgba(28, 28, 30, 0.18); }
+        .profile-card-avatar.v3 { background: var(--ink);
+            color: var(--card);
+            border-color: var(--ink); }
         .profile-card-avatar.company::after {
             content: '';
             position: absolute;
@@ -2079,15 +2306,40 @@
             border: 2px solid var(--card);
             border-radius: 3px;
         }
-        .profile-card-info { flex: 1; min-width: 0; }
-        .profile-card-name { font-family: var(--font); font-size: calc(var(--fs-body) * 1.2); font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
-        .profile-card-role { font-size: calc(var(--fs-body) * 0.85); color: var(--ink-mid); margin-top: 2px; }
-        .profile-card-tagline { font-size: calc(var(--fs-body) * 0.8); color: var(--ink-light); margin-top: 4px; font-style: italic; }
-        .profile-card-stats { display: flex; gap: 24px; padding: 12px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 16px; }
-        .profile-card-stat { display: flex; flex-direction: column; }
-        .profile-card-stat .num { font-family: var(--font-mono); font-size: calc(var(--fs-body) * 1.2); font-weight: 600; color: var(--ink); }
-        .profile-card-stat .label { font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-light); }
-        .profile-card-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .profile-card-info { flex: 1;
+            min-width: 0; }
+        .profile-card-name { font-family: var(--font);
+            font-size: calc(var(--fs-body) * 1.2);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--ink); }
+        .profile-card-role { font-size: calc(var(--fs-body) * 0.85);
+            color: var(--ink-mid);
+            margin-top: 2px; }
+        .profile-card-tagline { font-size: calc(var(--fs-body) * 0.8);
+            color: var(--ink-light);
+            margin-top: 4px;
+            font-style: italic; }
+        .profile-card-stats { display: flex;
+            gap: 24px;
+            padding: 12px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px; }
+        .profile-card-stat { display: flex;
+            flex-direction: column; }
+        .profile-card-stat .num { font-family: var(--font-mono);
+            font-size: calc(var(--fs-body) * 1.2);
+            font-weight: 600;
+            color: var(--ink); }
+        .profile-card-stat .label { font-family: var(--font-mono);
+            font-size: 7px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ink-light); }
+        .profile-card-actions { display: flex;
+            gap: 10px;
+            flex-wrap: wrap; }
 
         .co-badge {
             font-family: var(--font-mono);
@@ -2118,8 +2370,10 @@
         }
         .rapid-respond.open { display: flex; }
         @keyframes rapidPop {
-            from { opacity: 0; transform: scale(0.92) translateY(4px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            from { opacity: 0;
+                transform: scale(0.92) translateY(4px); }
+            to { opacity: 1;
+                transform: scale(1) translateY(0); }
         }
         .rapid-respond .rapid-header {
             display: flex;
@@ -2202,7 +2456,8 @@
             line-height: 1;
             transition: background .15s ease, color .15s ease;
         }
-        .rapid-respond .rapid-close:hover { background: var(--bg); color: var(--ink); }
+        .rapid-respond .rapid-close:hover { background: var(--bg);
+            color: var(--ink); }
         .rapid-respond .rapid-bubble-preview {
             font-family: var(--font-mono);
             font-size: 7px;
@@ -2250,9 +2505,14 @@
         }
 
         @media (max-width: 480px) {
-            .rapid-respond { min-width: 180px; max-width: 300px; padding: 10px 12px; }
-            .rapid-respond .rapid-input-wrap textarea { font-size: calc(var(--fs-body) * 0.8); min-height: 30px; }
-            .rapid-respond .rapid-input-wrap .rapid-send { font-size: 6px; padding: 4px 10px; min-height: 30px; }
+            .rapid-respond { min-width: 180px;
+                max-width: 300px;
+                padding: 10px 12px; }
+            .rapid-respond .rapid-input-wrap textarea { font-size: calc(var(--fs-body) * 0.8);
+                min-height: 30px; }
+            .rapid-respond .rapid-input-wrap .rapid-send { font-size: 6px;
+                padding: 4px 10px;
+                min-height: 30px; }
         }
 
         /* ── Edit & Mute buttons on statements ── */
@@ -2367,7 +2627,8 @@
             padding: 6px;
             border-radius: var(--radius-sm);
         }
-        .review-item .review-diff .old { text-decoration: line-through; color: var(--ink-light); }
+        .review-item .review-diff .old { text-decoration: line-through;
+            color: var(--ink-light); }
         .review-item .review-diff .new { font-weight: 500; }
         .review-item .review-meta {
             font-family: var(--font-mono);
@@ -2381,7 +2642,9 @@
             display: flex;
             gap: 6px;
         }
-        .review-item .review-actions .btn { font-size: 6px; padding: 2px 8px; min-height: 20px; }
+        .review-item .review-actions .btn { font-size: 6px;
+            padding: 2px 8px;
+            min-height: 20px; }
 
         /* ── Chips modal ── */
         .chip-manage-item {
@@ -2405,7 +2668,9 @@
             display: flex;
             gap: 4px;
         }
-        .chip-manage-item .chip-actions .btn { font-size: 6px; padding: 2px 6px; min-height: 20px; }
+        .chip-manage-item .chip-actions .btn { font-size: 6px;
+            padding: 2px 6px;
+            min-height: 20px; }
 
         .add-chip-row {
             display: flex;
@@ -2422,7 +2687,8 @@
             color: var(--ink);
             font-family: var(--font);
         }
-        .add-chip-row input[type="text"]:focus { outline: none; border-color: var(--ink); }
+        .add-chip-row input[type="text"]:focus { outline: none;
+            border-color: var(--ink); }
 
         /* ── Muted / Archive styling ── */
         .letter-panel[data-archive="true"] .statement-archive-muted {
@@ -2564,11 +2830,95 @@
         body.custom-cursor-active.write-native-cursor { cursor: auto; }
         .write-native-cursor .write-cursor-dot,
         .write-native-cursor .write-cursor-ellipse { opacity: 0 !important; }
+
+        /* ── PROFILE VIEW – thread letter ── */
+        .letter-profile-statement {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .letter-profile-statement .profile-statement-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+        .letter-profile-statement .profile-statement-head .avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 9px;
+            cursor: pointer;
+        }
+        .letter-profile-statement .profile-statement-author {
+            font-family: var(--font);
+            font-weight: 700;
+            font-size: calc(var(--fs-body) * 0.85);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            color: var(--ink);
+        }
+        .letter-profile-statement .profile-statement-author:hover { opacity: 0.7; }
+        .letter-profile-statement .profile-statement-time {
+            font-family: var(--font-mono);
+            font-size: 8px;
+            color: var(--ink-light);
+        }
+        .letter-profile-statement .profile-statement-tag {
+            font-family: var(--font-mono);
+            font-size: 7px;
+            color: var(--ink-light);
+            border: 1px solid var(--border);
+            padding: 0 6px;
+            border-radius: var(--radius-sm);
+        }
+        .letter-profile-statement .profile-statement-text {
+            font-family: var(--font);
+            font-size: calc(var(--fs-body) * 1.05);
+            font-weight: 500;
+            line-height: 1.5;
+            margin: 4px 0 6px 38px;
+            white-space: pre-wrap;
+            color: var(--ink);
+        }
+        .letter-profile-thread {
+            margin-left: 4px;
+        }
+
+        /* ── PROFILE VIEW – topbar user badge ── */
+        .profile-user-badge {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            font-size: calc(var(--fs-body) * 0.8);
+            font-weight: 600;
+            color: var(--ink);
+            margin-left: 8px;
+            padding: 0 8px;
+        }
+        .profile-user-badge .avatar {
+            width: 24px;
+            height: 24px;
+            font-size: 8px;
+        }
+        body.profile-view .profile-user-badge { display: inline-flex; }
+        body.profile-view .wordmark .count { display: none; }
+        body.profile-view .wordmark .save-status { display: none; }
+        body.profile-view .wordmark .profile-label { display: inline-block; }
+        .wordmark .profile-label { display: none; }
+
+        .profile-letter-count {
+            font-family: var(--font-mono);
+            font-size: 8px;
+            color: var(--ink-light);
+            margin-left: auto;
+        }
     </style>
 </head>
 <body data-scale="l" data-font="satoshi">
 
-    <!-- ─── CURSOR ELEMENTS (FIXED) ─── -->
+    <!-- ─── CURSOR ELEMENTS ─── -->
     <div class="write-cursor-ellipse" id="writeCursorEllipse" aria-hidden="true"></div>
     <div class="write-cursor-dot" id="writeCursorDot" aria-hidden="true"></div>
 
@@ -2587,7 +2937,17 @@
     <div class="topbar">
         <div class="wrap">
             <div class="logo-tile" id="logoTile" tabindex="0" aria-haspopup="true" aria-expanded="false">
-                <div class="wordmark">NEVEREVER.LAND <span class="count t-data" id="topCount"></span> <span class="save-status" id="saveStatus"></span></div>
+                <div class="wordmark">
+                    <button class="profile-back" id="profileBackBtn" type="button">← Back</button>
+                    <span>NEVEREVER.LAND</span>
+                    <span class="count t-data" id="topCount"></span>
+                    <span class="profile-label" id="profileLabel">Profile</span>
+                    <span class="save-status" id="saveStatus"></span>
+                    <span class="profile-user-badge" id="profileUserBadge">
+                        <span class="avatar sz-xs" id="profileBadgeAvatar">?</span>
+                        <span id="profileBadgeName"></span>
+                    </span>
+                </div>
                 <div class="logo-card" id="logoCard">
                     <p class="t-micro logo-card-eyebrow">Philosophy of use</p>
                     <p class="logo-card-text">Every line here is a statement, not a post. No feed to game, no likes to chase — just what's true right now, in your own words, in public.</p>
@@ -3227,8 +3587,12 @@
             const activeDisciplines = new Set();
             let searchQuery = '';
             let chips = [];
-            let activityDays = 0; // 0 = all, 1, 7, 14, 21
+            let activityDays = 0;
             let interactions = [];
+
+            // ── Profile view state ────────────────────────────────────
+            let isProfileView = false;
+            let profileUserId = null;
 
             // ── Rapid Respond State ──────────────────────────────────
             let rapidTarget = null;
@@ -3474,7 +3838,7 @@
                     </div>
                     <div class="profile-card-actions">
                         <button class="btn ${inAttn ? 'active' : ''}" id="profileSaveBtn">${inAttn ? 'SAVED' : 'SAVE PROFILE'}</button>
-                        <button class="btn ghost" id="profileViewBtn">VIEW (inert)</button>
+                        <button class="btn ghost" id="profileViewBtn">VIEW FULL PROFILE</button>
                     </div>
                 `;
 
@@ -3495,7 +3859,8 @@
                 if (viewBtn) {
                     viewBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        console.log('View profile (inert)');
+                        closeProfileModal();
+                        enterProfileView(objectId);
                     });
                 }
             }
@@ -3794,8 +4159,13 @@
                 interactions = [];
                 saveInteractions();
                 activeIndex = 0;
+                isProfileView = false;
+                profileUserId = null;
+                document.body.classList.remove('profile-view');
+                initMainLetterData();
                 renderTrack();
                 renderAttention();
+                updateProfileBadge();
                 console.log('resetDemoContent: reseeded', authors.length, 'authors /', statements.length, 'statements');
             }
             window.resetDemoContent = resetDemoContent;
@@ -3854,6 +4224,17 @@
                             alert('Edit history:\n' + s.editHistory.map((h, i) =>
                                 `#${i+1} ${fmtTime(h.timestamp)}\nOLD: ${h.oldText}\nNEW: ${h.newText}`).join(
                                 '\n\n'));
+                        }
+                    }
+                    // Click on avatar/name in profile view to view that user's profile
+                    const profileAuthor = closestSafe(e.target, '[data-profile-author-id]');
+                    if (profileAuthor) {
+                        e.stopPropagation();
+                        const id = profileAuthor.dataset.profileAuthorId;
+                        const obj = authorById(id);
+                        if (obj) {
+                            const type = obj.kind === 'company' ? 'company' : 'person';
+                            openProfileModal(type, id);
                         }
                     }
                 });
@@ -3986,11 +4367,8 @@
                     if (extraTag && s.tag !== extraTag) return false;
                     if (!includeMuted && s.muteState === 'muted') return false;
 
-                    // Half-life filter: only include statements that have at least one reply
-                    // within the activity window, sorted by reply count.
                     if (activityDays > 0) {
                         const cutoff = now - activityDays * 24 * 60 * 60 * 1000;
-                        // Check if any reply (including nested) is within the window
                         let hasRecentReply = false;
                         const checkReplies = (replies) => {
                             for (let r of replies) {
@@ -3999,8 +4377,6 @@
                             }
                             return false;
                         };
-                        // Also check the statement itself? No, the statement's own time is not a "reply".
-                        // We only care about replies.
                         if (!checkReplies(s.replies)) {
                             return false;
                         }
@@ -4011,8 +4387,6 @@
             }
 
             function sortByActivity(list) {
-                // Sort by number of replies in the activity window (if activityDays > 0)
-                // Otherwise sort by total reply count, then by time.
                 const now = Date.now();
                 const cutoff = activityDays > 0 ? now - activityDays * 24 * 60 * 60 * 1000 : 0;
 
@@ -4360,7 +4734,91 @@
                 `;
             }
 
-            // ── Bento card builder (semantic) ─────────────────────────
+            // ── Profile View ──────────────────────────────────────────
+            function enterProfileView(userId) {
+                const user = authorById(userId);
+                if (!user) return;
+
+                isProfileView = true;
+                profileUserId = userId;
+                document.body.classList.add('profile-view');
+
+                // Build letterData from user's original statements (non-replies)
+                const userStatements = statements.filter(s => s.authorId === userId);
+                // Sort newest first
+                userStatements.sort((a, b) => b.time - a.time);
+
+                if (userStatements.length === 0) {
+                    // Fallback: show a single empty letter
+                    letterData = [{
+                        title: 'No statements yet',
+                        deck: `${user.name} hasn't posted any original statements.`,
+                        isProfile: true,
+                        profileUserId: userId,
+                        statementIds: []
+                    }];
+                } else {
+                    letterData = userStatements.map((s, i) => {
+                        const timeLabel = i === 0 ? 'today' : (i === 1 ? 'yesterday' : new Date(s.time)
+                            .toLocaleDateString([], { month: 'short', day: 'numeric' }));
+                        return {
+                            title: `A letter written ${timeLabel}`,
+                            deck: '',
+                            isProfile: true,
+                            profileUserId: userId,
+                            statementIds: [s.id]
+                        };
+                    });
+                }
+
+                activeIndex = 0;
+                renderTrack();
+                updateProgressBar();
+                updateProfileBadge();
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function exitProfileView() {
+                isProfileView = false;
+                profileUserId = null;
+                document.body.classList.remove('profile-view');
+                initMainLetterData();
+                renderTrack();
+                updateProfileBadge();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function updateProfileBadge() {
+                const badge = document.getElementById('profileUserBadge');
+                const avatar = document.getElementById('profileBadgeAvatar');
+                const name = document.getElementById('profileBadgeName');
+                const label = document.getElementById('profileLabel');
+
+                if (isProfileView && profileUserId) {
+                    const user = authorById(profileUserId);
+                    if (user) {
+                        badge.style.display = 'inline-flex';
+                        const varClass = avatarVariant(user.id);
+                        const isCompany = user.kind === 'company';
+                        avatar.className = `avatar sz-xs ${varClass}${isCompany ? ' company' : ''}`;
+                        avatar.textContent = initialsFor(user);
+                        name.textContent = user.name;
+                        label.textContent = 'Profile';
+                        // Update the wordmark count
+                        const countEl = document.getElementById('topCount');
+                        if (countEl) countEl.textContent = '';
+                    }
+                } else {
+                    badge.style.display = 'none';
+                    label.textContent = '';
+                    const countEl = document.getElementById('topCount');
+                    if (countEl) countEl.textContent = String(statements.length).padStart(3, '0');
+                }
+            }
+
+            // ── Bento card builder ───────────────────────────────────
             function buildBentoCard(s, opts = {}) {
                 const a = authorById(s.authorId);
                 const variants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
@@ -4444,7 +4902,7 @@
                 return card;
             }
 
-            // ── Item builders (semantic) ─────────────────────────────
+            // ── Item builders ────────────────────────────────────────
             function buildRow(s, idx) {
                 const a = authorById(s.authorId);
                 const row = document.createElement('article');
@@ -4564,6 +5022,169 @@
                 return item;
             }
 
+            // ── Profile thread letter renderer ────────────────────────
+            function buildProfileThreadLetter(statementId) {
+                const s = statements.find(st => st.id === statementId);
+                if (!s) {
+                    const div = document.createElement('div');
+                    div.textContent = 'Statement not found.';
+                    return div;
+                }
+
+                const a = authorById(s.authorId);
+                const container = document.createElement('div');
+
+                // Statement header
+                const stmtDiv = document.createElement('div');
+                stmtDiv.className = 'letter-profile-statement';
+
+                const headDiv = document.createElement('div');
+                headDiv.className = 'profile-statement-head';
+                const avatarHtmlStr = avatarHtml(s.authorId, 'sm', true);
+                headDiv.innerHTML = `
+                    ${avatarHtmlStr}
+                    <span class="profile-statement-author" data-profile-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'Unknown'}</span>
+                    <time class="profile-statement-time">${fmtTime(s.time)}</time>
+                    ${s.tag ? `<span class="profile-statement-tag">${escapeHtml(s.tag)}</span>` : ''}
+                `;
+                stmtDiv.appendChild(headDiv);
+
+                const textDiv = document.createElement('div');
+                textDiv.className = 'profile-statement-text';
+                textDiv.textContent = s.text;
+                stmtDiv.appendChild(textDiv);
+
+                // Edit marker and actions
+                const marker = document.createElement('div');
+                marker.innerHTML = renderEditMarker(s);
+                stmtDiv.appendChild(marker);
+                const actions = document.createElement('div');
+                actions.innerHTML = renderStatementActions(s);
+                stmtDiv.appendChild(actions);
+
+                container.appendChild(stmtDiv);
+
+                // Replies thread
+                const threadDiv = document.createElement('div');
+                threadDiv.className = 'letter-profile-thread';
+                s.replies.forEach(r => {
+                    const node = renderProfileThreadNode(r);
+                    threadDiv.appendChild(node);
+                });
+
+                // Reply trigger
+                const replyTrigger = document.createElement('div');
+                replyTrigger.className = 'modal-reply-trigger';
+                const link = document.createElement('button');
+                link.className = 'modal-node-link';
+                link.textContent = '+ reply to this statement';
+                link.addEventListener('click', () => {
+                    modalReplyTargetId = (modalReplyTargetId === s.id) ? null : s.id;
+                    renderLetter(activeIndex);
+                });
+                replyTrigger.appendChild(link);
+
+                if (modalReplyTargetId === s.id) {
+                    const form = renderModalReplyForm(s);
+                    replyTrigger.appendChild(form);
+                }
+
+                container.appendChild(threadDiv);
+                container.appendChild(replyTrigger);
+
+                // Click on avatar/name in thread to open profile
+                container.querySelectorAll('[data-profile-author-id]').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = el.dataset.profileAuthorId;
+                        const obj = authorById(id);
+                        if (obj) {
+                            const type = obj.kind === 'company' ? 'company' : 'person';
+                            openProfileModal(type, id);
+                        }
+                    });
+                });
+                container.querySelectorAll('.avatar').forEach(el => {
+                    const parent = el.closest('.profile-statement-head, .modal-node-head');
+                    if (parent) {
+                        const authorSpan = parent.querySelector('[data-profile-author-id]');
+                        if (authorSpan) {
+                            el.style.cursor = 'pointer';
+                            el.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const id = authorSpan.dataset.profileAuthorId;
+                                const obj = authorById(id);
+                                if (obj) {
+                                    const type = obj.kind === 'company' ? 'company' : 'person';
+                                    openProfileModal(type, id);
+                                }
+                            });
+                        }
+                    }
+                });
+
+                return container;
+            }
+
+            function renderProfileThreadNode(node) {
+                const a = authorById(node.authorId);
+                const hasChildren = node.replies.length > 0;
+                const isCollapsed = collapsed.has(node.id);
+
+                const wrap = document.createElement('article');
+                wrap.className = 'modal-node';
+                wrap.dataset.nodeId = node.id;
+
+                const head = document.createElement('div');
+                head.className = 'modal-node-head';
+                head.innerHTML = `
+                    ${hasChildren ? `<button class="modal-node-toggle" data-node-id="${node.id}">${isCollapsed ? '[+]' : '[–]'}</button>` : ''}
+                    ${avatarHtml(node.authorId, 'xs', false)}
+                    <span class="modal-node-author" data-profile-author-id="${node.authorId}">${a ? escapeHtml(a.name) : 'Unknown'}</span>
+                    ${a && a.kind === 'company' ? '<span class="co-badge">CO</span>' : ''}
+                    <time class="modal-node-time">${fmtTime(node.time)}</time>
+                    ${isCollapsed ? `<span style="font-family:var(--font-mono);font-size:8px;color:var(--ink-light);">(${countReplies(node)+1} hidden)</span>` : ''}
+                `;
+                wrap.appendChild(head);
+
+                if (hasChildren) {
+                    const toggle = head.querySelector('.modal-node-toggle');
+                    toggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        isCollapsed ? collapsed.delete(node.id) : collapsed.add(node.id);
+                        renderLetter(activeIndex);
+                    });
+                }
+
+                if (!isCollapsed) {
+                    const text = document.createElement('div');
+                    text.className = 'modal-node-text';
+                    text.textContent = node.text;
+                    wrap.appendChild(text);
+
+                    if (node.replies.length) {
+                        const children = document.createElement('div');
+                        children.className = 'modal-node-children';
+                        node.replies.forEach(r => children.appendChild(renderProfileThreadNode(r)));
+                        wrap.appendChild(children);
+                    }
+                }
+
+                wrap.querySelectorAll('[data-profile-author-id]').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = el.dataset.profileAuthorId;
+                        const obj = authorById(id);
+                        if (obj) {
+                            const type = obj.kind === 'company' ? 'company' : 'person';
+                            openProfileModal(type, id);
+                        }
+                    });
+                });
+
+                return wrap;
+            }
+
             // ── Rendering ─────────────────────────────────────────────
             function renderLetter(index) {
                 const panels = document.querySelectorAll('.letter-panel');
@@ -4584,24 +5205,29 @@
                     if (kicker) kicker.textContent = 'LETTER ' + String(index + 1).padStart(2, '0');
                     if (title) title.textContent = data.title || 'Untitled letter';
                     if (deck) deck.textContent = data.deck || '';
+
+                    // In profile view, show the user name in the deck
+                    if (data.isProfile && data.profileUserId) {
+                        const user = authorById(data.profileUserId);
+                        if (user && deck) {
+                            deck.textContent = `${user.name} · ${user.role || ''}`;
+                        }
+                    }
                 }
 
                 const toolbar = frame.querySelector('.letter-toolbar');
-                const mode = data.viewMode || 'list';
-                const includeMuted = data.includeMuted || false;
-                let filtered = getFiltered(data.filterTag, includeMuted);
-                filtered = sortByActivity(filtered);
-
-                const toggle = toolbar?.querySelector('.view-toggle');
-                if (toggle) {
-                    ['list', 'grid', 'bento'].forEach(m => {
-                        const btn = toggle.querySelector(`[data-mode="${m}"]`);
-                        if (btn) btn.classList.toggle('active', m === mode);
-                    });
-                }
-
                 const countEl = toolbar?.querySelector('.letter-count');
-                if (countEl) countEl.textContent = filtered.length + ' statements';
+                if (countEl) {
+                    if (data.isProfile && data.statementIds) {
+                        countEl.textContent = data.statementIds.length + ' statement' + (data.statementIds.length > 1 ?
+                            's' : '');
+                    } else {
+                        const includeMuted = data.includeMuted || false;
+                        let filtered = getFiltered(data.filterTag, includeMuted);
+                        filtered = sortByActivity(filtered);
+                        countEl.textContent = filtered.length + ' statements';
+                    }
+                }
 
                 const oldContent = frame.querySelector('.letter-content');
                 if (oldContent) oldContent.remove();
@@ -4609,78 +5235,114 @@
                 const content = document.createElement('div');
                 content.className = 'letter-content';
 
-                if (filtered.length === 0) {
-                    content.innerHTML =
-                        `
-                    <div class="empty-letter">
-                      <div class="t-micro">NO STATEMENTS</div>
-                      <p>Nothing matches these filters${includeMuted ? ' (including muted)' : ''}.</p>
-                      <button class="btn ghost small" onclick="window.__clearFilters()" style="margin-top:8px;">Clear filters</button>
-                    </div>
-                  `;
-                } else {
+                // ── Profile view: render thread ──
+                if (data.isProfile && data.statementIds) {
                     const container = document.createElement('div');
-                    container.className = mode === 'list' ? 'letter-list' : mode === 'grid' ? 'letter-grid' :
-                        'letter-bento';
+                    container.className = 'letter-profile-container';
 
-                    if (includeMuted) panel.dataset.archive = 'true';
-                    else panel.dataset.archive = 'false';
+                    data.statementIds.forEach(sid => {
+                        const threadEl = buildProfileThreadLetter(sid);
+                        container.appendChild(threadEl);
+                    });
 
-                    const endIdx = Math.min(PAGE_SIZE, filtered.length);
-                    for (let i = 0; i < endIdx; i++) {
-                        const s = filtered[i];
-                        const idx = String(statements.length - statements.indexOf(s)).padStart(3, '0');
-                        const el = mode === 'list' ? buildRow(s, idx) : mode === 'grid' ? buildGridItem(s) :
-                            buildBentoCard(s);
-                        if (s.muteState === 'muted') {
-                            el.classList.add('statement-archive-muted');
-                        }
-                        container.appendChild(el);
-                    }
                     content.appendChild(container);
 
-                    if (filtered.length > PAGE_SIZE) {
-                        const trigger = document.createElement('div');
-                        trigger.className = 'load-more-trigger';
-                        trigger.textContent = `Load more (${filtered.length - PAGE_SIZE} remaining)`;
-                        trigger.addEventListener('click', () => {
-                            const currentCount = container.querySelectorAll(
-                                mode === 'list' ? '.letter-row' : mode === 'grid' ? '.grid-item' : '.card'
-                                ).length;
-                            const nextBatch = Math.min(currentCount + PAGE_SIZE, filtered.length);
-                            for (let i = currentCount; i < nextBatch; i++) {
-                                const s = filtered[i];
-                                const idx = String(statements.length - statements.indexOf(s)).padStart(3,
-                                '0');
-                                const el = mode === 'list' ? buildRow(s, idx) : mode === 'grid' ?
-                                    buildGridItem(s) : buildBentoCard(s);
-                                if (s.muteState === 'muted') el.classList.add('statement-archive-muted');
-                                container.appendChild(el);
-                            }
-                            if (nextBatch >= filtered.length) {
-                                trigger.textContent = 'All loaded ✓';
-                                trigger.style.cursor = 'default';
-                            } else {
-                                trigger.textContent = `Load more (${filtered.length - nextBatch} remaining)`;
-                            }
+                    // Update archive state
+                    panel.dataset.archive = 'false';
+                } else {
+                    // ── Normal view ──
+                    const includeMuted = data.includeMuted || false;
+                    let filtered = getFiltered(data.filterTag, includeMuted);
+                    filtered = sortByActivity(filtered);
+
+                    const mode = data.viewMode || 'list';
+
+                    const toggle = toolbar?.querySelector('.view-toggle');
+                    if (toggle) {
+                        ['list', 'grid', 'bento'].forEach(m => {
+                            const btn = toggle.querySelector(`[data-mode="${m}"]`);
+                            if (btn) btn.classList.toggle('active', m === mode);
                         });
-                        content.appendChild(trigger);
                     }
+
+                    if (filtered.length === 0) {
+                        content.innerHTML =
+                            `
+                        <div class="empty-letter">
+                          <div class="t-micro">NO STATEMENTS</div>
+                          <p>Nothing matches these filters${includeMuted ? ' (including muted)' : ''}.</p>
+                          <button class="btn ghost small" onclick="window.__clearFilters()" style="margin-top:8px;">Clear filters</button>
+                        </div>
+                      `;
+                    } else {
+                        const container = document.createElement('div');
+                        container.className = mode === 'list' ? 'letter-list' : mode === 'grid' ? 'letter-grid' :
+                            'letter-bento';
+
+                        if (includeMuted) panel.dataset.archive = 'true';
+                        else panel.dataset.archive = 'false';
+
+                        const endIdx = Math.min(PAGE_SIZE, filtered.length);
+                        for (let i = 0; i < endIdx; i++) {
+                            const s = filtered[i];
+                            const idx = String(statements.length - statements.indexOf(s)).padStart(3, '0');
+                            const el = mode === 'list' ? buildRow(s, idx) : mode === 'grid' ? buildGridItem(s) :
+                                buildBentoCard(s);
+                            if (s.muteState === 'muted') {
+                                el.classList.add('statement-archive-muted');
+                            }
+                            container.appendChild(el);
+                        }
+                        content.appendChild(container);
+
+                        if (filtered.length > PAGE_SIZE) {
+                            const trigger = document.createElement('div');
+                            trigger.className = 'load-more-trigger';
+                            trigger.textContent = `Load more (${filtered.length - PAGE_SIZE} remaining)`;
+                            trigger.addEventListener('click', () => {
+                                const currentCount = container.querySelectorAll(
+                                    mode === 'list' ? '.letter-row' : mode === 'grid' ? '.grid-item' :
+                                    '.card').length;
+                                const nextBatch = Math.min(currentCount + PAGE_SIZE, filtered.length);
+                                for (let i = currentCount; i < nextBatch; i++) {
+                                    const s = filtered[i];
+                                    const idx = String(statements.length - statements.indexOf(s)).padStart(3,
+                                        '0');
+                                    const el = mode === 'list' ? buildRow(s, idx) : mode === 'grid' ?
+                                        buildGridItem(s) : buildBentoCard(s);
+                                    if (s.muteState === 'muted') el.classList.add(
+                                    'statement-archive-muted');
+                                    container.appendChild(el);
+                                }
+                                if (nextBatch >= filtered.length) {
+                                    trigger.textContent = 'All loaded ✓';
+                                    trigger.style.cursor = 'default';
+                                } else {
+                                    trigger.textContent =
+                                        `Load more (${filtered.length - nextBatch} remaining)`;
+                                }
+                            });
+                            content.appendChild(trigger);
+                        }
+                    }
+
+                    // Update HUD view buttons
+                    ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach(id => {
+                        const btn = document.getElementById(id);
+                        if (btn) btn.classList.toggle('active', id === 'hudView' + mode.charAt(0).toUpperCase() +
+                            mode.slice(1));
+                    });
                 }
 
                 frame.appendChild(content);
 
-                document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
+                if (!isProfileView) {
+                    document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
+                }
                 updateFilterUI();
-
-                ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach(id => {
-                    const btn = document.getElementById(id);
-                    if (btn) btn.classList.toggle('active', id === 'hudView' + mode.charAt(0).toUpperCase() + mode
-                        .slice(1));
-                });
-
                 updateProgressBar();
                 renderReviewBadge();
+                updateProfileBadge();
             }
 
             // ── Viewport blur etc. ──────────────────────────────────
@@ -4756,25 +5418,29 @@
 
                 const toolbar = document.createElement('div');
                 toolbar.className = 'letter-toolbar';
-                const toggle = document.createElement('div');
-                toggle.className = 'view-toggle';
-                ['list', 'grid', 'bento'].forEach(m => {
-                    const btn = document.createElement('button');
-                    btn.className = 'chip' + (m === (data.viewMode || 'list') ? ' active' : '');
-                    btn.dataset.mode = m;
-                    btn.textContent = m.charAt(0).toUpperCase() + m.slice(1);
-                    btn.addEventListener('click', e => {
-                        e.stopPropagation();
-                        data.viewMode = m;
-                        renderLetter(index);
+
+                // Only show view toggle if not in profile view
+                if (!data.isProfile) {
+                    const toggle = document.createElement('div');
+                    toggle.className = 'view-toggle';
+                    ['list', 'grid', 'bento'].forEach(m => {
+                        const btn = document.createElement('button');
+                        btn.className = 'chip' + (m === (data.viewMode || 'list') ? ' active' : '');
+                        btn.dataset.mode = m;
+                        btn.textContent = m.charAt(0).toUpperCase() + m.slice(1);
+                        btn.addEventListener('click', e => {
+                            e.stopPropagation();
+                            data.viewMode = m;
+                            renderLetter(index);
+                        });
+                        toggle.appendChild(btn);
                     });
-                    toggle.appendChild(btn);
-                });
-                toolbar.appendChild(toggle);
+                    toolbar.appendChild(toggle);
+                }
 
                 const countEl = document.createElement('span');
                 countEl.className = 'letter-count';
-                countEl.textContent = '0 statements';
+                countEl.textContent = '0';
                 toolbar.appendChild(countEl);
                 frame.appendChild(toolbar);
 
@@ -4794,12 +5460,27 @@
             }
 
             // ── Carousel ──────────────────────────────────────────────
+            function initMainLetterData() {
+                letterData = [
+                    { title: 'The Feed', deck: 'All statements, unfiltered.', viewMode: 'bento',
+                        includeMuted: false },
+                    { title: 'Open to Work', deck: 'People looking for their next role.', viewMode: 'list',
+                        filterTag: 'OPEN TO WORK', includeMuted: false },
+                    { title: 'Hiring', deck: 'Companies and teams looking for talent.', viewMode: 'list',
+                        filterTag: 'HIRING', includeMuted: false },
+                    { title: 'Thoughts', deck: 'Ideas, observations, provocations.', viewMode: 'grid',
+                        includeMuted: false },
+                    { title: 'Archive', deck: 'Muted statements.', viewMode: 'list', includeMuted: true }
+                ];
+            }
+
             function renderTrack() {
                 const track = document.getElementById('lettersTrack');
                 track.innerHTML = '';
                 letterData.forEach((data, i) => track.appendChild(buildLetterPanel(i, data)));
                 renderLetter(0);
                 updateProgressBar();
+                updateProfileBadge();
             }
 
             function activatePanel(newIndex) {
@@ -4864,7 +5545,8 @@
                 const fakeStatement = { id: 'preview', authorId, tag, mediaUrl, text, time: Date.now(), replies: [],
                     editState: 'original', editHistory: [], muteState: 'visible' };
                 container.innerHTML = '';
-                container.appendChild(buildBentoCard(fakeStatement, { variant: composerPreviewVariant, noSpan: true, static: true }));
+                container.appendChild(buildBentoCard(fakeStatement, { variant: composerPreviewVariant, noSpan: true,
+                    static: true }));
             }
 
             function openComposer() {
@@ -5169,6 +5851,7 @@
             // ── Init ──────────────────────────────────────────────────
             window.__clearFilters = clearFilters;
             window.openProfileModal = openProfileModal;
+            window.enterProfileView = enterProfileView;
 
             document.addEventListener('DOMContentLoaded', async function() {
                 try {
@@ -5186,18 +5869,7 @@
                         await resetDemoContent();
                     }
 
-                    letterData = [
-                        { title: 'The Feed', deck: 'All statements, unfiltered.', viewMode: 'bento',
-                        includeMuted: false },
-                        { title: 'Open to Work', deck: 'People looking for their next role.', viewMode: 'list',
-                            filterTag: 'OPEN TO WORK', includeMuted: false },
-                        { title: 'Hiring', deck: 'Companies and teams looking for talent.', viewMode: 'list',
-                            filterTag: 'HIRING', includeMuted: false },
-                        { title: 'Thoughts', deck: 'Ideas, observations, provocations.', viewMode: 'grid',
-                            includeMuted: false },
-                        { title: 'Archive', deck: 'Muted statements.', viewMode: 'list', includeMuted: true }
-                    ];
-
+                    initMainLetterData();
                     renderTrack();
                     renderAttention();
                     renderChipsUI();
@@ -5211,14 +5883,17 @@
                     document.getElementById('focusExitBtn').addEventListener('click', () => setFocusMode(false));
 
                     document.getElementById('hudViewList').addEventListener('click', function() {
+                        if (isProfileView) return;
                         letterData[activeIndex].viewMode = 'list';
                         renderLetter(activeIndex);
                     });
                     document.getElementById('hudViewGrid').addEventListener('click', function() {
+                        if (isProfileView) return;
                         letterData[activeIndex].viewMode = 'grid';
                         renderLetter(activeIndex);
                     });
                     document.getElementById('hudViewBento').addEventListener('click', function() {
+                        if (isProfileView) return;
                         letterData[activeIndex].viewMode = 'bento';
                         renderLetter(activeIndex);
                     });
@@ -5312,6 +5987,7 @@
                             }
                             document.getElementById('attentionDropdown').classList.remove('open');
                             closeRapidRespond();
+                            if (isProfileView) exitProfileView();
                         }
                     });
 
@@ -5342,7 +6018,12 @@
                         });
                         saveData();
                         closeComposer();
-                        renderLetter(activeIndex);
+                        if (isProfileView) {
+                            // Rebuild profile view
+                            enterProfileView(profileUserId);
+                        } else {
+                            renderLetter(activeIndex);
+                        }
                         document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
                     });
 
@@ -5395,7 +6076,14 @@
                         await resetDemoContent();
                         clearFilters();
                         if (focusMode) setFocusMode(false);
+                        if (isProfileView) exitProfileView();
                         setLogoOpen(false);
+                    });
+
+                    // Profile back button
+                    document.getElementById('profileBackBtn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (isProfileView) exitProfileView();
                     });
 
                     document.getElementById('modalClose').addEventListener('click', closeConversation);
@@ -5468,7 +6156,7 @@
             });
         })();
 
-        // ── custom cursor (FIXED) ─────────────────────────────────────
+        // ── custom cursor ─────────────────────────────────────────────
         (function initWriteCursor() {
             const writeCursorDot = document.getElementById('writeCursorDot');
             const writeCursorEllipse = document.getElementById('writeCursorEllipse');
