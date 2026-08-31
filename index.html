@@ -298,6 +298,8 @@
             transform: translateY(-1px) rotate(180deg);
             color: var(--ink-light);
         }
+
+        /* ─── FIX 1: pointer-events on .logo-card ─── */
         .logo-card {
             position: absolute;
             top: calc(100% + 10px);
@@ -314,7 +316,7 @@
             transform-origin: top left;
             transition: opacity .22s ease, transform .22s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility .22s;
             z-index: 60;
-            pointer-events: none;
+            pointer-events: none;        /* added */
             cursor: default;
         }
         .logo-tile:hover .logo-card,
@@ -323,8 +325,26 @@
             opacity: 1;
             visibility: visible;
             transform: translateY(0) scale(1);
-            pointer-events: auto;
+            pointer-events: auto;       /* added */
         }
+
+        /* ─── FIX 2: disable :focus-within on mobile ─── */
+        @media (max-width: 640px) {
+            .logo-tile:hover .logo-card,
+            .logo-tile:focus-within .logo-card {
+                pointer-events: none;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-6px) scale(0.98);
+            }
+            .logo-tile.open .logo-card {
+                pointer-events: auto;
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         .logo-card-eyebrow { margin-bottom: 8px; }
         .logo-card-text {
             font-size: 12px;
@@ -2707,7 +2727,7 @@
             margin: 4px 0 8px;
         }
         .activity-filter-group .chip {
-            font-size: 1.1em;
+            font-size: 7px;
             padding: 4px 10px;
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -4833,14 +4853,29 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
+            // ─── FIX 3: exitProfileView with cleanup ───
             function exitProfileView() {
+                // Close any open dropdowns / modals that might block the UI
+                document.getElementById('attentionDropdown').classList.remove('open');
+                document.getElementById('bentoOverlay').classList.remove('open');
+                document.getElementById('reviewOverlay').classList.remove('open');
+                document.getElementById('chipsOverlay').classList.remove('open');
+                document.getElementById('conversationModal').classList.remove('open');
+                document.getElementById('profileModal').classList.remove('open');
+                closeRapidRespond();
+                closeComposer();
+
                 isProfileView = false;
                 profileUserId = null;
                 document.body.classList.remove('profile-view');
+                document.body.style.overflow = '';   // re-enable scrolling
+
                 initMainLetterData();
                 renderTrack();
                 updateProfileBadge();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // Reset scroll position safely
+                window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             }
 
             function updateProfileBadge() {
@@ -6137,9 +6172,10 @@
                         setLogoOpen(false);
                     });
 
-                    // Profile exit button
+                    // ─── FIX 4: profile exit listener with stopPropagation ───
                     document.getElementById('profileExitBtn').addEventListener('click', (e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                         if (isProfileView) exitProfileView();
                     });
 
