@@ -122,15 +122,15 @@
         .btn-badge { position: relative; }
         .btn-badge .badge {
             position: absolute;
-            top: -4px;
-            right: -4px;
+            top: -5px;
+            right: -5px;
             background: var(--ink);
             color: var(--card);
             font-family: var(--font-mono);
-            font-size: 6px;
+            font-size: 7px;
             font-weight: 600;
-            min-width: 14px;
-            height: 14px;
+            min-width: 16px;
+            height: 16px;
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -143,7 +143,7 @@
         .topbar {
             position: sticky;
             top: 0;
-            z-index: 50;
+            z-index: 150;
             background: transparent;
             padding: 6px 0;
             min-height: var(--topbar-height);
@@ -278,8 +278,8 @@
             gap: 6px;
             flex-shrink: 0;
         }
-        .topbar-right .btn { font-size: 7px; min-height: 26px; padding: 2px 8px; }
-        .topbar-right .btn-icon { width: 26px; padding: 0; font-size: 12px; }
+        .topbar-right .btn { font-size: 9px; min-height: 32px; padding: 4px 10px; }
+        .topbar-right .btn-icon { width: 32px; padding: 0; font-size: 15px; }
 
         /* ── font/scale ramp (appearance) dropdown ── */
         .topbar-appearance-wrapper {
@@ -288,9 +288,9 @@
             align-items: center;
         }
         .topbar-appearance-wrapper .btn {
-            font-size: 8px;
-            min-height: 28px;
-            padding: 2px 10px;
+            font-size: 10px;
+            min-height: 32px;
+            padding: 4px 12px;
         }
         .topbar-appearance-dropdown {
             position: absolute;
@@ -344,12 +344,12 @@
             background: transparent;
             border: 1px solid var(--border);
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 17px;
             color: var(--ink-mid);
             transition: background .15s ease, border-color .15s ease;
             cursor: pointer;
@@ -449,9 +449,9 @@
             border: 1px solid var(--border);
             flex-shrink: 0;
         }
-        .attention-item .item-avatar.v0 { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+        .attention-item .item-avatar.v0 { background: var(--accent); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
         .attention-item .item-avatar.v1 { background: var(--bg); color: var(--ink); }
-        .attention-item .item-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: var(--accent-2); }
+        .attention-item .item-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
         .attention-item .item-avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
         .attention-item .item-avatar.company::after {
             content: '';
@@ -518,7 +518,7 @@
 
         @media (max-width: 480px) {
             .attention-dropdown { width: 260px; right: -12px; max-height: 280px; }
-            .attention-btn { width: 26px; height: 26px; font-size: 12px; }
+            .attention-btn { width: 30px; height: 30px; font-size: 14px; }
         }
 
         /* ── main wrap ── */
@@ -566,6 +566,9 @@
         }
         .letter-panel.active { opacity: 1; cursor: auto; transform: scale(1); }
 
+        /* letter-hotspot had no size/position rules, so it was a 0×0 element
+           and the click listeners on it could never fire — this is what makes
+           the edge click zones (and their cursor state) "not work". */
         .letter-hotspot {
             position: absolute;
             top: 0;
@@ -949,9 +952,9 @@
         .avatar.sz-sm { width: 28px; height: 28px; font-size: 9px; }
         .avatar.sz-md { width: 40px; height: 40px; font-size: 13px; }
         .avatar.sz-lg { width: 52px; height: 52px; font-size: 16px; }
-        .avatar.v0 { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+        .avatar.v0 { background: var(--accent); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
         .avatar.v1 { background: var(--bg); color: var(--ink); }
-        .avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: var(--accent-2); }
+        .avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
         .avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
         .avatar.company::after {
             content: '';
@@ -2022,9 +2025,9 @@
             background: var(--bg);
             color: var(--ink);
         }
-        .profile-card-avatar.v0 { background: var(--accent); color: var(--ink); border-color: var(--accent); }
+        .profile-card-avatar.v0 { background: var(--accent); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
         .profile-card-avatar.v1 { background: var(--bg); color: var(--ink); }
-        .profile-card-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: var(--accent-2); }
+        .profile-card-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: rgba(28, 28, 30, 0.18); }
         .profile-card-avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
         .profile-card-avatar.company::after {
             content: '';
@@ -2425,15 +2428,15 @@
             color: var(--ink);
         }
 
-        /* ── Action Log modal (renamed from Activity) ── */
-        .action-list {
+        /* ── Action Log modal ── */
+        .activity-list {
             display: flex;
             flex-direction: column;
             flex: 1;
             overflow-y: auto;
             min-height: 0;
         }
-        .action-empty {
+        .activity-empty {
             font-family: var(--font-mono);
             font-size: 11px;
             letter-spacing: 0.06em;
@@ -2442,7 +2445,7 @@
             text-align: center;
             padding: 48px 0;
         }
-        .action-row {
+        .activity-row {
             display: grid;
             grid-template-columns: 10px 1fr auto;
             align-items: start;
@@ -2450,8 +2453,8 @@
             padding: 15px 4px;
             border-bottom: 1px solid var(--border);
         }
-        .action-row:last-child { border-bottom: none; }
-        .action-dot {
+        .activity-row:last-child { border-bottom: none; }
+        .activity-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
@@ -2459,18 +2462,18 @@
             background: var(--ink-lighter);
             flex-shrink: 0;
         }
-        .action-row[data-type="reply"] .action-dot { background: var(--accent); }
-        .action-row[data-type="save"] .action-dot { background: var(--accent-2); }
-        .action-row[data-type="view"] .action-dot { background: var(--ink-mid); }
-        .action-main { min-width: 0; }
-        .action-type {
+        .activity-row[data-type="reply"] .activity-dot { background: var(--accent); }
+        .activity-row[data-type="save"] .activity-dot { background: var(--accent-2); }
+        .activity-row[data-type="view"] .activity-dot { background: var(--ink-mid); }
+        .activity-main { min-width: 0; }
+        .activity-type {
             font-family: var(--font-mono);
             font-size: 10px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: var(--ink-light);
         }
-        .action-snippet {
+        .activity-snippet {
             font-size: calc(var(--fs-body) * 1.0);
             color: var(--ink);
             margin-top: 4px;
@@ -2478,7 +2481,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .action-meta {
+        .activity-meta {
             font-family: var(--font-mono);
             font-size: 10px;
             color: var(--ink-light);
@@ -2553,7 +2556,7 @@
                 </div>
             </div>
 
-            <!-- Right: appearance, reviews, chips, attention, action log -->
+            <!-- Right: appearance, reviews, chips, action log, attention -->
             <div class="topbar-right">
                 <!-- Appearance -->
                 <div class="topbar-appearance-wrapper">
@@ -2570,6 +2573,12 @@
                 <!-- Chips -->
                 <button class="btn" id="chipsToggleBtn" title="Manage chips">⌨</button>
 
+                <!-- Action log -->
+                <button class="btn btn-badge" id="actionToggleBtn" title="Action log">
+                    <span>⚡</span>
+                    <span class="badge" id="actionBadge" style="display:none;">0</span>
+                </button>
+
                 <!-- Attention -->
                 <div class="attention-wrapper" id="attentionWrapper">
                     <button class="attention-btn" id="attentionBtn" aria-label="Attention">
@@ -2581,9 +2590,6 @@
                         <div id="attentionList"></div>
                     </div>
                 </div>
-
-                <!-- Action Log (renamed from Activity) -->
-                <button class="btn" id="actionToggleBtn" title="Action log">⚡</button>
             </div>
         </div>
     </div>
@@ -2652,7 +2658,6 @@
             <span>Filters</span>
             <span class="filter-count" id="filterCount">0</span>
         </button>
-        <!-- Clear button removed per request -->
         <div class="hud-divider"></div>
         <button class="btn btn-primary" id="hudNew">+ New</button>
     </div>
@@ -2708,19 +2713,19 @@
         </div>
     </div>
 
-    <!-- ─── ACTION LOG MODAL (renamed) ─── -->
-    <div class="bento-overlay" id="actionOverlay">
+    <!-- ─── ACTION LOG MODAL ─── -->
+    <div class="bento-overlay" id="activityOverlay">
         <div class="bento-panel">
             <div class="bento-header">
-                <h2>Action log</h2>
-                <button class="close-btn" id="actionClose">✕</button>
+                <h2>Action Log</h2>
+                <button class="close-btn" id="activityClose">✕</button>
             </div>
             <div class="bento-card bento-card-full">
-                <h4>Your actions (mock)</h4>
-                <div class="action-list" id="actionList"></div>
+                <h4>Mock action (inert for demo)</h4>
+                <div class="activity-list" id="activityList"></div>
             </div>
             <div class="bento-actions">
-                <button class="btn ghost" id="actionClear">Clear log (mock)</button>
+                <button class="btn ghost" id="activityClear">Clear log (mock)</button>
             </div>
         </div>
     </div>
@@ -4037,7 +4042,6 @@
                     if (activeDisciplines.size) parts.push(`${activeDisciplines.size} discipline${activeDisciplines.size>1?'s':''}`);
                     showFilterToast(`Active: ${parts.join(', ')}`);
                 }
-                // Clear button removed, so no need to toggle it
             }
 
             // ── Conversation modal ───────────────────────────────────
@@ -5074,8 +5078,8 @@
                 });
             }
 
-            // ── Action Log (renamed) ──────────────────────────────────
-            const mockActionData = [
+            // ── Action Log (mock) ──────────────────────────────────
+            const mockActivityData = [
                 { type: 'reply', name: 'Zack Gort', snippet: 'This resonates. We hit the same wall last quarter.',
                     time: '2 mins ago' },
                 { type: 'save', name: 'Studio North', snippet: 'Saved profile · Design studio', time: '14 mins ago' },
@@ -5086,33 +5090,40 @@
                 { type: 'save', name: 'Strata', snippet: 'Saved profile · Cloud infrastructure', time: '1 day ago' },
             ];
 
-            function renderActionLog() {
-                const list = document.getElementById('actionList');
+            function renderActivityLog() {
+                const list = document.getElementById('activityList');
                 if (!list) return;
-                if (!mockActionData.length) {
-                    list.innerHTML = `<div class="action-empty">Nothing here yet.</div>`;
+                if (!mockActivityData.length) {
+                    list.innerHTML = `<div class="activity-empty">Nothing here yet.</div>`;
+                    const emptyBadge = document.getElementById('actionBadge');
+                    if (emptyBadge) emptyBadge.style.display = 'none';
                     return;
                 }
-                list.innerHTML = mockActionData.map(e =>
-                    `<div class="action-row" data-type="${e.type}">
-                <span class="action-dot"></span>
-                <div class="action-main">
-                  <div class="action-type">${e.type.toUpperCase()} · ${escapeHtml(e.name)}</div>
-                  <div class="action-snippet">${escapeHtml(e.snippet)}</div>
+                list.innerHTML = mockActivityData.map(e =>
+                    `<div class="activity-row" data-type="${e.type}">
+                <span class="activity-dot"></span>
+                <div class="activity-main">
+                  <div class="activity-type">${e.type.toUpperCase()} · ${escapeHtml(e.name)}</div>
+                  <div class="activity-snippet">${escapeHtml(e.snippet)}</div>
                 </div>
-                <div class="action-meta">${e.time}</div>
+                <div class="activity-meta">${e.time}</div>
               </div>`
                 ).join('');
+                const badge = document.getElementById('actionBadge');
+                if (badge) {
+                    badge.textContent = String(mockActivityData.length);
+                    badge.style.display = mockActivityData.length ? 'flex' : 'none';
+                }
             }
 
-            function openActionLog() {
-                renderActionLog();
-                document.getElementById('actionOverlay').classList.add('open');
+            function openActivity() {
+                renderActivityLog();
+                document.getElementById('activityOverlay').classList.add('open');
                 document.body.style.overflow = 'hidden';
             }
 
-            function closeActionLog() {
-                document.getElementById('actionOverlay').classList.remove('open');
+            function closeActivity() {
+                document.getElementById('activityOverlay').classList.remove('open');
                 document.body.style.overflow = '';
             }
 
@@ -5315,6 +5326,16 @@
                     });
                     document.getElementById('filterToastDismiss').addEventListener('click', hideFilterToast);
 
+                    document.getElementById('actionToggleBtn').addEventListener('click', openActivity);
+                    document.getElementById('activityClose').addEventListener('click', closeActivity);
+                    document.getElementById('activityOverlay').addEventListener('click', (e) => {
+                        if (e.target === e.currentTarget) closeActivity();
+                    });
+                    document.getElementById('activityClear').addEventListener('click', () => {
+                        mockActivityData.length = 0;
+                        renderActivityLog();
+                    });
+
                     const logoTile = document.getElementById('logoTile');
                     const logoReset = document.getElementById('logoReset');
 
@@ -5398,19 +5419,6 @@
                     });
                     document.getElementById('chipAddInput').addEventListener('keydown', (e) => {
                         if (e.key === 'Enter') document.getElementById('chipAddBtn').click();
-                    });
-
-                    // Action log toggle
-                    document.getElementById('actionToggleBtn').addEventListener('click', openActionLog);
-                    document.getElementById('actionClose').addEventListener('click', closeActionLog);
-                    document.getElementById('actionOverlay').addEventListener('click', (e) => {
-                        if (e.target === e.currentTarget) closeActionLog();
-                    });
-                    document.getElementById('actionClear').addEventListener('click', () => {
-                        if (confirm('Clear mock action log?')) {
-                            mockActionData.length = 0;
-                            renderActionLog();
-                        }
                     });
 
                     setTimeout(updateProgressBar, 100);
