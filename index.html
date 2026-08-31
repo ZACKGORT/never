@@ -120,15 +120,12 @@
         .btn-primary:hover { background: var(--ink-mid); border-color: var(--ink-mid); }
         .btn-icon { width: 30px; padding: 0; justify-content: center; font-size: 14px; }
 
-        /* ── topbar ── */
+        /* ── topbar (invisible/frameless — see .viewport-blur for the fade) ── */
         .topbar {
             position: sticky;
             top: 0;
             z-index: 50;
-            background: rgba(240, 240, 242, 0.88);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
+            background: transparent;
             padding: 6px 0;
             min-height: var(--topbar-height);
             display: flex;
@@ -143,6 +140,38 @@
             max-width: var(--max-width);
             margin: 0 auto;
             width: 100%;
+        }
+
+        /* ── viewport edge blur — replaces the topbar's solid bar; content
+           fades/blurs as it scrolls under the very top and very bottom
+           edges of the screen instead of hitting a hard frame ── */
+        .viewport-blur {
+            position: fixed;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            pointer-events: none;
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            transition: backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease, background 0.4s ease;
+        }
+        .viewport-blur.scrolling {
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+        .viewport-blur-top {
+            top: 0;
+            height: calc(var(--topbar-height) + 36px);
+            background: linear-gradient(to bottom, rgba(240, 240, 242, 0.7), rgba(240, 240, 242, 0));
+            mask-image: linear-gradient(to bottom, black 0%, black 60%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, black 60%, transparent 100%);
+        }
+        .viewport-blur-bottom {
+            bottom: 0;
+            height: calc(var(--hud-height) + 60px);
+            background: linear-gradient(to top, rgba(240, 240, 242, 0.7), rgba(240, 240, 242, 0));
+            mask-image: linear-gradient(to top, black 0%, black 45%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to top, black 0%, black 45%, transparent 100%);
         }
         .wordmark {
             font-family: var(--font);
@@ -1086,8 +1115,12 @@
         }
         .hud-top {
             top: calc(var(--topbar-height) + 12px);
+            transition: top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --hud-btn-pad: 5px 10px;
             --hud-btn-fs: 8px;
+        }
+        .hud-top.docked {
+            top: max(24px, env(safe-area-inset-top));
         }
 
         .hud-divider {
@@ -2130,6 +2163,10 @@
         <div class="scroll-progress-fill" id="scrollProgressFill"></div>
     </div>
 
+    <!-- ─── VIEWPORT EDGE BLUR (top/bottom fade, topbar itself is frameless) ─── -->
+    <div class="viewport-blur viewport-blur-top" id="viewportBlurTop" aria-hidden="true"></div>
+    <div class="viewport-blur viewport-blur-bottom" id="viewportBlurBottom" aria-hidden="true"></div>
+
     <!-- ─── TOPBAR ─── -->
     <div class="topbar">
         <div class="wrap">
@@ -2667,32 +2704,53 @@
                     'This is the take, honestly.'
                 ];
 
-                function makeReplies(parentTime, depth, excludeId) {
+                function makeNestedReplies(parentTime, depth, excludeId) {
                     if (depth > 2) return [];
-                    const chance = depth === 0 ? 0.85 : depth === 1 ? 0.45 : 0.2;
+                    const chance = depth === 1 ? 0.45 : 0.2;
                     if (Math.random() > chance) return [];
-                    const n = depth === 0 ? (1 + Math.floor(Math.random() * 3)) : 1;
+                    const candidates = authorsList.filter(a => a.id !== excludeId);
+                    const author = candidates[Math.floor(Math.random() * candidates.length)];
+                    const t = Math.min(now, parentTime + hour * (1 + Math.random() * 20));
+                    return [{
+                        id: uid(),
+                        authorId: author.id,
+                        time: t,
+                        text: REPLY_TEXTS[Math.floor(Math.random() * REPLY_TEXTS.length)],
+                        replies: makeNestedReplies(t, depth + 1, author.id)
+                    }];
+                }
+
+                // Every thread gets at least one reply. Counts are weighted
+                // so most threads are light-to-medium, a handful run long.
+                function pickReplyCount() {
+                    const r = Math.random();
+                    if (r < 0.3) return 1 + Math.floor(Math.random() * 2); // 1–2
+                    if (r < 0.7) return 3 + Math.floor(Math.random() * 3); // 3–5
+                    if (r < 0.92) return 6 + Math.floor(Math.random() * 5); // 6–10
+                    return 11 + Math.floor(Math.random() * 8); // 11–18
+                }
+
+                function makeTopLevelReplies(parentTime, excludeId) {
+                    const n = pickReplyCount();
                     const out = [];
+                    let cursor = parentTime;
                     for (let i = 0; i < n; i++) {
                         const candidates = authorsList.filter(a => a.id !== excludeId);
                         const author = candidates[Math.floor(Math.random() * candidates.length)];
-                        const t = parentTime + hour * (1 + Math.random() * 30);
-                        if (t > now) continue;
+                        cursor = Math.min(now, cursor + hour * (0.5 + Math.random() * 14));
                         out.push({
                             id: uid(),
                             authorId: author.id,
-                            time: t,
+                            time: cursor,
                             text: REPLY_TEXTS[Math.floor(Math.random() * REPLY_TEXTS.length)],
-                            replies: makeReplies(t, depth + 1, author.id)
+                            replies: makeNestedReplies(cursor, 1, author.id)
                         });
                     }
                     return out;
                 }
 
                 result.forEach(s => {
-                    if (Math.random() < 0.55) {
-                        s.replies = makeReplies(s.time, 0, s.authorId);
-                    }
+                    s.replies = makeTopLevelReplies(s.time, s.authorId);
                 });
 
                 return result;
@@ -3830,6 +3888,24 @@
                 updateProgressBar();
             }
 
+            // ── Viewport edge blur (top/bottom fade) + top HUD docking ──
+            function setupViewportBlur() {
+                const top = document.getElementById('viewportBlurTop');
+                const bottom = document.getElementById('viewportBlurBottom');
+                const hudTop = document.getElementById('hudTop');
+                if (!top || !bottom) return;
+                function update() {
+                    const scrollY = window.scrollY || window.pageYOffset || 0;
+                    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                    top.classList.toggle('scrolling', scrollY > 4);
+                    bottom.classList.toggle('scrolling', scrollY < maxScroll - 4);
+                    if (hudTop) hudTop.classList.toggle('docked', scrollY > 4);
+                }
+                window.addEventListener('scroll', update, { passive: true });
+                window.addEventListener('resize', update);
+                update();
+            }
+
             // ── Scroll Progress Bar ──────────────────────────────────
             function updateProgressBar() {
                 const fill = document.getElementById('scrollProgressFill');
@@ -4204,6 +4280,7 @@
                     setupAppearanceDropdown();
                     setupAttentionToggle();
                     setupDelegatedEvents();
+                    setupViewportBlur();
 
                     await loadData();
                     loadAttention();
