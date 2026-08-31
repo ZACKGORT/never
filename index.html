@@ -142,7 +142,9 @@
             width: 100%;
         }
 
-        /* ── viewport edge blur ── */
+        /* ── viewport edge blur — replaces the topbar's solid bar; content
+           fades/blurs as it scrolls under the very top and very bottom
+           edges of the screen instead of hitting a hard frame ── */
         .viewport-blur {
             position: fixed;
             left: 0;
@@ -252,7 +254,7 @@
         }
         .logo-card-home { width: 100%; }
 
-        /* ── topbar right ── */
+        /* ── topbar right: appearance + attention ── */
         .topbar-right {
             display: flex;
             align-items: center;
@@ -365,7 +367,6 @@
             width: 280px;
             max-height: 340px;
             overflow-y: auto;
-            overflow-x: hidden;
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
@@ -411,8 +412,6 @@
             cursor: pointer;
             transition: background .12s ease;
             border-bottom: 1px solid var(--border);
-            overflow: hidden;
-            min-width: 0;
         }
         .attention-item:last-child { border-bottom: none; }
         .attention-item:hover { background: var(--bg); }
@@ -436,6 +435,7 @@
         .attention-item .item-avatar.v1 { background: var(--bg); color: var(--ink); }
         .attention-item .item-avatar.v2 { background: var(--accent-2); color: var(--ink); border-color: var(--accent-2); }
         .attention-item .item-avatar.v3 { background: var(--ink); color: var(--card); border-color: var(--ink); }
+        .attention-item .item-avatar.company { position: relative; }
         .attention-item .item-avatar.company::after {
             content: '';
             position: absolute;
@@ -450,7 +450,6 @@
         .attention-item .item-info {
             flex: 1;
             min-width: 0;
-            overflow: hidden;
         }
         .attention-item .item-name {
             font-family: var(--font);
@@ -461,7 +460,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            width: 100%;
         }
         .attention-item .item-type {
             font-family: var(--font-mono);
@@ -470,7 +468,6 @@
             text-transform: uppercase;
             color: var(--ink-light);
             margin-left: 4px;
-            flex-shrink: 0;
         }
         .attention-item .item-dismiss {
             background: none;
@@ -487,7 +484,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
         }
         .attention-item .item-dismiss:hover {
             color: var(--ink);
@@ -662,20 +658,6 @@
             box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.02);
             transform: translateY(-2px);
         }
-        .letter-bento .card .action-btns {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            display: flex;
-            gap: 3px;
-            opacity: 0;
-            transition: opacity .2s ease;
-        }
-        .letter-bento .card:hover .action-btns,
-        .letter-bento .card:focus-within .action-btns {
-            opacity: 1;
-        }
-
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
@@ -778,18 +760,6 @@
             position: relative;
         }
         .letter-row:hover { background: rgba(0, 0, 0, 0.02); }
-        .letter-row .row-actions {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-            opacity: 0;
-            transition: opacity .2s ease;
-        }
-        .letter-row:hover .row-actions,
-        .letter-row:focus-within .row-actions {
-            opacity: 1;
-        }
-
         .letter-row-idx { font-family: var(--font-mono); font-size: 9px; color: var(--ink-light); padding-top: 2px; }
         .letter-row-avatar .avatar { width: 28px; height: 28px; font-size: 9px; cursor: pointer; }
         .letter-row-text-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -802,6 +772,7 @@
             letter-spacing: 0.02em;
             text-transform: uppercase;
             color: var(--ink);
+            /* No truncation: full name visible */
             overflow: visible;
             white-space: normal;
             max-width: none;
@@ -868,20 +839,6 @@
             position: relative;
         }
         .letter-grid .grid-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-        .letter-grid .grid-item .grid-actions {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            display: flex;
-            gap: 3px;
-            opacity: 0;
-            transition: opacity .2s ease;
-        }
-        .letter-grid .grid-item:hover .grid-actions,
-        .letter-grid .grid-item:focus-within .grid-actions {
-            opacity: 1;
-        }
-
         .letter-grid .grid-item .grid-top { display: flex; align-items: center; gap: 10px; }
         .letter-grid .grid-item .grid-top .avatar { width: 32px; height: 32px; font-size: 10px; cursor: pointer; }
         .letter-grid .grid-item .grid-meta { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
@@ -1348,8 +1305,11 @@
                 background: rgba(255, 255, 255, 0.08);
             }
         }
-
         /* ── Bento Filter Modal ── */
+        /* ── Bento Filter Modal ── */
+        /* Standard modal size, shared by the filter and activity overlays.
+           Mobile: full-screen for maximum tap-target room.
+           640px+: a centered medium-large modal card. */
         .bento-overlay {
             position: fixed;
             inset: 0;
@@ -1689,6 +1649,7 @@
             .letter-row { grid-template-columns: 20px 28px 1fr auto; gap: 8px; padding: 10px 0; }
             .letter-row-author {
                 font-size: calc(var(--fs-body) * 0.7);
+                /* remove truncation overrides */
                 max-width: none;
                 white-space: normal;
                 overflow: visible;
@@ -1833,12 +1794,6 @@
             color: var(--ink);
         }
         .modal-statement .card-who .avatar { cursor: pointer; }
-        .modal-statement .edit-demo-wrap {
-            margin-top: 8px;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
 
         .modal-thread { display: flex; flex-direction: column; margin-top: 6px; }
         .modal-node {
@@ -1914,7 +1869,7 @@
             .scroll-progress-bar { bottom: env(safe-area-inset-bottom, 0); }
         }
 
-        /* ── custom cursor (disabled on touch) ── */
+        /* ── custom cursor ── */
         body.custom-cursor-active { cursor: none; }
         .write-cursor-dot,
         .write-cursor-ellipse {
@@ -1949,10 +1904,6 @@
         body.custom-cursor-active.write-native-cursor { cursor: auto; }
         .write-native-cursor .write-cursor-dot,
         .write-native-cursor .write-cursor-ellipse { opacity: 0 !important; }
-        /* disable custom cursor on touch devices */
-        body.touch-device .write-cursor-dot,
-        body.touch-device .write-cursor-ellipse { display: none !important; }
-        body.touch-device.custom-cursor-active { cursor: auto; }
 
         /* ── click hotspots ── */
         .letter-hotspot {
@@ -2199,69 +2150,6 @@
             .rapid-respond .rapid-input-wrap textarea { font-size: calc(var(--fs-body) * 0.8); min-height: 30px; }
             .rapid-respond .rapid-input-wrap .rapid-send { font-size: 6px; padding: 4px 10px; min-height: 30px; }
         }
-
-        /* ── Micro Tooltip ── */
-        .micro-tooltip {
-            position: relative;
-            cursor: help;
-            display: inline-flex;
-            align-items: center;
-        }
-        .micro-tooltip .tooltip-text {
-            visibility: hidden;
-            width: 180px;
-            background-color: var(--card-dark);
-            color: var(--card);
-            text-align: center;
-            padding: 4px 8px;
-            border-radius: var(--radius-sm);
-            font-family: var(--font-mono);
-            font-size: 6px;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            position: absolute;
-            z-index: 100;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -90px;
-            opacity: 0;
-            transition: opacity 0.2s;
-            pointer-events: none;
-            border: 1px solid var(--border);
-        }
-        .micro-tooltip .tooltip-text::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: var(--card-dark) transparent transparent transparent;
-        }
-        .micro-tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-        .action-edit-demo {
-            font-family: var(--font-mono);
-            font-size: 6px;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--ink-light);
-            border: 1px solid var(--border);
-            padding: 2px 6px;
-            border-radius: var(--radius-sm);
-            cursor: help;
-            background: var(--bg);
-            transition: background .15s ease, color .15s ease;
-            line-height: 1.4;
-        }
-        .action-edit-demo:hover {
-            background: var(--ink);
-            color: var(--card);
-            border-color: var(--ink);
-        }
     </style>
 </head>
 <body data-scale="l" data-font="satoshi">
@@ -2275,7 +2163,7 @@
         <div class="scroll-progress-fill" id="scrollProgressFill"></div>
     </div>
 
-    <!-- ─── VIEWPORT EDGE BLUR ─── -->
+    <!-- ─── VIEWPORT EDGE BLUR (top/bottom fade, topbar itself is frameless) ─── -->
     <div class="viewport-blur viewport-blur-top" id="viewportBlurTop" aria-hidden="true"></div>
     <div class="viewport-blur viewport-blur-bottom" id="viewportBlurBottom" aria-hidden="true"></div>
 
@@ -2314,7 +2202,7 @@
         </div>
     </div>
 
-    <!-- ─── TOP HUD ─── -->
+    <!-- ─── TOP HUD (navigation + view) ─── -->
     <div class="hud hud-top" id="hudTop">
         <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
         <button class="btn btn-icon" id="hudNext" title="Next">›</button>
@@ -2328,7 +2216,7 @@
     </div>
 
     <div class="wrap">
-        <!-- ─── COMPOSER ─── -->
+        <!-- ─── COMPOSER (floating, draggable) ─── -->
         <div class="composer" id="composer">
             <div class="composer-header" id="composerHeader">
                 <span class="composer-title"><span class="grip">⠿⠿</span> New statement</span>
@@ -2374,8 +2262,9 @@
         </div>
     </div>
 
-    <!-- ─── BOTTOM HUD ─── -->
+    <!-- ─── BOTTOM HUD (filters + activity + new) ─── -->
     <div class="hud hud-bottom" id="hud">
+        <!-- Filter -->
         <button class="btn" id="filterToggleBtn">
             <span>Filters</span>
             <span class="filter-count" id="filterCount">0</span>
@@ -2384,6 +2273,7 @@
 
         <div class="hud-divider"></div>
 
+        <!-- Activity -->
         <button class="btn" id="activityToggleBtn">
             <span>Activity</span>
             <span class="filter-count" id="activityCount">0</span>
@@ -2391,10 +2281,11 @@
 
         <div class="hud-divider"></div>
 
+        <!-- New -->
         <button class="btn btn-primary" id="hudNew">+ New</button>
     </div>
 
-    <!-- ─── FILTER TOAST ─── -->
+    <!-- ─── FILTER TOAST (dismissable, auto-timeout) ─── -->
     <div class="filter-toast" id="filterToast" role="status" aria-live="polite">
         <span class="filter-toast-text" id="filterToastText"></span>
         <button class="filter-toast-dismiss" id="filterToastDismiss" aria-label="Dismiss">✕</button>
@@ -2495,7 +2386,7 @@
             'use strict';
 
             // ── Constants ─────────────────────────────────────────────
-            const STORAGE_KEY = 'neverever-statements-v12';
+            const STORAGE_KEY = 'neverever-statements-v9';
             const ATTENTION_KEY = 'neverever-attention-v1';
             const ACTIVITY_KEY = 'neverever-activity-v1';
             const PAGE_SIZE = 12;
@@ -2523,10 +2414,10 @@
             const isVideo = url => /\.(mp4|webm|mov)(\?|$)/i.test(url);
             const escapeHtml = s => (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;',
                 '"': '&quot;', "'": '&#39;' } [c]));
-
-            function closestSafe(node, selector) {
-                return (node && node.nodeType === 1 && node.closest) ? node.closest(selector) : null;
-            }
+            // Some event targets (text nodes, or exotic targets from native form
+            // controls) don't implement .closest — guard every lookup through this.
+            const closestSafe = (node, selector) => (node && node.nodeType === 1 && node.closest) ?
+                node.closest(selector) : null;
 
             function fmtTime(ts) {
                 const d = new Date(ts),
@@ -2649,7 +2540,7 @@
                 const authorById = id => authorsList.find(a => a.id === id);
                 const result = [];
 
-                // ── job listings ──
+                // ── job listings, hand-written per company ─────────────
                 const JOB_LISTINGS = {
                     'studio-north': [
                         'Studio North is hiring a Senior Product Designer. Remote-first, occasional NYC. $140k–$175k. Send a portfolio, not a resume.',
@@ -2701,7 +2592,7 @@
                     ]
                 };
 
-                // ── open-to-work ──
+                // ── open-to-work, one per person, tailored to their role ─
                 const OPEN_TO_WORK = {
                     zack: 'Looking for staff-level product work. Six years freelance, shipped 20+ products.',
                     maya: 'Ex-agency Creative Director, open to in-house roles. I don\'t want to pitch anymore, I want to build one thing.',
@@ -2723,7 +2614,7 @@
                     dara: 'UX Researcher, eight years, mostly qualitative. Looking for a role where research drives decisions, not just decks.'
                 };
 
-                // ── general pool ──
+                // ── general pool: thoughts, career, brand, community, leadership ─
                 const GENERAL = [
                     { tag: 'CAREER', text: 'Left my agency job today. No regrets yet — ask me in a month.' },
                     { tag: 'CAREER', text: 'A staff title means nothing if the team around it is broken.' },
@@ -2764,9 +2655,7 @@
                         tag,
                         text,
                         mediaUrl: Math.random() < (mediaChance != null ? mediaChance : 0.35) ? randAVIF() : '',
-                        replies: [],
-                        editHistory: [],
-                        editedAt: null
+                        replies: []
                     });
                     return result[result.length - 1];
                 }
@@ -2785,7 +2674,7 @@
                     push(a.id, g.tag, g.text, Math.random() * 14 * day, 0.4);
                 }
 
-                // ── replies ──
+                // ── active conversations: attach nested reply threads ────
                 const REPLY_TEXTS = [
                     'This resonates. We hit the same wall last quarter.',
                     'Strong disagree — but I like where your head\'s at.',
@@ -2831,12 +2720,14 @@
                     }];
                 }
 
+                // Every thread gets at least one reply. Counts are weighted
+                // so most threads are light-to-medium, a handful run long.
                 function pickReplyCount() {
                     const r = Math.random();
-                    if (r < 0.3) return 1 + Math.floor(Math.random() * 2);
-                    if (r < 0.7) return 3 + Math.floor(Math.random() * 3);
-                    if (r < 0.92) return 6 + Math.floor(Math.random() * 5);
-                    return 11 + Math.floor(Math.random() * 8);
+                    if (r < 0.3) return 1 + Math.floor(Math.random() * 2); // 1–2
+                    if (r < 0.7) return 3 + Math.floor(Math.random() * 3); // 3–5
+                    if (r < 0.92) return 6 + Math.floor(Math.random() * 5); // 6–10
+                    return 11 + Math.floor(Math.random() * 8); // 11–18
                 }
 
                 function makeTopLevelReplies(parentTime, excludeId) {
@@ -2888,6 +2779,9 @@
             const activeCompanies = new Set();
             const activeDisciplines = new Set();
             let searchQuery = '';
+
+            // ── Rapid Respond State ──────────────────────────────────
+            let rapidTarget = null;
 
             // ── Attention ─────────────────────────────────────────────
             let attentionItems = [];
@@ -3083,7 +2977,6 @@
                         if (parsed.authors?.length && parsed.statements?.length) {
                             authors = parsed.authors;
                             statements = parsed.statements;
-                            statements.forEach(s => { if (!s.editHistory) s.editHistory = []; });
                             return;
                         }
                     }
@@ -3116,13 +3009,12 @@
                 saveInFlight = false;
             }
 
-            // ── Reset ──
+            // ── DEV: reset ──
             async function resetDemoContent() {
                 try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
                 try { localStorage.removeItem(ATTENTION_KEY); } catch (e) {}
                 authors = seedAuthors();
                 statements = seedStatements(authors);
-                statements.forEach(s => { if (!s.editHistory) s.editHistory = []; });
                 await saveData();
                 attentionItems = [];
                 saveAttention();
@@ -3159,6 +3051,7 @@
                 if (el) el.textContent = String(activityLog.length);
             }
 
+            // ── Performance: batched activity logging ──────────────
             let logQueue = [];
             let logScheduled = false;
 
@@ -3233,7 +3126,7 @@
                 document.getElementById('activityOverlay').classList.remove('open');
             }
 
-            // ── Delegated events ──────────────────────────────────────
+            // ── Delegated event handling for interactions ────────────
             const hoverStartMap = new Map();
 
             function setupDelegatedEvents() {
@@ -3289,8 +3182,6 @@
             }
 
             // ── Rapid Respond ─────────────────────────────────────────
-            let rapidTarget = null;
-
             function openRapidRespond(statementId, x, y) {
                 const s = statements.find(st => st.id === statementId);
                 if (!s) return;
@@ -3625,10 +3516,6 @@
                 const container = document.getElementById('modalContent');
                 const a = authorById(s.authorId);
 
-                const hasEdits = s.editHistory && s.editHistory.length > 0;
-                const demoEditBtn =
-                    `<span class="micro-tooltip action-edit-demo">edit <span class="tooltip-text">demo: you needn't edit anything</span></span>`;
-
                 let html =
                     `
               <div class="modal-statement">
@@ -3640,27 +3527,12 @@
                       ${a && a.kind==='company' ? '<span class="co-badge">CO</span>' : ''}
                       <span class="card-time">${fmtTime(s.time)}</span>
                       ${s.tag ? `<span class="card-tag">${escapeHtml(s.tag)}</span>` : ''}
-                      ${s.editedAt ? `<span class="edited-badge">edited</span>` : ''}
                     </div>
                     <div class="card-role">${a ? escapeHtml(a.role||'') : ''}</div>
                   </div>
                 </div>
                 ${renderMediaHero(s.mediaUrl)}
                 <div class="card-text">${escapeHtml(s.text)}</div>
-                ${hasEdits ? `
-                  <div class="edit-history">
-                    <div class="t-micro" style="margin-bottom:4px;">Edit history</div>
-                    ${s.editHistory.map(e => `
-                      <div class="edit-entry">
-                        <span class="edit-time">${fmtTime(e.time)}</span>
-                        <span class="edit-text">${escapeHtml(e.text)}</span>
-                      </div>
-                    `).join('')}
-                  </div>
-                ` : ''}
-                <div class="edit-demo-wrap">
-                  ${demoEditBtn}
-                </div>
               </div>
               <div class="t-micro" style="margin-bottom:10px;">REPLIES (${countReplies(s)})</div>
               <div class="modal-thread" id="modalThread"></div>
@@ -3725,9 +3597,6 @@
             }
 
             // ── Bento card builder ───────────────────────────────────
-            const DEMO_EDIT_BTN =
-                `<span class="micro-tooltip action-edit-demo">edit <span class="tooltip-text">demo: you needn't edit anything</span></span>`;
-
             function buildBentoCard(s, opts = {}) {
                 const a = authorById(s.authorId);
                 const variants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
@@ -3740,8 +3609,7 @@
                 }
 
                 const card = document.createElement('div');
-                const cls = ['card', variant, spans].filter(Boolean).join(' ');
-                card.className = cls;
+                card.className = ['card', variant, spans].filter(Boolean).join(' ');
                 card.style.animationDelay = opts.static ? '0s' : (Math.random() * 0.2) + 's';
                 card.dataset.statementId = s.id;
 
@@ -3752,11 +3620,10 @@
                 const metaColor = isDark ? 'rgba(255,255,255,0.4)' : 'var(--ink-light)';
 
                 const avatarStr = avatarHtml(s.authorId, 'sm', true);
-                const hasEdits = s.editHistory && s.editHistory.length > 0;
 
                 card.innerHTML = `
               <div>
-                <div class="label-sm">${escapeHtml(s.tag || 'STATEMENT')}${hasEdits ? ' · edited' : ''}</div>
+                <div class="label-sm">${escapeHtml(s.tag || 'STATEMENT')}</div>
                 <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};display:flex;align-items:center;gap:6px;">
                   ${avatarStr}
                   <span style="cursor:pointer;" data-author-id="${s.authorId}">${escapeHtml(a ? a.name : 'Unknown')}</span>
@@ -3771,9 +3638,6 @@
               ${isDark ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>` :
               variant.includes('accent') ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>` :
               `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
-              <div class="action-btns">
-                ${DEMO_EDIT_BTN}
-              </div>
             `;
 
                 if (!opts.static) {
@@ -3816,7 +3680,6 @@
                 row.dataset.statementId = s.id;
 
                 const avatarStr = avatarHtml(s.authorId, 'sm', true);
-                const hasEdits = s.editHistory && s.editHistory.length > 0;
 
                 row.innerHTML =
                     `
@@ -3827,16 +3690,12 @@
                   <span class="letter-row-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
                   <span class="letter-row-time">${fmtTime(s.time)}</span>
                   ${s.tag ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;">${escapeHtml(s.tag)}</span>` : ''}
-                  ${hasEdits ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;">edited</span>` : ''}
                 </div>
                 <div class="letter-row-text">${escapeHtml(s.text)}</div>
               </div>
               <div class="letter-row-marker">
                 ${s.mediaUrl ? renderMediaThumb(s.mediaUrl) : ''}
                 ${countReplies(s)} replies
-                <span class="row-actions">
-                  ${DEMO_EDIT_BTN}
-                </span>
               </div>
             `;
 
@@ -3875,7 +3734,6 @@
                 item.dataset.statementId = s.id;
 
                 const avatarStr = avatarHtml(s.authorId, 'sm', true);
-                const hasEdits = s.editHistory && s.editHistory.length > 0;
 
                 item.innerHTML =
                     `
@@ -3883,7 +3741,7 @@
                 ${avatarStr}
                 <div class="grid-meta">
                   <span class="grid-author" data-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind==='company' ? ' <span class="co-badge">CO</span>' : ''}</span>
-                  <span class="grid-time">${fmtTime(s.time)}${hasEdits ? ' · edited' : ''}</span>
+                  <span class="grid-time">${fmtTime(s.time)}</span>
                 </div>
               </div>
               ${s.mediaUrl ? `<div class="thumb-grid"><img src="${escapeHtml(s.mediaUrl)}" alt="" loading="lazy" /></div>` : ''}
@@ -3891,9 +3749,6 @@
               <div class="grid-footer">
                 <span>${countReplies(s)} replies</span>
                 ${s.tag ? `<span class="grid-tag" style="font-family:var(--font-mono);font-size:6px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-light);border:1px solid var(--border);padding:1px 8px;border-radius:var(--radius-sm);">${escapeHtml(s.tag)}</span>` : ''}
-              </div>
-              <div class="grid-actions">
-                ${DEMO_EDIT_BTN}
               </div>
             `;
 
@@ -4033,13 +3888,12 @@
                 updateProgressBar();
             }
 
-            // ── Viewport edge blur ────────────────────────────────────
+            // ── Viewport edge blur (top/bottom fade) + top HUD docking ──
             function setupViewportBlur() {
                 const top = document.getElementById('viewportBlurTop');
                 const bottom = document.getElementById('viewportBlurBottom');
                 const hudTop = document.getElementById('hudTop');
                 if (!top || !bottom) return;
-
                 function update() {
                     const scrollY = window.scrollY || window.pageYOffset || 0;
                     const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -4213,8 +4067,7 @@
                 const tag = document.getElementById('c-tag').value.trim().toUpperCase();
                 const mediaUrl = document.getElementById('c-media').value.trim();
                 const text = document.getElementById('c-text').value.trim() || 'Your statement will appear here.';
-                const fakeStatement = { id: 'preview', authorId, tag, mediaUrl, text, time: Date.now(), replies: [],
-                    editHistory: [] };
+                const fakeStatement = { id: 'preview', authorId, tag, mediaUrl, text, time: Date.now(), replies: [] };
                 const previewVariants = ['card-white', 'card-light', 'card-dark', 'card-mid', 'card-accent', 'card-accent-2'];
                 container.innerHTML = '';
                 previewVariants.forEach(variant => {
@@ -4416,18 +4269,11 @@
                         dropdown.classList.remove('open');
                     }
                 });
-
-                btn.addEventListener('touchstart', (e) => {}, { passive: true });
             }
 
             // ── Init ──────────────────────────────────────────────────
             window.__clearFilters = clearFilters;
             window.openProfileModal = openProfileModal;
-
-            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            if (isTouchDevice) {
-                document.body.classList.add('touch-device');
-            }
 
             document.addEventListener('DOMContentLoaded', async function() {
                 try {
@@ -4439,9 +4285,7 @@
                     await loadData();
                     loadAttention();
                     loadActivity();
-
-                    statements.forEach(s => { if (!s.editHistory) s.editHistory = []; });
-
+                    updateActivityCount();
                     if (new URLSearchParams(location.search).has('reset-demo')) {
                         await resetDemoContent();
                     }
@@ -4569,7 +4413,7 @@
                         const text = document.getElementById('c-text').value.trim();
                         if (!text || !authorId) return;
                         statements.unshift({ id: uid(), authorId, time: Date.now(), tag, text, mediaUrl,
-                            replies: [], editHistory: [], editedAt: null });
+                            replies: [] });
                         saveData();
                         closeComposer();
                         renderLetter(activeIndex);
@@ -4645,11 +4489,13 @@
                         });
                     });
 
+                    // Profile modal
                     document.getElementById('profileModalClose').addEventListener('click', closeProfileModal);
                     document.getElementById('profileModal').addEventListener('click', (e) => {
                         if (e.target === e.currentTarget) closeProfileModal();
                     });
 
+                    // Rapid Respond
                     document.getElementById('rapidClose').addEventListener('click', closeRapidRespond);
                     document.getElementById('rapidSend').addEventListener('click', submitRapidReply);
                     document.addEventListener('click', (e) => {
@@ -4672,17 +4518,11 @@
             });
         })();
 
-        // ── custom cursor (disabled on touch) ─────────────────────────
+        // ── custom cursor ─────────────────────────────────────────────
         (function initWriteCursor() {
             const writeCursorDot = document.getElementById('writeCursorDot');
             const writeCursorEllipse = document.getElementById('writeCursorEllipse');
             if (!writeCursorDot || !writeCursorEllipse) return;
-
-            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            if (isTouchDevice) {
-                document.body.classList.add('touch-device');
-                return;
-            }
 
             const NATIVE_SELECTOR = [
                 'button', 'a', 'input', 'textarea', 'select', 'label',
