@@ -7416,20 +7416,44 @@
                 };
                 window.addEventListener('wheel', wheelListener, { passive: false });
 
+                // A tap must stay within this many px to still count as a tap
+                // (and therefore be allowed to fire a native click on whatever
+                // it landed on — a panel, the close button, an index link, etc).
+                var TAP_MOVE_THRESHOLD = 10;
+                var touchIsDragging = false;
+
                 var touchStartListener = function(e) {
-                    e.preventDefault();
+                    // Don't preventDefault here — doing so on touchstart stops
+                    // mobile browsers from ever synthesizing a click, which is
+                    // what silently broke tap-to-navigate and the close button.
+                    // touch-action:none on .js-spiral already blocks native
+                    // scrolling/panning, so nothing is lost by waiting.
                     var touch = e.touches[0] || e.changedTouches[0];
                     moved = 0;
+                    touchIsDragging = false;
                     touchStartX = touch.pageX;
                     touchStartY = touch.pageY;
                     cancelAnimationFrame(animRAF);
                 };
-                window.addEventListener('touchstart', touchStartListener, { passive: false });
+                window.addEventListener('touchstart', touchStartListener, { passive: true });
 
                 var touchMoveListener = function(e) {
-                    e.preventDefault();
                     var touch = e.touches[0] || e.changedTouches[0];
-                    moved = ((touchStartY - touch.pageY) + (touchStartX - touch.pageX)) * 3;
+                    var dx = touchStartX - touch.pageX;
+                    var dy = touchStartY - touch.pageY;
+
+                    if (!touchIsDragging) {
+                        if (Math.abs(dx) + Math.abs(dy) < TAP_MOVE_THRESHOLD) {
+                            // Still within tap tolerance — don't hijack the
+                            // gesture yet, so a genuine tap can still resolve
+                            // into a click on touchend.
+                            return;
+                        }
+                        touchIsDragging = true;
+                    }
+
+                    e.preventDefault();
+                    moved = (dy + dx) * 3;
                     touchStartX = touch.pageX;
                     touchStartY = touch.pageY;
                     rotation += moved / -10;
@@ -7441,8 +7465,13 @@
                 window.addEventListener('touchmove', touchMoveListener, { passive: false });
 
                 var touchEndListener = function() {
-                    // snap to nearest after touch ends, with a tiny delay to allow final position
-                    setTimeout(snapToNearest, 10);
+                    // Only snap/re-settle if this touch was actually a drag;
+                    // a tap should just let its click (section nav, close
+                    // button, index link, ...) happen untouched.
+                    if (touchIsDragging) {
+                        setTimeout(snapToNearest, 10);
+                    }
+                    touchIsDragging = false;
                 };
                 window.addEventListener('touchend', touchEndListener);
 
