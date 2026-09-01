@@ -150,6 +150,23 @@
             border-radius: inherit;
         }
 
+        /* ── yellow content cards (first & last) ── */
+        .js-section.yellow-card {
+            background: var(--accent) !important;
+        }
+        .js-section.yellow-card .panel-title {
+            color: var(--ink);
+        }
+        .js-section.yellow-card .panel-line {
+            color: var(--ink-mid);
+        }
+        .js-section.yellow-card .panel-num {
+            color: var(--ink-light);
+        }
+        .js-section.yellow-card:hover {
+            border-color: var(--bg);
+        }
+
         /* ── panel content ── */
         .panel {
             position: absolute;
@@ -198,21 +215,22 @@
         /* ── bookend index list ── */
         .bookend-index {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.25rem 1.5rem;
+            grid-template-rows: repeat(8, auto);
+            grid-auto-flow: column;
+            gap: 0.2rem 2rem;
             margin-top: 0.5rem;
-            max-width: 52ch;
+            max-width: 56ch;
         }
         .bookend-index a {
             display: flex;
             align-items: baseline;
             gap: 0.5rem;
-            padding: 0.25rem 0;
+            padding: 0.2rem 0;
             font-weight: 400;
-            font-size: clamp(0.85rem, 1.1vw, 1.1rem);
+            font-size: clamp(0.8rem, 1.05vw, 1.05rem);
             color: rgba(255, 255, 255, 0.8);
             transition: color 0.2s, transform 0.15s;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             cursor: pointer;
             pointer-events: auto;
             font-family: var(--font);
@@ -223,11 +241,11 @@
         }
         .bookend-index a .idx-num {
             font-family: var(--font-mono);
-            font-size: 0.65em;
+            font-size: 0.6em;
             opacity: 0.4;
             letter-spacing: 0.04em;
             flex-shrink: 0;
-            min-width: 2.2em;
+            min-width: 2.4em;
             color: rgba(255, 255, 255, 0.5);
         }
         .bookend-index a .idx-title {
@@ -260,12 +278,31 @@
 
         /* bookend density */
         .panel.density-bookend .panel-title {
-            font-size: clamp(2.2rem, 4.5vw, 4.2rem);
+            font-size: clamp(2rem, 4vw, 3.8rem);
             margin-bottom: 0.3em;
         }
         .panel.density-bookend .panel-line {
-            font-size: clamp(0.95rem, 1.4vw, 1.2rem);
+            font-size: clamp(0.9rem, 1.3vw, 1.15rem);
             max-width: 46ch;
+        }
+
+        /* brand identity special styling */
+        .panel.density-brand .panel-title {
+            font-size: clamp(1.6rem, 3.2vw, 2.8rem);
+            letter-spacing: -0.02em;
+        }
+        .panel.density-brand .panel-line {
+            font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+            max-width: 40ch;
+            font-weight: 400;
+            color: var(--ink-mid);
+        }
+        .panel.density-brand .panel-num {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            opacity: 0.6;
+            color: var(--ink-light);
         }
 
         /* ── custom cursor ── */
@@ -348,6 +385,12 @@
             .panel.density-bookend .panel-line {
                 font-size: clamp(0.8rem, 1.8vw, 1rem);
             }
+            .panel.density-brand .panel-title {
+                font-size: clamp(1.3rem, 4vw, 1.8rem);
+            }
+            .panel.density-brand .panel-line {
+                font-size: clamp(0.75rem, 1.6vw, 0.9rem);
+            }
             .js-spiral .js-section:hover {
                 border-radius: var(--radius-sm);
                 border-width: 4px;
@@ -356,13 +399,17 @@
                 font-size: 0.6rem;
             }
             .bookend-index {
-                grid-template-columns: 1fr;
-                gap: 0.1rem;
+                grid-template-rows: repeat(8, auto);
+                gap: 0.1rem 1rem;
                 max-width: 100%;
             }
             .bookend-index a {
-                font-size: clamp(0.75rem, 2vw, 0.95rem);
-                padding: 0.2rem 0;
+                font-size: clamp(0.7rem, 2vw, 0.9rem);
+                padding: 0.15rem 0;
+            }
+            .bookend-index a .idx-num {
+                min-width: 2em;
+                font-size: 0.55em;
             }
         }
 
@@ -398,11 +445,27 @@
             .panel.density-bookend .panel-line {
                 font-size: clamp(0.7rem, 2vw, 0.9rem);
             }
+            .panel.density-brand .panel-title {
+                font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+            }
+            .panel.density-brand .panel-line {
+                font-size: clamp(0.65rem, 1.5vw, 0.78rem);
+            }
             .panel-num {
                 font-size: 0.55rem;
             }
+            .bookend-index {
+                grid-template-rows: repeat(8, auto);
+                gap: 0.05rem 0.5rem;
+            }
             .bookend-index a {
-                font-size: clamp(0.65rem, 2.2vw, 0.8rem);
+                font-size: clamp(0.6rem, 2.2vw, 0.75rem);
+                padding: 0.1rem 0;
+                gap: 0.3rem;
+            }
+            .bookend-index a .idx-num {
+                min-width: 1.8em;
+                font-size: 0.5em;
             }
         }
     </style>
@@ -421,6 +484,8 @@
 
             // ─── content ──────────────────────────────────────────
             // Both bookends are identical index panels.
+            // First and last content cards (01 and 16) have yellow background.
+            // Panel 16 is the new Brand Mark · Identity section.
             var PANELS = [{
                 type: "bookend-start",
                 num: "∞",
@@ -433,7 +498,8 @@
                 density: "sparse",
                 lines: [
                     "Statements, not posts."
-                ]
+                ],
+                yellow: true
             }, {
                 num: "02",
                 title: "Ethos",
@@ -560,6 +626,19 @@
                     "Statements — as signatures"
                 ]
             }, {
+                // BRAND IDENTITY – new section, last content card, yellow
+                num: "NE.",
+                title: "Brand Mark · Identity",
+                density: "brand",
+                lines: [
+                    "NE. = a closed statement, signed and finished.",
+                    "The period terminates the identity into an utterance.",
+                    "A journal is a sequence of closed statements.",
+                    "ⳑ = the entrance into the collection of NE. units.",
+                    "NE. appears as the byline signature on each entry."
+                ],
+                yellow: true
+            }, {
                 // BOOKEND END – identical index
                 type: "bookend-end",
                 num: "∞",
@@ -596,10 +675,9 @@
                     link.appendChild(numSpan);
                     link.appendChild(titleSpan);
 
-                    // fix: stop propagation so the section's own click handler doesn't override
                     link.addEventListener('click', function(e) {
                         e.preventDefault();
-                        e.stopPropagation();  // ← critical fix
+                        e.stopPropagation();
                         var target = parseInt(this.dataset.target);
                         if (!isNaN(target) && target >= 0 && target < sections.length) {
                             cancelAnimationFrame(animRAF);
@@ -619,6 +697,9 @@
                 section.className = 'js-section';
                 if (panel.type === 'bookend-start' || panel.type === 'bookend-end') {
                     section.classList.add('bookend');
+                }
+                if (panel.yellow) {
+                    section.classList.add('yellow-card');
                 }
 
                 var wrap = document.createElement('div');
@@ -768,11 +849,14 @@
                     s.style.backfaceVisibility = 'hidden';
 
                     var panel = sectionData[i];
+                    // bookends get dark, yellow cards get yellow, others get light gradient
                     if (panel.type === 'bookend-start' || panel.type === 'bookend-end') {
                         s.style.backgroundColor = '#1C1C1E';
+                    } else if (panel.yellow) {
+                        s.style.backgroundColor = '#E5E567';
                     } else {
-                        var lightness = 96 - (i - 1) * 2.5;
-                        lightness = Math.max(75, lightness);
+                        var lightness = 96 - (i - 1) * 2.2;
+                        lightness = Math.max(78, lightness);
                         s.style.backgroundColor = 'hsl(0, 0%, ' + lightness + '%)';
                     }
                     s.style.transform = 'rotate(' + myRot + 'deg) scale(' + scale + ') ' + translate;
@@ -933,7 +1017,7 @@
 
                 window.addEventListener('mousemove', function(e) {
                     var overNative = !!(e.target && e.target.nodeType === 1 && e.target.closest(
-                    NATIVE_SELECTOR));
+                        NATIVE_SELECTOR));
                     setNativeCursor(overNative);
 
                     ptrX = e.clientX;
