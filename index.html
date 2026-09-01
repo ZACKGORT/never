@@ -7143,7 +7143,21 @@
                         "No algorithmic ranking — order is what you asked for."
                     ]
                 }, {
-                  num: "15", title: "neverever.land", density: "sparse", lines: [ "Statements — as signatures" ] }, { num: "neverever.land", title: "Identity · NVRVRLND", density: "brand", lines: [ "NE. = a canonical signature; a complete statement.", "ⳑ = a representation of place and intent.", "NE.ⳑ = a native:unicode identity; exists without facade." ],
+                    num: "15",
+                    title: "neverever.land",
+                    density: "sparse",
+                    lines: [
+                        "Statements — as signatures"
+                    ]
+                }, {
+                    num: "NE.",
+                    title: "Identity · NVRVRLND",
+                    density: "brand",
+                    lines: [
+                        "NE. = a canonical signature; a complete statement.",
+                        "ⳑ = a representation of place and intent.",
+                        "NE.ⳑ = a native:unicode identity; exists without facade."
+                    ],
                     yellow: true
                 }, {
                     type: "bookend",
@@ -7279,8 +7293,30 @@
                 var safari = (ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1) || ios;
 
                 function trimRotation(r) {
-                    return Math.max(-2000, Math.min(2000, r));
+                    // Clamp to the carousel's actual content range, not an
+                    // arbitrary fixed band. Scale is ASPECT^(rotation/90),
+                    // so letting rotation drift outside the real panel
+                    // span (0 .. -(sectionCount-1)*90) makes the scale
+                    // explode/collapse exponentially once you scroll or
+                    // drag past the first/last panel — that exponential
+                    // blow-up is what reads as "everything glitches".
+                    var minRot = -(sectionCount - 1) * 90;
+                    var maxRot = 0;
+                    return Math.max(minRot, Math.min(maxRot, r));
                 }
+
+                // Sections farther than this from the active one are
+                // hidden. Every panel is baked with scale(ASPECT^i), and
+                // the container counter-scales by ASPECT^(rotation/90) —
+                // those compound, so by the last panel ("Contents") the
+                // container is zoomed ~2200x. All 17 full-size panels
+                // still sit in the DOM at that scale, so the browser has
+                // to composite that entire subtree — that's what froze
+                // the tab. Panels that far from the active one are
+                // already invisible (off-screen or sub-pixel), so hiding
+                // them costs nothing visually and keeps the composited
+                // set small no matter how deep into the deck you scroll.
+                var VISIBLE_WINDOW = 3;
 
                 function scrollHandler() {
                     var scale = Math.pow(ASPECT, rotation / 90);
@@ -7289,6 +7325,12 @@
                     spiral.style.transform = 'rotate(' + rotation + 'deg) scale(' + scale + ')';
                     sections.forEach(function(s, i) {
                         s.classList.toggle('active', i === currentSection);
+                        var hide = Math.abs(i - currentSection) > VISIBLE_WINDOW;
+                        if (hide && s.style.display !== 'none') {
+                            s.style.display = 'none';
+                        } else if (!hide && s.style.display === 'none') {
+                            s.style.display = '';
+                        }
                     });
                 }
 
@@ -7393,11 +7435,12 @@
                     buildSpiral();
                 }
 
+                // Store event listener references and their options for proper removal
                 var resizeListener = function() { resizeHandler(); };
-                window.addEventListener('resize', resizeListener);
-
                 var scrollPrevent = function(e) { e.preventDefault(); };
-                window.addEventListener('scroll', scrollPrevent);
+                var touchStartOptions = { passive: true };
+                var touchMoveOptions = { passive: false };
+                var wheelOptions = { passive: false };
 
                 var wheelBusy = false;
                 var wheelListener = function(e) {
@@ -7407,16 +7450,31 @@
                     var dir = e.deltaY > 0 ? 1 : -1;
                     var newIdx = idx + dir;
                     // wrap around
-                    if (newIdx < 0) newIdx = sectionCount - 1;
-                    else if (newIdx >= sectionCount) newIdx = 0;
+                    var wrapped = false;
+                    if (newIdx < 0) { newIdx = sectionCount - 1; wrapped = true; }
+                    else if (newIdx >= sectionCount) { newIdx = 0; wrapped = true; }
                     var target = newIdx * -90;
-                    wheelBusy = true;
                     cancelAnimationFrame(animRAF);
-                    animateScroll(target, rotation, 0.22, function() {
-                        wheelBusy = false;
-                    });
+                    if (wrapped) {
+                        // Loop reset: the wrap target sits on the far side
+                        // of the spiral from the current rotation. Easing
+                        // toward it would animate rotation across every
+                        // panel in between (and briefly through invalid
+                        // scale territory) in a fraction of a second —
+                        // that sweep is the "glitch". Snap instantly instead,
+                        // same as the long-jump cut already used for the
+                        // contents index links.
+                        wheelBusy = true;
+                        rotation = trimRotation(target);
+                        scrollHandler();
+                        setTimeout(function() { wheelBusy = false; }, 80);
+                    } else {
+                        wheelBusy = true;
+                        animateScroll(target, rotation, 0.22, function() {
+                            wheelBusy = false;
+                        });
+                    }
                 };
-                window.addEventListener('wheel', wheelListener, { passive: false });
 
                 // Elements that should always get an untouched native tap
                 var NATIVE_TAP_SELECTOR = 'a, button, .info-overlay-close';
@@ -7436,7 +7494,6 @@
                     touchStartY = touch.pageY;
                     cancelAnimationFrame(animRAF);
                 };
-                window.addEventListener('touchstart', touchStartListener, { passive: true });
 
                 var touchMoveListener = function(e) {
                     if (touchIsControl) return;
@@ -7462,7 +7519,6 @@
                     cancelAnimationFrame(animRAF);
                     scrollHandler();
                 };
-                window.addEventListener('touchmove', touchMoveListener, { passive: false });
 
                 var touchEndListener = function() {
                     if (touchIsControl) {
@@ -7474,24 +7530,41 @@
                     }
                     touchIsDragging = false;
                 };
-                window.addEventListener('touchend', touchEndListener);
 
                 var keyDownListener = function(e) {
                     if (e.keyCode === 39 || e.keyCode === 40 || e.keyCode === 32) {
                         var idx = nearestSection(rotation);
                         var newIdx = idx + 1;
-                        if (newIdx >= sectionCount) newIdx = 0;
+                        var wrapped = false;
+                        if (newIdx >= sectionCount) { newIdx = 0; wrapped = true; }
                         cancelAnimationFrame(animRAF);
-                        animateScroll(newIdx * -90, rotation, 0.2);
+                        if (wrapped) {
+                            rotation = trimRotation(newIdx * -90);
+                        } else {
+                            animateScroll(newIdx * -90, rotation, 0.2);
+                        }
                     } else if (e.keyCode === 37 || e.keyCode === 38) {
                         var idx = nearestSection(rotation);
                         var newIdx = idx - 1;
-                        if (newIdx < 0) newIdx = sectionCount - 1;
+                        var wrapped = false;
+                        if (newIdx < 0) { newIdx = sectionCount - 1; wrapped = true; }
                         cancelAnimationFrame(animRAF);
-                        animateScroll(newIdx * -90, rotation, 0.2);
+                        if (wrapped) {
+                            rotation = trimRotation(newIdx * -90);
+                        } else {
+                            animateScroll(newIdx * -90, rotation, 0.2);
+                        }
                     }
                     scrollHandler();
                 };
+
+                // Attach listeners with proper options
+                window.addEventListener('resize', resizeListener);
+                window.addEventListener('scroll', scrollPrevent);
+                window.addEventListener('wheel', wheelListener, wheelOptions);
+                window.addEventListener('touchstart', touchStartListener, touchStartOptions);
+                window.addEventListener('touchmove', touchMoveListener, touchMoveOptions);
+                window.addEventListener('touchend', touchEndListener);
                 window.addEventListener('keydown', keyDownListener);
 
                 sections.forEach(function(s, i) {
@@ -7589,11 +7662,11 @@
                         startLoop();
                     };
                     window.addEventListener('mousemove', mouseMoveListener);
-
                     var mouseLeaveListener = function() { hideAll(); };
                     document.addEventListener('mouseleave', mouseLeaveListener);
 
-                    spiralCleanup = function() {
+                    // Store cursor cleanup function
+                    var cursorCleanup = function() {
                         window.removeEventListener('mousemove', mouseMoveListener);
                         document.removeEventListener('mouseleave', mouseLeaveListener);
                         hideAll();
@@ -7601,28 +7674,39 @@
                         ellipse.style.opacity = '0';
                         document.body.style.cursor = '';
                     };
+
+                    // Final cleanup function that removes all listeners
+                    spiralCleanup = function() {
+                        // Remove cursor listeners
+                        if (cursorCleanup) cursorCleanup();
+
+                        // Remove all window/document listeners
+                        window.removeEventListener('resize', resizeListener);
+                        window.removeEventListener('scroll', scrollPrevent);
+                        window.removeEventListener('wheel', wheelListener);
+                        window.removeEventListener('touchstart', touchStartListener);
+                        window.removeEventListener('touchmove', touchMoveListener);
+                        window.removeEventListener('touchend', touchEndListener);
+                        window.removeEventListener('keydown', keyDownListener);
+
+                        // Reset scroll
+                        document.documentElement.style.overflow = '';
+                        document.body.style.overflow = '';
+                        document.body.style.overscrollBehavior = '';
+
+                        // Cancel any pending animations/timeouts
+                        if (animRAF) cancelAnimationFrame(animRAF);
+                        if (scrollTimeout) clearTimeout(scrollTimeout);
+
+                        // Clear DOM
+                        spiral.innerHTML = '';
+                        spiralInitialized = false;
+                        spiralCleanup = null;
+                    };
                 })();
 
-                // Store cleanup
-                var originalCleanup = spiralCleanup;
-                spiralCleanup = function() {
-                    if (originalCleanup) originalCleanup();
-                    window.removeEventListener('resize', resizeListener);
-                    window.removeEventListener('scroll', scrollPrevent);
-                    window.removeEventListener('wheel', wheelListener);
-                    window.removeEventListener('touchstart', touchStartListener);
-                    window.removeEventListener('touchmove', touchMoveListener);
-                    window.removeEventListener('touchend', touchEndListener);
-                    window.removeEventListener('keydown', keyDownListener);
-                    document.documentElement.style.overflow = '';
-                    document.body.style.overflow = '';
-                    document.body.style.overscrollBehavior = '';
-                    if (animRAF) cancelAnimationFrame(animRAF);
-                    if (scrollTimeout) clearTimeout(scrollTimeout);
-                    spiral.innerHTML = '';
-                    spiralInitialized = false;
-                    spiralCleanup = null;
-                };
+                // Note: the spiralCleanup is set inside the cursor closure above.
+                // We'll also ensure it's called when overlay closes.
             }
 
             function openInfoOverlay() {
