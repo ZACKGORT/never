@@ -1899,6 +1899,8 @@
             }
             .letter-row-text { font-size: calc(var(--fs-body) * 0.82); }
         }
+
+        /* ── CHANGED: mobile breakpoint extended to 640px ── */
         @media (max-width: 640px) {
             body { padding-bottom: calc(var(--hud-height) + 12px + var(--scrollbar-height)); }
             .letters-track {
@@ -1948,6 +1950,17 @@
             .topbar .wrap { padding: 0 8px; }
             .wordmark { font-size: clamp(10px, 3vw, 14px); }
             .wordmark .count { font-size: 7px; }
+
+            /* hide logo text and profile label in profile view on mobile */
+            body.profile-view .wordmark-logo-text,
+            body.profile-view .wordmark .profile-label { display: none; }
+            body.profile-view .profile-user-badge { margin-left: 0;
+                padding: 0; }
+        }
+
+        /* keep extra-small adjustments for very narrow screens */
+        @media (max-width: 480px) {
+            /* already covered by 640px, but keep if needed */
         }
 
         /* ── conversation modal – polished ── */
@@ -2923,19 +2936,7 @@
         body.profile-view .wordmark .profile-label { display: inline-block; }
         .wordmark .profile-label { display: none; }
 
-        @media (max-width: 480px) {
-            body.profile-view .wordmark-logo-text,
-            body.profile-view .wordmark .profile-label { display: none; }
-            body.profile-view .profile-user-badge { margin-left: 0;
-                padding: 0; }
-        }
-
-        .profile-letter-count {
-            font-family: var(--font-mono);
-            font-size: 8px;
-            color: var(--ink-light);
-            margin-left: auto;
-        }
+        /* override for mobile: moved to the 640px block */
     </style>
 </head>
 <body data-scale="l" data-font="satoshi">
@@ -3285,9 +3286,6 @@
             }
 
             // ── Floating panel positioning (dropdowns / rollout menus) ──
-            // Anchors a fixed-position panel near the trigger that opened it,
-            // flipping above/below and clamping horizontally so it never
-            // clips off the edge of the viewport.
             function positionFloatingPanel(panel, trigger, opts = {}) {
                 if (!panel || !trigger) return;
                 const margin = opts.margin ?? 10;
@@ -3317,9 +3315,6 @@
                 panel.style.left = left + 'px';
             }
 
-            // Positions a rollout overlay's panel relative to its trigger button.
-            // On narrow viewports the panel is a full-width bottom sheet instead
-            // (handled entirely by CSS), so JS positioning is skipped there.
             function positionRolloutPanel(overlayId, trigger) {
                 const overlay = document.getElementById(overlayId);
                 const panel = overlay && overlay.querySelector('.bento-panel');
