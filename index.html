@@ -299,7 +299,6 @@
             color: var(--ink-light);
         }
 
-        /* ─── FIX 1: pointer-events on .logo-card ─── */
         .logo-card {
             position: absolute;
             top: calc(100% + 10px);
@@ -316,7 +315,7 @@
             transform-origin: top left;
             transition: opacity .22s ease, transform .22s cubic-bezier(0.25, 0.46, 0.45, 0.94), visibility .22s;
             z-index: 60;
-            pointer-events: none;        /* added */
+            pointer-events: none;
             cursor: default;
         }
         .logo-tile:hover .logo-card,
@@ -325,10 +324,9 @@
             opacity: 1;
             visibility: visible;
             transform: translateY(0) scale(1);
-            pointer-events: auto;       /* added */
+            pointer-events: auto;
         }
 
-        /* ─── FIX 2: disable :focus-within on mobile ─── */
         @media (max-width: 640px) {
             .logo-tile:hover .logo-card,
             .logo-tile:focus-within .logo-card {
@@ -354,7 +352,6 @@
         }
         .logo-card-home { width: 100%; }
 
-        /* ── topbar right ── */
         .topbar-right {
             display: flex;
             align-items: center;
@@ -368,7 +365,6 @@
             padding: 0;
             font-size: 15px; }
 
-        /* ── font/scale ramp (appearance) dropdown ── */
         .topbar-appearance-wrapper {
             position: relative;
             display: flex;
@@ -445,6 +441,17 @@
             background: var(--bg);
             border-color: var(--ink-light);
         }
+        .attention-btn .attention-eye {
+            display: block;
+            width: 22px;
+            height: 22px;
+            color: var(--ink-mid);
+            transition: color .15s ease;
+        }
+        .attention-btn:hover .attention-eye {
+            color: var(--ink);
+        }
+
         .attention-badge {
             position: absolute;
             top: -4px;
@@ -616,6 +623,8 @@
             .attention-btn { width: 30px;
                 height: 30px;
                 font-size: 14px; }
+            .attention-btn .attention-eye { width: 18px;
+                height: 18px; }
         }
 
         /* ── main wrap ── */
@@ -1900,7 +1909,6 @@
             .letter-row-text { font-size: calc(var(--fs-body) * 0.82); }
         }
 
-        /* ── CHANGED: mobile breakpoint extended to 640px ── */
         @media (max-width: 640px) {
             body { padding-bottom: calc(var(--hud-height) + 12px + var(--scrollbar-height)); }
             .letters-track {
@@ -1951,14 +1959,12 @@
             .wordmark { font-size: clamp(10px, 3vw, 14px); }
             .wordmark .count { font-size: 7px; }
 
-            /* hide logo text and profile label in profile view on mobile */
             body.profile-view .wordmark-logo-text,
             body.profile-view .wordmark .profile-label { display: none; }
             body.profile-view .profile-user-badge { margin-left: 0;
                 padding: 0; }
         }
 
-        /* keep extra-small adjustments for very narrow screens */
         @media (max-width: 480px) {
             /* already covered by 640px, but keep if needed */
         }
@@ -2823,7 +2829,7 @@
             padding-top: 2px;
         }
 
-        /* ── custom cursor (FIXED) ── */
+        /* ── custom cursor ── */
         body.custom-cursor-active { cursor: none; }
         .write-cursor-dot,
         .write-cursor-ellipse {
@@ -2937,6 +2943,54 @@
         .wordmark .profile-label { display: none; }
 
         /* override for mobile: moved to the 640px block */
+
+        /* ─── WINK EYE ANIMATION ─── */
+        .attention-eye {
+            display: block;
+            width: 22px;
+            height: 22px;
+            color: inherit;
+            transition: color .15s ease;
+        }
+        .attention-eye .eye-shape {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
+            transform-origin: center;
+        }
+        .attention-eye .eye-pupil {
+            transition: opacity 0.15s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center;
+        }
+        .attention-eye .wink-line {
+            transition: opacity 0.15s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center;
+            opacity: 0;
+        }
+
+        /* Wink state: eye closes, pupil fades, wink line appears */
+        .attention-eye.wink .eye-shape {
+            transform: scaleY(0.08) translateY(0px);
+        }
+        .attention-eye.wink .eye-pupil {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+        .attention-eye.wink .wink-line {
+            opacity: 1;
+        }
+
+        /* Small bounce on the whole eye when winking */
+        .attention-btn .attention-eye {
+            transition: transform 0.15s ease;
+        }
+        .attention-btn .attention-eye.wink {
+            transform: scale(1.02) rotate(1deg);
+        }
+        @media (max-width: 480px) {
+            .attention-eye {
+                width: 18px;
+                height: 18px;
+            }
+        }
     </style>
 </head>
 <body data-scale="l" data-font="satoshi">
@@ -2995,10 +3049,17 @@
                 <!-- Chips -->
                 <button class="btn" id="chipsToggleBtn" title="Manage chips">⌨</button>
 
-                <!-- Attention -->
+                <!-- Attention (with wink eye) -->
                 <div class="attention-wrapper" id="attentionWrapper">
                     <button class="attention-btn" id="attentionBtn" aria-label="Attention">
-                        <span>👁</span>
+                        <svg class="attention-eye" id="attentionEye" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <!-- Eye shape (open) -->
+                            <ellipse class="eye-shape" cx="20" cy="20" rx="14" ry="10" />
+                            <!-- Pupil -->
+                            <circle class="eye-pupil" cx="20" cy="20" r="4.5" fill="currentColor" stroke="none" />
+                            <!-- Wink line (hidden by default) -->
+                            <path class="wink-line" d="M6 20 Q20 16.5 34 20" stroke="currentColor" stroke-width="2.5" fill="none" />
+                        </svg>
                         <span class="attention-badge hidden" id="attentionBadge">0</span>
                     </button>
                     <div class="attention-dropdown" id="attentionDropdown">
@@ -3285,7 +3346,7 @@
                 return `<div class="${cls.join(' ')}">${escapeHtml(initialsFor(obj))}</div>`;
             }
 
-            // ── Floating panel positioning (dropdowns / rollout menus) ──
+            // ── Floating panel positioning ────────────────────────────
             function positionFloatingPanel(panel, trigger, opts = {}) {
                 if (!panel || !trigger) return;
                 const margin = opts.margin ?? 10;
@@ -4848,9 +4909,7 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            // ─── FIX 3: exitProfileView with cleanup ───
             function exitProfileView() {
-                // Close any open dropdowns / modals that might block the UI
                 document.getElementById('attentionDropdown').classList.remove('open');
                 document.getElementById('bentoOverlay').classList.remove('open');
                 document.getElementById('reviewOverlay').classList.remove('open');
@@ -4863,13 +4922,11 @@
                 isProfileView = false;
                 profileUserId = null;
                 document.body.classList.remove('profile-view');
-                document.body.style.overflow = '';   // re-enable scrolling
+                document.body.style.overflow = '';
 
                 initMainLetterData();
                 renderTrack();
                 updateProfileBadge();
-
-                // Reset scroll position safely
                 window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             }
 
@@ -4889,7 +4946,6 @@
                         avatar.textContent = initialsFor(user);
                         name.textContent = user.name;
                         label.textContent = 'Profile';
-                        // Update the wordmark count
                         const countEl = document.getElementById('topCount');
                         if (countEl) countEl.textContent = '';
                     }
@@ -5289,7 +5345,6 @@
                     if (title) title.textContent = data.title || 'Untitled letter';
                     if (deck) deck.textContent = data.deck || '';
 
-                    // In profile view, show the user name in the deck
                     if (data.isProfile && data.profileUserId) {
                         const user = authorById(data.profileUserId);
                         if (user && deck) {
@@ -5318,7 +5373,6 @@
                 const content = document.createElement('div');
                 content.className = 'letter-content';
 
-                // ── Profile view: render thread ──
                 if (data.isProfile && data.statementIds) {
                     const container = document.createElement('div');
                     container.className = 'letter-profile-container';
@@ -5329,11 +5383,8 @@
                     });
 
                     content.appendChild(container);
-
-                    // Update archive state
                     panel.dataset.archive = 'false';
                 } else {
-                    // ── Normal view ──
                     const includeMuted = data.includeMuted || false;
                     let filtered = getFiltered(data.filterTag, includeMuted);
                     filtered = sortByActivity(filtered);
@@ -5409,7 +5460,6 @@
                         }
                     }
 
-                    // Update HUD view buttons
                     ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach(id => {
                         const btn = document.getElementById(id);
                         if (btn) btn.classList.toggle('active', id === 'hudView' + mode.charAt(0).toUpperCase() +
@@ -5502,7 +5552,6 @@
                 const toolbar = document.createElement('div');
                 toolbar.className = 'letter-toolbar';
 
-                // Only show view toggle if not in profile view
                 if (!data.isProfile) {
                     const toggle = document.createElement('div');
                     toggle.className = 'view-toggle';
@@ -5935,6 +5984,37 @@
                 document.body.style.overflow = '';
             }
 
+            // ── Wink ──────────────────────────────────────────────────
+            // Get the eye SVG element
+            const eyeEl = document.getElementById('attentionEye');
+
+            function triggerWink() {
+                if (!eyeEl) return;
+                // Remove any existing wink class to reset
+                eyeEl.classList.remove('wink');
+                // Force reflow for re-trigger
+                void eyeEl.offsetWidth;
+                eyeEl.classList.add('wink');
+                // Remove after animation duration (400ms)
+                clearTimeout(eyeEl._winkTimer);
+                eyeEl._winkTimer = setTimeout(() => {
+                    eyeEl.classList.remove('wink');
+                }, 400);
+            }
+
+            function scheduleNextWink() {
+                // Random delay between 3 and 9 seconds
+                const delay = 3000 + Math.random() * 6000;
+                clearTimeout(eyeEl._scheduleTimer);
+                eyeEl._scheduleTimer = setTimeout(() => {
+                    triggerWink();
+                    scheduleNextWink();
+                }, delay);
+            }
+
+            // Start the wink scheduler after a short delay
+            setTimeout(scheduleNextWink, 4000);
+
             // ── Init ──────────────────────────────────────────────────
             window.__clearFilters = clearFilters;
             window.openProfileModal = openProfileModal;
@@ -6106,7 +6186,6 @@
                         saveData();
                         closeComposer();
                         if (isProfileView) {
-                            // Rebuild profile view
                             enterProfileView(profileUserId);
                         } else {
                             renderLetter(activeIndex);
@@ -6167,7 +6246,6 @@
                         setLogoOpen(false);
                     });
 
-                    // ─── FIX 4: profile exit listener with stopPropagation ───
                     document.getElementById('profileExitBtn').addEventListener('click', (e) => {
                         e.stopPropagation();
                         e.preventDefault();
