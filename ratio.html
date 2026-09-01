@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>neverever.land · statements</title>
 
-    <!-- Satoshi from Fontshare (your design system) -->
+    <!-- Satoshi from Fontshare -->
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@1,2,3,4,5,6,7,8,9&display=swap" rel="stylesheet" />
 
     <style>
-        /* ── design system variables (light theme) ── */
+        /* ── design system variables ── */
         :root {
             --bg: #f0f0f2;
             --card: #ffffff;
@@ -24,13 +24,11 @@
             --border: #e6e6e8;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
             --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.02);
-            --shadow-floating: 0 8px 32px rgba(0, 0, 0, 0.10);
             --radius: 1.5rem;
             --radius-sm: 0.65rem;
             --font: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
             --fs-body: 15px;
-            --fs-display: 54px;
             --transition: 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --max-width: 1600px;
             --margin: 16px;
@@ -105,12 +103,51 @@
             background: var(--card);
             box-shadow: var(--shadow);
             will-change: transform;
+            overflow: hidden;
         }
 
         .js-spiral .js-section:hover {
             border-radius: var(--radius);
             border: 8px solid var(--bg);
             box-shadow: var(--shadow-hover);
+        }
+
+        /* ── bookend special styling ── */
+        .js-section.bookend {
+            border: 2px solid var(--bg);
+            background: var(--card-dark);
+            color: #f5f5f7;
+            cursor: default;
+        }
+        .js-section.bookend:hover {
+            border-radius: var(--radius);
+            border: 8px solid var(--bg);
+            box-shadow: var(--shadow-hover);
+        }
+        .js-section.bookend .panel {
+            pointer-events: auto;
+        }
+        .js-section.bookend a {
+            color: #f5f5f7;
+        }
+        .js-section.bookend .panel-num {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .js-section.bookend .panel-title {
+            color: #ffffff;
+        }
+        .js-section.bookend .panel-line {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* bookend accent glow */
+        .js-section.bookend::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse at 30% 40%, rgba(229, 229, 103, 0.06) 0%, transparent 70%);
+            border-radius: inherit;
         }
 
         /* ── panel content ── */
@@ -125,6 +162,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            z-index: 2;
         }
 
         .panel-num {
@@ -157,6 +195,45 @@
             letter-spacing: -0.01em;
         }
 
+        /* ── bookend index list ── */
+        .bookend-index {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.25rem 1.5rem;
+            margin-top: 0.5rem;
+            max-width: 52ch;
+        }
+        .bookend-index a {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            padding: 0.25rem 0;
+            font-weight: 400;
+            font-size: clamp(0.85rem, 1.1vw, 1.1rem);
+            color: rgba(255, 255, 255, 0.8);
+            transition: color 0.2s, transform 0.15s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            cursor: pointer;
+            pointer-events: auto;
+            font-family: var(--font);
+        }
+        .bookend-index a:hover {
+            color: var(--accent);
+            transform: translateX(4px);
+        }
+        .bookend-index a .idx-num {
+            font-family: var(--font-mono);
+            font-size: 0.65em;
+            opacity: 0.4;
+            letter-spacing: 0.04em;
+            flex-shrink: 0;
+            min-width: 2.2em;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .bookend-index a .idx-title {
+            font-weight: 500;
+        }
+
         /* ── density scales ── */
         .panel.density-sparse .panel-title {
             font-size: clamp(1.8rem, 4vw, 3.4rem);
@@ -181,7 +258,17 @@
             margin-bottom: 0.2em;
         }
 
-        /* ── custom cursor (design system style) ── */
+        /* bookend density */
+        .panel.density-bookend .panel-title {
+            font-size: clamp(2.2rem, 4.5vw, 4.2rem);
+            margin-bottom: 0.3em;
+        }
+        .panel.density-bookend .panel-line {
+            font-size: clamp(0.95rem, 1.4vw, 1.2rem);
+            max-width: 46ch;
+        }
+
+        /* ── custom cursor ── */
         .write-cursor-dot,
         .write-cursor-ellipse {
             position: fixed;
@@ -193,7 +280,6 @@
             transition: opacity 0.15s ease;
             will-change: transform;
         }
-
         .write-cursor-dot {
             width: 6px;
             height: 6px;
@@ -201,7 +287,6 @@
             border-radius: 50%;
             background: var(--ink);
         }
-
         .write-cursor-ellipse {
             width: 30px;
             height: 30px;
@@ -209,6 +294,12 @@
             border-radius: 50%;
             border: 1.5px solid var(--ink);
             opacity: 0.25;
+        }
+        .js-section.bookend .write-cursor-dot {
+            background: #f5f5f7;
+        }
+        .js-section.bookend .write-cursor-ellipse {
+            border-color: #f5f5f7;
         }
 
         /* ── scrollbar ── */
@@ -251,12 +342,27 @@
             .panel.density-dense .panel-line {
                 font-size: clamp(0.65rem, 1.4vw, 0.78rem);
             }
+            .panel.density-bookend .panel-title {
+                font-size: clamp(1.8rem, 6vw, 2.8rem);
+            }
+            .panel.density-bookend .panel-line {
+                font-size: clamp(0.8rem, 1.8vw, 1rem);
+            }
             .js-spiral .js-section:hover {
                 border-radius: var(--radius-sm);
                 border-width: 4px;
             }
             .panel-num {
                 font-size: 0.6rem;
+            }
+            .bookend-index {
+                grid-template-columns: 1fr;
+                gap: 0.1rem;
+                max-width: 100%;
+            }
+            .bookend-index a {
+                font-size: clamp(0.75rem, 2vw, 0.95rem);
+                padding: 0.2rem 0;
             }
         }
 
@@ -286,8 +392,17 @@
             .panel.density-dense .panel-line {
                 font-size: clamp(0.55rem, 1.2vw, 0.65rem);
             }
+            .panel.density-bookend .panel-title {
+                font-size: clamp(1.5rem, 7vw, 2.2rem);
+            }
+            .panel.density-bookend .panel-line {
+                font-size: clamp(0.7rem, 2vw, 0.9rem);
+            }
             .panel-num {
                 font-size: 0.55rem;
+            }
+            .bookend-index a {
+                font-size: clamp(0.65rem, 2.2vw, 0.8rem);
             }
         }
     </style>
@@ -305,7 +420,14 @@
         (function() {
 
             // ─── content ──────────────────────────────────────────
+            // Both bookends are identical index panels.
             var PANELS = [{
+                type: "bookend-start",
+                num: "∞",
+                title: "Contents",
+                density: "bookend",
+                lines: [],
+            }, {
                 num: "01",
                 title: "neverever.land",
                 density: "sparse",
@@ -437,38 +559,100 @@
                 lines: [
                     "Statements — as signatures"
                 ]
+            }, {
+                // BOOKEND END – identical index
+                type: "bookend-end",
+                num: "∞",
+                title: "Contents",
+                density: "bookend",
+                lines: [],
             }];
 
             var spiral = document.getElementById('spiral');
             var sections = [];
+            var sectionData = [];
 
-            PANELS.forEach(function(panel) {
+            // ─── helper: build index list ─────────────────────────
+            function buildIndexList(container) {
+                var indexWrap = document.createElement('div');
+                indexWrap.className = 'bookend-index';
+
+                // gather content panels (skip bookends)
+                var contentPanels = PANELS.filter(function(p, i) {
+                    return p.type !== 'bookend-start' && p.type !== 'bookend-end';
+                });
+
+                contentPanels.forEach(function(p, i) {
+                    var link = document.createElement('a');
+                    link.href = '#';
+                    // target index = i + 1 because the first bookend is at index 0
+                    link.dataset.target = i + 1;
+                    var numSpan = document.createElement('span');
+                    numSpan.className = 'idx-num';
+                    numSpan.textContent = p.num;
+                    var titleSpan = document.createElement('span');
+                    titleSpan.className = 'idx-title';
+                    titleSpan.textContent = p.title;
+                    link.appendChild(numSpan);
+                    link.appendChild(titleSpan);
+
+                    // fix: stop propagation so the section's own click handler doesn't override
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();  // ← critical fix
+                        var target = parseInt(this.dataset.target);
+                        if (!isNaN(target) && target >= 0 && target < sections.length) {
+                            cancelAnimationFrame(animRAF);
+                            animateScroll(target * -90, rotation, 0.2);
+                        }
+                    });
+
+                    indexWrap.appendChild(link);
+                });
+
+                container.appendChild(indexWrap);
+            }
+
+            // ─── render panels ────────────────────────────────────
+            PANELS.forEach(function(panel, idx) {
                 var section = document.createElement('div');
                 section.className = 'js-section';
+                if (panel.type === 'bookend-start' || panel.type === 'bookend-end') {
+                    section.classList.add('bookend');
+                }
 
                 var wrap = document.createElement('div');
                 wrap.className = 'panel density-' + panel.density;
 
+                // num
                 var num = document.createElement('p');
                 num.className = 'panel-num';
                 num.textContent = panel.num;
                 wrap.appendChild(num);
 
+                // title
                 var title = document.createElement('p');
                 title.className = 'panel-title';
                 title.textContent = panel.title;
                 wrap.appendChild(title);
 
-                panel.lines.forEach(function(line) {
-                    var p = document.createElement('p');
-                    p.className = 'panel-line';
-                    p.textContent = line;
-                    wrap.appendChild(p);
-                });
+                // if bookend (both start and end) – build index
+                if (panel.type === 'bookend-start' || panel.type === 'bookend-end') {
+                    buildIndexList(wrap);
+                } else {
+                    // regular content lines
+                    panel.lines.forEach(function(line) {
+                        var p = document.createElement('p');
+                        p.className = 'panel-line';
+                        p.textContent = line;
+                        wrap.appendChild(p);
+                    });
+                }
 
                 section.appendChild(wrap);
                 spiral.appendChild(section);
                 sections.push(section);
+                sectionData.push(panel);
             });
 
             var sectionCount = sections.length;
@@ -478,7 +662,7 @@
             document.body.style.overflow = 'hidden';
             document.body.style.overscrollBehavior = 'none';
 
-            // ─── spiral mechanics (original logic, untouched) ────
+            // ─── spiral mechanics ────────────────────────────────
             var ASPECT = 0.618033;
             var AXIS = 0.7237;
 
@@ -496,8 +680,6 @@
             var firefox = ua.indexOf('firefox') !== -1 || ua.indexOf('mozilla') === -1;
             var ios = /iphone|ipod|ipad/.test(ua);
             var safari = (ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1) || ios;
-            var linux = ua.indexOf('linux') !== -1;
-            var windowsOS = ua.indexOf('windows') !== -1;
 
             function trimRotation(r) {
                 return Math.max(-1500, Math.min(1200, r));
@@ -505,36 +687,49 @@
 
             function scrollHandler() {
                 var scale = Math.pow(ASPECT, rotation / 90);
-                currentSection = Math.min(
-                    sectionCount + 2,
-                    Math.max(-sectionCount, Math.floor((rotation - 30) / -90))
-                );
+                var raw = Math.floor((rotation - 30) / -90);
+                currentSection = Math.min(sectionCount + 2, Math.max(-sectionCount, raw));
                 spiral.style.transform = 'rotate(' + rotation + 'deg) scale(' + scale + ')';
                 sections.forEach(function(s, i) {
                     s.classList.toggle('active', i === currentSection);
                 });
             }
 
-            function animateScroll(targR, startR, speed) {
+            var BASE_FRAME_MS = 1000 / 60;
+
+            function animateScroll(targR, startR, speed, onComplete) {
                 var mySpeed = speed || 0.2;
                 var hasTarget = targR !== undefined && targR !== null;
-                if ((hasTarget && Math.abs(targR - rotation) > 0.1) || Math.abs(moved) > 1) {
-                    if (hasTarget) {
-                        rotation += mySpeed * (targR - rotation);
-                    } else {
-                        moved *= 0.98;
-                        rotation += moved / -10;
+                var lastT = null;
+
+                function frame(now) {
+                    var dt = lastT === null ? BASE_FRAME_MS : (now - lastT);
+                    dt = Math.min(dt, BASE_FRAME_MS * 3);
+                    lastT = now;
+                    var steps = dt / BASE_FRAME_MS;
+
+                    if ((hasTarget && Math.abs(targR - rotation) > 0.1) || Math.abs(moved) > 1) {
+                        if (hasTarget) {
+                            var frameFactor = 1 - Math.pow(1 - mySpeed, steps);
+                            rotation += frameFactor * (targR - rotation);
+                        } else {
+                            moved *= Math.pow(0.98, steps);
+                            rotation += (moved / -10) * steps;
+                        }
+                        rotation = trimRotation(rotation);
+                        scrollHandler();
+                        animRAF = requestAnimationFrame(frame);
+                    } else if (hasTarget) {
+                        cancelAnimationFrame(animRAF);
+                        rotation = trimRotation(targR);
+                        scrollHandler();
+                        if (typeof onComplete === 'function') onComplete();
+                    } else if (typeof onComplete === 'function') {
+                        onComplete();
                     }
-                    rotation = trimRotation(rotation);
-                    scrollHandler();
-                    animRAF = requestAnimationFrame(function() {
-                        animateScroll(targR, startR, speed);
-                    });
-                } else if (hasTarget) {
-                    cancelAnimationFrame(animRAF);
-                    rotation = trimRotation(targR);
-                    scrollHandler();
                 }
+
+                animRAF = requestAnimationFrame(frame);
             }
 
             function startScrollTimeout() {
@@ -572,9 +767,14 @@
                     s.style.transformOrigin = spiralOrigin;
                     s.style.backfaceVisibility = 'hidden';
 
-                    // light theme gradient using design system
-                    var lightness = 96 - i * 2.5;
-                    s.style.backgroundColor = 'hsl(0, 0%, ' + lightness + '%)';
+                    var panel = sectionData[i];
+                    if (panel.type === 'bookend-start' || panel.type === 'bookend-end') {
+                        s.style.backgroundColor = '#1C1C1E';
+                    } else {
+                        var lightness = 96 - (i - 1) * 2.5;
+                        lightness = Math.max(75, lightness);
+                        s.style.backgroundColor = 'hsl(0, 0%, ' + lightness + '%)';
+                    }
                     s.style.transform = 'rotate(' + myRot + 'deg) scale(' + scale + ') ' + translate;
                 });
 
@@ -595,18 +795,20 @@
                 e.preventDefault();
             });
 
+            var wheelBusy = false;
+
             window.addEventListener('wheel', function(e) {
-                var deltaY = -e.deltaY;
-                if (windowsOS || linux) {
-                    deltaY = e.deltaY * 5;
-                }
-                moved = -deltaY || 0;
-                rotation += moved / -10;
-                rotation = trimRotation(rotation);
                 e.preventDefault();
-                startScrollTimeout();
+                if (wheelBusy) return;
+
+                var dir = e.deltaY > 0 ? 1 : -1;
+                var target = trimRotation((currentSection + dir) * -90);
+
+                wheelBusy = true;
                 cancelAnimationFrame(animRAF);
-                scrollHandler();
+                animateScroll(target, rotation, 0.22, function() {
+                    wheelBusy = false;
+                });
             }, { passive: false });
 
             window.addEventListener('touchstart', function(e) {
