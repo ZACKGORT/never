@@ -3558,6 +3558,28 @@
         display: none;
       }
 
+      /* ── Profile view: letters-between counter on top HUD ── */
+      .hud-nav-counter {
+        display: none;
+      }
+      body.profile-view .hud-top .hud-nav-counter {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--ink);
+        color: var(--card);
+        padding: var(--hud-pad-count);
+        border-radius: var(--radius-sm);
+        font-family: var(--font-mono);
+        font-size: var(--hud-fs-count);
+        font-weight: 600;
+        min-width: var(--hud-minw-count);
+        text-align: center;
+      }
+      body.profile-view .hud-top .hud-nav-counter:empty {
+        display: none;
+      }
+
       /* ── INFO OVERLAY (spiral) ──────────────────────────────────────────── */
       .info-overlay {
         position: fixed;
@@ -4162,6 +4184,7 @@
     <!-- ─── TOP HUD ─── -->
     <div class="hud hud-top" id="hudTop">
       <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
+      <span class="hud-nav-counter" id="hudNavCounter"></span>
       <button class="btn btn-icon" id="hudNext" title="Next">›</button>
       <div class="hud-divider"></div>
       <span class="hud-label">View</span>
@@ -6793,6 +6816,7 @@
             if (countEl)
               countEl.textContent = String(statements.length).padStart(3, '0');
           }
+          updateHudNavCounts();
         }
 
         // ── Bento card builder ───────────────────────────────────
@@ -7647,6 +7671,7 @@
           if (newIndex === activeIndex) {
             scrollToPanel(newIndex);
             updateProgressBar();
+            updateHudNavCounts();
             return;
           }
 
@@ -7657,6 +7682,21 @@
           renderLetter(activeIndex);
           scrollToPanel(activeIndex);
           updateProgressBar();
+          updateHudNavCounts();
+        }
+
+        // Shows, in the top HUD between prev/next while in profile view,
+        // the current letter's position among the total.
+        function updateHudNavCounts() {
+          const counterEl = document.getElementById('hudNavCounter');
+          if (!counterEl) return;
+
+          if (!isProfileView || letterData.length < 2) {
+            counterEl.textContent = '';
+            return;
+          }
+
+          counterEl.textContent = `${activeIndex + 1}/${letterData.length}`;
         }
 
         function scrollToPanel(index) {
