@@ -5984,18 +5984,72 @@
                 document.body.style.overflow = '';
             }
 
+            // ─── CURSOR TRACKING FOR THE EYE ──────────────────────────
+            function setupEyeTracking() {
+                const eyeEl = document.getElementById('attentionEye');
+                const btn = document.getElementById('attentionBtn');
+                if (!eyeEl || !btn) return;
+
+                const pupil = eyeEl.querySelector('.eye-pupil');
+                if (!pupil) return;
+
+                // Store original pupil center (viewBox coords)
+                const origCx = 20,
+                    origCy = 20;
+                const maxOffset = 4; // maximum displacement in viewBox units
+
+                function updatePupil(clientX, clientY) {
+                    const rect = eyeEl.getBoundingClientRect();
+                    // Convert client coords to viewBox coords (0-40)
+                    const scaleX = 40 / rect.width;
+                    const scaleY = 40 / rect.height;
+                    const xView = (clientX - rect.left) * scaleX;
+                    const yView = (clientY - rect.top) * scaleY;
+
+                    // Vector from center (20,20)
+                    let dx = xView - 20;
+                    let dy = yView - 20;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist === 0) {
+                        pupil.setAttribute('cx', origCx);
+                        pupil.setAttribute('cy', origCy);
+                        return;
+                    }
+                    // Clamp to maxOffset
+                    const clampedDist = Math.min(dist, maxOffset);
+                    const ratio = clampedDist / dist;
+                    const newCx = origCx + dx * ratio;
+                    const newCy = origCy + dy * ratio;
+                    pupil.setAttribute('cx', newCx);
+                    pupil.setAttribute('cy', newCy);
+                }
+
+                function resetPupil() {
+                    pupil.setAttribute('cx', origCx);
+                    pupil.setAttribute('cy', origCy);
+                }
+
+                btn.addEventListener('mouseenter', (e) => {
+                    updatePupil(e.clientX, e.clientY);
+                });
+
+                btn.addEventListener('mousemove', (e) => {
+                    updatePupil(e.clientX, e.clientY);
+                });
+
+                btn.addEventListener('mouseleave', () => {
+                    resetPupil();
+                });
+            }
+
             // ── Wink ──────────────────────────────────────────────────
-            // Get the eye SVG element
             const eyeEl = document.getElementById('attentionEye');
 
             function triggerWink() {
                 if (!eyeEl) return;
-                // Remove any existing wink class to reset
                 eyeEl.classList.remove('wink');
-                // Force reflow for re-trigger
                 void eyeEl.offsetWidth;
                 eyeEl.classList.add('wink');
-                // Remove after animation duration (400ms)
                 clearTimeout(eyeEl._winkTimer);
                 eyeEl._winkTimer = setTimeout(() => {
                     eyeEl.classList.remove('wink');
@@ -6003,7 +6057,6 @@
             }
 
             function scheduleNextWink() {
-                // Random delay between 3 and 9 seconds
                 const delay = 3000 + Math.random() * 6000;
                 clearTimeout(eyeEl._scheduleTimer);
                 eyeEl._scheduleTimer = setTimeout(() => {
@@ -6012,7 +6065,6 @@
                 }, delay);
             }
 
-            // Start the wink scheduler after a short delay
             setTimeout(scheduleNextWink, 4000);
 
             // ── Init ──────────────────────────────────────────────────
@@ -6314,6 +6366,9 @@
                     document.getElementById('chipAddInput').addEventListener('keydown', (e) => {
                         if (e.key === 'Enter') document.getElementById('chipAddBtn').click();
                     });
+
+                    // ─── Start eye tracking ──────────────────────────────
+                    setupEyeTracking();
 
                     setTimeout(updateProgressBar, 100);
                     renderLetter(0);
