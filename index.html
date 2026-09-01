@@ -2991,6 +2991,15 @@
                 height: 18px;
             }
         }
+
+        /* ── Profile view: hide view toggles in top HUD ── */
+        body.profile-view .hud-top .hud-divider,
+        body.profile-view .hud-top .hud-label,
+        body.profile-view .hud-top #hudViewList,
+        body.profile-view .hud-top #hudViewGrid,
+        body.profile-view .hud-top #hudViewBento {
+            display: none;
+        }
     </style>
 </head>
 <body data-scale="l" data-font="satoshi">
@@ -5460,22 +5469,28 @@
                         }
                     }
 
-                    ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach(id => {
-                        const btn = document.getElementById(id);
-                        if (btn) btn.classList.toggle('active', id === 'hudView' + mode.charAt(0).toUpperCase() +
-                            mode.slice(1));
-                    });
+                    // Update top HUD view toggle buttons only if this is the active panel
+                    if (index === activeIndex) {
+                        ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach(id => {
+                            const btn = document.getElementById(id);
+                            if (btn) btn.classList.toggle('active', id === 'hudView' + mode.charAt(0)
+                                .toUpperCase() + mode.slice(1));
+                        });
+                    }
                 }
 
                 frame.appendChild(content);
 
-                if (!isProfileView) {
-                    document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
+                // Only update global UI for the active panel
+                if (index === activeIndex) {
+                    if (!isProfileView) {
+                        document.getElementById('topCount').textContent = String(statements.length).padStart(3, '0');
+                    }
+                    updateFilterUI();
+                    updateProgressBar();
+                    renderReviewBadge();
+                    updateProfileBadge();
                 }
-                updateFilterUI();
-                updateProgressBar();
-                renderReviewBadge();
-                updateProfileBadge();
             }
 
             // ── Viewport blur etc. ──────────────────────────────────
@@ -6093,6 +6108,16 @@
                     renderAttention();
                     renderChipsUI();
                     renderRapidChips();
+
+                    // ── Preload the second letter ──────────────────────
+                    // Wait for the initial render to settle, then render panel 1
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            if (!isProfileView && letterData.length > 1) {
+                                renderLetter(1);
+                            }
+                        });
+                    });
 
                     // ─── HUD controls ─────────────────────────────────────
                     document.getElementById('hudPrev').addEventListener('click', () => activatePanel(activeIndex - 1));
