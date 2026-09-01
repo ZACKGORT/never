@@ -1747,11 +1747,11 @@
           --hud-pad: 4px 8px;
           --hud-gap: 3px;
           --hud-min-h: 38px;
-          --hud-btn-min-h: 22px;
+          --hud-btn-min-h: 30px;
           --hud-btn-pad: 4px 8px;
           --hud-btn-fs: 7px;
-          --hud-icon-w: 22px;
-          --hud-icon-fs: 10px;
+          --hud-icon-w: 30px;
+          --hud-icon-fs: 12px;
           --hud-divider-h: 16px;
         }
         .hud {
@@ -1782,11 +1782,11 @@
           --hud-pad: 3px 6px;
           --hud-gap: 2px;
           --hud-min-h: 34px;
-          --hud-btn-min-h: 20px;
+          --hud-btn-min-h: 28px;
           --hud-btn-pad: 3px 6px;
           --hud-btn-fs: 6px;
-          --hud-icon-w: 20px;
-          --hud-icon-fs: 9px;
+          --hud-icon-w: 28px;
+          --hud-icon-fs: 11px;
           --hud-divider-h: 14px;
         }
       }
@@ -4183,9 +4183,28 @@
 
     <!-- ─── TOP HUD ─── -->
     <div class="hud hud-top" id="hudTop">
-      <button class="btn btn-icon" id="hudPrev" title="Previous">‹</button>
-      <span class="hud-nav-counter" id="hudNavCounter"></span>
-      <button class="btn btn-icon" id="hudNext" title="Next">›</button>
+      <button
+        class="btn btn-icon"
+        id="hudPrev"
+        title="Previous"
+        aria-label="Previous letter"
+      >
+        ‹
+      </button>
+      <span
+        class="hud-nav-counter"
+        id="hudNavCounter"
+        role="status"
+        aria-live="polite"
+      ></span>
+      <button
+        class="btn btn-icon"
+        id="hudNext"
+        title="Next"
+        aria-label="Next letter"
+      >
+        ›
+      </button>
       <div class="hud-divider"></div>
       <span class="hud-label">View</span>
       <button class="btn active" id="hudViewList">List</button>
@@ -7512,8 +7531,22 @@
             bottom.classList.toggle('scrolling', scrollY < maxScroll - 4);
             if (hudTop) hudTop.classList.toggle('docked', scrollY > 4);
           }
-          window.addEventListener('scroll', update, { passive: true });
-          window.addEventListener('resize', update);
+
+          // Coalesce rapid scroll/resize events into one read+write per frame
+          // instead of running the layout read on every event tick.
+          let ticking = false;
+          function onScrollOrResize() {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+              update();
+              ticking = false;
+            });
+          }
+          window.addEventListener('scroll', onScrollOrResize, {
+            passive: true,
+          });
+          window.addEventListener('resize', onScrollOrResize);
           update();
         }
 
@@ -7693,10 +7726,14 @@
 
           if (!isProfileView || letterData.length < 2) {
             counterEl.textContent = '';
+            counterEl.removeAttribute('aria-label');
             return;
           }
 
-          counterEl.textContent = `${activeIndex + 1}/${letterData.length}`;
+          const position = activeIndex + 1;
+          const total = letterData.length;
+          counterEl.textContent = `${position}/${total}`;
+          counterEl.setAttribute('aria-label', `Letter ${position} of ${total}`);
         }
 
         function scrollToPanel(index) {
@@ -9410,6 +9447,15 @@
             logoTile.addEventListener('click', (e) => {
               if (closestSafe(e.target, '#logoReset')) return;
               setLogoOpen(!logoTile.classList.contains('open'));
+            });
+            logoTile.addEventListener('keydown', (e) => {
+              if (e.key !== 'Enter' && e.key !== ' ') return;
+              if (closestSafe(e.target, 'button, a')) return;
+              e.preventDefault();
+              setLogoOpen(!logoTile.classList.contains('open'));
+            });
+            logoTile.addEventListener('focusout', (e) => {
+              if (!logoTile.contains(e.relatedTarget)) setLogoOpen(false);
             });
             document.addEventListener('click', (e) => {
               if (!logoTile.contains(e.target)) setLogoOpen(false);
