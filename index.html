@@ -3551,6 +3551,7 @@
             position: fixed;
             inset: 0;
             pointer-events: none;
+            touch-action: none; /* prevent browser scrolling on touch */
         }
 
         .info-overlay .js-spiral .js-section {
@@ -7148,21 +7149,9 @@
                         "No algorithmic ranking — order is what you asked for."
                     ]
                 }, {
-                    num: "15",
-                    title: "neverever.land",
-                    density: "sparse",
-                    lines: [
-                        "Statements — as signatures"
-                    ]
-                }, {
-                    num: "NVRVRLND",
-                    title: "Brand Mark · Identity",
-                    density: "brand",
-                    lines: [
-                        "NE. = a canonical signature; a complete statement.",
-                        "ⳑ = a representation of place and intent.",
-                        "NE.ⳑ = a native:unicode identity; exists without facade."
-                    ],
+                  num: "15", title: "neverever.land", density: "sparse", lines: [ "Statements — as signatures" ] }, { num: "neverever.land", title: "Identity · NVRVRLND", density: "brand", lines: [ "NE. = a canonical signature; a complete statement.", "ⳑ = a representation of place and intent.", "NE.ⳑ = a native:unicode identity; exists without facade." ],
+
+                  
                     yellow: true
                 }, {
                     type: "bookend-end",
@@ -7188,6 +7177,7 @@
                     contentPanels.forEach(function(p, i) {
                         var link = document.createElement('a');
                         link.href = '#';
+                        // target index = i + 1 (because bookend-start is at 0)
                         link.dataset.target = i + 1;
                         var numSpan = document.createElement('span');
                         numSpan.className = 'idx-num';
@@ -7262,6 +7252,13 @@
                 document.body.style.overflow = 'hidden';
                 document.body.style.overscrollBehavior = 'none';
 
+                // ─── helper: nearest section ─────────────────────────
+                function nearestSection(rot) {
+                    // rot is in degrees, each section spans 90°
+                    var idx = Math.round(rot / -90);
+                    return Math.max(0, Math.min(sectionCount - 1, idx));
+                }
+
                 // ─── spiral mechanics ────────────────────────────────
                 var ASPECT = 0.618033;
                 var AXIS = 0.7237;
@@ -7281,8 +7278,9 @@
                 var ios = /iphone|ipod|ipad/.test(ua);
                 var safari = (ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1) || ios;
 
+                // increased range to accommodate all sections (max ~18 * -90 = -1620)
                 function trimRotation(r) {
-                    return Math.max(-1500, Math.min(1200, r));
+                    return Math.max(-2000, Math.min(2000, r));
                 }
 
                 function scrollHandler() {
@@ -7332,14 +7330,19 @@
                     animRAF = requestAnimationFrame(frame);
                 }
 
+                function snapToNearest() {
+                    var idx = nearestSection(rotation);
+                    var target = idx * -90;
+                    cancelAnimationFrame(animRAF);
+                    animateScroll(target, rotation, 0.2);
+                }
+
                 function startScrollTimeout() {
                     clearTimeout(scrollTimeout);
-                    if (currentSection > -1 && currentSection < sectionCount) {
-                        scrollTimeout = setTimeout(function() {
-                            cancelAnimationFrame(animRAF);
-                            animateScroll(currentSection * -90, rotation, 0.15);
-                        }, 200);
-                    }
+                    // always snap after a short delay, even if out of bounds
+                    scrollTimeout = setTimeout(function() {
+                        snapToNearest();
+                    }, 200);
                 }
 
                 function buildSpiral() {
@@ -7401,8 +7404,10 @@
                 var wheelListener = function(e) {
                     e.preventDefault();
                     if (wheelBusy) return;
+                    var idx = nearestSection(rotation);
                     var dir = e.deltaY > 0 ? 1 : -1;
-                    var target = trimRotation((currentSection + dir) * -90);
+                    var newIdx = Math.max(0, Math.min(sectionCount - 1, idx + dir));
+                    var target = newIdx * -90;
                     wheelBusy = true;
                     cancelAnimationFrame(animRAF);
                     animateScroll(target, rotation, 0.22, function() {
@@ -7436,17 +7441,22 @@
                 window.addEventListener('touchmove', touchMoveListener, { passive: false });
 
                 var touchEndListener = function() {
-                    animateScroll();
+                    // snap to nearest after touch ends, with a tiny delay to allow final position
+                    setTimeout(snapToNearest, 10);
                 };
                 window.addEventListener('touchend', touchEndListener);
 
                 var keyDownListener = function(e) {
                     if (e.keyCode === 39 || e.keyCode === 40 || e.keyCode === 32) {
+                        var idx = nearestSection(rotation);
+                        var newIdx = Math.min(sectionCount - 1, idx + 1);
                         cancelAnimationFrame(animRAF);
-                        animateScroll((currentSection + 1) * -90, rotation);
+                        animateScroll(newIdx * -90, rotation, 0.2);
                     } else if (e.keyCode === 37 || e.keyCode === 38) {
+                        var idx = nearestSection(rotation);
+                        var newIdx = Math.max(0, idx - 1);
                         cancelAnimationFrame(animRAF);
-                        animateScroll((currentSection - 1) * -90, rotation);
+                        animateScroll(newIdx * -90, rotation, 0.2);
                     }
                     scrollHandler();
                 };
@@ -7455,7 +7465,7 @@
                 sections.forEach(function(s, i) {
                     s.addEventListener('click', function() {
                         cancelAnimationFrame(animRAF);
-                        animateScroll(i * -90, rotation);
+                        animateScroll(i * -90, rotation, 0.2);
                     });
                 });
 
