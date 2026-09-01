@@ -7015,14 +7015,8 @@
                 if (spiralInitialized) return;
                 spiralInitialized = true;
 
-                // ─── content with bookend panels ──────────────────────
+                // ─── content with a single bookend at the end ──────────
                 var PANELS = [{
-                    type: "bookend-start",
-                    num: "∞",
-                    title: "Contents",
-                    density: "bookend",
-                    lines: [],
-                }, {
                     num: "01",
                     title: "neverever.land",
                     density: "sparse",
@@ -7150,11 +7144,9 @@
                     ]
                 }, {
                   num: "15", title: "neverever.land", density: "sparse", lines: [ "Statements — as signatures" ] }, { num: "neverever.land", title: "Identity · NVRVRLND", density: "brand", lines: [ "NE. = a canonical signature; a complete statement.", "ⳑ = a representation of place and intent.", "NE.ⳑ = a native:unicode identity; exists without facade." ],
-
-                  
                     yellow: true
                 }, {
-                    type: "bookend-end",
+                    type: "bookend",
                     num: "∞",
                     title: "Contents",
                     density: "bookend",
@@ -7170,15 +7162,14 @@
                     var indexWrap = document.createElement('div');
                     indexWrap.className = 'bookend-index';
 
-                    var contentPanels = PANELS.filter(function(p, i) {
-                        return p.type !== 'bookend-start' && p.type !== 'bookend-end';
-                    });
+                    // content panels are all except the last (bookend)
+                    var contentPanels = PANELS.slice(0, -1);
 
                     contentPanels.forEach(function(p, i) {
                         var link = document.createElement('a');
                         link.href = '#';
-                        // target index = i + 1 (because bookend-start is at 0)
-                        link.dataset.target = i + 1;
+                        // target index = i (now 0-based because bookend is last)
+                        link.dataset.target = i;
                         var numSpan = document.createElement('span');
                         numSpan.className = 'idx-num';
                         numSpan.textContent = p.num;
@@ -7192,9 +7183,18 @@
                             e.preventDefault();
                             e.stopPropagation();
                             var target = parseInt(this.dataset.target);
-                            if (!isNaN(target) && target >= 0 && target < sections.length) {
-                                cancelAnimationFrame(animRAF);
-                                animateScroll(target * -90, rotation, 0.2);
+                            if (isNaN(target) || target < 0 || target >= sections.length) return;
+
+                            cancelAnimationFrame(animRAF);
+                            var targR = target * -90;
+
+                            // Short hops animate, long jumps cut straight
+                            var currentIdx = nearestSection(rotation);
+                            if (Math.abs(target - currentIdx) > 2) {
+                                rotation = trimRotation(targR);
+                                scrollHandler();
+                            } else {
+                                animateScroll(targR, rotation, 0.2);
                             }
                         });
 
@@ -7208,7 +7208,7 @@
                 PANELS.forEach(function(panel, idx) {
                     var section = document.createElement('div');
                     section.className = 'js-section';
-                    if (panel.type === 'bookend-start' || panel.type === 'bookend-end') {
+                    if (panel.type === 'bookend') {
                         section.classList.add('bookend');
                     }
                     if (panel.yellow) {
@@ -7228,7 +7228,7 @@
                     title.textContent = panel.title;
                     wrap.appendChild(title);
 
-                    if (panel.type === 'bookend-start' || panel.type === 'bookend-end') {
+                    if (panel.type === 'bookend') {
                         buildIndexList(wrap);
                     } else {
                         panel.lines.forEach(function(line) {
@@ -7265,7 +7265,7 @@
 
                 var _winW, _winH, smallScreen, landscape, spiralOrigin;
 
-                var rotation = 0;
+                var rotation = 0; // start at first content panel (index 0)
                 var currentSection = 0;
                 var touchStartY = 0;
                 var touchStartX = 0;
@@ -7278,7 +7278,6 @@
                 var ios = /iphone|ipod|ipad/.test(ua);
                 var safari = (ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1) || ios;
 
-                // increased range to accommodate all sections (max ~18 * -90 = -1620)
                 function trimRotation(r) {
                     return Math.max(-2000, Math.min(2000, r));
                 }
@@ -7306,7 +7305,8 @@
                         lastT = now;
                         var steps = dt / BASE_FRAME_MS;
 
-                        if ((hasTarget && Math.abs(targR - rotation) > 0.1) || Math.abs(moved) > 1) {
+                        // Only check 'moved' when there is no target
+                        if ((hasTarget && Math.abs(targR - rotation) > 0.1) || (!hasTarget && Math.abs(moved) > 1)) {
                             if (hasTarget) {
                                 var frameFactor = 1 - Math.pow(1 - mySpeed, steps);
                                 rotation += frameFactor * (targR - rotation);
@@ -7339,7 +7339,6 @@
 
                 function startScrollTimeout() {
                     clearTimeout(scrollTimeout);
-                    // always snap after a short delay, even if out of bounds
                     scrollTimeout = setTimeout(function() {
                         snapToNearest();
                     }, 200);
@@ -7371,12 +7370,12 @@
                         s.style.backfaceVisibility = 'hidden';
 
                         var panel = sectionData[i];
-                        if (panel.type === 'bookend-start' || panel.type === 'bookend-end') {
+                        if (panel.type === 'bookend') {
                             s.style.backgroundColor = '#1C1C1E';
                         } else if (panel.yellow) {
                             s.style.backgroundColor = '#E5E567';
                         } else {
-                            var lightness = 96 - (i - 1) * 2.2;
+                            var lightness = 96 - (i) * 2.2; // i is now 0‑based
                             lightness = Math.max(78, lightness);
                             s.style.backgroundColor = 'hsl(0, 0%, ' + lightness + '%)';
                         }
@@ -7406,7 +7405,10 @@
                     if (wheelBusy) return;
                     var idx = nearestSection(rotation);
                     var dir = e.deltaY > 0 ? 1 : -1;
-                    var newIdx = Math.max(0, Math.min(sectionCount - 1, idx + dir));
+                    var newIdx = idx + dir;
+                    // wrap around
+                    if (newIdx < 0) newIdx = sectionCount - 1;
+                    else if (newIdx >= sectionCount) newIdx = 0;
                     var target = newIdx * -90;
                     wheelBusy = true;
                     cancelAnimationFrame(animRAF);
@@ -7416,20 +7418,10 @@
                 };
                 window.addEventListener('wheel', wheelListener, { passive: false });
 
-                // Elements that should always get an untouched native tap —
-                // the close button and the "Contents" jump links. These are
-                // small targets, so even the tiny jitter in a real tap can
-                // exceed a movement threshold; rather than risk that, any
-                // touch starting on one of these is handed entirely to the
-                // browser and the spiral's drag logic never runs for it.
+                // Elements that should always get an untouched native tap
                 var NATIVE_TAP_SELECTOR = 'a, button, .info-overlay-close';
                 var touchIsControl = false;
 
-                // For everything else (the big panel faces), a touch only
-                // becomes a "drag" once it moves past this threshold. Below
-                // it, we don't preventDefault, so a genuine tap still lets
-                // the browser synthesize a click — which is what the
-                // per-section click listener (tap-to-navigate) relies on.
                 var TAP_MOVE_THRESHOLD = 10;
                 var touchIsDragging = false;
 
@@ -7455,9 +7447,6 @@
 
                     if (!touchIsDragging) {
                         if (Math.abs(dx) + Math.abs(dy) < TAP_MOVE_THRESHOLD) {
-                            // Still within tap tolerance — don't hijack the
-                            // gesture yet, so a genuine tap can still resolve
-                            // into a click on touchend.
                             return;
                         }
                         touchIsDragging = true;
@@ -7480,9 +7469,6 @@
                         touchIsControl = false;
                         return;
                     }
-                    // Only snap/re-settle if this touch was actually a drag;
-                    // a tap should just let its click (section nav, close
-                    // button) happen untouched.
                     if (touchIsDragging) {
                         setTimeout(snapToNearest, 10);
                     }
@@ -7493,12 +7479,14 @@
                 var keyDownListener = function(e) {
                     if (e.keyCode === 39 || e.keyCode === 40 || e.keyCode === 32) {
                         var idx = nearestSection(rotation);
-                        var newIdx = Math.min(sectionCount - 1, idx + 1);
+                        var newIdx = idx + 1;
+                        if (newIdx >= sectionCount) newIdx = 0;
                         cancelAnimationFrame(animRAF);
                         animateScroll(newIdx * -90, rotation, 0.2);
                     } else if (e.keyCode === 37 || e.keyCode === 38) {
                         var idx = nearestSection(rotation);
-                        var newIdx = Math.max(0, idx - 1);
+                        var newIdx = idx - 1;
+                        if (newIdx < 0) newIdx = sectionCount - 1;
                         cancelAnimationFrame(animRAF);
                         animateScroll(newIdx * -90, rotation, 0.2);
                     }
@@ -7513,6 +7501,8 @@
                     });
                 });
 
+                // Start with rotation = 0 (first content panel)
+                rotation = 0;
                 resizeHandler();
 
                 // ─── custom cursor (spiral) ─────────────────────────
@@ -7613,7 +7603,7 @@
                     };
                 })();
 
-                // Store cleanup for the spiral
+                // Store cleanup
                 var originalCleanup = spiralCleanup;
                 spiralCleanup = function() {
                     if (originalCleanup) originalCleanup();
