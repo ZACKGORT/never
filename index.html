@@ -6,17 +6,6 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"
     />
-    <!-- Before -->
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' ... /></svg>"
-    />
-    <link
-      rel="apple-touch-icon"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' ... /></svg>"
-    />
-
-    <!-- After -->
     <link
       rel="icon"
       href="https://raw.githubusercontent.com/ZACKGORT/never/main/favicon.ico"
@@ -25,7 +14,6 @@
       rel="apple-touch-icon"
       href="https://raw.githubusercontent.com/ZACKGORT/never/main/favicon.ico"
     />
-
     <title>neverever.land · 2026</title>
     <link
       href="https://api.fontshare.com/v2/css?f[]=satoshi@1,2,3,4,5,6,7,8,9&display=swap"
@@ -543,7 +531,6 @@
         display: flex;
         align-items: center;
         cursor: pointer;
-        z-index: 10000;
       }
       .attention-btn {
         background: transparent;
@@ -594,7 +581,6 @@
         border: 1px solid var(--card);
         transition: opacity 0.2s ease;
         pointer-events: none;
-        
       }
       .attention-badge.hidden {
         opacity: 0;
@@ -4302,6 +4288,8 @@
 
         <!-- Right: appearance, reviews, chips, info, attention -->
         <div class="topbar-right">
+
+
           <!-- Appearance -->
           <div class="topbar-appearance-wrapper">
             <button class="btn" id="appearanceTrigger">Aa</button>
@@ -4464,6 +4452,9 @@
         </div>
         <div class="composer-actions">
           <button class="btn ghost small" id="c-cancel">Cancel</button>
+          <button class="btn ghost small" id="c-save-thought">
+            Save as Thought
+          </button>
           <button class="btn btn-primary small" id="c-post">State</button>
         </div>
       </div>
@@ -4496,6 +4487,10 @@
         <span>⚡</span>
         <span class="badge" id="actionBadge" style="display: none">0</span>
       </button>
+                <!-- Thoughts toggle -->
+                <button class="btn" id="thoughtsToggleBtn" title="My Thoughts">
+                  ✎
+                </button>
       <div class="hud-divider"></div>
       <button class="btn btn-primary" id="hudNew">+ New</button>
     </div>
@@ -4722,6 +4717,7 @@
 
         // ── Constants ─────────────────────────────────────────────
         const STORAGE_KEY = 'neverever-statements-v11';
+        const THOUGHTS_KEY = 'neverever-thoughts-v1';
         const ATTENTION_KEY = 'neverever-attention-v2';
         const CHIPS_KEY = 'neverever-chips-v1';
         const INTERACTIONS_KEY = 'neverever-interactions-v1';
@@ -5223,12 +5219,6 @@
             dara: 'UX Researcher, eight years, mostly qualitative. Looking for a role where research drives decisions, not just decks.',
           };
 
-          // Each entry can carry a `discipline` so the statement only gets
-          // assigned to an author whose background actually matches it —
-          // a backend engineer shouldn't be caught musing about tagline
-          // strategy. Entries with no discipline are open to anyone,
-          // since the sentiment (career, community, leadership) isn't
-          // domain-specific.
           const GENERAL = [
             {
               tag: 'CAREER',
@@ -5390,9 +5380,6 @@
             },
           ];
 
-          // Pick an author whose discipline actually matches the entry,
-          // falling back to the full pool when the entry is discipline-agnostic
-          // or when (in a hand-edited list) nobody happens to match.
           function authorForGeneral(entry, pool) {
             if (!entry.discipline) return pool;
             const matches = pool.filter(
@@ -5444,9 +5431,6 @@
           }
 
           // ── active conversations ──────────────────────────────
-          // Reply pools are keyed to what the parent statement actually is,
-          // so a HIRING post gets applicant-shaped replies instead of a
-          // random "strong disagree" landing on a job listing.
           const GENERAL_REPLY_TEXTS = [
             'This resonates. We hit the same wall last quarter.',
             "Strong disagree — but I like where your head's at.",
@@ -5510,9 +5494,6 @@
               now,
               parentTime + hour * (1 + Math.random() * 20)
             );
-            // Nested replies drift toward general conversation regardless of
-            // the root's tag — a thread about a job post can wander once
-            // it's a few layers deep, same as a real comment section.
             const nestedPool = depth === 1 ? pool : GENERAL_REPLY_TEXTS;
             return [
               {
@@ -5592,6 +5573,7 @@
         // ── State ─────────────────────────────────────────────────
         let authors = [];
         let statements = [];
+        let thoughts = [];
         let letterData = [];
         let activeIndex = 0;
         let focusMode = false;
@@ -5606,11 +5588,15 @@
         let chips = [];
         let activityDays = 0;
         let interactions = [];
-        let sortMode = 'record'; // 'record' or 'activity'
+        let sortMode = 'record';
 
         // ── Profile view state ────────────────────────────────────
         let isProfileView = false;
         let profileUserId = null;
+
+        // ── Thoughts view ─────────────────────────────────────────
+        let isThoughtsView = false;
+        let editingThoughtId = null;
 
         // ── Rapid Respond State ──────────────────────────────────
         let rapidTarget = null;
@@ -5825,30 +5811,14 @@
               );
               const isCompany = obj.kind === 'company';
               return `
-                        <div class="attention-item" data-type="${
-                          item.objectType
-                        }" data-id="${item.objectId}">
-                            <div class="item-avatar ${varClass}${
-                isCompany ? ' company' : ''
-              }">${escapeHtml(avatarContent)}</div>
+                        <div class="attention-item" data-type="${item.objectType}" data-id="${item.objectId}">
+                            <div class="item-avatar ${varClass}${isCompany ? ' company' : ''}">${escapeHtml(avatarContent)}</div>
                             <div class="item-info">
-                                <span class="item-name">${escapeHtml(
-                                  displayName
-                                )}</span>
-                                ${
-                                  displaySnippet
-                                    ? `<div class="item-snippet">${escapeHtml(
-                                        displaySnippet.slice(0, 60)
-                                      )}</div>`
-                                    : ''
-                                }
+                                <span class="item-name">${escapeHtml(displayName)}</span>
+                                ${displaySnippet ? `<div class="item-snippet">${escapeHtml(displaySnippet.slice(0, 60))}</div>` : ''}
                                 <span class="item-type">${typeLabel}</span>
                             </div>
-                            <button class="item-dismiss" data-type="${
-                              item.objectType
-                            }" data-id="${
-                item.objectId
-              }" title="Dismiss">×</button>
+                            <button class="item-dismiss" data-type="${item.objectType}" data-id="${item.objectId}" title="Dismiss">×</button>
                         </div>
                     `;
             })
@@ -5902,37 +5872,19 @@
 
           content.innerHTML = `
                     <div class="profile-card-header">
-                        <div class="profile-card-avatar ${varClass}${
-            isCompany ? ' company' : ''
-          }">${escapeHtml(initialsFor(obj))}</div>
+                        <div class="profile-card-avatar ${varClass}${isCompany ? ' company' : ''}">${escapeHtml(initialsFor(obj))}</div>
                         <div class="profile-card-info">
-                            <div class="profile-card-name">${escapeHtml(
-                              obj.name
-                            )}</div>
-                            <div class="profile-card-role">${escapeHtml(
-                              obj.role || ''
-                            )}</div>
-                            ${
-                              obj.tagline
-                                ? `<div class="profile-card-tagline">${escapeHtml(
-                                    obj.tagline
-                                  )}</div>`
-                                : ''
-                            }
+                            <div class="profile-card-name">${escapeHtml(obj.name)}</div>
+                            <div class="profile-card-role">${escapeHtml(obj.role || '')}</div>
+                            ${obj.tagline ? `<div class="profile-card-tagline">${escapeHtml(obj.tagline)}</div>` : ''}
                         </div>
                     </div>
                     <div class="profile-card-stats">
                         <div class="profile-card-stat"><span class="num">${stmtCount}</span><span class="label">Statements</span></div>
-                        <div class="profile-card-stat"><span class="num">${
-                          isCompany ? 'Company' : 'Person'
-                        }</span><span class="label">Type</span></div>
+                        <div class="profile-card-stat"><span class="num">${isCompany ? 'Company' : 'Person'}</span><span class="label">Type</span></div>
                     </div>
                     <div class="profile-card-actions">
-                        <button class="btn ${
-                          inAttn ? 'active' : ''
-                        }" id="profileSaveBtn">${
-            inAttn ? 'SAVED' : 'SAVE PROFILE'
-          }</button>
+                        <button class="btn ${inAttn ? 'active' : ''}" id="profileSaveBtn">${inAttn ? 'SAVED' : 'SAVE PROFILE'}</button>
                         <button class="btn ghost" id="profileViewBtn">VIEW FULL PROFILE</button>
                     </div>
                 `;
@@ -6028,12 +5980,8 @@
                         <span class="chip-text">${escapeHtml(c.text)}</span>
                         <span class="chip-uses">${c.useCount || 0} uses</span>
                         <div class="chip-actions">
-                            <button class="btn ghost small chip-edit" data-id="${
-                              c.id
-                            }">✎</button>
-                            <button class="btn ghost small chip-delete" data-id="${
-                              c.id
-                            }">×</button>
+                            <button class="btn ghost small chip-edit" data-id="${c.id}">✎</button>
+                            <button class="btn ghost small chip-delete" data-id="${c.id}">×</button>
                         </div>
                     </div>
                 `
@@ -6068,9 +6016,7 @@
           container.innerHTML = chips
             .map(
               (c) => `
-                    <button class="chip chip-use" data-id="${
-                      c.id
-                    }">${escapeHtml(c.text)}</button>
+                    <button class="chip chip-use" data-id="${c.id}">${escapeHtml(c.text)}</button>
                 `
             )
             .join('');
@@ -6133,28 +6079,16 @@
               return `
                         <div class="review-item">
                             <div class="review-meta">
-                                <span>${
-                                  a ? escapeHtml(a.name) : 'Unknown'
-                                }</span>
-                                <span>${fmtTime(
-                                  lastEdit ? lastEdit.timestamp : s.time
-                                )}</span>
+                                <span>${a ? escapeHtml(a.name) : 'Unknown'}</span>
+                                <span>${fmtTime(lastEdit ? lastEdit.timestamp : s.time)}</span>
                             </div>
                             <div class="review-diff">
-                                <div class="old">${escapeHtml(
-                                  lastEdit ? lastEdit.oldText : ''
-                                )}</div>
-                                <div class="new">${escapeHtml(
-                                  lastEdit ? lastEdit.newText : ''
-                                )}</div>
+                                <div class="old">${escapeHtml(lastEdit ? lastEdit.oldText : '')}</div>
+                                <div class="new">${escapeHtml(lastEdit ? lastEdit.newText : '')}</div>
                             </div>
                             <div class="review-actions">
-                                <button class="btn btn-primary review-approve" data-id="${
-                                  s.id
-                                }">Approve (cosmetic)</button>
-                                <button class="btn ghost review-deny" data-id="${
-                                  s.id
-                                }">Deny</button>
+                                <button class="btn btn-primary review-approve" data-id="${s.id}">Approve (cosmetic)</button>
+                                <button class="btn ghost review-deny" data-id="${s.id}">Deny</button>
                             </div>
                         </div>
                     `;
@@ -6196,9 +6130,7 @@
           const form = document.createElement('div');
           form.className = 'edit-inline';
           form.innerHTML = `
-                    <textarea id="editText" rows="2">${escapeHtml(
-                      s.text
-                    )}</textarea>
+                    <textarea id="editText" rows="2">${escapeHtml(s.text)}</textarea>
                     <div class="edit-actions">
                         <label><input type="checkbox" id="editCosmetic" /> Request cosmetic review</label>
                         <button class="btn ghost small" id="editCancel">Cancel</button>
@@ -6242,6 +6174,213 @@
           saveData();
           renderLetter(activeIndex);
           if (modalStatementId === s.id) renderModalContent(s.id);
+        }
+
+        // ── Thoughts ──────────────────────────────────────────────
+        function loadThoughts() {
+          try {
+            const raw = localStorage.getItem(THOUGHTS_KEY);
+            thoughts = raw ? JSON.parse(raw) : [];
+          } catch (e) {
+            thoughts = [];
+          }
+        }
+
+        function saveThoughts() {
+          try {
+            localStorage.setItem(THOUGHTS_KEY, JSON.stringify(thoughts));
+          } catch (e) {}
+          // if we're in thoughts view, re‑render
+          if (isThoughtsView) renderThoughtsLetter();
+        }
+
+        function addThought(text, tag, mediaUrl, authorId) {
+          if (!text.trim()) return;
+          thoughts.unshift({
+            id: uid(),
+            authorId: authorId || authors[0]?.id || 'zack',
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            text: text.trim(),
+            tag: tag || '',
+            mediaUrl: mediaUrl || '',
+            status: 'draft', // draft | converted
+            statementId: null,
+          });
+          saveThoughts();
+        }
+
+        function updateThought(id, text, tag, mediaUrl) {
+          const t = thoughts.find((th) => th.id === id);
+          if (!t) return;
+          t.text = text.trim();
+          t.tag = tag || '';
+          t.mediaUrl = mediaUrl || '';
+          t.updatedAt = Date.now();
+          saveThoughts();
+        }
+
+        function deleteThought(id) {
+          if (!confirm('Delete this thought?')) return;
+          thoughts = thoughts.filter((t) => t.id !== id);
+          saveThoughts();
+        }
+
+        function convertThoughtToStatement(id) {
+          const t = thoughts.find((th) => th.id === id);
+          if (!t) return;
+          // Create a new statement
+          statements.unshift({
+            id: uid(),
+            authorId: t.authorId,
+            time: Date.now(),
+            tag: t.tag,
+            text: t.text,
+            mediaUrl: t.mediaUrl,
+            replies: [],
+            editState: 'original',
+            editHistory: [],
+            muteState: 'visible',
+            sourceThoughtId: t.id,
+          });
+          // Mark thought as converted
+          t.status = 'converted';
+          t.statementId = statements[0].id;
+          saveData();
+          saveThoughts();
+          if (isThoughtsView) renderThoughtsLetter();
+          renderLetter(activeIndex);
+          document.getElementById('topCount').textContent = String(
+            statements.length
+          ).padStart(3, '0');
+        }
+
+        function renderThoughtsLetter() {
+          // This is a special letter that shows thoughts in a simple list
+          const panel = document.querySelector('.letter-panel[data-thoughts="true"]');
+          if (!panel) return;
+          const frame = panel.querySelector('.letter-card-frame');
+          if (!frame) return;
+
+          // Update cover
+          const cover = frame.querySelector('.letter-cover');
+          if (cover) {
+            const kicker = cover.querySelector('.letter-cover-kicker');
+            const title = cover.querySelector('.letter-cover-name');
+            const deck = cover.querySelector('.letter-cover-deck');
+            if (kicker) kicker.textContent = 'THOUGHTS';
+            if (title) title.textContent = 'Not yet stated.';
+            if (deck) deck.textContent = 'Things you\'re still thinking about.';
+          }
+
+          const oldContent = frame.querySelector('.letter-content');
+          if (oldContent) oldContent.remove();
+
+          const content = document.createElement('div');
+          content.className = 'letter-content';
+
+          if (!thoughts.length) {
+            content.innerHTML = `
+                        <div class="empty-letter">
+                            <div class="t-micro">NO THOUGHTS YET</div>
+                            <p>Write something in the composer and save it as a thought.</p>
+                        </div>
+                    `;
+          } else {
+            const list = document.createElement('div');
+            list.className = 'thoughts-list';
+            list.style.cssText = 'display:flex;flex-direction:column;gap:12px;';
+
+            thoughts.forEach((t, i) => {
+              const item = document.createElement('div');
+              item.className = 'thought-item';
+              item.style.cssText =
+                'display:grid;grid-template-columns:auto 1fr auto;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);align-items:start;';
+
+              const idx = document.createElement('span');
+              idx.className = 't-micro';
+              idx.textContent = String(i + 1).padStart(2, '0');
+              idx.style.paddingTop = '4px';
+
+              const body = document.createElement('div');
+              body.style.display = 'flex';
+              body.style.flexDirection = 'column';
+              body.style.gap = '4px';
+
+              const textEl = document.createElement('div');
+              textEl.textContent = t.text;
+              textEl.style.fontSize = 'calc(var(--fs-body) * 0.95)';
+              textEl.style.lineHeight = '1.5';
+              textEl.style.color = 'var(--ink)';
+
+              const meta = document.createElement('div');
+              meta.style.fontSize = '7px';
+              meta.style.fontFamily = 'var(--font-mono)';
+              meta.style.color = 'var(--ink-light)';
+              meta.textContent = `edited ${fmtTime(t.updatedAt)}${t.status === 'converted' ? ' · stated' : ''}`;
+
+              body.appendChild(textEl);
+              body.appendChild(meta);
+
+              const actions = document.createElement('div');
+              actions.style.display = 'flex';
+              actions.style.gap = '4px';
+              actions.style.alignItems = 'center';
+              actions.style.flexWrap = 'wrap';
+
+              if (t.status !== 'converted') {
+                const stateBtn = document.createElement('button');
+                stateBtn.className = 'btn btn-primary small';
+                stateBtn.textContent = 'State';
+                stateBtn.addEventListener('click', () => {
+                  convertThoughtToStatement(t.id);
+                });
+                actions.appendChild(stateBtn);
+
+                const editBtn = document.createElement('button');
+                editBtn.className = 'btn ghost small';
+                editBtn.textContent = '✎';
+                editBtn.title = 'Edit thought';
+                editBtn.addEventListener('click', () => {
+                  // Populate composer with thought content
+                  const composer = document.getElementById('composer');
+                  const textArea = document.getElementById('c-text');
+                  const tagInput = document.getElementById('c-tag');
+                  const mediaInput = document.getElementById('c-media');
+                  const authorSelect = document.getElementById('c-author-select');
+
+                  textArea.value = t.text;
+                  tagInput.value = t.tag;
+                  mediaInput.value = t.mediaUrl;
+                  authorSelect.value = t.authorId;
+                  editingThoughtId = t.id;
+                  // Update composer title
+                  document.querySelector('.composer-title').innerHTML =
+                    `<span class="grip">⠿⠿</span> Edit thought`;
+                  openComposer();
+                });
+                actions.appendChild(editBtn);
+              }
+
+              const deleteBtn = document.createElement('button');
+              deleteBtn.className = 'btn ghost small';
+              deleteBtn.textContent = '×';
+              deleteBtn.title = 'Delete thought';
+              deleteBtn.addEventListener('click', () => {
+                deleteThought(t.id);
+              });
+              actions.appendChild(deleteBtn);
+
+              item.appendChild(idx);
+              item.appendChild(body);
+              item.appendChild(actions);
+              list.appendChild(item);
+            });
+
+            content.appendChild(list);
+          }
+
+          frame.appendChild(content);
         }
 
         // ── Data loading ──────────────────────────────────────────
@@ -6316,9 +6455,14 @@
           try {
             localStorage.removeItem(INTERACTIONS_KEY);
           } catch (e) {}
+          try {
+            localStorage.removeItem(THOUGHTS_KEY);
+          } catch (e) {}
           authors = seedAuthors();
           statements = seedStatements(authors);
+          thoughts = [];
           await saveData();
+          saveThoughts();
           attentionItems = [];
           saveAttention();
           chips = [];
@@ -6328,6 +6472,7 @@
           activeIndex = 0;
           isProfileView = false;
           profileUserId = null;
+          isThoughtsView = false;
           document.body.classList.remove('profile-view');
           initMainLetterData();
           renderTrack();
@@ -6346,22 +6491,7 @@
         // ── Delegated events ─────────────────────────────────────
         function setupDelegatedEvents() {
           document.addEventListener('click', (e) => {
-            // Author name / avatar clicks — single source of truth for
-            // both [data-author-id] (feed, list/grid/bento, conversation
-            // modal) and [data-profile-author-id] (profile-view threads).
-            // These used to be two independent systems: data-author-id
-            // was wired by hand at every render site (main cards, rows,
-            // grid items, the modal's own statement head, and every
-            // recursive modal-node level), while data-profile-author-id
-            // had its own separate hand-wiring PLUS this delegated check
-            // as a redundant third path. Handling both here, once, and
-            // returning immediately means an author click always works —
-            // no matter how deep in a reply tree it sits or which view
-            // rendered it — without every render function needing to
-            // remember to wire it itself. It's checked first and returns
-            // so an author click never also triggers whatever the click
-            // would otherwise bubble into (e.g. opening the statement
-            // the author name happens to sit inside).
+            // Author name / avatar clicks
             const authorTarget = closestSafe(
               e.target,
               '[data-author-id], [data-profile-author-id]'
@@ -6447,9 +6577,7 @@
                     s.editHistory
                       .map(
                         (h, i) =>
-                          `#${i + 1} ${fmtTime(h.timestamp)}\nOLD: ${
-                            h.oldText
-                          }\nNEW: ${h.newText}`
+                          `#${i + 1} ${fmtTime(h.timestamp)}\nOLD: ${h.oldText}\nNEW: ${h.newText}`
                       )
                       .join('\n\n')
                 );
@@ -6505,9 +6633,7 @@
 
           const varClass = avatarVariant(a.id);
           const isCompany = a.kind === 'company';
-          avatar.className = `avatar sz-sm ${varClass}${
-            isCompany ? ' company' : ''
-          }`;
+          avatar.className = `avatar sz-sm ${varClass}${isCompany ? ' company' : ''}`;
           avatar.textContent = initialsFor(a);
           name.textContent = a.name;
 
@@ -6728,21 +6854,15 @@
               );
             if (activePeople.size)
               parts.push(
-                `${activePeople.size} ${
-                  activePeople.size > 1 ? 'people' : 'person'
-                }`
+                `${activePeople.size} ${activePeople.size > 1 ? 'people' : 'person'}`
               );
             if (activeCompanies.size)
               parts.push(
-                `${activeCompanies.size} compan${
-                  activeCompanies.size > 1 ? 'ies' : 'y'
-                }`
+                `${activeCompanies.size} compan${activeCompanies.size > 1 ? 'ies' : 'y'}`
               );
             if (activeDisciplines.size)
               parts.push(
-                `${activeDisciplines.size} discipline${
-                  activeDisciplines.size > 1 ? 's' : ''
-                }`
+                `${activeDisciplines.size} discipline${activeDisciplines.size > 1 ? 's' : ''}`
               );
             showFilterToast(`Active: ${parts.join(', ')}`);
           }
@@ -6777,48 +6897,18 @@
 
           let headHtml = `
               <div class="modal-node-head">
-                ${
-                  hasChildren
-                    ? `<button class="modal-node-toggle" data-node-id="${
-                        node.id
-                      }">${isCollapsed ? '[+]' : '[–]'}</button>`
-                    : ''
-                }
+                ${hasChildren ? `<button class="modal-node-toggle" data-node-id="${node.id}">${isCollapsed ? '[+]' : '[–]'}</button>` : ''}
                 ${avatarHtml(node.authorId, 'xs', true)}
                 <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
-                  <span class="modal-node-author" data-author-id="${
-                    node.authorId
-                  }" itemprop="name">${
-            a ? escapeHtml(a.name) : 'UNKNOWN'
-          }</span>
+                  <span class="modal-node-author" data-author-id="${node.authorId}" itemprop="name">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
                 </address>
-                ${
-                  a && a.kind === 'company'
-                    ? '<span class="co-badge">CO</span>'
-                    : ''
-                }
-                <time class="modal-node-time" datetime="${new Date(
-                  node.time
-                ).toISOString()}" itemprop="dateCreated">${fmtTime(
-            node.time
-          )}</time>
-                ${
-                  isCollapsed
-                    ? `<span style="font-family:var(--font-mono);font-size:8px;color:var(--ink-light);">(${
-                        countReplies(node) + 1
-                      } hidden)</span>`
-                    : ''
-                }
+                ${a && a.kind === 'company' ? '<span class="co-badge">CO</span>' : ''}
+                <time class="modal-node-time" datetime="${new Date(node.time).toISOString()}" itemprop="dateCreated">${fmtTime(node.time)}</time>
+                ${isCollapsed ? `<span style="font-family:var(--font-mono);font-size:8px;color:var(--ink-light);">(${countReplies(node) + 1} hidden)</span>` : ''}
               </div>
             `;
           wrap.innerHTML = headHtml;
 
-          // Author name and avatar (avatarHtml already tags the avatar
-          // with data-author-id when clickable) are both picked up by the
-          // single delegated click handler in setupDelegatedEvents — no
-          // per-node wiring needed here, which also means this works
-          // identically no matter how deep this node sits in the reply
-          // tree.
           const head = wrap.querySelector('.modal-node-head');
           wrap.addEventListener('contextmenu', (e) => {
             e.preventDefault();
@@ -6946,45 +7036,21 @@
                   <div>
                     <div class="card-author-row">
                       <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
-                        <span class="card-author" data-author-id="${
-                          s.authorId
-                        }" itemprop="name">${
-            a ? escapeHtml(a.name) : 'UNKNOWN'
-          }</span>
+                        <span class="card-author" data-author-id="${s.authorId}" itemprop="name">${a ? escapeHtml(a.name) : 'UNKNOWN'}</span>
                       </address>
-                      ${
-                        a && a.kind === 'company'
-                          ? '<span class="co-badge">CO</span>'
-                          : ''
-                      }
-                      <time class="card-time" datetime="${new Date(
-                        s.time
-                      ).toISOString()}" itemprop="dateCreated">${fmtTime(
-            s.time
-          )}</time>
-                      ${
-                        s.tag
-                          ? `<span class="card-tag" itemprop="keywords">${escapeHtml(
-                              s.tag
-                            )}</span>`
-                          : ''
-                      }
+                      ${a && a.kind === 'company' ? '<span class="co-badge">CO</span>' : ''}
+                      <time class="card-time" datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
+                      ${s.tag ? `<span class="card-tag" itemprop="keywords">${escapeHtml(s.tag)}</span>` : ''}
                     </div>
-                    <div class="card-role">${
-                      a ? escapeHtml(a.role || '') : ''
-                    }</div>
+                    <div class="card-role">${a ? escapeHtml(a.role || '') : ''}</div>
                   </div>
                 </div>
                 ${renderMediaHero(s.mediaUrl)}
-                <div class="card-text" itemprop="text">${escapeHtml(
-                  s.text
-                )}</div>
+                <div class="card-text" itemprop="text">${escapeHtml(s.text)}</div>
                 ${renderEditMarker(s)}
                 ${renderStatementActions(s, true)}
               </article>
-              <div class="t-micro" style="margin-bottom:10px;">REPLIES (${countReplies(
-                s
-              )})</div>
+              <div class="t-micro" style="margin-bottom:10px;">REPLIES (${countReplies(s)})</div>
               <div class="modal-thread" id="modalThread"></div>
               <div class="modal-reply-trigger" id="modalReplyTrigger"></div>
             `;
@@ -6999,10 +7065,6 @@
               openRapidRespond(s.id, e.clientX, e.clientY);
             });
           }
-
-          // The statement head's avatar and .card-author both carry
-          // data-author-id and are handled by the delegated click
-          // handler — see setupDelegatedEvents.
 
           const threadEl = container.querySelector('#modalThread');
           s.replies.forEach((r) =>
@@ -7040,19 +7102,9 @@
           const muted = s.muteState === 'muted';
           return `
                     <div class="statement-actions">
-                        <button class="action-btn" data-action="edit" data-statement-id="${
-                          s.id
-                        }">✎ Edit</button>
-                        <button class="action-btn ${
-                          muted ? 'muted' : ''
-                        }" data-action="mute" data-statement-id="${s.id}">${
-            muted ? 'Unmute' : 'Mute'
-          }</button>
-                        <button class="action-btn ${
-                          inAttn ? 'in-attention' : ''
-                        }" data-action="attention" data-statement-id="${
-            s.id
-          }">${inAttn ? '👁' : '◯'}</button>
+                        <button class="action-btn" data-action="edit" data-statement-id="${s.id}">✎ Edit</button>
+                        <button class="action-btn ${muted ? 'muted' : ''}" data-action="mute" data-statement-id="${s.id}">${muted ? 'Unmute' : 'Mute'}</button>
+                        <button class="action-btn ${inAttn ? 'in-attention' : ''}" data-action="attention" data-statement-id="${s.id}">${inAttn ? '👁' : '◯'}</button>
                     </div>
                     <div id="editFormContainer"></div>
                 `;
@@ -7063,19 +7115,19 @@
           const user = authorById(userId);
           if (!user) return;
 
+          // Exit thoughts view if active
+          if (isThoughtsView) toggleThoughtsView();
+
           isProfileView = true;
           profileUserId = userId;
           document.body.classList.add('profile-view');
 
-          // Build letterData from user's original statements (non-replies)
           const userStatements = statements.filter(
             (s) => s.authorId === userId
           );
-          // Sort newest first
           userStatements.sort((a, b) => b.time - a.time);
 
           if (userStatements.length === 0) {
-            // Fallback: show a single empty letter
             letterData = [
               {
                 title: 'No statements yet',
@@ -7106,12 +7158,8 @@
             });
           }
 
-          // Index letter — the permanent table of contents, pinned as
-          // LETTER 02: every statement this person has made, numbered by
-          // where it actually sits in this deck. Built for persons and
-          // companies alike, since anyone with statements has a record.
           letterData.unshift({
-            title: 'Canon',
+            title: 'Index',
             deck: `${user.name}'s permanent record.`,
             isIndex: true,
             profileUserId: userId,
@@ -7122,13 +7170,8 @@
             })),
           });
 
-          // Title card is the front door: pin it as LETTER 01, identity
-          // rather than pitch. Persons and companies get the same card —
-          // both are just name/role, discipline, status, tagline-or-photo,
-          // and a record count, so there's no reason to withhold it from
-          // one kind of author.
           letterData.unshift({
-            title: 'Provenance',
+            title: 'Title Card',
             deck: `${user.name} · ${user.role || ''}`,
             isTitleCard: true,
             profileUserId: userId,
@@ -7137,17 +7180,11 @@
           activeIndex = 0;
           renderTrack();
 
-          // Preload the Index (LETTER 02) content immediately rather than
-          // waiting for it to become the active panel — it sits one swipe
-          // past the title card, so it should already show the record
-          // when it's peeking into view, not render blank until clicked.
           const indexPos = letterData.findIndex((d) => d.isIndex);
           if (indexPos > 0) renderLetter(indexPos);
 
           updateProgressBar();
           updateProfileBadge();
-
-          // Scroll to top
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -7167,8 +7204,12 @@
           document.body.classList.remove('profile-view');
           document.body.style.overflow = '';
 
-          initMainLetterData();
-          renderTrack();
+          if (isThoughtsView) {
+            toggleThoughtsView();
+          } else {
+            initMainLetterData();
+            renderTrack();
+          }
           updateProfileBadge();
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         }
@@ -7185,9 +7226,7 @@
               badge.style.display = 'inline-flex';
               const varClass = avatarVariant(user.id);
               const isCompany = user.kind === 'company';
-              avatar.className = `avatar sz-xs ${varClass}${
-                isCompany ? ' company' : ''
-              }`;
+              avatar.className = `avatar sz-xs ${varClass}${isCompany ? ' company' : ''}`;
               avatar.textContent = initialsFor(user);
               name.textContent = user.name;
               label.textContent = 'Profile';
@@ -7202,6 +7241,46 @@
               countEl.textContent = String(statements.length).padStart(3, '0');
           }
           updateHudNavCounts();
+        }
+
+        // ── Thoughts View ─────────────────────────────────────────
+        function toggleThoughtsView() {
+          isThoughtsView = !isThoughtsView;
+          if (isThoughtsView) {
+            // Exit profile view if active
+            if (isProfileView) {
+              exitProfileView();
+              // re-enter thoughts view after profile exit
+              isThoughtsView = true;
+            }
+            // Build a single-letter view for thoughts
+            letterData = [
+              {
+                title: 'Thoughts',
+                deck: 'Not yet stated.',
+                isThoughts: true,
+                viewMode: 'list',
+              },
+            ];
+            renderTrack();
+            // Mark the panel as thoughts
+            const panel = document.querySelector('.letter-panel');
+            if (panel) panel.dataset.thoughts = 'true';
+            renderThoughtsLetter();
+            activeIndex = 0;
+            updateProgressBar();
+            updateProfileBadge();
+            // Update button style
+            document.getElementById('thoughtsToggleBtn').classList.toggle('active', isThoughtsView);
+          } else {
+            // Exit thoughts view
+            initMainLetterData();
+            renderTrack();
+            activeIndex = 0;
+            updateProgressBar();
+            updateProfileBadge();
+            document.getElementById('thoughtsToggleBtn').classList.remove('active');
+          }
         }
 
         // ── Bento card builder ───────────────────────────────────
@@ -7244,9 +7323,6 @@
             ? 'rgba(255,255,255,0.4)'
             : 'var(--ink-light)';
 
-          // Static cards (e.g. the composer's live preview) are inert —
-          // no data-author-id, so the delegated click handler never picks
-          // them up and they don't open a profile.
           const avatarStr = avatarHtml(s.authorId, 'sm', !opts.static);
           const authorAttr = opts.static
             ? ''
@@ -7254,61 +7330,28 @@
 
           card.innerHTML = `
               <div>
-                <div class="label-sm" itemprop="keywords">${escapeHtml(
-                  s.tag || 'STATEMENT'
-                )}</div>
+                <div class="label-sm" itemprop="keywords">${escapeHtml(s.tag || 'STATEMENT')}</div>
                 <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};display:flex;align-items:center;gap:6px;">
                   ${avatarStr}
                   <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
-                    <span${authorAttr} itemprop="name">${escapeHtml(
-            a ? a.name : 'Unknown'
-          )}</span>
+                    <span${authorAttr} itemprop="name">${escapeHtml(a ? a.name : 'Unknown')}</span>
                   </address>
                 </div>
-                ${
-                  a?.role
-                    ? `<div class="body-xs" style="color:${lightColor};" itemprop="jobTitle">${escapeHtml(
-                        a.role
-                      )}</div>`
-                    : ''
-                }
+                ${a?.role ? `<div class="body-xs" style="color:${lightColor};" itemprop="jobTitle">${escapeHtml(a.role)}</div>` : ''}
               </div>
               <div class="mt-auto">
-                <p class="body-sm" style="max-width:30ch;margin-top:0.2rem;color:${bodyColor};" itemprop="text">${escapeHtml(
-            s.text
-          )}</p>
-                ${
-                  s.mediaUrl
-                    ? `<div style="margin-top:0.4rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);max-height:80px;" itemprop="image"><img src="${escapeHtml(
-                        s.mediaUrl
-                      )}" alt="" style="display:block;width:100%;height:auto;object-fit:cover;" loading="lazy" /></div>`
-                    : ''
-                }
+                <p class="body-sm" style="max-width:30ch;margin-top:0.2rem;color:${bodyColor};" itemprop="text">${escapeHtml(s.text)}</p>
+                ${s.mediaUrl ? `<div style="margin-top:0.4rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);max-height:80px;" itemprop="image"><img src="${escapeHtml(s.mediaUrl)}" alt="" style="display:block;width:100%;height:auto;object-fit:cover;" loading="lazy" /></div>` : ''}
                 <div class="label-xs" style="margin-top:0.3rem;color:${metaColor};">
-                  <time datetime="${new Date(
-                    s.time
-                  ).toISOString()}" itemprop="dateCreated">${fmtTime(
-            s.time
-          )}</time>
-                  · ${countReplies(s)} repl${
-            countReplies(s) === 1 ? 'y' : 'ies'
-          }
+                  <time datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
+                  · ${countReplies(s)} repl${countReplies(s) === 1 ? 'y' : 'ies'}
                 </div>
                 ${renderEditMarker(s)}
                 ${opts.static ? '' : renderStatementActions(s)}
               </div>
-              ${
-                isDark
-                  ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>`
-                  : variant.includes('accent')
-                  ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>`
-                  : `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`
-              }
+              ${isDark ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>` : variant.includes('accent') ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>` : `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
             `;
 
-          // Author name and avatar clicks are handled by the delegated
-          // click handler in setupDelegatedEvents (see data-author-id
-          // above) — nothing to wire here.
           if (opts.static) {
             card.style.cursor = 'default';
           }
@@ -7334,28 +7377,12 @@
               <div class="letter-row-text-wrap">
                 <div class="letter-row-meta">
                   <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
-                    <span class="letter-row-author" data-author-id="${
-                      s.authorId
-                    }" itemprop="name">${a ? escapeHtml(a.name) : 'UNKNOWN'}${
-            a && a.kind === 'company' ? ' <span class="co-badge">CO</span>' : ''
-          }</span>
+                    <span class="letter-row-author" data-author-id="${s.authorId}" itemprop="name">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind === 'company' ? ' <span class="co-badge">CO</span>' : ''}</span>
                   </address>
-                  <time class="letter-row-time" datetime="${new Date(
-                    s.time
-                  ).toISOString()}" itemprop="dateCreated">${fmtTime(
-            s.time
-          )}</time>
-                  ${
-                    s.tag
-                      ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;" itemprop="keywords">${escapeHtml(
-                          s.tag
-                        )}</span>`
-                      : ''
-                  }
+                  <time class="letter-row-time" datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
+                  ${s.tag ? `<span style="font-family:var(--font-mono);font-size:6px;color:var(--ink-light);border:1px solid var(--border);padding:0 4px;border-radius:2px;" itemprop="keywords">${escapeHtml(s.tag)}</span>` : ''}
                 </div>
-                <div class="letter-row-text" itemprop="text">${escapeHtml(
-                  s.text
-                )}</div>
+                <div class="letter-row-text" itemprop="text">${escapeHtml(s.text)}</div>
                 ${renderEditMarker(s)}
                 ${renderStatementActions(s)}
               </div>
@@ -7364,9 +7391,6 @@
                 ${countReplies(s)} replies
               </div>
             `;
-
-          // Author name and avatar clicks are handled by the delegated
-          // click handler in setupDelegatedEvents.
 
           return row;
         }
@@ -7387,51 +7411,25 @@
                 ${avatarStr}
                 <div class="grid-meta">
                   <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
-                    <span class="grid-author" data-author-id="${
-                      s.authorId
-                    }" itemprop="name">${a ? escapeHtml(a.name) : 'UNKNOWN'}${
-            a && a.kind === 'company' ? ' <span class="co-badge">CO</span>' : ''
-          }</span>
+                    <span class="grid-author" data-author-id="${s.authorId}" itemprop="name">${a ? escapeHtml(a.name) : 'UNKNOWN'}${a && a.kind === 'company' ? ' <span class="co-badge">CO</span>' : ''}</span>
                   </address>
-                  <time class="grid-time" datetime="${new Date(
-                    s.time
-                  ).toISOString()}" itemprop="dateCreated">${fmtTime(
-            s.time
-          )}</time>
+                  <time class="grid-time" datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
                 </div>
               </div>
-              ${
-                s.mediaUrl
-                  ? `<div class="thumb-grid" itemprop="image"><img src="${escapeHtml(
-                      s.mediaUrl
-                    )}" alt="" loading="lazy" /></div>`
-                  : ''
-              }
+              ${s.mediaUrl ? `<div class="thumb-grid" itemprop="image"><img src="${escapeHtml(s.mediaUrl)}" alt="" loading="lazy" /></div>` : ''}
               <div class="grid-text" itemprop="text">${escapeHtml(s.text)}</div>
               ${renderEditMarker(s)}
               ${renderStatementActions(s)}
               <div class="grid-footer">
                 <span>${countReplies(s)} replies</span>
-                ${
-                  s.tag
-                    ? `<span class="grid-tag" style="font-family:var(--font-mono);font-size:6px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-light);border:1px solid var(--border);padding:1px 8px;border-radius:var(--radius-sm);" itemprop="keywords">${escapeHtml(
-                        s.tag
-                      )}</span>`
-                    : ''
-                }
+                ${s.tag ? `<span class="grid-tag" style="font-family:var(--font-mono);font-size:6px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-light);border:1px solid var(--border);padding:1px 8px;border-radius:var(--radius-sm);" itemprop="keywords">${escapeHtml(s.tag)}</span>` : ''}
               </div>
             `;
-
-          // Author name and avatar clicks are handled by the delegated
-          // click handler in setupDelegatedEvents.
 
           return item;
         }
 
-        // ── Title card letter renderer (LETTER 01, persons + companies) ──
-        // Status is never a field you fill in — it's read off the
-        // author's own most recent statement. The title card can only
-        // ever reflect the record, never get ahead of it.
+        // ── Title card letter renderer ───────────────────────────
         function deriveStatus(userId) {
           const own = statements
             .filter((s) => s.authorId === userId)
@@ -7461,55 +7459,33 @@
                   <div class="tc-cell span-2">
                     <span class="tc-label">Name / role</span>
                     <span class="tc-value">${escapeHtml(user.name)}</span>
-                    <span class="tc-value-sm">${escapeHtml(
-                      user.role || ''
-                    )}</span>
+                    <span class="tc-value-sm">${escapeHtml(user.role || '')}</span>
                   </div>
                   <div class="tc-cell">
                     <span class="tc-label">Discipline</span>
-                    <span class="tc-value-sm">${escapeHtml(
-                      user.discipline || '—'
-                    )}</span>
+                    <span class="tc-value-sm">${escapeHtml(user.discipline || '—')}</span>
                   </div>
                   <div class="tc-cell">
                     <span class="tc-label">Status</span>
-                    <span class="tc-value-sm">${
-                      status ? escapeHtml(status) : '—'
-                    }</span>
+                    <span class="tc-value-sm">${status ? escapeHtml(status) : '—'}</span>
                   </div>
-                  ${
-                    user.photoUrl
-                      ? `<div class="tc-cell tc-photo row-span-2"><img src="${escapeHtml(
-                          user.photoUrl
-                        )}" alt="" loading="lazy" /></div>`
-                      : `<div class="tc-cell">
+                  ${user.photoUrl ? `<div class="tc-cell tc-photo row-span-2"><img src="${escapeHtml(user.photoUrl)}" alt="" loading="lazy" /></div>` : `<div class="tc-cell">
                            <span class="tc-label">Tagline</span>
-                           <span class="tc-value-sm">${
-                             user.tagline ? escapeHtml(user.tagline) : '—'
-                           }</span>
-                         </div>`
-                  }
+                           <span class="tc-value-sm">${user.tagline ? escapeHtml(user.tagline) : '—'}</span>
+                         </div>`}
                   <div class="tc-cell span-2">
                     <span class="tc-label">Record</span>
                     <div class="tc-stat-row">
                       <div>
                         <div class="tc-stat-num">${stmtCount}</div>
-                        <div class="tc-stat-label">Statement${
-                          stmtCount === 1 ? '' : 's'
-                        }</div>
+                        <div class="tc-stat-label">Statement${stmtCount === 1 ? '' : 's'}</div>
                       </div>
                     </div>
                   </div>
-                  ${
-                    user.photoUrl
-                      ? `<div class="tc-cell">
+                  ${user.photoUrl ? `<div class="tc-cell">
                            <span class="tc-label">Tagline</span>
-                           <span class="tc-value-sm">${
-                             user.tagline ? escapeHtml(user.tagline) : '—'
-                           }</span>
-                         </div>`
-                      : ''
-                  }
+                           <span class="tc-value-sm">${user.tagline ? escapeHtml(user.tagline) : '—'}</span>
+                         </div>` : ''}
                 `;
 
           const editWrap = document.createElement('div');
@@ -7597,10 +7573,7 @@
           }
         }
 
-        // ── Index letter renderer (LETTER 02) ──────────────────────
-        // selfIndex is this letter's own position in letterData, so the
-        // numbers shown always match where each statement actually sits
-        // in the deck — the index doesn't own its own numbering.
+        // ── Index letter renderer ─────────────────────────────────
         function buildIndexLetter(userId, statementRefs, selfIndex) {
           const user = authorById(userId);
           const container = document.createElement('div');
@@ -7609,9 +7582,7 @@
             container.innerHTML = `
                     <div class="empty-letter">
                       <div class="t-micro">NOTHING YET</div>
-                      <p>${
-                        user ? escapeHtml(user.name) : 'This person'
-                      } hasn't made any statements.</p>
+                      <p>${user ? escapeHtml(user.name) : 'This person'} hasn't made any statements.</p>
                     </div>
                 `;
             return container;
@@ -7655,7 +7626,6 @@
           const a = authorById(s.authorId);
           const container = document.createElement('div');
 
-          // Statement header
           const stmtDiv = document.createElement('div');
           stmtDiv.className = 'letter-profile-statement';
 
@@ -7664,19 +7634,9 @@
           const avatarHtmlStr = avatarHtml(s.authorId, 'sm', true);
           headDiv.innerHTML = `
                     ${avatarHtmlStr}
-                    <span class="profile-statement-author" data-profile-author-id="${
-                      s.authorId
-                    }">${a ? escapeHtml(a.name) : 'Unknown'}</span>
-                    <time class="profile-statement-time">${fmtTime(
-                      s.time
-                    )}</time>
-                    ${
-                      s.tag
-                        ? `<span class="profile-statement-tag">${escapeHtml(
-                            s.tag
-                          )}</span>`
-                        : ''
-                    }
+                    <span class="profile-statement-author" data-profile-author-id="${s.authorId}">${a ? escapeHtml(a.name) : 'Unknown'}</span>
+                    <time class="profile-statement-time">${fmtTime(s.time)}</time>
+                    ${s.tag ? `<span class="profile-statement-tag">${escapeHtml(s.tag)}</span>` : ''}
                 `;
           stmtDiv.appendChild(headDiv);
 
@@ -7685,7 +7645,6 @@
           textDiv.textContent = s.text;
           stmtDiv.appendChild(textDiv);
 
-          // Edit marker and actions
           const marker = document.createElement('div');
           marker.innerHTML = renderEditMarker(s);
           stmtDiv.appendChild(marker);
@@ -7695,7 +7654,6 @@
 
           container.appendChild(stmtDiv);
 
-          // Replies thread
           const threadDiv = document.createElement('div');
           threadDiv.className = 'letter-profile-thread';
           s.replies.forEach((r) => {
@@ -7703,7 +7661,6 @@
             threadDiv.appendChild(node);
           });
 
-          // Reply trigger
           const replyTrigger = document.createElement('div');
           replyTrigger.className = 'modal-reply-trigger';
           const link = document.createElement('button');
@@ -7723,11 +7680,6 @@
           container.appendChild(threadDiv);
           container.appendChild(replyTrigger);
 
-          // Author name and avatar (avatarHtml already tags the avatar
-          // with data-author-id) are picked up by the single delegated
-          // click handler in setupDelegatedEvents — it matches both
-          // data-author-id and data-profile-author-id.
-
           return container;
         }
 
@@ -7743,30 +7695,12 @@
           const head = document.createElement('div');
           head.className = 'modal-node-head';
           head.innerHTML = `
-                    ${
-                      hasChildren
-                        ? `<button class="modal-node-toggle" data-node-id="${
-                            node.id
-                          }">${isCollapsed ? '[+]' : '[–]'}</button>`
-                        : ''
-                    }
+                    ${hasChildren ? `<button class="modal-node-toggle" data-node-id="${node.id}">${isCollapsed ? '[+]' : '[–]'}</button>` : ''}
                     ${avatarHtml(node.authorId, 'xs', true)}
-                    <span class="modal-node-author" data-profile-author-id="${
-                      node.authorId
-                    }">${a ? escapeHtml(a.name) : 'Unknown'}</span>
-                    ${
-                      a && a.kind === 'company'
-                        ? '<span class="co-badge">CO</span>'
-                        : ''
-                    }
+                    <span class="modal-node-author" data-profile-author-id="${node.authorId}">${a ? escapeHtml(a.name) : 'Unknown'}</span>
+                    ${a && a.kind === 'company' ? '<span class="co-badge">CO</span>' : ''}
                     <time class="modal-node-time">${fmtTime(node.time)}</time>
-                    ${
-                      isCollapsed
-                        ? `<span style="font-family:var(--font-mono);font-size:8px;color:var(--ink-light);">(${
-                            countReplies(node) + 1
-                          } hidden)</span>`
-                        : ''
-                    }
+                    ${isCollapsed ? `<span style="font-family:var(--font-mono);font-size:8px;color:var(--ink-light);">(${countReplies(node) + 1} hidden)</span>` : ''}
                 `;
           wrap.appendChild(head);
 
@@ -7795,9 +7729,6 @@
             }
           }
 
-          // Author name and avatar clicks are handled by the delegated
-          // click handler in setupDelegatedEvents.
-
           return wrap;
         }
 
@@ -7810,6 +7741,12 @@
           const data = letterData[index];
           if (!data) return;
 
+          // If this is the thoughts panel, render it specially
+          if (data.isThoughts) {
+            renderThoughtsLetter();
+            return;
+          }
+
           const frame = panel.querySelector('.letter-card-frame');
           if (!frame) return;
 
@@ -7818,9 +7755,7 @@
             const kicker = cover.querySelector('.letter-cover-kicker');
             const title = cover.querySelector('.letter-cover-name');
             const deck = cover.querySelector('.letter-cover-deck');
-            if (kicker)
-              kicker.textContent =
-                'LETTER ' + String(index + 1).padStart(2, '0');
+            if (kicker) kicker.textContent = 'LETTER ' + String(index + 1).padStart(2, '0');
             if (title) title.textContent = data.title || 'Untitled letter';
             if (deck) deck.textContent = data.deck || '';
 
@@ -7864,7 +7799,6 @@
             } else {
               const includeMuted = data.includeMuted || false;
               let filtered = getFiltered(data.filterTag, includeMuted, data.filterUntagged);
-              // Apply sort based on sortMode
               if (sortMode === 'activity') {
                 filtered = sortByActivity(filtered);
               } else {
@@ -7906,7 +7840,6 @@
           } else {
             const includeMuted = data.includeMuted || false;
             let filtered = getFiltered(data.filterTag, includeMuted, data.filterUntagged);
-            // Apply sort
             if (sortMode === 'activity') {
               filtered = sortByActivity(filtered);
             } else {
@@ -7927,9 +7860,7 @@
               content.innerHTML = `
                         <div class="empty-letter">
                           <div class="t-micro">NO STATEMENTS</div>
-                          <p>Nothing matches these filters${
-                            includeMuted ? ' (including muted)' : ''
-                          }.</p>
+                          <p>Nothing matches these filters${includeMuted ? ' (including muted)' : ''}.</p>
                           <button class="btn ghost small" onclick="window.__clearFilters()" style="margin-top:8px;">Clear filters</button>
                         </div>
                       `;
@@ -7967,9 +7898,7 @@
               if (filtered.length > PAGE_SIZE) {
                 const trigger = document.createElement('div');
                 trigger.className = 'load-more-trigger';
-                trigger.textContent = `Load more (${
-                  filtered.length - PAGE_SIZE
-                } remaining)`;
+                trigger.textContent = `Load more (${filtered.length - PAGE_SIZE} remaining)`;
                 trigger.addEventListener('click', () => {
                   const currentCount = container.querySelectorAll(
                     mode === 'list'
@@ -8001,16 +7930,13 @@
                     trigger.textContent = 'All loaded ✓';
                     trigger.style.cursor = 'default';
                   } else {
-                    trigger.textContent = `Load more (${
-                      filtered.length - nextBatch
-                    } remaining)`;
+                    trigger.textContent = `Load more (${filtered.length - nextBatch} remaining)`;
                   }
                 });
                 content.appendChild(trigger);
               }
             }
 
-            // Update top HUD view toggle buttons only if this is the active panel
             if (index === activeIndex) {
               ['hudViewList', 'hudViewGrid', 'hudViewBento'].forEach((id) => {
                 const btn = document.getElementById(id);
@@ -8026,9 +7952,8 @@
 
           frame.appendChild(content);
 
-          // Only update global UI for the active panel
           if (index === activeIndex) {
-            if (!isProfileView) {
+            if (!isProfileView && !isThoughtsView) {
               document.getElementById('topCount').textContent = String(
                 statements.length
               ).padStart(3, '0');
@@ -8056,8 +7981,6 @@
             if (hudTop) hudTop.classList.toggle('docked', scrollY > 4);
           }
 
-          // Coalesce rapid scroll/resize events into one read+write per frame
-          // instead of running the layout read on every event tick.
           let ticking = false;
           function onScrollOrResize() {
             if (ticking) return;
@@ -8101,6 +8024,7 @@
           const panel = document.createElement('div');
           panel.className = 'letter-panel' + (index === 0 ? ' active' : '');
           panel.dataset.index = String(index);
+          if (data.isThoughts) panel.dataset.thoughts = 'true';
 
           const inner = document.createElement('div');
           inner.className = 'letter-panel-inner';
@@ -8123,12 +8047,8 @@
           const cover = document.createElement('div');
           cover.className = 'letter-cover';
           cover.innerHTML = `
-              <span class="letter-cover-kicker">LETTER ${String(
-                index + 1
-              ).padStart(2, '0')}</span>
-              <h2 class="letter-cover-name">${escapeHtml(
-                data.title || 'Untitled letter'
-              )}</h2>
+              <span class="letter-cover-kicker">${data.isThoughts ? 'THOUGHTS' : 'LETTER ' + String(index + 1).padStart(2, '0')}</span>
+              <h2 class="letter-cover-name">${escapeHtml(data.title || 'Untitled letter')}</h2>
               <p class="letter-cover-deck">${escapeHtml(data.deck || '')}</p>
             `;
           frame.appendChild(cover);
@@ -8136,7 +8056,7 @@
           const toolbar = document.createElement('div');
           toolbar.className = 'letter-toolbar';
 
-          if (!data.isProfile && !data.isTitleCard && !data.isIndex) {
+          if (!data.isProfile && !data.isTitleCard && !data.isIndex && !data.isThoughts) {
             const toggle = document.createElement('div');
             toggle.className = 'view-toggle';
             ['list', 'grid', 'bento'].forEach((m) => {
@@ -8200,13 +8120,6 @@
               includeMuted: false,
             },
             {
-              title: 'Thoughts',
-              deck: 'Untagged signal.',
-              viewMode: 'grid',
-              includeMuted: false,
-              filterUntagged: true,
-            },
-            {
               title: 'Archive',
               deck: 'Muted statements.',
               viewMode: 'list',
@@ -8224,6 +8137,10 @@
           renderLetter(0);
           updateProgressBar();
           updateProfileBadge();
+          // If thoughts view, render the thoughts letter after track is built
+          if (isThoughtsView) {
+            renderThoughtsLetter();
+          }
         }
 
         function activatePanel(newIndex) {
@@ -8246,8 +8163,6 @@
           updateHudNavCounts();
         }
 
-        // Shows, in the top HUD between prev/next while in profile view,
-        // the current letter's position among the total.
         function updateHudNavCounts() {
           const counterEl = document.getElementById('hudNavCounter');
           if (!counterEl) return;
@@ -8373,6 +8288,9 @@
           document.getElementById('c-tag').value = '';
           document.getElementById('c-media').value = '';
           document.getElementById('c-text').value = '';
+          editingThoughtId = null;
+          document.querySelector('.composer-title').innerHTML =
+            `<span class="grip">⠿⠿</span> New statement`;
         }
 
         function setupComposerDrag() {
@@ -8448,7 +8366,6 @@
                 parseInt(c.dataset.days) === activityDays
               );
             });
-          // Set sort chips
           document.querySelectorAll('#sortGroup .chip').forEach((c) => {
             c.classList.toggle('active', c.dataset.sort === sortMode);
           });
@@ -8712,9 +8629,7 @@
                 `<div class="activity-row" data-type="${e.type}">
                 <span class="activity-dot"></span>
                 <div class="activity-main">
-                  <div class="activity-type">${e.type.toUpperCase()} · ${escapeHtml(
-                  e.name
-                )}</div>
+                  <div class="activity-type">${e.type.toUpperCase()} · ${escapeHtml(e.name)}</div>
                   <div class="activity-snippet">${escapeHtml(e.snippet)}</div>
                 </div>
                 <div class="activity-meta">${e.time}</div>
@@ -8752,20 +8667,17 @@
           const pupil = eyeEl.querySelector('.eye-pupil');
           if (!pupil) return;
 
-          // Store original pupil center (viewBox coords)
           const origCx = 20,
             origCy = 20;
-          const maxOffset = 4; // maximum displacement in viewBox units
+          const maxOffset = 4;
 
           function updatePupil(clientX, clientY) {
             const rect = eyeEl.getBoundingClientRect();
-            // Convert client coords to viewBox coords (0-40)
             const scaleX = 40 / rect.width;
             const scaleY = 40 / rect.height;
             const xView = (clientX - rect.left) * scaleX;
             const yView = (clientY - rect.top) * scaleY;
 
-            // Vector from center (20,20)
             let dx = xView - 20;
             let dy = yView - 20;
             const dist = Math.hypot(dx, dy);
@@ -8774,7 +8686,6 @@
               pupil.setAttribute('cy', origCy);
               return;
             }
-            // Clamp to maxOffset
             const clampedDist = Math.min(dist, maxOffset);
             const ratio = clampedDist / dist;
             const newCx = origCx + dx * ratio;
@@ -8834,179 +8745,199 @@
           if (spiralInitialized) return;
           spiralInitialized = true;
 
-          // ─── content with a single bookend at the end ──────────
+          // ─── content ──────────────────────────────────────────
           var PANELS = [
-  {
-    num: '01',
-    title: 'neverever.land',
-    density: 'sparse',
-    lines: ['Statements, not posts.'],
-    yellow: true,
-  },
-  {
-    num: '02',
-    title: 'The Record',
-    density: 'medium',
-    lines: [
-      'Every line is a statement — not a disposable post.',
-      'No likes. No share counts. No algorithmic feed.',
-      'What you write stands on its own.',
-    ],
-  },
-  {
-    num: '03',
-    title: 'Public & Permanent',
-    density: 'medium',
-    lines: [
-      'Statements are public by default.',
-      'Nothing is deleted — only muted or archived.',
-      'Your words are your work, and they persist.',
-    ],
-  },
-  {
-    num: '04',
-    title: 'The Five Letters',
-    density: 'dense',
-    lines: [
-      'Record · everything visible',
-      'Open to Work · people looking',
-      'Hiring · roles open',
-      'Thoughts · untagged signal',
-      'Archive · muted, not gone',
-      'Each is a different lens on the same statements.',
-    ],
-  },
-  {
-    num: '05',
-    title: 'Profiles as Letters',
-    density: 'medium',
-    lines: [
-      'Click a name → a new letter deck.',
-      'Title Card · identity derived from your statements',
-      'Index · table of contents',
-      'Each original statement becomes its own letter.',
-      'A profile is a record, not a résumé.',
-    ],
-  },
-  {
-    num: '06',
-    title: 'Views & Density',
-    density: 'medium',
-    lines: [
-      'List · fastest scanning',
-      'Grid · visual overview',
-      'Bento · rich card layout',
-      'Same statements, different surface.',
-    ],
-  },
-  {
-    num: '07',
-    title: 'Replies & Threads',
-    density: 'dense',
-    lines: [
-      'Replies nest, branches collapse.',
-      'Right‑click / long‑press → Rapid Respond.',
-      'Chips = saved snippets for quick replies.',
-      'Conversations stay attached to the original statement.',
-    ],
-  },
-  {
-    num: '08',
-    title: 'Attention',
-    density: 'dense',
-    lines: [
-      'Save people, companies, or statements.',
-      'Cap: 20 — intentional, not a feed.',
-      'The eye winks at you. A quiet reminder.',
-    ],
-  },
-  {
-    num: '09',
-    title: 'Activity Half‑Life',
-    density: 'dense',
-    lines: [
-      'Filter by reply recency, not post date.',
-      'Today · 7 days · 14 days · 21 days',
-      'Surfaces what is alive, not just recent.',
-    ],
-  },
-  {
-    num: '10',
-    title: 'Intended Use',
-    density: 'medium',
-    lines: [
-      'Job seekers · one clear open‑to‑work statement',
-      'Hiring · post a role; people will find it',
-      'Craft · share the thought, not the brand',
-      'Community · small, focused threads',
-    ],
-  },
-  {
-    num: '11',
-    title: 'Design Principles',
-    density: 'medium',
-    lines: [
-      'Minimal. Calm. No doomscroll.',
-      'Finite loads. Keyboard‑first. Mobile‑native.',
-      'Floating HUD, not competing chrome.',
-      'No algorithmic ranking — order is what you choose.',
-    ],
-  },
-  {
-    num: '12',
-    title: 'What This Is',
-    density: 'medium',
-    lines: [
-      'Right now: one person, one artifact.',
-      'The next test: five to ten real people, real names.',
-      'Does anyone come back a second day?',
-      "That's the honest question.",
-      "If it stays a one‑person thing, that's still legitimate.",
-    ],
-  },
-  {
-    num: '13',
-    title: 'The Signature',
-    density: 'sparse',
-    lines: ['Statements — as signatures'],
-  },
-  {
-    num: 'NVR².ⳑ',
-    title: 'NVRVRLND',
-    density: 'brand',
-    lines: [
-      'NVR² = a canonical identity; a recursive environment',
-      '. = the impetus, not the end; a completed thought',
-      'ⳑ = marks a place; invites action.',
-      'NVR².ⳑ = a native unicode identity; sans facade.',
-    ],
-    yellow: true,
-  },
-  {
-    type: 'bookend',
-    num: '∞',
-    title: 'Contents',
-    density: 'bookend',
-    lines: [],
-  },
-];
+            {
+              num: '01',
+              title: 'neverever.land',
+              density: 'sparse',
+              lines: ['Statements, not posts.'],
+              yellow: true,
+            },
+            {
+              num: '02',
+              title: 'The Record',
+              density: 'medium',
+              lines: [
+                'Every line is a statement — not a disposable post.',
+                'No likes. No share counts. No algorithmic feed.',
+                'What you write stands on its own.',
+              ],
+            },
+            {
+              num: '03',
+              title: 'Public & Permanent',
+              density: 'medium',
+              lines: [
+                'Statements are public by default.',
+                'Nothing is deleted — only muted or archived.',
+                'Your words are your work, and they persist.',
+              ],
+            },
+            {
+              num: '04',
+              title: 'The Five Letters',
+              density: 'dense',
+              lines: [
+                'Record · everything visible',
+                'Open to Work · people looking',
+                'Hiring · roles open',
+                'Thoughts · private workspace',
+                'Archive · muted, not gone',
+                'Each is a different lens on the same statements.',
+              ],
+            },
+            {
+              num: '05',
+              title: 'Profiles as Letters',
+              density: 'medium',
+              lines: [
+                'Click a name → a new letter deck.',
+                'Title Card · identity derived from your statements',
+                'Index · table of contents',
+                'Each original statement becomes its own letter.',
+                'A profile is a record, not a résumé.',
+              ],
+            },
+            {
+              num: '06',
+              title: 'Views & Density',
+              density: 'medium',
+              lines: [
+                'List · fastest scanning',
+                'Grid · visual overview',
+                'Bento · rich card layout',
+                'Same statements, different surface.',
+              ],
+            },
+            {
+              num: '07',
+              title: 'Replies & Threads',
+              density: 'dense',
+              lines: [
+                'Replies nest, branches collapse.',
+                'Right‑click / long‑press → Rapid Respond.',
+                'Chips = saved snippets for quick replies.',
+                'Conversations stay attached to the original statement.',
+              ],
+            },
+            {
+              num: '08',
+              title: 'Attention',
+              density: 'dense',
+              lines: [
+                'Save people, companies, or statements.',
+                'Cap: 20 — intentional, not a feed.',
+                'The eye winks at you. A quiet reminder.',
+              ],
+            },
+            {
+              num: '09',
+              title: 'Activity Half‑Life',
+              density: 'dense',
+              lines: [
+                'Filter by reply recency, not post date.',
+                'Today · 7 days · 14 days · 21 days',
+                'Surfaces what is alive, not just recent.',
+              ],
+            },
+            {
+              num: '10',
+              title: 'Intended Use',
+              density: 'medium',
+              lines: [
+                'Job seekers · one clear open‑to‑work statement',
+                'Hiring · post a role; people will find it',
+                'Craft · share the thought, not the brand',
+                'Community · small, focused threads',
+              ],
+            },
+            {
+              num: '11',
+              title: 'Design Principles',
+              density: 'medium',
+              lines: [
+                'Minimal. Calm. No doomscroll.',
+                'Finite loads. Keyboard‑first. Mobile‑native.',
+                'Floating HUD, not competing chrome.',
+                'No algorithmic ranking — order is what you choose.',
+              ],
+            },
+            {
+              num: '12',
+              title: 'What This Is',
+              density: 'medium',
+              lines: [
+                'Right now: one person, one artifact.',
+                'The next test: five to ten real people, real names.',
+                'Does anyone come back a second day?',
+                "That's the honest question.",
+                "If it stays a one‑person thing, that's still legitimate.",
+              ],
+            },
+            {
+              num: '13',
+              title: 'Recursive Exploration',
+              density: 'medium',
+              lines: [
+                'Click a name → enter their profile letter deck.',
+                'Read their original statements, see their replies.',
+                'Find someone else in a thread → click again.',
+                'A fluid, recursive drift through the network.',
+                'No algorithmic suggestion. Just your own curiosity.',
+              ],
+            },
+            {
+              num: '14',
+              title: 'Thoughts',
+              density: 'medium',
+              lines: [
+                'A private workspace, not a public letter.',
+                'Everything you write here is permeable — mutable, revisable, abandonable.',
+                'When you State it, it becomes a Statement in the record.',
+                'Think freely. State deliberately.',
+              ],
+            },
+            {
+              num: '15',
+              title: 'The Signature',
+              density: 'sparse',
+              lines: ['Statements — as signatures'],
+            },
+            {
+              num: 'NVR².ⳑ',
+              title: 'NVRVRLND',
+              density: 'brand',
+              lines: [
+                'NVR² = a canonical identity; a recursive environment',
+                '. = the impetus, not the end; a completed thought',
+                'ⳑ = marks a place; invites action.',
+                'NVR².ⳑ = a native unicode identity; sans facade.',
+              ],
+              yellow: true,
+            },
+            {
+              type: 'bookend',
+              num: '∞',
+              title: 'Contents',
+              density: 'bookend',
+              lines: [],
+            },
+          ];
 
           var spiral = container;
           var sections = [];
           var sectionData = [];
 
-          // ─── helper: build index list ─────────────────────────
           function buildIndexList(containerEl) {
             var indexWrap = document.createElement('div');
             indexWrap.className = 'bookend-index';
 
-            // content panels are all except the last (bookend)
             var contentPanels = PANELS.slice(0, -1);
 
             contentPanels.forEach(function (p, i) {
               var link = document.createElement('a');
               link.href = '#';
-              // target index = i (now 0-based because bookend is last)
               link.dataset.target = i;
               var numSpan = document.createElement('span');
               numSpan.className = 'idx-num';
@@ -9027,7 +8958,6 @@
                 cancelAnimationFrame(animRAF);
                 var targR = target * -90;
 
-                // Short hops animate, long jumps cut straight
                 var currentIdx = nearestSection(rotation);
                 if (Math.abs(target - currentIdx) > 2) {
                   rotation = trimRotation(targR);
@@ -9043,7 +8973,6 @@
             containerEl.appendChild(indexWrap);
           }
 
-          // ─── render panels ────────────────────────────────────
           PANELS.forEach(function (panel, idx) {
             var section = document.createElement('div');
             section.className = 'js-section';
@@ -9086,25 +9015,21 @@
 
           var sectionCount = sections.length;
 
-          // ─── scroll lock ──────────────────────────────────────
           document.documentElement.style.overflow = 'hidden';
           document.body.style.overflow = 'hidden';
           document.body.style.overscrollBehavior = 'none';
 
-          // ─── helper: nearest section ─────────────────────────
           function nearestSection(rot) {
-            // rot is in degrees, each section spans 90°
             var idx = Math.round(rot / -90);
             return Math.max(0, Math.min(sectionCount - 1, idx));
           }
 
-          // ─── spiral mechanics ────────────────────────────────
           var ASPECT = 0.618033;
           var AXIS = 0.7237;
 
           var _winW, _winH, smallScreen, landscape, spiralOrigin;
 
-          var rotation = 0; // start at first content panel (index 0)
+          var rotation = 0;
           var currentSection = 0;
           var touchStartY = 0;
           var touchStartX = 0;
@@ -9120,29 +9045,11 @@
             (ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1) || ios;
 
           function trimRotation(r) {
-            // Clamp to the carousel's actual content range, not an
-            // arbitrary fixed band. Scale is ASPECT^(rotation/90),
-            // so letting rotation drift outside the real panel
-            // span (0 .. -(sectionCount-1)*90) makes the scale
-            // explode/collapse exponentially once you scroll or
-            // drag past the first/last panel — that exponential
-            // blow-up is what reads as "everything glitches".
             var minRot = -(sectionCount - 1) * 90;
             var maxRot = 0;
             return Math.max(minRot, Math.min(maxRot, r));
           }
 
-          // Sections farther than this from the active one are
-          // hidden. Every panel is baked with scale(ASPECT^i), and
-          // the container counter-scales by ASPECT^(rotation/90) —
-          // those compound, so by the last panel ("Contents") the
-          // container is zoomed ~2200x. All 17 full-size panels
-          // still sit in the DOM at that scale, so the browser has
-          // to composite that entire subtree — that's what froze
-          // the tab. Panels that far from the active one are
-          // already invisible (off-screen or sub-pixel), so hiding
-          // them costs nothing visually and keeps the composited
-          // set small no matter how deep into the deck you scroll.
           var VISIBLE_WINDOW = 6;
 
           function scrollHandler() {
@@ -9178,7 +9085,6 @@
               lastT = now;
               var steps = dt / BASE_FRAME_MS;
 
-              // Only check 'moved' when there is no target
               if (
                 (hasTarget && Math.abs(targR - rotation) > 0.1) ||
                 (!hasTarget && Math.abs(moved) > 1)
@@ -9258,7 +9164,7 @@
               } else if (panel.yellow) {
                 s.style.backgroundColor = '#E5E567';
               } else {
-                var lightness = 96 - i * 2.2; // i is now 0‑based
+                var lightness = 96 - i * 2.2;
                 lightness = Math.max(78, lightness);
                 s.style.backgroundColor = 'hsl(0, 0%, ' + lightness + '%)';
               }
@@ -9277,7 +9183,6 @@
             buildSpiral();
           }
 
-          // Store event listener references and their options for proper removal
           var resizeListener = function () {
             resizeHandler();
           };
@@ -9295,7 +9200,6 @@
             var idx = nearestSection(rotation);
             var dir = e.deltaY > 0 ? 1 : -1;
             var newIdx = idx + dir;
-            // wrap around
             var wrapped = false;
             if (newIdx < 0) {
               newIdx = sectionCount - 1;
@@ -9307,14 +9211,6 @@
             var target = newIdx * -90;
             cancelAnimationFrame(animRAF);
             if (wrapped) {
-              // Loop reset: the wrap target sits on the far side
-              // of the spiral from the current rotation. Easing
-              // toward it would animate rotation across every
-              // panel in between (and briefly through invalid
-              // scale territory) in a fraction of a second —
-              // that sweep is the "glitch". Snap instantly instead,
-              // same as the long-jump cut already used for the
-              // contents index links.
               wheelBusy = true;
               rotation = trimRotation(target);
               scrollHandler();
@@ -9329,7 +9225,6 @@
             }
           };
 
-          // Elements that should always get an untouched native tap
           var NATIVE_TAP_SELECTOR = 'a, button, .info-overlay-close';
           var touchIsControl = false;
 
@@ -9337,11 +9232,7 @@
           var touchIsDragging = false;
 
           var touchStartListener = function (e) {
-            touchIsControl = !!(
-              e.target &&
-              e.target.closest &&
-              e.target.closest(NATIVE_TAP_SELECTOR)
-            );
+            touchIsControl = !!(e.target && e.target.closest && e.target.closest(NATIVE_TAP_SELECTOR));
             if (touchIsControl) return;
 
             var touch = e.touches[0] || e.changedTouches[0];
@@ -9421,7 +9312,6 @@
             scrollHandler();
           };
 
-          // Attach listeners with proper options
           window.addEventListener('resize', resizeListener);
           window.addEventListener('scroll', scrollPrevent);
           window.addEventListener('wheel', wheelListener, wheelOptions);
@@ -9445,7 +9335,6 @@
             });
           });
 
-          // Start with rotation = 0 (first content panel)
           rotation = 0;
           resizeHandler();
 
@@ -9536,11 +9425,7 @@
             }
 
             var mouseMoveListener = function (e) {
-              var overNative = !!(
-                e.target &&
-                e.target.nodeType === 1 &&
-                e.target.closest(NATIVE_SELECTOR)
-              );
+              var overNative = !!(e.target && e.target.nodeType === 1 && e.target.closest(NATIVE_SELECTOR));
               setNativeCursor(overNative);
               ptrX = e.clientX;
               ptrY = e.clientY;
@@ -9553,7 +9438,6 @@
             };
             document.addEventListener('mouseleave', mouseLeaveListener);
 
-            // Store cursor cleanup function
             var cursorCleanup = function () {
               window.removeEventListener('mousemove', mouseMoveListener);
               document.removeEventListener('mouseleave', mouseLeaveListener);
@@ -9563,12 +9447,9 @@
               document.body.style.cursor = '';
             };
 
-            // Final cleanup function that removes all listeners
             spiralCleanup = function () {
-              // Remove cursor listeners
               if (cursorCleanup) cursorCleanup();
 
-              // Remove all window/document listeners
               window.removeEventListener('resize', resizeListener);
               window.removeEventListener('scroll', scrollPrevent);
               window.removeEventListener('wheel', wheelListener);
@@ -9577,24 +9458,18 @@
               window.removeEventListener('touchend', touchEndListener);
               window.removeEventListener('keydown', keyDownListener);
 
-              // Reset scroll
               document.documentElement.style.overflow = '';
               document.body.style.overflow = '';
               document.body.style.overscrollBehavior = '';
 
-              // Cancel any pending animations/timeouts
               if (animRAF) cancelAnimationFrame(animRAF);
               if (scrollTimeout) clearTimeout(scrollTimeout);
 
-              // Clear DOM
               spiral.innerHTML = '';
               spiralInitialized = false;
               spiralCleanup = null;
             };
           })();
-
-          // Note: the spiralCleanup is set inside the cursor closure above.
-          // We'll also ensure it's called when overlay closes.
         }
 
         function openInfoOverlay() {
@@ -9646,6 +9521,7 @@
             setupViewportBlur();
 
             await loadData();
+            loadThoughts();
             loadAttention();
             loadChips();
             loadInteractions();
@@ -9653,6 +9529,78 @@
             if (new URLSearchParams(location.search).has('reset-demo')) {
               await resetDemoContent();
             }
+
+            // Update composer actions
+            document.getElementById('c-save-thought').addEventListener('click', () => {
+              const authorId = document.getElementById('c-author-select').value;
+              const tag = document.getElementById('c-tag').value.trim().toUpperCase();
+              const mediaUrl = document.getElementById('c-media').value.trim();
+              const text = document.getElementById('c-text').value.trim();
+              if (!text) return;
+
+              if (editingThoughtId) {
+                updateThought(editingThoughtId, text, tag, mediaUrl);
+                editingThoughtId = null;
+                document.querySelector('.composer-title').innerHTML = `<span class="grip">⠿⠿</span> New statement`;
+              } else {
+                addThought(text, tag, mediaUrl, authorId);
+              }
+              closeComposer();
+              if (isThoughtsView) renderThoughtsLetter();
+            });
+
+            // Thoughts toggle
+            document.getElementById('thoughtsToggleBtn').addEventListener('click', toggleThoughtsView);
+
+            // Composer "State" button
+            document.getElementById('c-post').addEventListener('click', () => {
+              const authorId = document.getElementById('c-author-select').value;
+              const tag = document.getElementById('c-tag').value.trim().toUpperCase();
+              const mediaUrl = document.getElementById('c-media').value.trim();
+              const text = document.getElementById('c-text').value.trim();
+              if (!text || !authorId) return;
+
+              // If editing a thought, convert it
+              if (editingThoughtId) {
+                const thought = thoughts.find(t => t.id === editingThoughtId);
+                if (thought) {
+                  // Update thought text and media
+                  thought.text = text;
+                  thought.tag = tag;
+                  thought.mediaUrl = mediaUrl;
+                  thought.updatedAt = Date.now();
+                  saveThoughts();
+                  convertThoughtToStatement(editingThoughtId);
+                  editingThoughtId = null;
+                  document.querySelector('.composer-title').innerHTML = `<span class="grip">⠿⠿</span> New statement`;
+                  closeComposer();
+                  return;
+                }
+              }
+
+              statements.unshift({
+                id: uid(),
+                authorId,
+                time: Date.now(),
+                tag,
+                text,
+                mediaUrl,
+                replies: [],
+                editState: 'original',
+                editHistory: [],
+                muteState: 'visible',
+              });
+              saveData();
+              closeComposer();
+              if (isProfileView) {
+                enterProfileView(profileUserId);
+              } else {
+                renderLetter(activeIndex);
+              }
+              document.getElementById('topCount').textContent = String(
+                statements.length
+              ).padStart(3, '0');
+            });
 
             initMainLetterData();
             renderTrack();
@@ -9662,7 +9610,7 @@
 
             requestAnimationFrame(() => {
               requestAnimationFrame(() => {
-                if (!isProfileView && letterData.length > 1) {
+                if (!isProfileView && !isThoughtsView && letterData.length > 1) {
                   renderLetter(1);
                 }
               });
@@ -9688,21 +9636,21 @@
             document
               .getElementById('hudViewList')
               .addEventListener('click', function () {
-                if (isProfileView) return;
+                if (isProfileView || isThoughtsView) return;
                 letterData[activeIndex].viewMode = 'list';
                 renderLetter(activeIndex);
               });
             document
               .getElementById('hudViewGrid')
               .addEventListener('click', function () {
-                if (isProfileView) return;
+                if (isProfileView || isThoughtsView) return;
                 letterData[activeIndex].viewMode = 'grid';
                 renderLetter(activeIndex);
               });
             document
               .getElementById('hudViewBento')
               .addEventListener('click', function () {
-                if (isProfileView) return;
+                if (isProfileView || isThoughtsView) return;
                 letterData[activeIndex].viewMode = 'bento';
                 renderLetter(activeIndex);
               });
@@ -9728,7 +9676,6 @@
                 });
               });
 
-            // Sort toggle
             document.querySelectorAll('#sortGroup .chip').forEach((chip) => {
               chip.addEventListener('click', () => {
                 document
@@ -9776,45 +9723,31 @@
               { passive: true }
             );
 
-let isDragging = false,
-    dragStartX = 0,
-    dragStartScroll = 0;
+            let isDragging = false,
+                dragStartX = 0,
+                dragStartScroll = 0;
 
-track.addEventListener('pointerdown', (e) => {
-  if (e.pointerType === 'touch') return;
-  if (closestSafe(e.target, '.letter-row, .grid-item, .card, button, a, [data-author-id], [data-profile-author-id]')) return;
+            track.addEventListener('pointerdown', (e) => {
+              if (e.pointerType === 'touch') return;
+              if (closestSafe(e.target, '.letter-row, .grid-item, .card, button, a, [data-author-id], [data-profile-author-id]')) return;
 
-  isDragging = true;
-  dragStartX = e.clientX;
-  dragStartScroll = track.scrollLeft;
-  track.classList.add('dragging');
-  track.setPointerCapture(e.pointerId);
-});
-
-track.addEventListener('pointermove', (e) => {
-  if (!isDragging) return;
-  track.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
-});
-
-track.addEventListener('pointerup', () => {
-  isDragging = false;
-  track.classList.remove('dragging');
-});
-
-track.addEventListener('pointercancel', () => {
-  isDragging = false;
-  track.classList.remove('dragging');
-});
-
+              isDragging = true;
+              dragStartX = e.clientX;
+              dragStartScroll = track.scrollLeft;
+              track.classList.add('dragging');
+              track.setPointerCapture(e.pointerId);
+            });
 
             track.addEventListener('pointermove', (e) => {
               if (!isDragging) return;
               track.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
             });
+
             track.addEventListener('pointerup', () => {
               isDragging = false;
               track.classList.remove('dragging');
             });
+
             track.addEventListener('pointercancel', () => {
               isDragging = false;
               track.classList.remove('dragging');
@@ -9900,38 +9833,6 @@ track.addEventListener('pointercancel', () => {
               .getElementById('c-author-select')
               .addEventListener('change', renderComposerPreview);
             setupComposerDrag();
-            document.getElementById('c-post').addEventListener('click', () => {
-              const authorId = document.getElementById('c-author-select').value;
-              const tag = document
-                .getElementById('c-tag')
-                .value.trim()
-                .toUpperCase();
-              const mediaUrl = document.getElementById('c-media').value.trim();
-              const text = document.getElementById('c-text').value.trim();
-              if (!text || !authorId) return;
-              statements.unshift({
-                id: uid(),
-                authorId,
-                time: Date.now(),
-                tag,
-                text,
-                mediaUrl,
-                replies: [],
-                editState: 'original',
-                editHistory: [],
-                muteState: 'visible',
-              });
-              saveData();
-              closeComposer();
-              if (isProfileView) {
-                enterProfileView(profileUserId);
-              } else {
-                renderLetter(activeIndex);
-              }
-              document.getElementById('topCount').textContent = String(
-                statements.length
-              ).padStart(3, '0');
-            });
 
             document
               .getElementById('filterToggleBtn')
@@ -9956,7 +9857,6 @@ track.addEventListener('pointercancel', () => {
                 searchQuery = document
                   .getElementById('bentoSearch')
                   .value.trim();
-                // read sort mode from UI
                 const activeSort = document.querySelector(
                   '#sortGroup .chip.active'
                 );
@@ -10027,6 +9927,7 @@ track.addEventListener('pointercancel', () => {
               clearFilters();
               if (focusMode) setFocusMode(false);
               if (isProfileView) exitProfileView();
+              if (isThoughtsView) toggleThoughtsView();
               setLogoOpen(false);
             });
 
@@ -10282,11 +10183,7 @@ track.addEventListener('pointercancel', () => {
         }
 
         window.addEventListener('mousemove', (e) => {
-          const overNative = !!(
-            e.target &&
-            e.target.nodeType === 1 &&
-            e.target.closest(NATIVE_SELECTOR)
-          );
+          const overNative = !!(e.target && e.target.nodeType === 1 && e.target.closest(NATIVE_SELECTOR));
           document.body.classList.add('custom-cursor-active');
           document.body.classList.toggle('write-native-cursor', overNative);
 
