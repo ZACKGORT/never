@@ -2222,61 +2222,175 @@
         color: var(--ink-mid);
       }
 
-      /* ── Resume letter ── */
-      .resume-letter {
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-        padding-top: 4px;
-        max-width: 640px;
+      /* ── Title card letter (LETTER 01) ── */
+      .letter-card-frame.title-card-frame {
+        background: var(--accent);
+        border-color: var(--accent);
       }
-      .resume-headline {
-        font-family: var(--font);
-        font-size: calc(var(--fs-body) * 1.35);
-        font-weight: 700;
-        letter-spacing: -0.015em;
-        line-height: 1.35;
+      .letter-card-frame.title-card-frame .letter-cover {
+        border-bottom-color: rgba(28, 28, 30, 0.15);
+      }
+      .letter-card-frame.title-card-frame .letter-cover-kicker,
+      .letter-card-frame.title-card-frame .letter-cover-deck {
+        color: rgba(28, 28, 30, 0.6);
+      }
+      .letter-card-frame.title-card-frame .letter-cover-name {
         color: var(--ink);
       }
-      .resume-body {
-        font-family: var(--font);
-        font-size: calc(var(--fs-body) * 1.02);
-        line-height: 1.7;
-        color: var(--ink-mid);
-        white-space: pre-wrap;
+      .letter-card-frame.title-card-frame .letter-toolbar .letter-count {
+        color: rgba(28, 28, 30, 0.5);
       }
-      .resume-media {
+      .letter-card-frame.title-card-frame .letter-card-focus-toggle {
+        border-color: rgba(28, 28, 30, 0.2);
+        color: var(--ink);
+      }
+
+      .title-card-letter {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 10px;
-      }
-      .resume-media-item {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: rgba(28, 28, 30, 0.15);
+        border: 1px solid rgba(28, 28, 30, 0.15);
         border-radius: var(--radius-sm);
         overflow: hidden;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        aspect-ratio: 4 / 3;
       }
-      .resume-media-item img,
-      .resume-media-item video {
+      .title-card-letter .tc-cell {
+        background: var(--accent);
+        padding: 1.25rem 1.4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 110px;
+        color: var(--ink);
+      }
+      .title-card-letter .tc-cell.span-2 {
+        grid-column: span 2;
+      }
+      .title-card-letter .tc-cell.row-span-2 {
+        grid-row: span 2;
+      }
+      .title-card-letter .tc-photo {
+        padding: 0;
+        overflow: hidden;
+      }
+      .title-card-letter .tc-photo img {
         display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
+        min-height: 110px;
       }
-      .resume-links {
+      .title-card-letter .tc-label {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(28, 28, 30, 0.55);
+        font-weight: 500;
+      }
+      .title-card-letter .tc-value {
+        font-family: var(--font);
+        font-size: calc(var(--fs-body) * 1.1);
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        color: var(--ink);
+      }
+      .title-card-letter .tc-value-sm {
+        font-family: var(--font);
+        font-size: calc(var(--fs-body) * 0.95);
+        font-weight: 500;
+        color: var(--ink);
+      }
+      .title-card-letter .tc-stat-row {
         display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
+        gap: 18px;
       }
-      .resume-meta {
-        color: var(--ink-light);
+      .title-card-letter .tc-stat-num {
+        font-family: var(--font);
+        font-size: calc(var(--fs-body) * 1.3);
+        font-weight: 700;
+        color: var(--ink);
       }
-      .resume-edit-btn {
+      .title-card-letter .tc-stat-label {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(28, 28, 30, 0.55);
+      }
+      .tc-edit-btn {
         align-self: flex-start;
+        margin-top: 14px;
       }
-      .empty-letter .resume-edit-btn {
-        margin-top: 12px;
+
+      /* ── Index letter (LETTER 02) — permanent table of contents ── */
+      .letter-card-frame.index-card-frame {
+        background: var(--card-dark);
+        border-color: var(--card-dark);
+      }
+      .letter-card-frame.index-card-frame .letter-cover {
+        border-bottom-color: rgba(255, 255, 255, 0.12);
+      }
+      .letter-card-frame.index-card-frame .letter-cover-kicker,
+      .letter-card-frame.index-card-frame .letter-cover-deck {
+        color: rgba(255, 255, 255, 0.55);
+      }
+      .letter-card-frame.index-card-frame .letter-cover-name {
+        color: #ffffff;
+      }
+      .letter-card-frame.index-card-frame .letter-toolbar .letter-count {
+        color: rgba(255, 255, 255, 0.4);
+      }
+      .letter-card-frame.index-card-frame .letter-card-focus-toggle {
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+      }
+
+      .index-letter {
+        display: grid;
+        grid-template-rows: repeat(10, auto);
+        grid-auto-flow: column;
+        gap: 0.2rem 2rem;
+        max-width: 640px;
+      }
+      .index-letter a.idx-row {
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+        padding: 0.35rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        cursor: pointer;
+        transition: color 0.2s, transform 0.15s;
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .index-letter a.idx-row:hover {
+        color: var(--accent);
+        transform: translateX(4px);
+      }
+      .index-letter .idx-num {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.04em;
+        opacity: 0.45;
+        flex-shrink: 0;
+        min-width: 2.6em;
+        color: rgba(255, 255, 255, 0.55);
+      }
+      .index-letter .idx-title {
+        font-family: var(--font);
+        font-size: calc(var(--fs-body) * 0.95);
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      @media (max-width: 640px) {
+        .index-letter {
+          grid-auto-flow: row;
+          grid-template-rows: none;
+        }
       }
 
       .load-more-trigger {
@@ -4510,47 +4624,47 @@
     </div>
 
     <!-- ─── RESUME LETTER EDITOR MODAL ─── -->
-    <div class="bento-overlay rollout" id="resumeOverlay">
+    <div class="bento-overlay rollout" id="titleCardOverlay">
       <div class="bento-panel">
         <div class="bento-header">
-          <h2>Edit resume letter</h2>
-          <button class="close-btn" id="resumeClose">✕</button>
+          <h2>Edit title card</h2>
+          <button class="close-btn" id="titleCardClose">✕</button>
         </div>
         <div class="bento-card bento-card-full">
-          <label class="t-micro">Headline</label>
+          <label class="t-micro">Role</label>
           <input
             type="text"
-            id="resume-headline"
-            placeholder="Staff-level product designer, six years freelance."
+            id="titlecard-role"
+            placeholder="Product / UX Designer"
           />
         </div>
         <div class="bento-card bento-card-full">
-          <label class="t-micro">About</label>
-          <textarea
-            id="resume-body"
-            rows="6"
-            placeholder="The longer version. What you've done, what you're looking for."
-          ></textarea>
+          <label class="t-micro">Discipline</label>
+          <input
+            type="text"
+            id="titlecard-discipline"
+            placeholder="DESIGN"
+          />
         </div>
         <div class="bento-card bento-card-full">
-          <label class="t-micro">Media (one image or video URL per line, optional)</label>
-          <textarea
-            id="resume-media"
-            rows="3"
+          <label class="t-micro">Tagline (one line)</label>
+          <input
+            type="text"
+            id="titlecard-tagline"
+            placeholder="Six years freelance."
+          />
+        </div>
+        <div class="bento-card bento-card-full">
+          <label class="t-micro">Photo (image URL, optional)</label>
+          <input
+            type="text"
+            id="titlecard-photo"
             placeholder="https://…"
-          ></textarea>
-        </div>
-        <div class="bento-card bento-card-full">
-          <label class="t-micro">Links (one per line, as: Label | https://…)</label>
-          <textarea
-            id="resume-links"
-            rows="2"
-            placeholder="Portfolio | https://…"
-          ></textarea>
+          />
         </div>
         <div class="bento-actions">
-          <button class="btn ghost" id="resumeClear">Remove resume letter</button>
-          <button class="btn btn-primary" id="resumeSave">Save</button>
+          <button class="btn ghost" id="titleCardClear">Clear photo &amp; tagline</button>
+          <button class="btn btn-primary" id="titleCardSave">Save</button>
         </div>
       </div>
     </div>
@@ -4750,16 +4864,7 @@
               name: 'Zack Gort',
               role: 'Product / UX Designer',
               tagline: 'Six years freelance.',
-              resumeLetter: {
-                headline:
-                  'Staff-level product designer, six years freelance.',
-                body: "I've spent six years working freelance across fintech, healthtech, and a couple of startups that no longer exist. What I'm good at: taking a vague product problem and getting it to a shippable v1 without losing the point along the way. What I'm looking for now: one team, staff-level scope, and fewer client decks.\n\nRecent work: redesigned onboarding for a Series B fintech (conversion up 22%), built the design system a 40-person product org still uses, ran discovery and shipped v1 for two healthtech products from scratch.",
-                media: [],
-                links: [
-                  { label: 'Portfolio', url: 'https://zackgort.example.com' },
-                ],
-                updatedAt: Date.now() - 3 * 24 * 60 * 60 * 1000,
-              },
+              photoUrl: '',
             },
             {
               id: 'maya',
@@ -4768,13 +4873,7 @@
               name: 'Maya Chen',
               role: 'Creative Director',
               tagline: 'Ex-agency.',
-              resumeLetter: {
-                headline: "Ex-agency Creative Director, done pitching.",
-                body: "Ten years in agency-land, the last four running creative for accounts most people would recognize. I'm good at the thing agencies are actually for — getting a room of stakeholders to agree on a direction fast — and tired of the thing agencies have become, which is pitching for six weeks to win eight.\n\nI want to build one thing in-house, all the way through, instead of handing off decks. Open to Creative Director or Head of Brand roles at a single company, not another shop.",
-                media: [],
-                links: [],
-                updatedAt: Date.now() - 6 * 24 * 60 * 60 * 1000,
-              },
+              photoUrl: '',
             },
             {
               id: 'tom',
@@ -4783,16 +4882,7 @@
               name: 'Tom Okafor',
               role: 'ML Engineer',
               tagline: 'Infra and eval.',
-              resumeLetter: {
-                headline:
-                  'ML engineer, infra and eval — I ship models, not papers.',
-                body: "Five years building the unglamorous half of ML: eval pipelines, serving infra, the stuff that determines whether a model actually works in production versus just in a notebook. I've taken two models from research prototype to serving millions of requests a day.\n\nLooking for a team where shipping is the point, not publishing. Comfortable owning eval frameworks end to end, less interested in being the tenth person on a research team.",
-                media: [],
-                links: [
-                  { label: 'GitHub', url: 'https://github.com/example-tom' },
-                ],
-                updatedAt: Date.now() - 1 * 24 * 60 * 60 * 1000,
-              },
+              photoUrl: '',
             },
             {
               id: 'ria',
@@ -4801,14 +4891,7 @@
               name: 'Ria Patel',
               role: 'Brand Strategist',
               tagline: 'Naming, systems.',
-              resumeLetter: {
-                headline:
-                  'Brand strategist — naming and systems, open to fractional work.',
-                body: "I do the two parts of brand work that actually stick: naming (products, companies, features) and the systems that keep a voice consistent once ten other people are writing in it. Not a logo person — I hand that off to designers I trust.\n\nCurrently taking on fractional clients, 2–3 days a week. Best fit is a company past the 'what do we even call ourselves' stage and into 'we have twelve people writing copy and none of it sounds the same.'",
-                media: [],
-                links: [],
-                updatedAt: Date.now() - 9 * 24 * 60 * 60 * 1000,
-              },
+              photoUrl: '',
             },
             {
               id: 'dev',
@@ -5498,7 +5581,7 @@
 
         // ── Rapid Respond State ──────────────────────────────────
         let rapidTarget = null;
-        let resumeEditTargetId = null;
+        let titleCardEditTargetId = null;
         let composerPreviewVariant = 'card-white';
 
         // ── Interactions ──────────────────────────────────────────
@@ -7007,17 +7090,31 @@
             });
           }
 
-          // Resume letter, when present, is the front door: pin it as
-          // LETTER 01, ahead of the person's ongoing statements. Companies
-          // don't get this yet — resumeLetter is only ever set on persons,
-          // but the kind check here keeps that explicit rather than implicit.
+          // Index letter — the permanent table of contents, pinned as
+          // LETTER 02: every statement this person has made, numbered by
+          // where it actually sits in this deck. Built for persons and
+          // companies alike, since anyone with statements has a record.
+          letterData.unshift({
+            title: 'Index',
+            deck: `${user.name}'s permanent record.`,
+            isIndex: true,
+            profileUserId: userId,
+            statementRefs: userStatements.map((s) => ({
+              id: s.id,
+              time: s.time,
+              text: s.text,
+            })),
+          });
+
+          // Title card, when present, is the front door: pin it as
+          // LETTER 01, identity rather than pitch. Companies don't get
+          // this yet — title cards are only ever set on persons, but the
+          // kind check here keeps that explicit rather than implicit.
           if (user.kind === 'person') {
             letterData.unshift({
-              title: 'Resume',
-              deck: user.resumeLetter
-                ? user.resumeLetter.headline
-                : `${user.name} hasn't written a resume letter yet.`,
-              isResume: true,
+              title: 'Title Card',
+              deck: `${user.name} · ${user.role || ''}`,
+              isTitleCard: true,
               profileUserId: userId,
             });
           }
@@ -7036,7 +7133,7 @@
           document.getElementById('bentoOverlay').classList.remove('open');
           document.getElementById('reviewOverlay').classList.remove('open');
           document.getElementById('chipsOverlay').classList.remove('open');
-          document.getElementById('resumeOverlay').classList.remove('open');
+          document.getElementById('titleCardOverlay').classList.remove('open');
           document.getElementById('conversationModal').classList.remove('open');
           document.getElementById('profileModal').classList.remove('open');
           closeRapidRespond();
@@ -7367,168 +7464,219 @@
           return item;
         }
 
-        // ── Resume letter renderer (persons only, for now) ────────────
-        function renderResumeMedia(media) {
-          if (!media || !media.length) return '';
-          return `<div class="resume-media">${media
-            .map((url) => {
-              const tag = isVideo(url) ? 'video' : 'img';
-              const attrs = isVideo(url)
-                ? 'controls playsinline muted'
-                : 'alt=""';
-              return `<div class="resume-media-item"><${tag} src="${escapeHtml(
-                url
-              )}" ${attrs} loading="lazy" /></div>`;
-            })
-            .join('')}</div>`;
+        // ── Title card letter renderer (LETTER 01, persons only) ──────
+        // Status is never a field you fill in — it's read off the
+        // person's own most recent statement. The title card can only
+        // ever reflect the record, never get ahead of it.
+        function deriveStatus(userId) {
+          const own = statements
+            .filter((s) => s.authorId === userId)
+            .sort((a, b) => b.time - a.time);
+          const hit = own.find(
+            (s) => s.tag === 'OPEN TO WORK' || s.tag === 'HIRING'
+          );
+          return hit ? hit.tag : null;
         }
 
-        function renderResumeLinks(links) {
-          if (!links || !links.length) return '';
-          return `<div class="resume-links">${links
-            .map(
-              (l) =>
-                `<a class="btn ghost small" href="${escapeHtml(
-                  l.url
-                )}" target="_blank" rel="noopener noreferrer">${escapeHtml(
-                  l.label || l.url
-                )}</a>`
-            )
-            .join('')}</div>`;
-        }
-
-        function buildResumeLetter(userId) {
+        function buildTitleCardLetter(userId) {
           const user = authorById(userId);
           const container = document.createElement('div');
-          container.className = 'resume-letter';
 
-          if (!user || !user.resumeLetter) {
-            container.innerHTML = `
-                    <div class="empty-letter">
-                      <div class="t-micro">NO RESUME YET</div>
-                      <p>${
-                        user ? escapeHtml(user.name) : 'This person'
-                      } hasn't written a resume letter.</p>
-                      <button class="btn btn-primary small resume-edit-btn" data-author-id="${userId}">+ Write resume letter</button>
+          if (!user) {
+            container.innerHTML = `<div class="empty-letter"><p>Person not found.</p></div>`;
+            return container;
+          }
+
+          const stmtCount = statements.filter(
+            (s) => s.authorId === userId
+          ).length;
+          const status = deriveStatus(userId);
+
+          container.className = 'title-card-letter';
+          container.innerHTML = `
+                  <div class="tc-cell span-2">
+                    <span class="tc-label">Name / role</span>
+                    <span class="tc-value">${escapeHtml(user.name)}</span>
+                    <span class="tc-value-sm">${escapeHtml(
+                      user.role || ''
+                    )}</span>
+                  </div>
+                  <div class="tc-cell">
+                    <span class="tc-label">Discipline</span>
+                    <span class="tc-value-sm">${escapeHtml(
+                      user.discipline || '—'
+                    )}</span>
+                  </div>
+                  <div class="tc-cell">
+                    <span class="tc-label">Status</span>
+                    <span class="tc-value-sm">${
+                      status ? escapeHtml(status) : '—'
+                    }</span>
+                  </div>
+                  ${
+                    user.photoUrl
+                      ? `<div class="tc-cell tc-photo row-span-2"><img src="${escapeHtml(
+                          user.photoUrl
+                        )}" alt="" loading="lazy" /></div>`
+                      : `<div class="tc-cell">
+                           <span class="tc-label">Tagline</span>
+                           <span class="tc-value-sm">${
+                             user.tagline ? escapeHtml(user.tagline) : '—'
+                           }</span>
+                         </div>`
+                  }
+                  <div class="tc-cell span-2">
+                    <span class="tc-label">Record</span>
+                    <div class="tc-stat-row">
+                      <div>
+                        <div class="tc-stat-num">${stmtCount}</div>
+                        <div class="tc-stat-label">Statement${
+                          stmtCount === 1 ? '' : 's'
+                        }</div>
+                      </div>
                     </div>
+                  </div>
+                  ${
+                    user.photoUrl
+                      ? `<div class="tc-cell">
+                           <span class="tc-label">Tagline</span>
+                           <span class="tc-value-sm">${
+                             user.tagline ? escapeHtml(user.tagline) : '—'
+                           }</span>
+                         </div>`
+                      : ''
+                  }
                 `;
-          } else {
-            const r = user.resumeLetter;
-            container.innerHTML = `
-                    <div class="resume-headline">${escapeHtml(
-                      r.headline || ''
-                    )}</div>
-                    <div class="resume-body">${escapeHtml(r.body || '')}</div>
-                    ${renderResumeMedia(r.media)}
-                    ${renderResumeLinks(r.links)}
-                    <div class="resume-meta t-micro">${
-                      r.updatedAt ? 'Updated ' + fmtTime(r.updatedAt) : ''
-                    }</div>
-                    <button class="btn ghost small resume-edit-btn" data-author-id="${userId}">✎ Edit resume</button>
-                `;
-          }
 
-          const editBtn = container.querySelector('.resume-edit-btn');
-          if (editBtn) {
-            editBtn.addEventListener('click', (e) => {
-              e.stopPropagation();
-              openResumeEditor(userId);
-            });
-          }
+          const editWrap = document.createElement('div');
+          editWrap.style.marginTop = '14px';
+          editWrap.innerHTML = `<button class="btn ghost small tc-edit-btn" data-author-id="${userId}">✎ Edit title card</button>`;
+          const outer = document.createElement('div');
+          outer.appendChild(container);
+          outer.appendChild(editWrap);
 
-          return container;
+          const editBtn = editWrap.querySelector('.tc-edit-btn');
+          editBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openTitleCardEditor(userId);
+          });
+
+          return outer;
         }
 
-        function openResumeEditor(userId) {
+        function openTitleCardEditor(userId) {
           const user = authorById(userId);
           if (!user || user.kind !== 'person') return;
-          resumeEditTargetId = userId;
-          const r = user.resumeLetter;
+          titleCardEditTargetId = userId;
 
-          document.getElementById('resume-headline').value = r
-            ? r.headline || ''
-            : '';
-          document.getElementById('resume-body').value = r ? r.body || '' : '';
-          document.getElementById('resume-media').value =
-            r && r.media ? r.media.join('\n') : '';
-          document.getElementById('resume-links').value =
-            r && r.links
-              ? r.links.map((l) => `${l.label || ''} | ${l.url}`).join('\n')
-              : '';
+          document.getElementById('titlecard-role').value = user.role || '';
+          document.getElementById('titlecard-discipline').value =
+            user.discipline || '';
+          document.getElementById('titlecard-tagline').value =
+            user.tagline || '';
+          document.getElementById('titlecard-photo').value =
+            user.photoUrl || '';
 
-          const overlay = document.getElementById('resumeOverlay');
+          const overlay = document.getElementById('titleCardOverlay');
           positionRolloutPanel(
-            'resumeOverlay',
-            document.querySelector('.resume-edit-btn') ||
+            'titleCardOverlay',
+            document.querySelector('.tc-edit-btn') ||
               document.getElementById('logoTile')
           );
           overlay.classList.add('open');
           document.body.style.overflow = 'hidden';
-          document.getElementById('resume-headline').focus();
+          document.getElementById('titlecard-role').focus();
         }
 
-        function closeResumeEditor() {
-          document.getElementById('resumeOverlay').classList.remove('open');
+        function closeTitleCardEditor() {
+          document.getElementById('titleCardOverlay').classList.remove('open');
           document.body.style.overflow = '';
-          resumeEditTargetId = null;
+          titleCardEditTargetId = null;
         }
 
-        function parseResumeLinks(raw) {
-          return raw
-            .split('\n')
-            .map((line) => line.trim())
-            .filter(Boolean)
-            .map((line) => {
-              const [label, ...rest] = line.split('|');
-              const url = rest.join('|').trim();
-              return url
-                ? { label: label.trim() || url, url }
-                : { label: label.trim(), url: label.trim() };
-            })
-            .filter((l) => l.url);
-        }
-
-        function saveResumeLetter() {
-          if (!resumeEditTargetId) return;
-          const user = authorById(resumeEditTargetId);
+        function saveTitleCardLetter() {
+          if (!titleCardEditTargetId) return;
+          const user = authorById(titleCardEditTargetId);
           if (!user) return;
 
-          const headline = document
-            .getElementById('resume-headline')
+          user.role = document.getElementById('titlecard-role').value.trim();
+          user.discipline = document
+            .getElementById('titlecard-discipline')
             .value.trim();
-          const body = document.getElementById('resume-body').value.trim();
-          const media = document
-            .getElementById('resume-media')
-            .value.split('\n')
-            .map((s) => s.trim())
-            .filter(Boolean);
-          const links = parseResumeLinks(
-            document.getElementById('resume-links').value
-          );
-
-          if (!headline && !body) {
-            user.resumeLetter = null;
-          } else {
-            user.resumeLetter = { headline, body, media, links, updatedAt: Date.now() };
-          }
+          user.tagline = document
+            .getElementById('titlecard-tagline')
+            .value.trim();
+          user.photoUrl = document
+            .getElementById('titlecard-photo')
+            .value.trim();
 
           saveData();
-          closeResumeEditor();
-          if (isProfileView && profileUserId === resumeEditTargetId) {
+          closeTitleCardEditor();
+          if (isProfileView && profileUserId === titleCardEditTargetId) {
             enterProfileView(profileUserId);
           }
         }
 
-        function clearResumeLetter() {
-          if (!resumeEditTargetId) return;
-          if (!confirm('Remove this resume letter?')) return;
-          const user = authorById(resumeEditTargetId);
-          if (user) user.resumeLetter = null;
+        function clearTitleCardExtras() {
+          if (!titleCardEditTargetId) return;
+          const user = authorById(titleCardEditTargetId);
+          if (user) {
+            user.tagline = '';
+            user.photoUrl = '';
+          }
+          document.getElementById('titlecard-tagline').value = '';
+          document.getElementById('titlecard-photo').value = '';
           saveData();
-          closeResumeEditor();
-          if (isProfileView && profileUserId === resumeEditTargetId) {
+          closeTitleCardEditor();
+          if (isProfileView && profileUserId === titleCardEditTargetId) {
             enterProfileView(profileUserId);
           }
+        }
+
+        // ── Index letter renderer (LETTER 02) ──────────────────────
+        // selfIndex is this letter's own position in letterData, so the
+        // numbers shown always match where each statement actually sits
+        // in the deck — the index doesn't own its own numbering.
+        function buildIndexLetter(userId, statementRefs, selfIndex) {
+          const user = authorById(userId);
+          const container = document.createElement('div');
+
+          if (!statementRefs || !statementRefs.length) {
+            container.innerHTML = `
+                    <div class="empty-letter">
+                      <div class="t-micro">NOTHING YET</div>
+                      <p>${
+                        user ? escapeHtml(user.name) : 'This person'
+                      } hasn't made any statements.</p>
+                    </div>
+                `;
+            return container;
+          }
+
+          container.className = 'index-letter';
+          container.innerHTML = statementRefs
+            .map((ref, i) => {
+              const letterNum = String(selfIndex + 2 + i).padStart(2, '0');
+              const panelIdx = selfIndex + 1 + i;
+              const excerpt = (ref.text || '').slice(0, 64);
+              return `
+                    <a class="idx-row" data-jump-index="${panelIdx}">
+                      <span class="idx-num">${letterNum}</span>
+                      <span class="idx-title">${escapeHtml(excerpt)}</span>
+                    </a>
+                  `;
+            })
+            .join('');
+
+          container.querySelectorAll('.idx-row').forEach((row) => {
+            row.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const idx = Number(row.dataset.jumpIndex);
+              activatePanel(idx);
+            });
+          });
+
+          return container;
         }
 
         // ── Profile thread letter renderer ────────────────────────
@@ -7758,12 +7906,15 @@
               if (user && deck) {
                 deck.textContent = `${user.name} · ${user.role || ''}`;
               }
-            } else if (data.isResume && data.profileUserId) {
+            } else if (data.isTitleCard && data.profileUserId) {
               const user = authorById(data.profileUserId);
               if (user && deck) {
-                deck.textContent = user.resumeLetter
-                  ? user.resumeLetter.headline
-                  : `${user.name} hasn't written a resume letter yet.`;
+                deck.textContent = `${user.name} · ${user.role || ''}`;
+              }
+            } else if (data.isIndex && data.profileUserId) {
+              const user = authorById(data.profileUserId);
+              if (user && deck) {
+                deck.textContent = `${user.name}'s permanent record.`;
               }
             }
           }
@@ -7771,12 +7922,17 @@
           const toolbar = frame.querySelector('.letter-toolbar');
           const countEl = toolbar?.querySelector('.letter-count');
           if (countEl) {
-            if (data.isResume && data.profileUserId) {
-              const user = authorById(data.profileUserId);
-              const updatedAt = user?.resumeLetter?.updatedAt;
-              countEl.textContent = updatedAt
-                ? 'Updated ' + fmtTime(updatedAt)
-                : 'Not written yet';
+            if (data.isTitleCard && data.profileUserId) {
+              const stmtCount = statements.filter(
+                (s) => s.authorId === data.profileUserId
+              ).length;
+              countEl.textContent =
+                stmtCount + ' statement' + (stmtCount === 1 ? '' : 's');
+            } else if (data.isIndex && data.statementRefs) {
+              countEl.textContent =
+                data.statementRefs.length +
+                ' statement' +
+                (data.statementRefs.length > 1 ? 's' : '');
             } else if (data.isProfile && data.statementIds) {
               countEl.textContent =
                 data.statementIds.length +
@@ -7796,8 +7952,17 @@
           const content = document.createElement('div');
           content.className = 'letter-content';
 
-          if (data.isResume && data.profileUserId) {
-            content.appendChild(buildResumeLetter(data.profileUserId));
+          if (data.isTitleCard && data.profileUserId) {
+            content.appendChild(buildTitleCardLetter(data.profileUserId));
+            panel.dataset.archive = 'false';
+          } else if (data.isIndex && data.profileUserId) {
+            content.appendChild(
+              buildIndexLetter(
+                data.profileUserId,
+                data.statementRefs,
+                index
+              )
+            );
             panel.dataset.archive = 'false';
           } else if (data.isProfile && data.statementIds) {
             const container = document.createElement('div');
@@ -8008,7 +8173,10 @@
           inner.className = 'letter-panel-inner';
 
           const frame = document.createElement('div');
-          frame.className = 'letter-card-frame';
+          frame.className =
+            'letter-card-frame' +
+            (data.isTitleCard ? ' title-card-frame' : '') +
+            (data.isIndex ? ' index-card-frame' : '');
 
           const focusBtn = document.createElement('button');
           focusBtn.className = 'letter-card-focus-toggle';
@@ -8035,7 +8203,7 @@
           const toolbar = document.createElement('div');
           toolbar.className = 'letter-toolbar';
 
-          if (!data.isProfile && !data.isResume) {
+          if (!data.isProfile && !data.isTitleCard && !data.isIndex) {
             const toggle = document.createElement('div');
             toggle.className = 'view-toggle';
             ['list', 'grid', 'bento'].forEach((m) => {
@@ -10016,19 +10184,19 @@
               });
 
             document
-              .getElementById('resumeClose')
-              .addEventListener('click', closeResumeEditor);
+              .getElementById('titleCardClose')
+              .addEventListener('click', closeTitleCardEditor);
             document
-              .getElementById('resumeOverlay')
+              .getElementById('titleCardOverlay')
               .addEventListener('click', (e) => {
-                if (e.target === e.currentTarget) closeResumeEditor();
+                if (e.target === e.currentTarget) closeTitleCardEditor();
               });
             document
-              .getElementById('resumeSave')
-              .addEventListener('click', saveResumeLetter);
+              .getElementById('titleCardSave')
+              .addEventListener('click', saveTitleCardLetter);
             document
-              .getElementById('resumeClear')
-              .addEventListener('click', clearResumeLetter);
+              .getElementById('titleCardClear')
+              .addEventListener('click', clearTitleCardExtras);
             document
               .getElementById('chipAddInput')
               .addEventListener('keydown', (e) => {
