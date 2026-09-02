@@ -7733,7 +7733,10 @@
           const position = activeIndex + 1;
           const total = letterData.length;
           counterEl.textContent = `${position}/${total}`;
-          counterEl.setAttribute('aria-label', `Letter ${position} of ${total}`);
+          counterEl.setAttribute(
+            'aria-label',
+            `Letter ${position} of ${total}`
+          );
         }
 
         function scrollToPanel(index) {
@@ -8441,7 +8444,7 @@
             },
             {
               num: '15',
-              title: 'neverever.land',
+              title: 'The signature',
               density: 'sparse',
               lines: ['Statements — as signatures'],
             },
