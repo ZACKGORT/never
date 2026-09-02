@@ -6,6 +6,17 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"
     />
+    <!-- Before -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' ... /></svg>"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' ... /></svg>"
+    />
+
+    <!-- After -->
     <link
       rel="icon"
       href="https://raw.githubusercontent.com/ZACKGORT/never/main/favicon.ico"
@@ -123,7 +134,6 @@
         );
         transition: font-size 0.2s ease, font-family 0.2s ease;
         overflow-x: hidden;
-        padding-top: var(--scrollbar-height);
       }
       ::selection {
         background: var(--accent);
@@ -240,15 +250,13 @@
       /* ── topbar ── */
       .topbar {
         position: sticky;
-        top: var(--scrollbar-height);
+        top: 0;
         z-index: 150;
         background: transparent;
         padding: 6px 0;
         min-height: var(--topbar-height);
         display: flex;
         align-items: center;
-        transition: background 0.3s ease, backdrop-filter 0.3s ease,
-          border-color 0.3s ease;
       }
       .topbar .wrap {
         display: flex;
@@ -301,7 +309,7 @@
         -webkit-backdrop-filter: blur(8px);
       }
       .viewport-blur-top {
-        top: calc(var(--scrollbar-height));
+        top: 0;
         height: calc(var(--topbar-height) + 36px);
         background: linear-gradient(
           to bottom,
@@ -352,7 +360,6 @@
         gap: 6px;
         color: var(--ink);
         flex-shrink: 0;
-        transition: font-size 0.3s ease;
       }
       .wordmark .count {
         font-family: var(--font-mono);
@@ -382,23 +389,6 @@
         transition: color 0.2s ease;
         white-space: nowrap;
       }
-      .wordmark-focus-logo {
-        display: none;
-        font-size: clamp(11px, 3vw, 18px);
-        letter-spacing: -0.02em;
-        align-items: baseline;
-        gap: 4px;
-      }
-      .wordmark-focus-logo .wordmark-sub {
-        font-size: 0.5em;
-        font-weight: 400;
-        opacity: 0.55;
-        letter-spacing: 0.02em;
-        font-family: var(--font-mono);
-      }
-      .wordmark-logo-text {
-        display: inline;
-      }
 
       .logo-tile {
         position: relative;
@@ -416,10 +406,6 @@
       .logo-tile.open .wordmark::after {
         transform: translateY(-1px) rotate(180deg);
         color: var(--ink-light);
-      }
-      .logo-tile.focus-logo .wordmark::after {
-        content: '';
-        display: none;
       }
 
       .logo-card {
@@ -485,7 +471,6 @@
         align-items: center;
         gap: 6px;
         flex-shrink: 0;
-        transition: opacity 0.3s ease;
       }
       .topbar-right .btn {
         font-size: 9px;
@@ -1638,13 +1623,13 @@
         --hud-fs-label: 9px;
       }
       .hud-top {
-        top: calc(var(--topbar-height) + 12px + var(--scrollbar-height));
+        top: calc(var(--topbar-height) + 12px);
         transition: top 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         --hud-btn-pad: 5px 10px;
         --hud-btn-fs: 8px;
       }
       .hud-top.docked {
-        top: max(24px, env(safe-area-inset-top) + var(--scrollbar-height));
+        top: max(24px, env(safe-area-inset-top));
       }
 
       .hud-divider {
@@ -1758,7 +1743,7 @@
           --hud-fs-label: 9px;
         }
         .hud-top {
-          top: calc(var(--topbar-height) + 8px + var(--scrollbar-height));
+          top: calc(var(--topbar-height) + 8px);
           --hud-pad: 4px 8px;
           --hud-gap: 3px;
           --hud-min-h: 38px;
@@ -1793,7 +1778,7 @@
           --hud-maxw-summary: 90px;
         }
         .hud-top {
-          top: calc(var(--topbar-height) + 6px + var(--scrollbar-height));
+          top: calc(var(--topbar-height) + 6px);
           --hud-pad: 3px 6px;
           --hud-gap: 2px;
           --hud-min-h: 34px;
@@ -1806,15 +1791,15 @@
         }
       }
 
-      /* ── SCROLL PROGRESS BAR (top, yellow) ──────────────────── */
+      /* ── SCROLL PROGRESS BAR ── */
       .scroll-progress-bar {
         position: fixed;
-        top: 0;
+        bottom: 0;
         left: 0;
         width: 100%;
         height: var(--scrollbar-height);
         background: rgba(0, 0, 0, 0.06);
-        z-index: 160;
+        z-index: 150;
         pointer-events: none;
         transition: opacity 0.3s ease;
       }
@@ -2039,8 +2024,7 @@
         -webkit-backdrop-filter: none;
         align-items: flex-start;
         justify-content: flex-end;
-        padding: calc(var(--topbar-height) + 12px + var(--scrollbar-height)) 16px
-          16px 0;
+        padding: calc(var(--topbar-height) + 12px) 16px 16px 0;
       }
       .bento-overlay.rollout .bento-panel {
         width: min(400px, calc(100vw - 32px));
@@ -2121,22 +2105,7 @@
       }
 
       /* ── focus mode ── */
-      body.focus-mode .topbar {
-        display: flex !important;
-        background: rgba(255, 255, 255, 0.98) !important;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid var(--border);
-        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
-      }
-      body.focus-mode .topbar-right {
-        opacity: 0.4;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-      }
-      body.focus-mode .topbar-right:hover {
-        opacity: 0.7;
-      }
+      body.focus-mode .topbar,
       body.focus-mode .hud-top,
       body.focus-mode .hud-bottom {
         display: none;
@@ -2175,21 +2144,6 @@
       }
       body.focus-mode .letters-track {
         padding-top: 0;
-      }
-      body.focus-mode .wordmark-logo-text {
-        display: none;
-      }
-      body.focus-mode .wordmark-focus-logo {
-        display: inline-flex;
-      }
-      body.focus-mode .wordmark .count,
-      body.focus-mode .wordmark .save-status,
-      body.focus-mode .wordmark .profile-label {
-        display: none;
-      }
-      body.focus-mode .logo-tile .wordmark::after {
-        content: '';
-        display: none;
       }
 
       .focus-exit-btn {
@@ -2291,7 +2245,6 @@
         color: var(--ink);
       }
 
-      /* ── unified title-card bento grid (persons + companies) ── */
       .title-card-letter {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -2321,8 +2274,7 @@
         padding: 0;
         overflow: hidden;
       }
-      .title-card-letter .tc-photo img,
-      .title-card-letter .tc-photo video {
+      .title-card-letter .tc-photo img {
         display: block;
         width: 100%;
         height: 100%;
@@ -2367,25 +2319,6 @@
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: rgba(28, 28, 30, 0.55);
-      }
-      .title-card-letter .tc-about-text {
-        font-family: var(--font);
-        font-size: calc(var(--fs-body) * 0.9);
-        line-height: 1.5;
-        color: var(--ink-mid);
-        max-width: 52ch;
-      }
-      .title-card-letter .tc-website-link {
-        font-family: var(--font-mono);
-        font-size: calc(var(--fs-body) * 0.85);
-        color: var(--ink);
-        text-decoration: underline;
-        text-underline-offset: 2px;
-        text-decoration-thickness: 1px;
-        text-decoration-color: rgba(28, 28, 30, 0.25);
-        transition: color 0.2s ease, text-decoration-color 0.2s ease;
-        pointer-events: none;
-        cursor: default;
       }
       .tc-edit-btn {
         align-self: flex-start;
@@ -2622,9 +2555,6 @@
         .wordmark .count {
           font-size: 7px;
         }
-        .wordmark-focus-logo {
-          font-size: clamp(9px, 2.6vw, 13px);
-        }
 
         body.profile-view .wordmark-logo-text,
         body.profile-view .wordmark .profile-label {
@@ -2634,67 +2564,10 @@
           margin-left: 0;
           padding: 0;
         }
-
-        /* company card adjustments */
-        .title-card-letter {
-          grid-template-columns: 1fr 1fr;
-        }
-        .title-card-letter .tc-cell.span-2,
-        .title-card-letter .tc-cell.span-3,
-        .title-card-letter .tc-cell.span-4 {
-          grid-column: span 2;
-        }
-        .title-card-letter .tc-cell {
-          padding: 1rem;
-          min-height: 80px;
-        }
-        .title-card-letter .tc-about-text {
-          font-size: calc(var(--fs-body) * 0.8);
-        }
-        .title-card-letter .tc-photo img,
-        .title-card-letter .tc-photo video {
-          min-height: 80px;
-        }
       }
 
       @media (max-width: 480px) {
-        .title-card-letter {
-          grid-template-columns: 1fr;
-        }
-        .title-card-letter .tc-cell.span-2,
-        .title-card-letter .tc-cell.span-3,
-        .title-card-letter .tc-cell.span-4 {
-          grid-column: span 1;
-        }
-        .title-card-letter .tc-cell {
-          padding: 0.8rem;
-          min-height: 70px;
-        }
-        .title-card-letter .tc-about-text {
-          font-size: calc(var(--fs-body) * 0.75);
-        }
-        .title-card-letter .tc-website-link {
-          font-size: calc(var(--fs-body) * 0.7);
-        }
-        .wordmark-focus-logo {
-          font-size: clamp(8px, 2.4vw, 11px);
-        }
-        .wordmark-focus-logo .wordmark-sub {
-          font-size: 0.4em;
-        }
-        .title-card-letter .tc-value {
-          font-size: calc(var(--fs-body) * 0.95);
-        }
-        .title-card-letter .tc-value-sm {
-          font-size: calc(var(--fs-body) * 0.8);
-        }
-        .title-card-letter .tc-stat-num {
-          font-size: calc(var(--fs-body) * 1.1);
-        }
-        .title-card-letter .tc-photo img,
-        .title-card-letter .tc-photo video {
-          min-height: 70px;
-        }
+        /* already covered by 640px, but keep if needed */
       }
 
       /* ── conversation modal – polished ── */
@@ -4355,7 +4228,7 @@
       ×
     </button>
 
-    <!-- ─── SCROLL PROGRESS BAR (top, yellow) ─── -->
+    <!-- ─── SCROLL PROGRESS BAR ─── -->
     <div
       class="scroll-progress-bar"
       id="scrollProgressBar"
@@ -4390,10 +4263,7 @@
           aria-expanded="false"
         >
           <div class="wordmark">
-            <!-- Default: full NEVEREVER.LAND -->
             <span class="wordmark-logo-text">NEVEREVER.LAND</span>
-            <!-- Focus mode: short logo with NVR².ⳑ subtitle -->
-            <span class="wordmark-focus-logo">NVRVRLND <span class="wordmark-sub">NVR².ⳑ</span></span>
             <span class="count t-data" id="topCount"></span>
             <span class="profile-label" id="profileLabel">Profile</span>
             <span class="save-status" id="saveStatus"></span>
@@ -4855,20 +4725,6 @@
         const INTERACTIONS_KEY = 'neverever-interactions-v1';
         const PAGE_SIZE = 12;
         const MAX_ATTENTION = 20;
-        // Pool of CC0 AVIF images for company hero images & galleries
-        const GALLERY_IMAGES = [
-          'https://images.unsplash.com/photo-1506744038136-46273834b3fb?fm=avif&w=800&h=800&fit=crop&q=80',
-          'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?fm=avif&w=800&h=800&fit=crop&q=80',
-          'https://images.unsplash.com/photo-1485550409059-9afb054cada4?fm=avif&w=800&h=800&fit=crop&q=80',
-          'https://images.unsplash.com/photo-1519681393784-d120267933ba?fm=avif&w=800&h=800&fit=crop&q=80',
-          'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?fm=avif&w=800&h=800&fit=crop&q=80',
-          'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?fm=avif&w=800&h=800&fit=crop&q=80',
-          'https://images.unsplash.com/photo-1522071820081-009f0129c71c?fm=avif&w=800&h=800&fit=crop&q=80',
-          'https://images.unsplash.com/photo-1497366216548-37526070297c?fm=avif&w=800&h=800&fit=crop&q=80',
-          'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?fm=avif&w=800&h=800&fit=crop&q=80',
-          'https://images.unsplash.com/photo-1521737711867-e3b97375f902?fm=avif&w=800&h=800&fit=crop&q=80',
-        ];
-
         const AVIF_IMAGES = [
           'https://images.unsplash.com/photo-1506744038136-46273834b3fb?fm=avif&w=800&h=450&fit=crop&q=80',
           'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?fm=avif&w=800&h=450&fit=crop&q=80',
@@ -5186,8 +5042,6 @@
               name: 'Studio North',
               role: 'Design studio, 12 people',
               tagline: 'Systems-heavy.',
-              about: 'A systems-heavy design studio working with founder-led companies on product and brand.',
-              website: 'studionorth.design',
             },
             {
               id: 'forge-labs',
@@ -5196,8 +5050,6 @@
               name: 'Forge Labs',
               role: 'Inference infra',
               tagline: 'Model deployment.',
-              about: 'We build inference infrastructure for AI teams that actually ship. Simplicity over complexity.',
-              website: 'forgelabs.dev',
             },
             {
               id: 'hollow-co',
@@ -5206,8 +5058,6 @@
               name: 'Hollow & Co',
               role: 'Branding agency',
               tagline: 'Portfolio reviews.',
-              about: 'Branding agency that works with early-stage companies. We do portfolio reviews and brand strategy.',
-              website: 'hollowand.co',
             },
             {
               id: 'strata',
@@ -5216,8 +5066,6 @@
               name: 'Strata',
               role: 'Cloud infrastructure',
               tagline: 'Multi-cloud.',
-              about: 'Cloud infrastructure consulting for teams that need to scale without lock-in.',
-              website: 'strata.cloud',
             },
             {
               id: 'fieldwork',
@@ -5226,8 +5074,6 @@
               name: 'Fieldwork',
               role: 'Product design consultancy',
               tagline: 'Founders.',
-              about: 'Design consultancy for founders shipping their first product. Fast, human, no ego.',
-              website: 'fieldwork.design',
             },
             {
               id: 'catalyst',
@@ -5236,8 +5082,6 @@
               name: 'Catalyst',
               role: 'Brand + comms',
               tagline: 'Say something real.',
-              about: 'Brand and communications for climate and energy companies. Words first, always.',
-              website: 'catalyst.brand',
             },
             {
               id: 'bright-machine',
@@ -5246,8 +5090,6 @@
               name: 'Bright Machine',
               role: 'Hardware + software studio, 8 people',
               tagline: 'Physical products.',
-              about: 'Hardware and software studio. We design physical products that actually ship.',
-              website: 'brightmachine.studio',
             },
             {
               id: 'wayfinder',
@@ -5256,8 +5098,6 @@
               name: 'Wayfinder',
               role: 'Product design collective',
               tagline: 'No offices, ever.',
-              about: 'A design collective that has never had an office. Fully remote, 14 designers across 9 time zones.',
-              website: 'wayfinder.design',
             },
             {
               id: 'lattice',
@@ -5266,8 +5106,6 @@
               name: 'Lattice Systems',
               role: 'Data platform',
               tagline: 'Pipelines at scale.',
-              about: 'Data platform engineering for teams that need pipelines that never page you at 3am.',
-              website: 'lattice.systems',
             },
             {
               id: 'ionpath',
@@ -5276,8 +5114,6 @@
               name: 'Ionpath',
               role: 'Developer tools',
               tagline: 'Build systems.',
-              about: 'Developer tools and build systems for teams that ship. Small, deliberate, effective.',
-              website: 'ionpath.dev',
             },
             {
               id: 'northweather',
@@ -5286,8 +5122,6 @@
               name: 'Northweather',
               role: 'Brand studio',
               tagline: 'Slow, deliberate.',
-              about: 'Brand studio that works slowly and deliberately. Clients wait for our work.',
-              website: 'northweather.studio',
             },
             {
               id: 'signal-house',
@@ -5296,8 +5130,6 @@
               name: 'Signal House',
               role: 'Naming + verbal identity',
               tagline: 'Words first.',
-              about: 'Naming and verbal identity. We think in sentences before we think in decks.',
-              website: 'signal.house',
             },
           ];
         }
@@ -6512,36 +6344,6 @@
         // ── Delegated events ─────────────────────────────────────
         function setupDelegatedEvents() {
           document.addEventListener('click', (e) => {
-            // Handle clicks on author names/avatars (data-author-id)
-            const authorEl = closestSafe(e.target, '[data-author-id]');
-            if (authorEl) {
-              e.stopPropagation();
-              const id = authorEl.dataset.authorId;
-              const obj = authorById(id);
-              if (obj) {
-                const type = obj.kind === 'company' ? 'company' : 'person';
-                openProfileModal(type, id);
-              }
-              return; // prevent further handlers
-            }
-
-            // Handle clicks on profile-view thread authors (data-profile-author-id)
-            const profileAuthor = closestSafe(
-              e.target,
-              '[data-profile-author-id]'
-            );
-            if (profileAuthor) {
-              e.stopPropagation();
-              const id = profileAuthor.dataset.profileAuthorId;
-              const obj = authorById(id);
-              if (obj) {
-                const type = obj.kind === 'company' ? 'company' : 'person';
-                openProfileModal(type, id);
-              }
-              return;
-            }
-
-            // Handle statement card clicks (open conversation)
             const item = closestSafe(e.target, '[data-statement-id]');
             if (
               item &&
@@ -6558,8 +6360,6 @@
                 openConversation(sid);
               }
             }
-
-            // Edit, mute, attention buttons
             const editBtn = closestSafe(
               e.target,
               '.action-btn[data-action="edit"]'
@@ -6618,6 +6418,20 @@
                       )
                       .join('\n\n')
                 );
+              }
+            }
+            // Click on avatar/name in profile view to view that user's profile
+            const profileAuthor = closestSafe(
+              e.target,
+              '[data-profile-author-id]'
+            );
+            if (profileAuthor) {
+              e.stopPropagation();
+              const id = profileAuthor.dataset.profileAuthorId;
+              const obj = authorById(id);
+              if (obj) {
+                const type = obj.kind === 'company' ? 'company' : 'person';
+                openProfileModal(type, id);
               }
             }
           });
@@ -7318,7 +7132,7 @@
           // where it actually sits in this deck. Built for persons and
           // companies alike, since anyone with statements has a record.
           letterData.unshift({
-            title: 'Index',
+            title: 'Canon',
             deck: `${user.name}'s permanent record.`,
             isIndex: true,
             profileUserId: userId,
@@ -7329,10 +7143,13 @@
             })),
           });
 
-          // Title card is the front door: pin it as LETTER 01.
-          // Both persons and companies get this now, with different content.
+          // Title card is the front door: pin it as LETTER 01, identity
+          // rather than pitch. Persons and companies get the same card —
+          // both are just name/role, discipline, status, tagline-or-photo,
+          // and a record count, so there's no reason to withhold it from
+          // one kind of author.
           letterData.unshift({
-            title: 'Title Card',
+            title: 'Provenance',
             deck: `${user.name} · ${user.role || ''}`,
             isTitleCard: true,
             profileUserId: userId,
@@ -7340,6 +7157,14 @@
 
           activeIndex = 0;
           renderTrack();
+
+          // Preload the Index (LETTER 02) content immediately rather than
+          // waiting for it to become the active panel — it sits one swipe
+          // past the title card, so it should already show the record
+          // when it's peeking into view, not render blank until clicked.
+          const indexPos = letterData.findIndex((d) => d.isIndex);
+          if (indexPos > 0) renderLetter(indexPos);
+
           updateProgressBar();
           updateProfileBadge();
 
@@ -7683,9 +7508,10 @@
           return item;
         }
 
-        // ── Title card letter renderer (LETTER 01) ──────────────
-        // Unified layout for persons AND companies.
-        // Companies get a hero image (from gallery) + about + website.
+        // ── Title card letter renderer (LETTER 01, persons + companies) ──
+        // Status is never a field you fill in — it's read off the
+        // author's own most recent statement. The title card can only
+        // ever reflect the record, never get ahead of it.
         function deriveStatus(userId) {
           const own = statements
             .filter((s) => s.authorId === userId)
@@ -7709,83 +7535,63 @@
             (s) => s.authorId === userId
           ).length;
           const status = deriveStatus(userId);
-          const isCompany = user.kind === 'company';
 
-          // ── unified grid: same layout for persons and companies ──
-          // Cells:
-          //   1) Name/role (span-2)
-          //   2) Discipline
-          //   3) Status
-          //   4) Photo / Hero image (row-span-2)
-          //   5) Record (span-2) — tagline for persons, about+website for companies
-
-          const containerClass = 'title-card-letter';
-          container.className = containerClass;
-
-          // Pick a hero image for companies (or use person's photoUrl)
-          let photoUrl = '';
-          if (isCompany) {
-            const shuffled = [...GALLERY_IMAGES].sort(() => Math.random() - 0.5);
-            photoUrl = shuffled[0] || '';
-          } else {
-            photoUrl = user.photoUrl || '';
-          }
-
-          const aboutText = isCompany ? user.about || '' : '';
-          const websiteText = isCompany ? user.website || '' : '';
-          const taglineText = isCompany ? '' : user.tagline || '';
-
-          // Build the record cell content: persons show tagline, companies show about+website
-          let recordContent = '';
-          if (isCompany) {
-            recordContent = `
-              <div style="display:flex;flex-direction:column;gap:6px;width:100%;">
-                ${aboutText ? `<span class="tc-about-text">${escapeHtml(aboutText)}</span>` : ''}
-                ${websiteText ? `<span class="tc-website-link">${escapeHtml(websiteText)}</span>` : ''}
-                <div class="tc-stat-row" style="margin-top:4px;">
-                  <div>
-                    <div class="tc-stat-num">${stmtCount}</div>
-                    <div class="tc-stat-label">Statement${stmtCount === 1 ? '' : 's'}</div>
-                  </div>
-                </div>
-              </div>
-            `;
-          } else {
-            recordContent = `
-              <span class="tc-value-sm">${taglineText ? escapeHtml(taglineText) : '—'}</span>
-              <div class="tc-stat-row" style="margin-top:8px;">
-                <div>
-                  <div class="tc-stat-num">${stmtCount}</div>
-                  <div class="tc-stat-label">Statement${stmtCount === 1 ? '' : 's'}</div>
-                </div>
-              </div>
-            `;
-          }
-
+          container.className = 'title-card-letter';
           container.innerHTML = `
-            <div class="tc-cell span-2">
-              <span class="tc-label">${isCompany ? 'Company / role' : 'Name / role'}</span>
-              <span class="tc-value">${escapeHtml(user.name)}</span>
-              <span class="tc-value-sm">${escapeHtml(user.role || '')}</span>
-            </div>
-            <div class="tc-cell">
-              <span class="tc-label">Discipline</span>
-              <span class="tc-value-sm">${escapeHtml(user.discipline || '—')}</span>
-            </div>
-            <div class="tc-cell">
-              <span class="tc-label">Status</span>
-              <span class="tc-value-sm">${status ? escapeHtml(status) : '—'}</span>
-            </div>
-            <div class="tc-cell tc-photo row-span-2">
-              ${photoUrl ? `<img src="${escapeHtml(photoUrl)}" alt="" loading="lazy" />` : '<span style="font-family:var(--font-mono);font-size:0.65rem;color:rgba(28,28,30,0.35);">no image</span>'}
-            </div>
-            <div class="tc-cell span-2" style="justify-content:center;">
-              <span class="tc-label">${isCompany ? 'About & record' : 'Tagline & record'}</span>
-              ${recordContent}
-            </div>
-          `;
+                  <div class="tc-cell span-2">
+                    <span class="tc-label">Name / role</span>
+                    <span class="tc-value">${escapeHtml(user.name)}</span>
+                    <span class="tc-value-sm">${escapeHtml(
+                      user.role || ''
+                    )}</span>
+                  </div>
+                  <div class="tc-cell">
+                    <span class="tc-label">Discipline</span>
+                    <span class="tc-value-sm">${escapeHtml(
+                      user.discipline || '—'
+                    )}</span>
+                  </div>
+                  <div class="tc-cell">
+                    <span class="tc-label">Status</span>
+                    <span class="tc-value-sm">${
+                      status ? escapeHtml(status) : '—'
+                    }</span>
+                  </div>
+                  ${
+                    user.photoUrl
+                      ? `<div class="tc-cell tc-photo row-span-2"><img src="${escapeHtml(
+                          user.photoUrl
+                        )}" alt="" loading="lazy" /></div>`
+                      : `<div class="tc-cell">
+                           <span class="tc-label">Tagline</span>
+                           <span class="tc-value-sm">${
+                             user.tagline ? escapeHtml(user.tagline) : '—'
+                           }</span>
+                         </div>`
+                  }
+                  <div class="tc-cell span-2">
+                    <span class="tc-label">Record</span>
+                    <div class="tc-stat-row">
+                      <div>
+                        <div class="tc-stat-num">${stmtCount}</div>
+                        <div class="tc-stat-label">Statement${
+                          stmtCount === 1 ? '' : 's'
+                        }</div>
+                      </div>
+                    </div>
+                  </div>
+                  ${
+                    user.photoUrl
+                      ? `<div class="tc-cell">
+                           <span class="tc-label">Tagline</span>
+                           <span class="tc-value-sm">${
+                             user.tagline ? escapeHtml(user.tagline) : '—'
+                           }</span>
+                         </div>`
+                      : ''
+                  }
+                `;
 
-          // Edit button (opens the same editor for both)
           const editWrap = document.createElement('div');
           editWrap.style.marginTop = '14px';
           editWrap.innerHTML = `<button class="btn ghost small tc-edit-btn" data-author-id="${userId}">✎ Edit title card</button>`;
@@ -7872,6 +7678,9 @@
         }
 
         // ── Index letter renderer (LETTER 02) ──────────────────────
+        // selfIndex is this letter's own position in letterData, so the
+        // numbers shown always match where each statement actually sits
+        // in the deck — the index doesn't own its own numbering.
         function buildIndexLetter(userId, statementRefs, selfIndex) {
           const user = authorById(userId);
           const container = document.createElement('div');
@@ -8175,11 +7984,7 @@
                 (data.statementIds.length > 1 ? 's' : '');
             } else {
               const includeMuted = data.includeMuted || false;
-              let filtered = getFiltered(
-                data.filterTag,
-                includeMuted,
-                data.filterUntagged
-              );
+              let filtered = getFiltered(data.filterTag, includeMuted, data.filterUntagged);
               // Apply sort based on sortMode
               if (sortMode === 'activity') {
                 filtered = sortByActivity(filtered);
@@ -8221,11 +8026,7 @@
             panel.dataset.archive = 'false';
           } else {
             const includeMuted = data.includeMuted || false;
-            let filtered = getFiltered(
-              data.filterTag,
-              includeMuted,
-              data.filterUntagged
-            );
+            let filtered = getFiltered(data.filterTag, includeMuted, data.filterUntagged);
             // Apply sort
             if (sortMode === 'activity') {
               filtered = sortByActivity(filtered);
@@ -8394,7 +8195,7 @@
           update();
         }
 
-        // ── Scroll Progress Bar (top, yellow) ────────────────────
+        // ── Scroll Progress Bar ──────────────────────────────────
         function updateProgressBar() {
           const fill = document.getElementById('scrollProgressFill');
           const track = document.getElementById('lettersTrack');
@@ -8614,9 +8415,6 @@
             btn.classList.toggle('active', on);
             btn.textContent = on ? 'Exit focus' : 'Focus';
           }
-          // Toggle focus logo on the logo tile
-          const tile = document.getElementById('logoTile');
-          if (tile) tile.classList.toggle('focus-logo', on);
         }
 
         // ── Composer ──────────────────────────────────────────────
