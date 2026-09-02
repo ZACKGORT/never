@@ -257,6 +257,8 @@
         min-height: var(--topbar-height);
         display: flex;
         align-items: center;
+        transition: background 0.3s ease, backdrop-filter 0.3s ease,
+          border-color 0.3s ease;
       }
       .topbar .wrap {
         display: flex;
@@ -360,6 +362,7 @@
         gap: 6px;
         color: var(--ink);
         flex-shrink: 0;
+        transition: font-size 0.3s ease;
       }
       .wordmark .count {
         font-family: var(--font-mono);
@@ -389,6 +392,23 @@
         transition: color 0.2s ease;
         white-space: nowrap;
       }
+      .wordmark-focus-logo {
+        display: none;
+        font-size: clamp(11px, 3vw, 18px);
+        letter-spacing: -0.02em;
+        align-items: baseline;
+        gap: 4px;
+      }
+      .wordmark-focus-logo .wordmark-sub {
+        font-size: 0.5em;
+        font-weight: 400;
+        opacity: 0.55;
+        letter-spacing: 0.02em;
+        font-family: var(--font-mono);
+      }
+      .wordmark-logo-text {
+        display: inline;
+      }
 
       .logo-tile {
         position: relative;
@@ -406,6 +426,10 @@
       .logo-tile.open .wordmark::after {
         transform: translateY(-1px) rotate(180deg);
         color: var(--ink-light);
+      }
+      .logo-tile.focus-logo .wordmark::after {
+        content: '';
+        display: none;
       }
 
       .logo-card {
@@ -471,6 +495,7 @@
         align-items: center;
         gap: 6px;
         flex-shrink: 0;
+        transition: opacity 0.3s ease;
       }
       .topbar-right .btn {
         font-size: 9px;
@@ -2105,7 +2130,22 @@
       }
 
       /* ── focus mode ── */
-      body.focus-mode .topbar,
+      body.focus-mode .topbar {
+        display: flex !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+      }
+      body.focus-mode .topbar-right {
+        opacity: 0.4;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      body.focus-mode .topbar-right:hover {
+        opacity: 0.7;
+      }
       body.focus-mode .hud-top,
       body.focus-mode .hud-bottom {
         display: none;
@@ -2144,6 +2184,21 @@
       }
       body.focus-mode .letters-track {
         padding-top: 0;
+      }
+      body.focus-mode .wordmark-logo-text {
+        display: none;
+      }
+      body.focus-mode .wordmark-focus-logo {
+        display: inline-flex;
+      }
+      body.focus-mode .wordmark .count,
+      body.focus-mode .wordmark .save-status,
+      body.focus-mode .wordmark .profile-label {
+        display: none;
+      }
+      body.focus-mode .logo-tile .wordmark::after {
+        content: '';
+        display: none;
       }
 
       .focus-exit-btn {
@@ -2554,6 +2609,9 @@
         }
         .wordmark .count {
           font-size: 7px;
+        }
+        .wordmark-focus-logo {
+          font-size: clamp(9px, 2.6vw, 13px);
         }
 
         body.profile-view .wordmark-logo-text,
@@ -4263,7 +4321,10 @@
           aria-expanded="false"
         >
           <div class="wordmark">
+            <!-- Default: full NEVEREVER.LAND -->
             <span class="wordmark-logo-text">NEVEREVER.LAND</span>
+            <!-- Focus mode: short logo with NVR².ⳑ subtitle -->
+            <span class="wordmark-focus-logo">NVRVRLND <span class="wordmark-sub">NVR².ⳑ</span></span>
             <span class="count t-data" id="topCount"></span>
             <span class="profile-label" id="profileLabel">Profile</span>
             <span class="save-status" id="saveStatus"></span>
@@ -8408,6 +8469,9 @@
             btn.classList.toggle('active', on);
             btn.textContent = on ? 'Exit focus' : 'Focus';
           }
+          // Toggle focus logo on the logo tile
+          const tile = document.getElementById('logoTile');
+          if (tile) tile.classList.toggle('focus-logo', on);
         }
 
         // ── Composer ──────────────────────────────────────────────
