@@ -543,6 +543,7 @@
         display: flex;
         align-items: center;
         cursor: pointer;
+        z-index: 10000;
       }
       .attention-btn {
         background: transparent;
@@ -593,6 +594,7 @@
         border: 1px solid var(--card);
         transition: opacity 0.2s ease;
         pointer-events: none;
+        
       }
       .attention-badge.hidden {
         opacity: 0;
@@ -6344,6 +6346,39 @@
         // ── Delegated events ─────────────────────────────────────
         function setupDelegatedEvents() {
           document.addEventListener('click', (e) => {
+            // Author name / avatar clicks — single source of truth for
+            // both [data-author-id] (feed, list/grid/bento, conversation
+            // modal) and [data-profile-author-id] (profile-view threads).
+            // These used to be two independent systems: data-author-id
+            // was wired by hand at every render site (main cards, rows,
+            // grid items, the modal's own statement head, and every
+            // recursive modal-node level), while data-profile-author-id
+            // had its own separate hand-wiring PLUS this delegated check
+            // as a redundant third path. Handling both here, once, and
+            // returning immediately means an author click always works —
+            // no matter how deep in a reply tree it sits or which view
+            // rendered it — without every render function needing to
+            // remember to wire it itself. It's checked first and returns
+            // so an author click never also triggers whatever the click
+            // would otherwise bubble into (e.g. opening the statement
+            // the author name happens to sit inside).
+            const authorTarget = closestSafe(
+              e.target,
+              '[data-author-id], [data-profile-author-id]'
+            );
+            if (authorTarget) {
+              const id =
+                authorTarget.dataset.authorId ||
+                authorTarget.dataset.profileAuthorId;
+              const obj = authorById(id);
+              if (obj) {
+                e.stopPropagation();
+                const type = obj.kind === 'company' ? 'company' : 'person';
+                openProfileModal(type, id);
+              }
+              return;
+            }
+
             const item = closestSafe(e.target, '[data-statement-id]');
             if (
               item &&
@@ -6418,20 +6453,6 @@
                       )
                       .join('\n\n')
                 );
-              }
-            }
-            // Click on avatar/name in profile view to view that user's profile
-            const profileAuthor = closestSafe(
-              e.target,
-              '[data-profile-author-id]'
-            );
-            if (profileAuthor) {
-              e.stopPropagation();
-              const id = profileAuthor.dataset.profileAuthorId;
-              const obj = authorById(id);
-              if (obj) {
-                const type = obj.kind === 'company' ? 'company' : 'person';
-                openProfileModal(type, id);
               }
             }
           });
@@ -6792,31 +6813,13 @@
             `;
           wrap.innerHTML = headHtml;
 
+          // Author name and avatar (avatarHtml already tags the avatar
+          // with data-author-id when clickable) are both picked up by the
+          // single delegated click handler in setupDelegatedEvents — no
+          // per-node wiring needed here, which also means this works
+          // identically no matter how deep this node sits in the reply
+          // tree.
           const head = wrap.querySelector('.modal-node-head');
-          const authorEls = head.querySelectorAll('[data-author-id]');
-          authorEls.forEach((el) => {
-            el.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const id = el.dataset.authorId;
-              const aObj = authorById(id);
-              if (aObj) {
-                const type = aObj.kind === 'company' ? 'company' : 'person';
-                openProfileModal(type, id);
-              }
-            });
-          });
-          const avatarEl = head.querySelector('.avatar');
-          if (avatarEl) {
-            avatarEl.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const id = node.authorId;
-              const aObj = authorById(id);
-              if (aObj) {
-                const type = aObj.kind === 'company' ? 'company' : 'person';
-                openProfileModal(type, id);
-              }
-            });
-          }
           wrap.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -6997,33 +7000,9 @@
             });
           }
 
-          const whoEl = container.querySelector('.card-who');
-          if (whoEl) {
-            const avatarEl = whoEl.querySelector('.avatar');
-            const authorEl = whoEl.querySelector('.card-author');
-            if (avatarEl) {
-              avatarEl.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = s.authorId;
-                const obj = authorById(id);
-                if (obj) {
-                  const type = obj.kind === 'company' ? 'company' : 'person';
-                  openProfileModal(type, id);
-                }
-              });
-            }
-            if (authorEl) {
-              authorEl.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = s.authorId;
-                const obj = authorById(id);
-                if (obj) {
-                  const type = obj.kind === 'company' ? 'company' : 'person';
-                  openProfileModal(type, id);
-                }
-              });
-            }
-          }
+          // The statement head's avatar and .card-author both carry
+          // data-author-id and are handled by the delegated click
+          // handler — see setupDelegatedEvents.
 
           const threadEl = container.querySelector('#modalThread');
           s.replies.forEach((r) =>
@@ -7132,7 +7111,7 @@
           // where it actually sits in this deck. Built for persons and
           // companies alike, since anyone with statements has a record.
           letterData.unshift({
-            title: 'Canon',
+            title: 'Index',
             deck: `${user.name}'s permanent record.`,
             isIndex: true,
             profileUserId: userId,
@@ -7149,7 +7128,7 @@
           // and a record count, so there's no reason to withhold it from
           // one kind of author.
           letterData.unshift({
-            title: 'Provenance',
+            title: 'Title Card',
             deck: `${user.name} · ${user.role || ''}`,
             isTitleCard: true,
             profileUserId: userId,
@@ -7265,7 +7244,13 @@
             ? 'rgba(255,255,255,0.4)'
             : 'var(--ink-light)';
 
-          const avatarStr = avatarHtml(s.authorId, 'sm', true);
+          // Static cards (e.g. the composer's live preview) are inert —
+          // no data-author-id, so the delegated click handler never picks
+          // them up and they don't open a profile.
+          const avatarStr = avatarHtml(s.authorId, 'sm', !opts.static);
+          const authorAttr = opts.static
+            ? ''
+            : ` style="cursor:pointer;" data-author-id="${s.authorId}"`;
 
           card.innerHTML = `
               <div>
@@ -7275,9 +7260,7 @@
                 <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};display:flex;align-items:center;gap:6px;">
                   ${avatarStr}
                   <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
-                    <span style="cursor:pointer;" data-author-id="${
-                      s.authorId
-                    }" itemprop="name">${escapeHtml(
+                    <span${authorAttr} itemprop="name">${escapeHtml(
             a ? a.name : 'Unknown'
           )}</span>
                   </address>
@@ -7323,31 +7306,10 @@
               }
             `;
 
-          if (!opts.static) {
-            card.querySelectorAll('[data-author-id]').forEach((el) => {
-              el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = el.dataset.authorId;
-                const obj = authorById(id);
-                if (obj) {
-                  const type = obj.kind === 'company' ? 'company' : 'person';
-                  openProfileModal(type, id);
-                }
-              });
-            });
-            const avatarEl = card.querySelector('.avatar');
-            if (avatarEl) {
-              avatarEl.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = s.authorId;
-                const obj = authorById(id);
-                if (obj) {
-                  const type = obj.kind === 'company' ? 'company' : 'person';
-                  openProfileModal(type, id);
-                }
-              });
-            }
-          } else {
+          // Author name and avatar clicks are handled by the delegated
+          // click handler in setupDelegatedEvents (see data-author-id
+          // above) — nothing to wire here.
+          if (opts.static) {
             card.style.cursor = 'default';
           }
 
@@ -7403,29 +7365,8 @@
               </div>
             `;
 
-          row.querySelectorAll('[data-author-id]').forEach((el) => {
-            el.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const id = el.dataset.authorId;
-              const obj = authorById(id);
-              if (obj) {
-                const type = obj.kind === 'company' ? 'company' : 'person';
-                openProfileModal(type, id);
-              }
-            });
-          });
-          const avatarEl = row.querySelector('.avatar');
-          if (avatarEl) {
-            avatarEl.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const id = s.authorId;
-              const obj = authorById(id);
-              if (obj) {
-                const type = obj.kind === 'company' ? 'company' : 'person';
-                openProfileModal(type, id);
-              }
-            });
-          }
+          // Author name and avatar clicks are handled by the delegated
+          // click handler in setupDelegatedEvents.
 
           return row;
         }
@@ -7481,29 +7422,8 @@
               </div>
             `;
 
-          item.querySelectorAll('[data-author-id]').forEach((el) => {
-            el.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const id = el.dataset.authorId;
-              const obj = authorById(id);
-              if (obj) {
-                const type = obj.kind === 'company' ? 'company' : 'person';
-                openProfileModal(type, id);
-              }
-            });
-          });
-          const avatarEl = item.querySelector('.avatar');
-          if (avatarEl) {
-            avatarEl.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const id = s.authorId;
-              const obj = authorById(id);
-              if (obj) {
-                const type = obj.kind === 'company' ? 'company' : 'person';
-                openProfileModal(type, id);
-              }
-            });
-          }
+          // Author name and avatar clicks are handled by the delegated
+          // click handler in setupDelegatedEvents.
 
           return item;
         }
@@ -7594,7 +7514,7 @@
 
           const editWrap = document.createElement('div');
           editWrap.style.marginTop = '14px';
-          editWrap.innerHTML = `<button class="btn ghost small tc-edit-btn" data-author-id="${userId}">✎ Edit title card</button>`;
+          editWrap.innerHTML = `<button class="btn ghost small tc-edit-btn" data-edit-author-id="${userId}">✎ Edit title card</button>`;
           const outer = document.createElement('div');
           outer.appendChild(container);
           outer.appendChild(editWrap);
@@ -7803,42 +7723,10 @@
           container.appendChild(threadDiv);
           container.appendChild(replyTrigger);
 
-          // Click on avatar/name in thread to open profile
-          container
-            .querySelectorAll('[data-profile-author-id]')
-            .forEach((el) => {
-              el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = el.dataset.profileAuthorId;
-                const obj = authorById(id);
-                if (obj) {
-                  const type = obj.kind === 'company' ? 'company' : 'person';
-                  openProfileModal(type, id);
-                }
-              });
-            });
-          container.querySelectorAll('.avatar').forEach((el) => {
-            const parent = el.closest(
-              '.profile-statement-head, .modal-node-head'
-            );
-            if (parent) {
-              const authorSpan = parent.querySelector(
-                '[data-profile-author-id]'
-              );
-              if (authorSpan) {
-                el.style.cursor = 'pointer';
-                el.addEventListener('click', (e) => {
-                  e.stopPropagation();
-                  const id = authorSpan.dataset.profileAuthorId;
-                  const obj = authorById(id);
-                  if (obj) {
-                    const type = obj.kind === 'company' ? 'company' : 'person';
-                    openProfileModal(type, id);
-                  }
-                });
-              }
-            }
-          });
+          // Author name and avatar (avatarHtml already tags the avatar
+          // with data-author-id) are picked up by the single delegated
+          // click handler in setupDelegatedEvents — it matches both
+          // data-author-id and data-profile-author-id.
 
           return container;
         }
@@ -7862,7 +7750,7 @@
                           }">${isCollapsed ? '[+]' : '[–]'}</button>`
                         : ''
                     }
-                    ${avatarHtml(node.authorId, 'xs', false)}
+                    ${avatarHtml(node.authorId, 'xs', true)}
                     <span class="modal-node-author" data-profile-author-id="${
                       node.authorId
                     }">${a ? escapeHtml(a.name) : 'Unknown'}</span>
@@ -7907,17 +7795,8 @@
             }
           }
 
-          wrap.querySelectorAll('[data-profile-author-id]').forEach((el) => {
-            el.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const id = el.dataset.profileAuthorId;
-              const obj = authorById(id);
-              if (obj) {
-                const type = obj.kind === 'company' ? 'company' : 'person';
-                openProfileModal(type, id);
-              }
-            });
-          });
+          // Author name and avatar clicks are handled by the delegated
+          // click handler in setupDelegatedEvents.
 
           return wrap;
         }
@@ -9919,24 +9798,37 @@
               { passive: true }
             );
 
-            let isDragging = false,
-              dragStartX = 0,
-              dragStartScroll = 0;
-            track.addEventListener('pointerdown', (e) => {
-              if (e.pointerType === 'touch') return;
-              if (
-                closestSafe(
-                  e.target,
-                  '.letter-row, .grid-item, .card, button, a'
-                )
-              )
-                return;
-              isDragging = true;
-              dragStartX = e.clientX;
-              dragStartScroll = track.scrollLeft;
-              track.classList.add('dragging');
-              track.setPointerCapture(e.pointerId);
-            });
+let isDragging = false,
+    dragStartX = 0,
+    dragStartScroll = 0;
+
+track.addEventListener('pointerdown', (e) => {
+  if (e.pointerType === 'touch') return;
+  if (closestSafe(e.target, '.letter-row, .grid-item, .card, button, a, [data-author-id], [data-profile-author-id]')) return;
+
+  isDragging = true;
+  dragStartX = e.clientX;
+  dragStartScroll = track.scrollLeft;
+  track.classList.add('dragging');
+  track.setPointerCapture(e.pointerId);
+});
+
+track.addEventListener('pointermove', (e) => {
+  if (!isDragging) return;
+  track.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
+});
+
+track.addEventListener('pointerup', () => {
+  isDragging = false;
+  track.classList.remove('dragging');
+});
+
+track.addEventListener('pointercancel', () => {
+  isDragging = false;
+  track.classList.remove('dragging');
+});
+
+
             track.addEventListener('pointermove', (e) => {
               if (!isDragging) return;
               track.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
