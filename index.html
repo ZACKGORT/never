@@ -7111,7 +7111,7 @@
           // where it actually sits in this deck. Built for persons and
           // companies alike, since anyone with statements has a record.
           letterData.unshift({
-            title: 'Index',
+            title: 'Canon',
             deck: `${user.name}'s permanent record.`,
             isIndex: true,
             profileUserId: userId,
@@ -7128,7 +7128,7 @@
           // and a record count, so there's no reason to withhold it from
           // one kind of author.
           letterData.unshift({
-            title: 'Title Card',
+            title: 'Provenance',
             deck: `${user.name} · ${user.role || ''}`,
             isTitleCard: true,
             profileUserId: userId,
@@ -8836,182 +8836,160 @@
 
           // ─── content with a single bookend at the end ──────────
           var PANELS = [
-            {
-              num: '01',
-              title: 'neverever.land',
-              density: 'sparse',
-              lines: ['Statements, not posts.'],
-              yellow: true,
-            },
-            {
-              num: '02',
-              title: 'Ethos',
-              density: 'medium',
-              lines: [
-                'Every line you publish is a statement, not a post.',
-                'No feed to game. No likes. No share counts.',
-                'What you write stands on its own.',
-              ],
-            },
-            {
-              num: '03',
-              title: 'Public, deliberate',
-              density: 'medium',
-              lines: [
-                'Statements are public by default.',
-                'The interface is built for thoughtful expression — not impulsive broadcasting.',
-              ],
-            },
-            {
-              num: '04',
-              title: 'Your words are your work',
-              density: 'medium',
-              lines: [
-                "Whether you're open to work, hiring, or putting a craft idea into words — each statement is part of the record you maintain.",
-              ],
-            },
-            {
-              num: '05',
-              title: 'Letters, not a timeline',
-              density: 'medium',
-              lines: [
-                'The interface is a carousel of letters — thematic decks of statements.',
-                "Flip between perspectives. Don't scroll a feed.",
-              ],
-            },
-            {
-              num: '06',
-              title: 'The five letters',
-              density: 'dense',
-              lines: [
-                'The Record · everything',
-                'Open to Work · people looking',
-                'Hiring · roles open',
-                'Thoughts · untagged signal',
-                'Archive · muted, not deleted',
-                'Same motion. Different intent.',
-              ],
-            },
-            {
-              num: '07',
-              title: 'Views',
-              density: 'medium',
-              lines: [
-                'List. Grid. Bento.',
-                'Same statements. Different density.',
-                'You choose how much surface you need.',
-              ],
-            },
-            {
-              num: '08',
-              title: 'The statement',
-              density: 'dense',
-              lines: [
-                'Author. Timestamp. Optional tag. Optional media. Text.',
-                'Replied to. Edited (with history). Muted. Saved to attention.',
-                'Nothing vanishes. It only changes place or status.',
-              ],
-            },
-            {
-              num: '09',
-              title: 'Profiles as letters',
-              density: 'dense',
-              lines: [
-                'A profile is not a résumé template.',
-                "Click a name → a new letter, generated on the fly, of that person's original statements.",
-                "Back is honest. You're a few pivots deep.",
-              ],
-            },
-            {
-              num: '10',
-              title: 'Reply & rapid respond',
-              density: 'dense',
-              lines: [
-                'Replies nest. Branches collapse.',
-                'Right-click / long-press → floating reply.',
-                'Chips = saved snippets. Low friction. Still a statement.',
-              ],
-            },
-            {
-              num: '11',
-              title: 'Attention',
-              density: 'dense',
-              lines: [
-                'Save a person, a company, or a statement.',
-                'Cap: 20.',
-                'Peripheral awareness — not a second feed.',
-              ],
-            },
-            {
-              num: '12',
-              title: 'Activity half-life',
-              density: 'dense',
-              lines: [
-                'Filter by reply recency, not post date.',
-                'Today · 7 days · 14 days · 21 days',
-                "What's alive surfaces. What's merely recent does not.",
-              ],
-            },
-            {
-              num: '13',
-              title: 'Intended use',
-              density: 'medium',
-              lines: [
-                'Job seekers — one clear open-to-work statement. Credibility from quality, not network size.',
-                'Hiring — post the role; people exploring will find it.',
-                'Craft — share the thought without building a personal brand.',
-                'Community — small threads that stay on the statement.',
-              ],
-            },
-            {
-              num: '14',
-              title: 'Design principles',
-              density: 'medium',
-              lines: [
-                'Minimal. Calm. No doomscroll.',
-                'Finite loads. Keyboard-first. Mobile-native.',
-                'Floating HUD, not chrome that competes.',
-                'No algorithmic ranking — order is what you asked for.',
-              ],
-            },
-            {
-              num: '15',
-              title: 'What this actually is',
-              density: 'medium',
-              lines: [
-                'Right now: one person, wiring up statements to see if the shape works.',
-                "Polish isn't the next test. Five to ten real people, real names, is.",
-                'Does anyone come back a second day? That\u2019s the honest question.',
-                "If it stays a one-person artifact, that's still a legitimate thing to have made.",
-              ],
-            },
-            {
-              num: '16',
-              title: 'The signature',
-              density: 'sparse',
-              lines: ['Statements — as signatures'],
-            },
-            {
-              num: 'NVR².ⳑ',
-              title: 'NVRVRLND',
-              density: 'brand',
-              lines: [
-                'NVR² = a canonical identity; a recursive environment',
-                '. = the impetus, not the end; a completed thought, now stated.',
-                'ⳑ = marks a place; invites action.',
-                'NVR².ⳑ = a native unicode identity; sans facade.',
-              ],
-
-              yellow: true,
-            },
-            {
-              type: 'bookend',
-              num: '∞',
-              title: 'Contents',
-              density: 'bookend',
-              lines: [],
-            },
-          ];
+  {
+    num: '01',
+    title: 'neverever.land',
+    density: 'sparse',
+    lines: ['Statements, not posts.'],
+    yellow: true,
+  },
+  {
+    num: '02',
+    title: 'The Record',
+    density: 'medium',
+    lines: [
+      'Every line is a statement — not a disposable post.',
+      'No likes. No share counts. No algorithmic feed.',
+      'What you write stands on its own.',
+    ],
+  },
+  {
+    num: '03',
+    title: 'Public & Permanent',
+    density: 'medium',
+    lines: [
+      'Statements are public by default.',
+      'Nothing is deleted — only muted or archived.',
+      'Your words are your work, and they persist.',
+    ],
+  },
+  {
+    num: '04',
+    title: 'The Five Letters',
+    density: 'dense',
+    lines: [
+      'Record · everything visible',
+      'Open to Work · people looking',
+      'Hiring · roles open',
+      'Thoughts · untagged signal',
+      'Archive · muted, not gone',
+      'Each is a different lens on the same statements.',
+    ],
+  },
+  {
+    num: '05',
+    title: 'Profiles as Letters',
+    density: 'medium',
+    lines: [
+      'Click a name → a new letter deck.',
+      'Title Card · identity derived from your statements',
+      'Index · table of contents',
+      'Each original statement becomes its own letter.',
+      'A profile is a record, not a résumé.',
+    ],
+  },
+  {
+    num: '06',
+    title: 'Views & Density',
+    density: 'medium',
+    lines: [
+      'List · fastest scanning',
+      'Grid · visual overview',
+      'Bento · rich card layout',
+      'Same statements, different surface.',
+    ],
+  },
+  {
+    num: '07',
+    title: 'Replies & Threads',
+    density: 'dense',
+    lines: [
+      'Replies nest, branches collapse.',
+      'Right‑click / long‑press → Rapid Respond.',
+      'Chips = saved snippets for quick replies.',
+      'Conversations stay attached to the original statement.',
+    ],
+  },
+  {
+    num: '08',
+    title: 'Attention',
+    density: 'dense',
+    lines: [
+      'Save people, companies, or statements.',
+      'Cap: 20 — intentional, not a feed.',
+      'The eye winks at you. A quiet reminder.',
+    ],
+  },
+  {
+    num: '09',
+    title: 'Activity Half‑Life',
+    density: 'dense',
+    lines: [
+      'Filter by reply recency, not post date.',
+      'Today · 7 days · 14 days · 21 days',
+      'Surfaces what is alive, not just recent.',
+    ],
+  },
+  {
+    num: '10',
+    title: 'Intended Use',
+    density: 'medium',
+    lines: [
+      'Job seekers · one clear open‑to‑work statement',
+      'Hiring · post a role; people will find it',
+      'Craft · share the thought, not the brand',
+      'Community · small, focused threads',
+    ],
+  },
+  {
+    num: '11',
+    title: 'Design Principles',
+    density: 'medium',
+    lines: [
+      'Minimal. Calm. No doomscroll.',
+      'Finite loads. Keyboard‑first. Mobile‑native.',
+      'Floating HUD, not competing chrome.',
+      'No algorithmic ranking — order is what you choose.',
+    ],
+  },
+  {
+    num: '12',
+    title: 'What This Is',
+    density: 'medium',
+    lines: [
+      'Right now: one person, one artifact.',
+      'The next test: five to ten real people, real names.',
+      'Does anyone come back a second day?',
+      "That's the honest question.",
+      "If it stays a one‑person thing, that's still legitimate.",
+    ],
+  },
+  {
+    num: '13',
+    title: 'The Signature',
+    density: 'sparse',
+    lines: ['Statements — as signatures'],
+  },
+  {
+    num: 'NVR².ⳑ',
+    title: 'NVRVRLND',
+    density: 'brand',
+    lines: [
+      'NVR² = a canonical identity; a recursive environment',
+      '. = the impetus, not the end; a completed thought',
+      'ⳑ = marks a place; invites action.',
+      'NVR².ⳑ = a native unicode identity; sans facade.',
+    ],
+    yellow: true,
+  },
+  {
+    type: 'bookend',
+    num: '∞',
+    title: 'Contents',
+    density: 'bookend',
+    lines: [],
+  },
+];
 
           var spiral = container;
           var sections = [];
