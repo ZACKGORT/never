@@ -7285,79 +7285,79 @@
 
         // ── Bento card builder ───────────────────────────────────
         function buildBentoCard(s, opts = {}) {
-          const a = authorById(s.authorId);
-          const variants = [
-            'card-white',
-            'card-light',
-            'card-dark',
-            'card-mid',
-            'card-accent',
-            'card-accent-2',
-          ];
-          const variant =
-            opts.variant ||
-            variants[Math.floor(Math.random() * variants.length)];
-          let spans = '';
-          if (!opts.noSpan) {
-            const r = Math.random();
-            if (r < 0.2) spans = 'span-2';
-            else if (r < 0.3) spans = 'row-span-2';
-          }
+  const a = authorById(s.authorId);
+  const variants = [
+    'card-white',
+    'card-light',
+    'card-dark',
+    'card-mid',
+    'card-accent',
+    'card-accent-2',
+  ];
+  const variant =
+    opts.variant ||
+    variants[Math.floor(Math.random() * variants.length)];
+  let spans = '';
+  if (!opts.noSpan) {
+    const r = Math.random();
+    if (r < 0.2) spans = 'span-2';
+    else if (r < 0.3) spans = 'row-span-2';
+  }
 
-          const card = document.createElement('article');
-          card.className = ['card', variant, spans].filter(Boolean).join(' ');
-          card.style.animationDelay = opts.static
-            ? '0s'
-            : Math.random() * 0.2 + 's';
-          card.dataset.statementId = s.id;
-          card.setAttribute('itemscope', '');
-          card.setAttribute('itemtype', 'https://schema.org/CreativeWork');
+  const card = document.createElement('article');
+  card.className = ['card', variant, spans].filter(Boolean).join(' ');
+  card.style.animationDelay = opts.static
+    ? '0s'
+    : Math.random() * 0.2 + 's';
+  card.dataset.statementId = s.id;
+  card.setAttribute('itemscope', '');
+  card.setAttribute('itemtype', 'https://schema.org/CreativeWork');
 
-          const isDark = variant.includes('dark') || variant.includes('mid');
-          const textColor = isDark ? '#fff' : 'var(--ink)';
-          const lightColor = isDark
-            ? 'rgba(255,255,255,0.6)'
-            : 'var(--ink-light)';
-          const bodyColor = isDark ? 'rgba(255,255,255,0.8)' : 'var(--ink-mid)';
-          const metaColor = isDark
-            ? 'rgba(255,255,255,0.4)'
-            : 'var(--ink-light)';
+  const isDark = variant.includes('dark') || variant.includes('mid');
+  const textColor = isDark ? '#fff' : 'var(--ink)';
+  const lightColor = isDark
+    ? 'rgba(255,255,255,0.6)'
+    : 'var(--ink-light)';
+  const bodyColor = isDark ? 'rgba(255,255,255,0.8)' : 'var(--ink-mid)';
+  const metaColor = isDark
+    ? 'rgba(255,255,255,0.4)'
+    : 'var(--ink-light)';
 
-          const avatarStr = avatarHtml(s.authorId, 'sm', !opts.static);
-          const authorAttr = opts.static
-            ? ''
-            : ` style="cursor:pointer;" data-author-id="${s.authorId}"`;
+  const avatarStr = avatarHtml(s.authorId, 'sm', !opts.static);
+  const authorAttr = opts.static
+    ? ''
+    : ` style="cursor:pointer;" data-author-id="${s.authorId}"`;
 
-          card.innerHTML = `
-              <div>
-                <div class="label-sm" itemprop="keywords">${escapeHtml(s.tag || 'STATEMENT')}</div>
-                <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};display:flex;align-items:center;gap:6px;">
-                  ${avatarStr}
-                  <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
-                    <span${authorAttr} itemprop="name">${escapeHtml(a ? a.name : 'Unknown')}</span>
-                  </address>
-                </div>
-                ${a?.role ? `<div class="body-xs" style="color:${lightColor};" itemprop="jobTitle">${escapeHtml(a.role)}</div>` : ''}
-              </div>
-              <div class="mt-auto">
-                <p class="body-sm" style="max-width:30ch;margin-top:0.2rem;color:${bodyColor};" itemprop="text">${escapeHtml(s.text)}</p>
-                ${s.mediaUrl ? `<div style="margin-top:0.4rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);max-height:80px;" itemprop="image"><img src="${escapeHtml(s.mediaUrl)}" alt="" style="display:block;width:100%;height:auto;object-fit:cover;" loading="lazy" /></div>` : ''}
-                <div class="label-xs" style="margin-top:0.3rem;color:${metaColor};">
-                  <time datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
-                  · ${countReplies(s)} repl${countReplies(s) === 1 ? 'y' : 'ies'}
-                </div>
-                ${renderEditMarker(s)}
-                ${opts.static ? '' : renderStatementActions(s)}
-              </div>
-              ${isDark ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>` : variant.includes('accent') ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>` : `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
-            `;
+  card.innerHTML = `
+      <div>
+        <div class="label-sm" itemprop="keywords">${escapeHtml(s.tag || 'STATEMENT')}</div>
+        <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};display:flex;align-items:center;gap:6px;">
+          ${avatarStr}
+          <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
+            <span${authorAttr} itemprop="name">${escapeHtml(a ? a.name : 'Unknown')}</span>
+          </address>
+        </div>
+        ${a?.role ? `<div class="body-xs" style="color:${lightColor};" itemprop="jobTitle">${escapeHtml(a.role)}</div>` : ''}
+      </div>
+      <div class="mt-auto">
+        <p class="body-sm" style="max-width:30ch;margin-top:0.2rem;color:${bodyColor};display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;" itemprop="text">${escapeHtml(s.text)}</p>
+        ${s.mediaUrl ? `<div style="margin-top:0.4rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);max-height:80px;" itemprop="image"><img src="${escapeHtml(s.mediaUrl)}" alt="" style="display:block;width:100%;height:auto;object-fit:cover;" loading="lazy" /></div>` : ''}
+        <div class="label-xs" style="margin-top:0.3rem;color:${metaColor};">
+          <time datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
+          · ${countReplies(s)} repl${countReplies(s) === 1 ? 'y' : 'ies'}
+        </div>
+        ${renderEditMarker(s)}
+        ${opts.static ? '' : renderStatementActions(s)}
+      </div>
+      ${isDark ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>` : variant.includes('accent') ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>` : `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
+    `;
 
-          if (opts.static) {
-            card.style.cursor = 'default';
-          }
+  if (opts.static) {
+    card.style.cursor = 'default';
+  }
 
-          return card;
-        }
+  return card;
+}
 
         // ── Item builders ────────────────────────────────────────
         function buildRow(s, idx) {
