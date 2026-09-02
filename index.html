@@ -2342,6 +2342,7 @@
         grid-auto-flow: column;
         gap: 0.2rem 2rem;
         max-width: 640px;
+        overflow: hidden;
       }
       .index-letter a.idx-row {
         display: flex;
@@ -2352,6 +2353,8 @@
         cursor: pointer;
         transition: color 0.2s, transform 0.15s;
         color: rgba(255, 255, 255, 0.85);
+        max-width: 100%;
+        overflow: hidden;
       }
       .index-letter a.idx-row:hover {
         color: var(--accent);
@@ -2373,11 +2376,50 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        flex: 1;
+        min-width: 0;
       }
+
+      /* ── Toggle inside index card ── */
+      .index-toggle-bar {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 0.5rem;
+      }
+      .index-toggle-bar .toggle-btn {
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.2);
+        color: rgba(255,255,255,0.6);
+        padding: 0.2rem 0.8rem;
+        border-radius: var(--radius-sm);
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s, border-color 0.2s;
+        min-height: 26px;
+      }
+      .index-toggle-bar .toggle-btn.active {
+        background: rgba(255,255,255,0.15);
+        color: #ffffff;
+        border-color: var(--accent);
+      }
+      .index-toggle-bar .toggle-btn:hover:not(.active) {
+        color: rgba(255,255,255,0.9);
+        border-color: rgba(255,255,255,0.4);
+      }
+
       @media (max-width: 640px) {
         .index-letter {
           grid-auto-flow: row;
           grid-template-rows: none;
+        }
+        .index-toggle-bar .toggle-btn {
+          font-size: 0.55rem;
+          padding: 0.15rem 0.6rem;
         }
       }
 
@@ -3764,6 +3806,24 @@
         display: none;
       }
 
+      /* ── Profile view: show title card & index buttons ── */
+      .hud-profile-nav {
+        display: none;
+        align-items: center;
+        gap: 4px;
+      }
+      body.profile-view .hud-top .hud-profile-nav {
+        display: flex;
+      }
+      .hud-profile-nav .btn {
+        min-height: var(--hud-btn-min-h);
+        padding: 4px 8px;
+        font-size: var(--hud-btn-fs);
+        border-radius: var(--radius-sm);
+        font-family: var(--font-mono);
+        letter-spacing: 0.04em;
+      }
+
       /* ── INFO OVERLAY (spiral) ──────────────────────────────────────────── */
       .info-overlay {
         position: fixed;
@@ -4396,6 +4456,11 @@
       <button class="btn active" id="hudViewList">List</button>
       <button class="btn" id="hudViewGrid">Grid</button>
       <button class="btn" id="hudViewBento">Bento</button>
+      <!-- Profile navigation buttons (hidden by default) -->
+      <div class="hud-profile-nav">
+        <button class="btn" id="hudTitleCardBtn" title="Title Card">⏺</button>
+        <button class="btn" id="hudIndexBtn" title="Index">☰</button>
+      </div>
     </div>
 
     <div class="wrap">
@@ -5034,6 +5099,60 @@
               tagline: 'Talks to users.',
             },
             {
+              id: 'sarah',
+              kind: 'person',
+              discipline: 'DATA',
+              name: 'Sarah Chen',
+              role: 'Data Scientist',
+              tagline: 'ML and causal inference.',
+              photoUrl: '',
+            },
+            {
+              id: 'markus',
+              kind: 'person',
+              discipline: 'OPERATIONS',
+              name: 'Markus Schmidt',
+              role: 'Operations Lead',
+              tagline: 'Scaling teams and processes.',
+              photoUrl: '',
+            },
+            {
+              id: 'anya',
+              kind: 'person',
+              discipline: 'PRODUCT',
+              name: 'Anya Sharma',
+              role: 'Product Director',
+              tagline: '0-to-1 product launches.',
+              photoUrl: '',
+            },
+            {
+              id: 'ben',
+              kind: 'person',
+              discipline: 'ENGINEERING',
+              name: 'Ben Carter',
+              role: 'Engineering Manager',
+              tagline: 'Building high-performing teams.',
+              photoUrl: '',
+            },
+            {
+              id: 'chloe',
+              kind: 'person',
+              discipline: 'DESIGN',
+              name: 'Chloe Kim',
+              role: 'Visual Designer',
+              tagline: 'Brand & identity systems.',
+              photoUrl: '',
+            },
+            {
+              id: 'david',
+              kind: 'person',
+              discipline: 'DATA',
+              name: 'David Okafor',
+              role: 'Analytics Engineer',
+              tagline: 'Data pipelines and dashboards.',
+              photoUrl: '',
+            },
+            {
               id: 'studio-north',
               kind: 'company',
               discipline: 'DESIGN',
@@ -5155,22 +5274,27 @@
             strata: [
               'Strata is hiring a Site Reliability Engineer. Remote. $160k–$190k. On-call rotation, real pager, real ownership.',
               'Strata · Cloud Infrastructure Engineer, multi-cloud team. Remote (US). $145k–$175k. Terraform fluency required.',
+              'Strata is hiring a Cloud Security Engineer. Remote. $160k–$190k. Deep AWS/GCP experience required.',
             ],
             fieldwork: [
               'Fieldwork is hiring a Product Designer for founder-stage clients. Remote. $120k–$150k. You ship fast and explain your reasoning.',
               'Fieldwork · Design Researcher, part-time to start. Remote. $70/hr. Comfortable running discovery with zero-to-one teams.',
+              'Fieldwork is hiring a Product Manager. Remote. $130k–$160k. Experience with early-stage startups is a plus.',
             ],
             catalyst: [
               "Catalyst is hiring a Brand Director. Onsite, LA. $150k–$180k. You've turned a company's reputation around before.",
               'Catalyst · Comms Lead, climate + energy clients. Remote. $110k–$135k. Op-eds and crisis response both count as writing.',
+              'Catalyst is hiring a Senior Copywriter. LA/Hybrid. $90k–$115k. We need a voice that cuts through.',
             ],
             'bright-machine': [
               'Bright Machine is hiring an Industrial Designer. Onsite, Oakland. $110k–$140k. Hardware background preferred, not required.',
               'Bright Machine · Product Designer, software side of a hardware company. Onsite, Oakland. $130k–$160k.',
+              'Bright Machine is hiring a Firmware Engineer. Oakland. $140k–$170k. Embedded C and RTOS experience.',
             ],
             wayfinder: [
               "Wayfinder is hiring a Senior Designer. Fully remote, always. $135k–$165k. We've never had an office and never will.",
               'Wayfinder · Design Ops lead. Remote. $115k–$140k. Keep 14 designers across 9 time zones pointed the same direction.',
+              'Wayfinder is hiring a Design Researcher. Remote. $110k–$140k. Help us understand the future of work.',
             ],
             lattice: [
               "Lattice Systems is hiring a Data Platform Engineer. Remote (US/Canada). $155k–$185k. Pipelines that don't page you at 3am.",
@@ -5217,6 +5341,12 @@
             owen: "Brand Designer, type-obsessed. Portfolio's mostly typefaces I designed for one client each. Open to work.",
             yuki: 'Engineering Manager, platform teams. Looking for an org that still lets managers write code sometimes.',
             dara: 'UX Researcher, eight years, mostly qualitative. Looking for a role where research drives decisions, not just decks.',
+            sarah: 'Data Scientist, ML and causal inference. Looking for a team that values rigorous experimentation.',
+            markus: 'Operations Lead, scaling teams and processes. Open to COO or Head of Ops roles in growth-stage startups.',
+            anya: 'Product Director, 0-to-1 product launches. I love the messy early stage.',
+            ben: 'Engineering Manager, building high-performing teams. Looking for a place where I can still write code 30% of the time.',
+            chloe: 'Visual Designer, brand & identity systems. I make things look considered.',
+            david: 'Analytics Engineer, data pipelines and dashboards. I turn data into decisions.',
           };
 
           const GENERAL = [
@@ -5378,6 +5508,50 @@
               tag: 'LEADERSHIP',
               text: "Promoted someone specifically because they kept telling me things I didn't want to hear.",
             },
+            {
+              tag: 'THOUGHTS',
+              discipline: 'PRODUCT',
+              text: 'Product management is 20% vision and 80% saying no.',
+            },
+            {
+              tag: 'THOUGHTS',
+              discipline: 'DATA',
+              text: 'Most data pipelines are just sophisticated ways to lie to yourself.',
+            },
+            {
+              tag: 'THOUGHTS',
+              discipline: 'OPERATIONS',
+              text: 'Operational excellence is invisible when done right.',
+            },
+            {
+              tag: 'CAREER',
+              discipline: 'PRODUCT',
+              text: 'The best product managers understand the technology deeply enough to know what\'s hard.',
+            },
+            {
+              tag: 'CAREER',
+              discipline: 'DATA',
+              text: 'Data scientists should spend more time on data quality and less on model tuning.',
+            },
+            {
+              tag: 'CAREER',
+              discipline: 'OPERATIONS',
+              text: 'Process is a prison unless it\'s owned by the people who use it.',
+            },
+            {
+              tag: 'BRAND',
+              discipline: 'PRODUCT',
+              text: 'Product-led growth is just a fancy way of saying your product has to actually work.',
+            },
+            {
+              tag: 'BRAND',
+              discipline: 'DATA',
+              text: 'Data privacy is not a feature. It\'s a constraint that shapes the product.',
+            },
+            {
+              tag: 'THOUGHTS',
+              text: 'The most important skill in 2026 is knowing when to stop reading and start doing.',
+            },
           ];
 
           function authorForGeneral(entry, pool) {
@@ -5423,7 +5597,7 @@
             );
           });
 
-          for (let i = 0; i < 38; i++) {
+          for (let i = 0; i < 60; i++) {
             const g = GENERAL[i % GENERAL.length];
             const pool = authorForGeneral(g, authorsList);
             const a = pool[Math.floor(Math.random() * pool.length)];
@@ -5547,6 +5721,26 @@
             );
           });
 
+          // ── Add some replies from Zack to demonstrate Responded mode ──
+          // Find a few statements not authored by Zack and add replies from Zack.
+          const nonZackStatements = result.filter(s => s.authorId !== 'zack');
+          const shuffled = nonZackStatements.sort(() => Math.random() - 0.5);
+          const targets = shuffled.slice(0, 3);
+          targets.forEach((target, i) => {
+            const replyTexts = [
+              "This is a great point — I've been thinking about this too.",
+              "Thanks for sharing this. I'm curious how others are approaching this.",
+              "I appreciate the honesty here. It's refreshing.",
+            ];
+            target.replies.push({
+              id: uid(),
+              authorId: 'zack',
+              time: Date.now() - (i + 1) * 2 * hour,
+              text: replyTexts[i % replyTexts.length],
+              replies: [],
+            });
+          });
+
           return result;
         }
 
@@ -5593,6 +5787,7 @@
         // ── Profile view state ────────────────────────────────────
         let isProfileView = false;
         let profileUserId = null;
+        let profileViewMode = 'original'; // 'original' | 'responded'
 
         // ── Thoughts view ─────────────────────────────────────────
         let isThoughtsView = false;
@@ -6460,14 +6655,54 @@
           } catch (e) {}
           authors = seedAuthors();
           statements = seedStatements(authors);
-          thoughts = [];
+          thoughts = [
+            {
+              id: 'thought1',
+              authorId: 'zack',
+              createdAt: Date.now() - 100000,
+              updatedAt: Date.now() - 50000,
+              text: 'Should I specialize in AI design or stick to general product design?',
+              tag: 'CAREER',
+              mediaUrl: '',
+              status: 'draft',
+              statementId: null,
+            },
+            {
+              id: 'thought2',
+              authorId: 'zack',
+              createdAt: Date.now() - 200000,
+              updatedAt: Date.now() - 150000,
+              text: 'What if the future of work is just really well-written async documents?',
+              tag: 'THOUGHTS',
+              mediaUrl: '',
+              status: 'draft',
+              statementId: null,
+            },
+          ];
+          chips = [
+            { id: 'chip1', text: 'This resonates with me.', useCount: 3, createdAt: Date.now() },
+            { id: 'chip2', text: 'Can you share more details?', useCount: 5, createdAt: Date.now() },
+            { id: 'chip3', text: 'I’d love to connect.', useCount: 2, createdAt: Date.now() },
+            { id: 'chip4', text: 'What’s the timeline here?', useCount: 1, createdAt: Date.now() },
+            { id: 'chip5', text: 'Bookmarking this.', useCount: 4, createdAt: Date.now() },
+          ];
+          // Pre-seed attention items
+          const sampleStatement = statements.find(s => s.authorId === 'studio-north');
+          attentionItems = [
+            { id: 'att1', userId: 'user_self', objectType: 'company', objectId: 'studio-north', createdAt: Date.now(), active: true },
+            { id: 'att2', userId: 'user_self', objectType: 'person', objectId: 'maya', createdAt: Date.now(), active: true },
+            { id: 'att3', userId: 'user_self', objectType: 'statement', objectId: sampleStatement?.id || '', createdAt: Date.now(), active: true },
+          ].filter(item => item.objectId);
+          // Pre-seed interactions
+          interactions = [
+            { targetId: 'studio-north', targetKind: 'company', type: 'save', lastInteracted: Date.now() - 10000, count: 1 },
+            { targetId: 'maya', targetKind: 'person', type: 'view', lastInteracted: Date.now() - 50000, count: 2 },
+            { targetId: 'zack', targetKind: 'person', type: 'reply', lastInteracted: Date.now() - 20000, count: 3 },
+          ];
           await saveData();
           saveThoughts();
-          attentionItems = [];
           saveAttention();
-          chips = [];
           saveChips();
-          interactions = [];
           saveInteractions();
           activeIndex = 0;
           isProfileView = false;
@@ -7111,6 +7346,82 @@
         }
 
         // ── Profile View ──────────────────────────────────────────
+        function setProfileViewMode(mode) {
+          if (mode !== 'original' && mode !== 'responded') return;
+          profileViewMode = mode;
+          rebuildProfileLetters();
+          renderTrack();
+          // Activate the index card (index 1) after re-render
+          const indexPos = letterData.findIndex((d) => d.isIndex);
+          if (indexPos >= 0) {
+            activatePanel(indexPos);
+          }
+        }
+
+        function rebuildProfileLetters() {
+          const user = authorById(profileUserId);
+          if (!user) return;
+
+          let items = [];
+          if (profileViewMode === 'original') {
+            items = statements
+              .filter((s) => s.authorId === profileUserId && !s.parentId)
+              .sort((a, b) => b.time - a.time);
+          } else {
+            // Responded: replies authored by the user (top-level replies, i.e. parentId exists)
+            items = statements
+              .filter((s) => s.authorId === profileUserId && s.parentId)
+              .sort((a, b) => b.time - a.time);
+          }
+
+          // Build letterData: Title Card, Index, then one letter per item.
+          const newLetterData = [
+            {
+              title: 'Provenance',
+              deck: `${user.name} · ${user.role || ''}`,
+              isTitleCard: true,
+              profileUserId: profileUserId,
+            },
+            {
+              title: 'Canon',
+              deck: `${user.name}'s permanent record.`,
+              isIndex: true,
+              profileUserId: profileUserId,
+              statementRefs: items.map((s) => ({
+                id: s.id,
+                time: s.time,
+                text: s.text,
+              })),
+              mode: profileViewMode,
+            },
+          ];
+
+          if (items.length === 0) {
+            newLetterData.push({
+              title: profileViewMode === 'original' ? 'No originals' : 'No replies',
+              deck: profileViewMode === 'original'
+                ? `${user.name} hasn't posted any original statements.`
+                : `${user.name} hasn't replied to any statements yet.`,
+              isProfile: true,
+              profileUserId: profileUserId,
+              statementIds: [],
+            });
+          } else {
+            items.forEach((s) => {
+              newLetterData.push({
+                title: profileViewMode === 'original' ? 'Original' : 'Reply',
+                deck: '',
+                isProfile: true,
+                profileUserId: profileUserId,
+                statementIds: [s.id],
+                mode: profileViewMode,
+              });
+            });
+          }
+
+          letterData = newLetterData;
+        }
+
         function enterProfileView(userId) {
           const user = authorById(userId);
           if (!user) return;
@@ -7120,68 +7431,30 @@
 
           isProfileView = true;
           profileUserId = userId;
+          profileViewMode = 'original'; // default
           document.body.classList.add('profile-view');
 
-          const userStatements = statements.filter(
-            (s) => s.authorId === userId
-          );
-          userStatements.sort((a, b) => b.time - a.time);
-
-          if (userStatements.length === 0) {
-            letterData = [
-              {
-                title: 'No statements yet',
-                deck: `${user.name} hasn't posted any original statements.`,
-                isProfile: true,
-                profileUserId: userId,
-                statementIds: [],
-              },
-            ];
-          } else {
-            letterData = userStatements.map((s, i) => {
-              const timeLabel =
-                i === 0
-                  ? 'today'
-                  : i === 1
-                  ? 'yesterday'
-                  : new Date(s.time).toLocaleDateString([], {
-                      month: 'short',
-                      day: 'numeric',
-                    });
-              return {
-                title: `A letter written ${timeLabel}`,
-                deck: '',
-                isProfile: true,
-                profileUserId: userId,
-                statementIds: [s.id],
-              };
-            });
-          }
-
-          letterData.unshift({
-            title: 'Index',
-            deck: `${user.name}'s permanent record.`,
-            isIndex: true,
-            profileUserId: userId,
-            statementRefs: userStatements.map((s) => ({
-              id: s.id,
-              time: s.time,
-              text: s.text,
-            })),
-          });
-
-          letterData.unshift({
-            title: 'Title Card',
-            deck: `${user.name} · ${user.role || ''}`,
-            isTitleCard: true,
-            profileUserId: userId,
-          });
-
-          activeIndex = 0;
+          rebuildProfileLetters();
           renderTrack();
 
+          // Preload the index card (index 1) after render
           const indexPos = letterData.findIndex((d) => d.isIndex);
-          if (indexPos > 0) renderLetter(indexPos);
+          if (indexPos >= 0) {
+            // render all letters then activate index
+            // renderLetter will be called by renderTrack, but we need to set activeIndex to indexPos
+            // we can set activeIndex after renderTrack, but renderTrack calls renderLetter(0)
+            // so we need to activate after that.
+            // We'll use a small timeout or set activeIndex and re-render.
+            // Better: set activeIndex = 0, then after renderTrack, activate index.
+            // But we want to start on title card, so activeIndex = 0.
+            // Then we activate index after a brief delay.
+            activeIndex = 0;
+            // after renderTrack, we can activate index
+            // We'll use requestAnimationFrame
+            requestAnimationFrame(() => {
+              activatePanel(indexPos);
+            });
+          }
 
           updateProgressBar();
           updateProfileBadge();
@@ -7574,22 +7847,45 @@
         }
 
         // ── Index letter renderer ─────────────────────────────────
-        function buildIndexLetter(userId, statementRefs, selfIndex) {
+        function buildIndexLetter(userId, statementRefs, selfIndex, mode) {
           const user = authorById(userId);
           const container = document.createElement('div');
 
+          // Add toggle bar
+          const toggleBar = document.createElement('div');
+          toggleBar.className = 'index-toggle-bar';
+          const toggleOriginal = document.createElement('button');
+          toggleOriginal.className = `toggle-btn${mode === 'original' ? ' active' : ''}`;
+          toggleOriginal.textContent = 'Original';
+          toggleOriginal.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setProfileViewMode('original');
+          });
+          const toggleResponded = document.createElement('button');
+          toggleResponded.className = `toggle-btn${mode === 'responded' ? ' active' : ''}`;
+          toggleResponded.textContent = 'Responded';
+          toggleResponded.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setProfileViewMode('responded');
+          });
+          toggleBar.appendChild(toggleOriginal);
+          toggleBar.appendChild(toggleResponded);
+          container.appendChild(toggleBar);
+
           if (!statementRefs || !statementRefs.length) {
-            container.innerHTML = `
-                    <div class="empty-letter">
-                      <div class="t-micro">NOTHING YET</div>
-                      <p>${user ? escapeHtml(user.name) : 'This person'} hasn't made any statements.</p>
-                    </div>
-                `;
+            const empty = document.createElement('div');
+            empty.className = 'empty-letter';
+            empty.innerHTML = `
+              <div class="t-micro">${mode === 'original' ? 'NO ORIGINALS' : 'NO REPLIES'}</div>
+              <p>${user ? escapeHtml(user.name) : 'This person'} ${mode === 'original' ? 'hasn\'t posted any original statements.' : 'hasn\'t replied to any statements yet.'}</p>
+            `;
+            container.appendChild(empty);
             return container;
           }
 
-          container.className = 'index-letter';
-          container.innerHTML = statementRefs
+          const indexDiv = document.createElement('div');
+          indexDiv.className = 'index-letter';
+          indexDiv.innerHTML = statementRefs
             .map((ref, i) => {
               const letterNum = String(selfIndex + 2 + i).padStart(2, '0');
               const panelIdx = selfIndex + 1 + i;
@@ -7603,7 +7899,7 @@
             })
             .join('');
 
-          container.querySelectorAll('.idx-row').forEach((row) => {
+          indexDiv.querySelectorAll('.idx-row').forEach((row) => {
             row.addEventListener('click', (e) => {
               e.stopPropagation();
               const idx = Number(row.dataset.jumpIndex);
@@ -7611,6 +7907,7 @@
             });
           });
 
+          container.appendChild(indexDiv);
           return container;
         }
 
@@ -7822,7 +8119,8 @@
               buildIndexLetter(
                 data.profileUserId,
                 data.statementRefs,
-                index
+                index,
+                data.mode || 'original'
               )
             );
             panel.dataset.archive = 'false';
@@ -9655,6 +9953,20 @@
                 renderLetter(activeIndex);
               });
 
+            // Profile navigation buttons
+            document.getElementById('hudTitleCardBtn').addEventListener('click', function() {
+              if (isProfileView) {
+                // Title card is always at index 0 in profile view
+                activatePanel(0);
+              }
+            });
+            document.getElementById('hudIndexBtn').addEventListener('click', function() {
+              if (isProfileView) {
+                // Index card is always at index 1 in profile view
+                activatePanel(1);
+              }
+            });
+
             document
               .getElementById('hudNew')
               .addEventListener('click', function () {
@@ -9753,68 +10065,97 @@
               track.classList.remove('dragging');
             });
 
+            // ─── Enhanced Escape key handling ───────────────────
             document.addEventListener('keydown', (e) => {
-              if (
-                closestSafe(
-                  e.target,
-                  '.letter-row, .grid-item, .card, button, a, input, textarea'
-                )
-              )
-                return;
-              if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                activatePanel(activeIndex - 1);
-              }
-              if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                activatePanel(activeIndex + 1);
-              }
               if (e.key === 'Escape') {
-                if (focusMode) setFocusMode(false);
-                if (
-                  document
-                    .getElementById('profileModal')
-                    .classList.contains('open')
-                )
-                  closeProfileModal();
-                if (
-                  document
-                    .getElementById('conversationModal')
-                    .classList.contains('open')
-                )
-                  closeConversation();
-                if (
-                  document
-                    .getElementById('bentoOverlay')
-                    .classList.contains('open')
-                )
-                  closeBento();
-                if (
-                  document
-                    .getElementById('reviewOverlay')
-                    .classList.contains('open')
-                )
-                  closeReviewModal();
-                if (
-                  document
-                    .getElementById('chipsOverlay')
-                    .classList.contains('open')
-                ) {
-                  document
-                    .getElementById('chipsOverlay')
-                    .classList.remove('open');
+                // Close any open overlay
+                if (focusMode) {
+                  setFocusMode(false);
+                  e.preventDefault();
+                  return;
                 }
-                document
-                  .getElementById('attentionDropdown')
-                  .classList.remove('open');
-                closeRapidRespond();
-                if (isProfileView) exitProfileView();
-                if (
-                  document
-                    .getElementById('infoOverlay')
-                    .classList.contains('open')
-                )
+                if (document.getElementById('profileModal').classList.contains('open')) {
+                  closeProfileModal();
+                  e.preventDefault();
+                  return;
+                }
+                if (document.getElementById('conversationModal').classList.contains('open')) {
+                  closeConversation();
+                  e.preventDefault();
+                  return;
+                }
+                if (document.getElementById('bentoOverlay').classList.contains('open')) {
+                  closeBento();
+                  e.preventDefault();
+                  return;
+                }
+                if (document.getElementById('reviewOverlay').classList.contains('open')) {
+                  closeReviewModal();
+                  e.preventDefault();
+                  return;
+                }
+                if (document.getElementById('chipsOverlay').classList.contains('open')) {
+                  document.getElementById('chipsOverlay').classList.remove('open');
+                  document.body.style.overflow = '';
+                  e.preventDefault();
+                  return;
+                }
+                if (document.getElementById('titleCardOverlay').classList.contains('open')) {
+                  closeTitleCardEditor();
+                  e.preventDefault();
+                  return;
+                }
+                if (document.getElementById('activityOverlay').classList.contains('open')) {
+                  closeActivity();
+                  e.preventDefault();
+                  return;
+                }
+                if (document.getElementById('attentionDropdown').classList.contains('open')) {
+                  document.getElementById('attentionDropdown').classList.remove('open');
+                  e.preventDefault();
+                  return;
+                }
+                if (document.getElementById('infoOverlay').classList.contains('open')) {
                   closeInfoOverlay();
+                  e.preventDefault();
+                  return;
+                }
+                if (document.querySelector('.topbar-appearance-dropdown.open')) {
+                  document.querySelector('.topbar-appearance-dropdown.open').classList.remove('open');
+                  e.preventDefault();
+                  return;
+                }
+                if (document.getElementById('rapidRespond').classList.contains('open')) {
+                  closeRapidRespond();
+                  e.preventDefault();
+                  return;
+                }
+                if (isProfileView) {
+                  exitProfileView();
+                  e.preventDefault();
+                  return;
+                }
+              }
+              // Arrow keys for carousel navigation (only when no overlay is open)
+              if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                // Check if any overlay is open
+                const overlays = [
+                  'profileModal', 'conversationModal', 'bentoOverlay',
+                  'reviewOverlay', 'chipsOverlay', 'titleCardOverlay',
+                  'activityOverlay', 'infoOverlay'
+                ];
+                for (const id of overlays) {
+                  if (document.getElementById(id)?.classList.contains('open')) {
+                    return;
+                  }
+                }
+                if (closestSafe(e.target, 'input, textarea, select, button, a, .letter-row, .grid-item, .card')) return;
+                e.preventDefault();
+                if (e.key === 'ArrowLeft') {
+                  activatePanel(activeIndex - 1);
+                } else {
+                  activatePanel(activeIndex + 1);
+                }
               }
             });
 
