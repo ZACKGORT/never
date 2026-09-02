@@ -2222,6 +2222,63 @@
         color: var(--ink-mid);
       }
 
+      /* ── Resume letter ── */
+      .resume-letter {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        padding-top: 4px;
+        max-width: 640px;
+      }
+      .resume-headline {
+        font-family: var(--font);
+        font-size: calc(var(--fs-body) * 1.35);
+        font-weight: 700;
+        letter-spacing: -0.015em;
+        line-height: 1.35;
+        color: var(--ink);
+      }
+      .resume-body {
+        font-family: var(--font);
+        font-size: calc(var(--fs-body) * 1.02);
+        line-height: 1.7;
+        color: var(--ink-mid);
+        white-space: pre-wrap;
+      }
+      .resume-media {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+      }
+      .resume-media-item {
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        aspect-ratio: 4 / 3;
+      }
+      .resume-media-item img,
+      .resume-media-item video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .resume-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .resume-meta {
+        color: var(--ink-light);
+      }
+      .resume-edit-btn {
+        align-self: flex-start;
+      }
+      .empty-letter .resume-edit-btn {
+        margin-top: 12px;
+      }
+
       .load-more-trigger {
         grid-column: 1 / -1;
         display: flex;
@@ -4452,6 +4509,52 @@
       </div>
     </div>
 
+    <!-- ─── RESUME LETTER EDITOR MODAL ─── -->
+    <div class="bento-overlay rollout" id="resumeOverlay">
+      <div class="bento-panel">
+        <div class="bento-header">
+          <h2>Edit resume letter</h2>
+          <button class="close-btn" id="resumeClose">✕</button>
+        </div>
+        <div class="bento-card bento-card-full">
+          <label class="t-micro">Headline</label>
+          <input
+            type="text"
+            id="resume-headline"
+            placeholder="Staff-level product designer, six years freelance."
+          />
+        </div>
+        <div class="bento-card bento-card-full">
+          <label class="t-micro">About</label>
+          <textarea
+            id="resume-body"
+            rows="6"
+            placeholder="The longer version. What you've done, what you're looking for."
+          ></textarea>
+        </div>
+        <div class="bento-card bento-card-full">
+          <label class="t-micro">Media (one image or video URL per line, optional)</label>
+          <textarea
+            id="resume-media"
+            rows="3"
+            placeholder="https://…"
+          ></textarea>
+        </div>
+        <div class="bento-card bento-card-full">
+          <label class="t-micro">Links (one per line, as: Label | https://…)</label>
+          <textarea
+            id="resume-links"
+            rows="2"
+            placeholder="Portfolio | https://…"
+          ></textarea>
+        </div>
+        <div class="bento-actions">
+          <button class="btn ghost" id="resumeClear">Remove resume letter</button>
+          <button class="btn btn-primary" id="resumeSave">Save</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ─── INFO OVERLAY (spiral) ─── -->
     <div class="info-overlay" id="infoOverlay">
       <button
@@ -4472,7 +4575,7 @@
         'use strict';
 
         // ── Constants ─────────────────────────────────────────────
-        const STORAGE_KEY = 'neverever-statements-v10';
+        const STORAGE_KEY = 'neverever-statements-v11';
         const ATTENTION_KEY = 'neverever-attention-v2';
         const CHIPS_KEY = 'neverever-chips-v1';
         const INTERACTIONS_KEY = 'neverever-interactions-v1';
@@ -4647,6 +4750,16 @@
               name: 'Zack Gort',
               role: 'Product / UX Designer',
               tagline: 'Six years freelance.',
+              resumeLetter: {
+                headline:
+                  'Staff-level product designer, six years freelance.',
+                body: "I've spent six years working freelance across fintech, healthtech, and a couple of startups that no longer exist. What I'm good at: taking a vague product problem and getting it to a shippable v1 without losing the point along the way. What I'm looking for now: one team, staff-level scope, and fewer client decks.\n\nRecent work: redesigned onboarding for a Series B fintech (conversion up 22%), built the design system a 40-person product org still uses, ran discovery and shipped v1 for two healthtech products from scratch.",
+                media: [],
+                links: [
+                  { label: 'Portfolio', url: 'https://zackgort.example.com' },
+                ],
+                updatedAt: Date.now() - 3 * 24 * 60 * 60 * 1000,
+              },
             },
             {
               id: 'maya',
@@ -4655,6 +4768,13 @@
               name: 'Maya Chen',
               role: 'Creative Director',
               tagline: 'Ex-agency.',
+              resumeLetter: {
+                headline: "Ex-agency Creative Director, done pitching.",
+                body: "Ten years in agency-land, the last four running creative for accounts most people would recognize. I'm good at the thing agencies are actually for — getting a room of stakeholders to agree on a direction fast — and tired of the thing agencies have become, which is pitching for six weeks to win eight.\n\nI want to build one thing in-house, all the way through, instead of handing off decks. Open to Creative Director or Head of Brand roles at a single company, not another shop.",
+                media: [],
+                links: [],
+                updatedAt: Date.now() - 6 * 24 * 60 * 60 * 1000,
+              },
             },
             {
               id: 'tom',
@@ -4663,6 +4783,16 @@
               name: 'Tom Okafor',
               role: 'ML Engineer',
               tagline: 'Infra and eval.',
+              resumeLetter: {
+                headline:
+                  'ML engineer, infra and eval — I ship models, not papers.',
+                body: "Five years building the unglamorous half of ML: eval pipelines, serving infra, the stuff that determines whether a model actually works in production versus just in a notebook. I've taken two models from research prototype to serving millions of requests a day.\n\nLooking for a team where shipping is the point, not publishing. Comfortable owning eval frameworks end to end, less interested in being the tenth person on a research team.",
+                media: [],
+                links: [
+                  { label: 'GitHub', url: 'https://github.com/example-tom' },
+                ],
+                updatedAt: Date.now() - 1 * 24 * 60 * 60 * 1000,
+              },
             },
             {
               id: 'ria',
@@ -4671,6 +4801,14 @@
               name: 'Ria Patel',
               role: 'Brand Strategist',
               tagline: 'Naming, systems.',
+              resumeLetter: {
+                headline:
+                  'Brand strategist — naming and systems, open to fractional work.',
+                body: "I do the two parts of brand work that actually stick: naming (products, companies, features) and the systems that keep a voice consistent once ten other people are writing in it. Not a logo person — I hand that off to designers I trust.\n\nCurrently taking on fractional clients, 2–3 days a week. Best fit is a company past the 'what do we even call ourselves' stage and into 'we have twelve people writing copy and none of it sounds the same.'",
+                media: [],
+                links: [],
+                updatedAt: Date.now() - 9 * 24 * 60 * 60 * 1000,
+              },
             },
             {
               id: 'dev',
@@ -4970,6 +5108,12 @@
             dara: 'UX Researcher, eight years, mostly qualitative. Looking for a role where research drives decisions, not just decks.',
           };
 
+          // Each entry can carry a `discipline` so the statement only gets
+          // assigned to an author whose background actually matches it —
+          // a backend engineer shouldn't be caught musing about tagline
+          // strategy. Entries with no discipline are open to anyone,
+          // since the sentiment (career, community, leadership) isn't
+          // domain-specific.
           const GENERAL = [
             {
               tag: 'CAREER',
@@ -4992,24 +5136,62 @@
               text: 'Your first ten years should be spent collecting problems, not titles.',
             },
             {
+              tag: 'CAREER',
+              text: "Turned down a promotion this year. Wasn't ready to stop doing the work.",
+            },
+            {
+              tag: 'CAREER',
+              text: "Six months into 'individual contributor, permanently.' No regrets so far.",
+            },
+            {
               tag: 'THOUGHTS',
+              discipline: 'DESIGN',
               text: "Design systems are not about consistency. They're about enabling speed.",
             },
             {
               tag: 'THOUGHTS',
-              text: "Distributed systems are hard because we're trying to make unreliable things reliable.",
-            },
-            {
-              tag: 'THOUGHTS',
+              discipline: 'DESIGN',
               text: 'I care about the details that make products feel human.',
             },
             {
               tag: 'THOUGHTS',
+              discipline: 'DESIGN',
+              text: 'A prototype that lies about performance is worse than no prototype.',
+            },
+            {
+              tag: 'THOUGHTS',
+              discipline: 'DESIGN',
+              text: 'Research nobody reads is just a way of feeling better about a decision you already made.',
+            },
+            {
+              tag: 'THOUGHTS',
+              discipline: 'ENGINEERING',
+              text: "Distributed systems are hard because we're trying to make unreliable things reliable.",
+            },
+            {
+              tag: 'THOUGHTS',
+              discipline: 'ENGINEERING',
               text: "Observability isn't about dashboards. It's about answering questions you didn't know you'd need to ask.",
             },
             {
               tag: 'THOUGHTS',
+              discipline: 'ENGINEERING',
               text: 'Go is the best programming language for infrastructure work.',
+            },
+            {
+              tag: 'THOUGHTS',
+              discipline: 'ENGINEERING',
+              text: "Best systems I've built had failure as first-class concern.",
+            },
+            {
+              tag: 'THOUGHTS',
+              discipline: 'ENGINEERING',
+              text: 'The best code review comment is a question, not a correction.',
+            },
+            {
+              tag: 'THOUGHTS',
+              discipline: 'ENGINEERING',
+              text: 'On-call rotations tell you more about a company than the interview loop does.',
             },
             {
               tag: 'THOUGHTS',
@@ -5017,19 +5199,7 @@
             },
             {
               tag: 'THOUGHTS',
-              text: "Best systems I've built had failure as first-class concern.",
-            },
-            {
-              tag: 'THOUGHTS',
               text: 'Most roadmaps are just a list of things nobody wanted to say no to.',
-            },
-            {
-              tag: 'THOUGHTS',
-              text: 'A prototype that lies about performance is worse than no prototype.',
-            },
-            {
-              tag: 'THOUGHTS',
-              text: 'The best code review comment is a question, not a correction.',
             },
             {
               tag: 'BRAND',
@@ -5048,11 +5218,17 @@
               text: "If your brand voice sounds like everyone else's, it's not a voice, it's a template.",
             },
             {
+              tag: 'BRAND',
+              text: "Naming a product is easy. Naming it something you'll still defend in a trademark dispute is the job.",
+            },
+            {
               tag: 'COMMUNITY',
+              discipline: 'BRAND',
               text: 'Free brand strategy workshop next week. 2 hours, 20 people max.',
             },
             {
               tag: 'COMMUNITY',
+              discipline: 'DESIGN',
               text: 'Portfolio reviews back. Every Friday, 5 portfolios, honest feedback.',
             },
             {
@@ -5065,7 +5241,13 @@
             },
             {
               tag: 'COMMUNITY',
+              discipline: 'DESIGN',
               text: "Open critique night, bring anything you're stuck on. No RSVP needed.",
+            },
+            {
+              tag: 'COMMUNITY',
+              discipline: 'ENGINEERING',
+              text: 'Running a small incident-review reading group. Bring a postmortem, yours or someone else\u2019s.',
             },
             {
               tag: 'LEADERSHIP',
@@ -5087,7 +5269,22 @@
               tag: 'LEADERSHIP',
               text: 'Firing someone well is a skill nobody trains you for and everybody needs.',
             },
+            {
+              tag: 'LEADERSHIP',
+              text: "Promoted someone specifically because they kept telling me things I didn't want to hear.",
+            },
           ];
+
+          // Pick an author whose discipline actually matches the entry,
+          // falling back to the full pool when the entry is discipline-agnostic
+          // or when (in a hand-edited list) nobody happens to match.
+          function authorForGeneral(entry, pool) {
+            if (!entry.discipline) return pool;
+            const matches = pool.filter(
+              (au) => au.discipline === entry.discipline
+            );
+            return matches.length ? matches : pool;
+          }
 
           function push(authorId, tag, text, ageMs, mediaChance) {
             result.push({
@@ -5125,18 +5322,19 @@
           });
 
           for (let i = 0; i < 38; i++) {
-            const a =
-              authorsList[Math.floor(Math.random() * authorsList.length)];
             const g = GENERAL[i % GENERAL.length];
-            push(a.id, g.tag, g.text, Math.random() * 14 * day, 0.4);
+            const pool = authorForGeneral(g, authorsList);
+            const a = pool[Math.floor(Math.random() * pool.length)];
+            push(a.id, g.tag, g.text, Math.random() * 14 * day, 0.2);
           }
 
           // ── active conversations ──────────────────────────────
-          const REPLY_TEXTS = [
+          // Reply pools are keyed to what the parent statement actually is,
+          // so a HIRING post gets applicant-shaped replies instead of a
+          // random "strong disagree" landing on a job listing.
+          const GENERAL_REPLY_TEXTS = [
             'This resonates. We hit the same wall last quarter.',
             "Strong disagree — but I like where your head's at.",
-            'Following up here: what stack are you using?',
-            "Sent you a note — let's talk.",
             'This is the whole thread in one line.',
             "Yes. Everyone who's shipped knows this.",
             'Curious how this holds up at scale though.',
@@ -5149,19 +5347,44 @@
             'This is exactly why I left agency work.',
             'Hard same.',
             'Not sure I agree but I respect the conviction.',
-            'DMing you about this.',
             "This tracks with what we're seeing on our team.",
             'The replies here are better than the post.',
-            'Following.',
             'Would love to hear how this plays out in six months.',
-            "This is a hiring pitch disguised as a thought and it's working on me.",
             'Saved. Sending to my team.',
             'Counterpoint: sometimes the boring answer is just correct.',
             'What changed your mind on this?',
             'This is the take, honestly.',
           ];
+          const JOB_REPLY_TEXTS = [
+            'Applied. This one actually reads like a real team wrote it.',
+            "Is this open to remote outside the US, or is that a hard no?",
+            'Sent a portfolio your way — hope it lands.',
+            "What's the interview loop look like?",
+            'Sharing this with someone who fits perfectly.',
+            'Does the range flex for someone more senior?',
+            'Following the link now.',
+            'Following up here: what stack are you using day to day?',
+            'Congrats on the opening — hope you find someone great.',
+            "Curious whether this is backfill or a new headcount.",
+          ];
+          const SEEKING_REPLY_TEXTS = [
+            "Sent you a note — let's talk.",
+            "We're hiring for something adjacent, would love to connect.",
+            'Following. If anything opens on our side I\u2019ll flag it.',
+            'Your work speaks for itself, good luck out there.',
+            'DMing you — might have something.',
+            'Wish you were on my team already.',
+            'What does your ideal next role actually look like?',
+            "This is a hiring pitch disguised as a thought and it's working on me.",
+          ];
 
-          function makeNestedReplies(parentTime, depth, excludeId) {
+          function replyPoolForTag(tag) {
+            if (tag === 'HIRING') return JOB_REPLY_TEXTS;
+            if (tag === 'OPEN TO WORK') return SEEKING_REPLY_TEXTS;
+            return GENERAL_REPLY_TEXTS;
+          }
+
+          function makeNestedReplies(parentTime, depth, excludeId, pool) {
             if (depth > 2) return [];
             const chance = depth === 1 ? 0.45 : 0.2;
             if (Math.random() > chance) return [];
@@ -5172,15 +5395,19 @@
               now,
               parentTime + hour * (1 + Math.random() * 20)
             );
+            // Nested replies drift toward general conversation regardless of
+            // the root's tag — a thread about a job post can wander once
+            // it's a few layers deep, same as a real comment section.
+            const nestedPool = depth === 1 ? pool : GENERAL_REPLY_TEXTS;
             return [
               {
                 id: uid(),
                 authorId: author.id,
                 time: t,
-                text: REPLY_TEXTS[
-                  Math.floor(Math.random() * REPLY_TEXTS.length)
+                text: nestedPool[
+                  Math.floor(Math.random() * nestedPool.length)
                 ],
-                replies: makeNestedReplies(t, depth + 1, author.id),
+                replies: makeNestedReplies(t, depth + 1, author.id, pool),
               },
             ];
           }
@@ -5193,7 +5420,7 @@
             return 11 + Math.floor(Math.random() * 8);
           }
 
-          function makeTopLevelReplies(parentTime, excludeId) {
+          function makeTopLevelReplies(parentTime, excludeId, pool) {
             const n = pickReplyCount();
             const out = [];
             let cursor = parentTime;
@@ -5209,17 +5436,19 @@
                 id: uid(),
                 authorId: author.id,
                 time: cursor,
-                text: REPLY_TEXTS[
-                  Math.floor(Math.random() * REPLY_TEXTS.length)
-                ],
-                replies: makeNestedReplies(cursor, 1, author.id),
+                text: pool[Math.floor(Math.random() * pool.length)],
+                replies: makeNestedReplies(cursor, 1, author.id, pool),
               });
             }
             return out;
           }
 
           result.forEach((s) => {
-            s.replies = makeTopLevelReplies(s.time, s.authorId);
+            s.replies = makeTopLevelReplies(
+              s.time,
+              s.authorId,
+              replyPoolForTag(s.tag)
+            );
           });
 
           return result;
@@ -5269,6 +5498,7 @@
 
         // ── Rapid Respond State ──────────────────────────────────
         let rapidTarget = null;
+        let resumeEditTargetId = null;
         let composerPreviewVariant = 'card-white';
 
         // ── Interactions ──────────────────────────────────────────
@@ -6777,6 +7007,21 @@
             });
           }
 
+          // Resume letter, when present, is the front door: pin it as
+          // LETTER 01, ahead of the person's ongoing statements. Companies
+          // don't get this yet — resumeLetter is only ever set on persons,
+          // but the kind check here keeps that explicit rather than implicit.
+          if (user.kind === 'person') {
+            letterData.unshift({
+              title: 'Resume',
+              deck: user.resumeLetter
+                ? user.resumeLetter.headline
+                : `${user.name} hasn't written a resume letter yet.`,
+              isResume: true,
+              profileUserId: userId,
+            });
+          }
+
           activeIndex = 0;
           renderTrack();
           updateProgressBar();
@@ -6791,6 +7036,7 @@
           document.getElementById('bentoOverlay').classList.remove('open');
           document.getElementById('reviewOverlay').classList.remove('open');
           document.getElementById('chipsOverlay').classList.remove('open');
+          document.getElementById('resumeOverlay').classList.remove('open');
           document.getElementById('conversationModal').classList.remove('open');
           document.getElementById('profileModal').classList.remove('open');
           closeRapidRespond();
@@ -7121,6 +7367,170 @@
           return item;
         }
 
+        // ── Resume letter renderer (persons only, for now) ────────────
+        function renderResumeMedia(media) {
+          if (!media || !media.length) return '';
+          return `<div class="resume-media">${media
+            .map((url) => {
+              const tag = isVideo(url) ? 'video' : 'img';
+              const attrs = isVideo(url)
+                ? 'controls playsinline muted'
+                : 'alt=""';
+              return `<div class="resume-media-item"><${tag} src="${escapeHtml(
+                url
+              )}" ${attrs} loading="lazy" /></div>`;
+            })
+            .join('')}</div>`;
+        }
+
+        function renderResumeLinks(links) {
+          if (!links || !links.length) return '';
+          return `<div class="resume-links">${links
+            .map(
+              (l) =>
+                `<a class="btn ghost small" href="${escapeHtml(
+                  l.url
+                )}" target="_blank" rel="noopener noreferrer">${escapeHtml(
+                  l.label || l.url
+                )}</a>`
+            )
+            .join('')}</div>`;
+        }
+
+        function buildResumeLetter(userId) {
+          const user = authorById(userId);
+          const container = document.createElement('div');
+          container.className = 'resume-letter';
+
+          if (!user || !user.resumeLetter) {
+            container.innerHTML = `
+                    <div class="empty-letter">
+                      <div class="t-micro">NO RESUME YET</div>
+                      <p>${
+                        user ? escapeHtml(user.name) : 'This person'
+                      } hasn't written a resume letter.</p>
+                      <button class="btn btn-primary small resume-edit-btn" data-author-id="${userId}">+ Write resume letter</button>
+                    </div>
+                `;
+          } else {
+            const r = user.resumeLetter;
+            container.innerHTML = `
+                    <div class="resume-headline">${escapeHtml(
+                      r.headline || ''
+                    )}</div>
+                    <div class="resume-body">${escapeHtml(r.body || '')}</div>
+                    ${renderResumeMedia(r.media)}
+                    ${renderResumeLinks(r.links)}
+                    <div class="resume-meta t-micro">${
+                      r.updatedAt ? 'Updated ' + fmtTime(r.updatedAt) : ''
+                    }</div>
+                    <button class="btn ghost small resume-edit-btn" data-author-id="${userId}">✎ Edit resume</button>
+                `;
+          }
+
+          const editBtn = container.querySelector('.resume-edit-btn');
+          if (editBtn) {
+            editBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openResumeEditor(userId);
+            });
+          }
+
+          return container;
+        }
+
+        function openResumeEditor(userId) {
+          const user = authorById(userId);
+          if (!user || user.kind !== 'person') return;
+          resumeEditTargetId = userId;
+          const r = user.resumeLetter;
+
+          document.getElementById('resume-headline').value = r
+            ? r.headline || ''
+            : '';
+          document.getElementById('resume-body').value = r ? r.body || '' : '';
+          document.getElementById('resume-media').value =
+            r && r.media ? r.media.join('\n') : '';
+          document.getElementById('resume-links').value =
+            r && r.links
+              ? r.links.map((l) => `${l.label || ''} | ${l.url}`).join('\n')
+              : '';
+
+          const overlay = document.getElementById('resumeOverlay');
+          positionRolloutPanel(
+            'resumeOverlay',
+            document.querySelector('.resume-edit-btn') ||
+              document.getElementById('logoTile')
+          );
+          overlay.classList.add('open');
+          document.body.style.overflow = 'hidden';
+          document.getElementById('resume-headline').focus();
+        }
+
+        function closeResumeEditor() {
+          document.getElementById('resumeOverlay').classList.remove('open');
+          document.body.style.overflow = '';
+          resumeEditTargetId = null;
+        }
+
+        function parseResumeLinks(raw) {
+          return raw
+            .split('\n')
+            .map((line) => line.trim())
+            .filter(Boolean)
+            .map((line) => {
+              const [label, ...rest] = line.split('|');
+              const url = rest.join('|').trim();
+              return url
+                ? { label: label.trim() || url, url }
+                : { label: label.trim(), url: label.trim() };
+            })
+            .filter((l) => l.url);
+        }
+
+        function saveResumeLetter() {
+          if (!resumeEditTargetId) return;
+          const user = authorById(resumeEditTargetId);
+          if (!user) return;
+
+          const headline = document
+            .getElementById('resume-headline')
+            .value.trim();
+          const body = document.getElementById('resume-body').value.trim();
+          const media = document
+            .getElementById('resume-media')
+            .value.split('\n')
+            .map((s) => s.trim())
+            .filter(Boolean);
+          const links = parseResumeLinks(
+            document.getElementById('resume-links').value
+          );
+
+          if (!headline && !body) {
+            user.resumeLetter = null;
+          } else {
+            user.resumeLetter = { headline, body, media, links, updatedAt: Date.now() };
+          }
+
+          saveData();
+          closeResumeEditor();
+          if (isProfileView && profileUserId === resumeEditTargetId) {
+            enterProfileView(profileUserId);
+          }
+        }
+
+        function clearResumeLetter() {
+          if (!resumeEditTargetId) return;
+          if (!confirm('Remove this resume letter?')) return;
+          const user = authorById(resumeEditTargetId);
+          if (user) user.resumeLetter = null;
+          saveData();
+          closeResumeEditor();
+          if (isProfileView && profileUserId === resumeEditTargetId) {
+            enterProfileView(profileUserId);
+          }
+        }
+
         // ── Profile thread letter renderer ────────────────────────
         function buildProfileThreadLetter(statementId) {
           const s = statements.find((st) => st.id === statementId);
@@ -7348,13 +7758,26 @@
               if (user && deck) {
                 deck.textContent = `${user.name} · ${user.role || ''}`;
               }
+            } else if (data.isResume && data.profileUserId) {
+              const user = authorById(data.profileUserId);
+              if (user && deck) {
+                deck.textContent = user.resumeLetter
+                  ? user.resumeLetter.headline
+                  : `${user.name} hasn't written a resume letter yet.`;
+              }
             }
           }
 
           const toolbar = frame.querySelector('.letter-toolbar');
           const countEl = toolbar?.querySelector('.letter-count');
           if (countEl) {
-            if (data.isProfile && data.statementIds) {
+            if (data.isResume && data.profileUserId) {
+              const user = authorById(data.profileUserId);
+              const updatedAt = user?.resumeLetter?.updatedAt;
+              countEl.textContent = updatedAt
+                ? 'Updated ' + fmtTime(updatedAt)
+                : 'Not written yet';
+            } else if (data.isProfile && data.statementIds) {
               countEl.textContent =
                 data.statementIds.length +
                 ' statement' +
@@ -7373,7 +7796,10 @@
           const content = document.createElement('div');
           content.className = 'letter-content';
 
-          if (data.isProfile && data.statementIds) {
+          if (data.isResume && data.profileUserId) {
+            content.appendChild(buildResumeLetter(data.profileUserId));
+            panel.dataset.archive = 'false';
+          } else if (data.isProfile && data.statementIds) {
             const container = document.createElement('div');
             container.className = 'letter-profile-container';
 
@@ -7609,7 +8035,7 @@
           const toolbar = document.createElement('div');
           toolbar.className = 'letter-toolbar';
 
-          if (!data.isProfile) {
+          if (!data.isProfile && !data.isResume) {
             const toggle = document.createElement('div');
             toggle.className = 'view-toggle';
             ['list', 'grid', 'bento'].forEach((m) => {
@@ -8444,6 +8870,17 @@
             },
             {
               num: '15',
+              title: 'What this actually is',
+              density: 'medium',
+              lines: [
+                'Right now: one person, wiring up statements to see if the shape works.',
+                "Polish isn't the next test. Five to ten real people, real names, is.",
+                'Does anyone come back a second day? That\u2019s the honest question.',
+                "If it stays a one-person artifact, that's still a legitimate thing to have made.",
+              ],
+            },
+            {
+              num: '16',
               title: 'The signature',
               density: 'sparse',
               lines: ['Statements — as signatures'],
@@ -9577,6 +10014,21 @@
                   renderChipsUI();
                 }
               });
+
+            document
+              .getElementById('resumeClose')
+              .addEventListener('click', closeResumeEditor);
+            document
+              .getElementById('resumeOverlay')
+              .addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeResumeEditor();
+              });
+            document
+              .getElementById('resumeSave')
+              .addEventListener('click', saveResumeLetter);
+            document
+              .getElementById('resumeClear')
+              .addEventListener('click', clearResumeLetter);
             document
               .getElementById('chipAddInput')
               .addEventListener('keydown', (e) => {
