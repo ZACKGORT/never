@@ -816,6 +816,13 @@
         cursor: grab;
         user-select: none;
         box-sizing: border-box;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .letters-track::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
       }
       .letters-track.dragging {
         cursor: grabbing;
@@ -1804,7 +1811,7 @@
       /* ── SCROLL PROGRESS BAR ── */
       .scroll-progress-bar {
         position: fixed;
-        bottom: 0;
+        top: 0;
         left: 0;
         width: 100%;
         height: var(--scrollbar-height);
@@ -2957,6 +2964,12 @@
       }
       .profile-modal.open .profile-card {
         transform: scale(1);
+      }
+      /* Keep the attention icon visible above the profile modal's blur
+         instead of getting buried under it — the topbar is its nearest
+         stacking context, so we lift the whole bar while the modal is open. */
+      body:has(.profile-modal.open) .topbar {
+        z-index: 410;
       }
       .profile-card-close {
         position: absolute;
@@ -6173,6 +6186,7 @@
             viewBtn.addEventListener('click', (e) => {
               e.stopPropagation();
               closeProfileModal();
+              closeConversation();
               enterProfileView(objectId);
             });
           }
@@ -7569,6 +7583,7 @@
             toggleThoughtsView();
           } else {
             initMainLetterData();
+            activeIndex = 0;
             renderTrack();
           }
           updateProfileBadge();
@@ -8586,7 +8601,7 @@
           letterData.forEach((data, i) =>
             track.appendChild(buildLetterPanel(i, data))
           );
-          renderLetter(0);
+          letterData.forEach((_, i) => renderLetter(i));
           updateProgressBar();
           updateProfileBadge();
           // If thoughts view, render the thoughts letter after track is built
