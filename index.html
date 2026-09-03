@@ -7416,16 +7416,17 @@
 
         // ── Profile View ──────────────────────────────────────────
         function setProfileViewMode(mode) {
-          if (mode !== 'original' && mode !== 'responded') return;
-          profileViewMode = mode;
-          rebuildProfileLetters();
-          renderTrack();
-          // Activate the index card (index 1) after re-render
-          const indexPos = letterData.findIndex((d) => d.isIndex);
-          if (indexPos >= 0) {
-            activatePanel(indexPos);
-          }
-        }
+  // Ignore any mode other than 'original'
+  if (mode !== 'original') return;
+  // The rest of the function stays the same
+  profileViewMode = 'original';
+  rebuildProfileLetters();
+  renderTrack();
+  const indexPos = letterData.findIndex((d) => d.isIndex);
+  if (indexPos >= 0) {
+    activatePanel(indexPos);
+  }
+}
 
         function rebuildProfileLetters() {
           const user = authorById(profileUserId);
@@ -7930,7 +7931,7 @@
           const toggleResponded = document.createElement('button');
           toggleResponded.className = `toggle-btn${mode === 'responded' ? ' active' : ''}`;
           toggleResponded.textContent = 'Responded';
-          toggleResponded.addEventListener('click', (e) => {
+          toggleResponded.addEventListener('none', (e) => {
             e.stopPropagation();
             setProfileViewMode('responded');
           });
