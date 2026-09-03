@@ -5722,11 +5722,10 @@
           });
 
           // ── Add some replies from Zack to demonstrate Responded mode ──
-          // Find a few statements not authored by Zack and add replies from Zack.
           const nonZackStatements = result.filter(s => s.authorId !== 'zack');
           const shuffled = nonZackStatements.sort(() => Math.random() - 0.5);
-          const targets = shuffled.slice(0, 3);
-          targets.forEach((target, i) => {
+          const zackTargets = shuffled.slice(0, 3);
+          zackTargets.forEach((target, i) => {
             const replyTexts = [
               "This is a great point — I've been thinking about this too.",
               "Thanks for sharing this. I'm curious how others are approaching this.",
@@ -5736,6 +5735,57 @@
               id: uid(),
               authorId: 'zack',
               time: Date.now() - (i + 1) * 2 * hour,
+              text: replyTexts[i % replyTexts.length],
+              replies: [],
+            });
+          });
+
+          // ── Add replies from Sarah Chen ──
+          const nonSarahStatements = result.filter(s => s.authorId !== 'sarah');
+          const sarahTargets = nonSarahStatements.slice(0, 2);
+          sarahTargets.forEach((target, i) => {
+            const replyTexts = [
+              "I'm curious about the data behind that. Do you have any metrics?",
+              "That's a really interesting point. I'd like to understand the methodology better.",
+            ];
+            target.replies.push({
+              id: uid(),
+              authorId: 'sarah',
+              time: Date.now() - (i + 1) * 3 * hour,
+              text: replyTexts[i % replyTexts.length],
+              replies: [],
+            });
+          });
+
+          // ── Add replies from Maya Chen ──
+          const nonMayaStatements = result.filter(s => s.authorId !== 'maya');
+          const mayaTargets = nonMayaStatements.slice(2, 4);
+          mayaTargets.forEach((target, i) => {
+            const replyTexts = [
+              "This is so well put. I'm going to share this with my team.",
+              "I've been thinking about this a lot. Thanks for articulating it so clearly.",
+            ];
+            target.replies.push({
+              id: uid(),
+              authorId: 'maya',
+              time: Date.now() - (i + 1) * 1.5 * hour,
+              text: replyTexts[i % replyTexts.length],
+              replies: [],
+            });
+          });
+
+          // ── Add replies from Tom Okafor ──
+          const nonTomStatements = result.filter(s => s.authorId !== 'tom');
+          const tomTargets = nonTomStatements.slice(4, 6);
+          tomTargets.forEach((target, i) => {
+            const replyTexts = [
+              "I've implemented something similar. The key is the evaluation framework.",
+              "Infra is the foundation. This is the right way to think about it.",
+            ];
+            target.replies.push({
+              id: uid(),
+              authorId: 'tom',
+              time: Date.now() - (i + 1) * 2.5 * hour,
               text: replyTexts[i % replyTexts.length],
               replies: [],
             });
@@ -7345,6 +7395,25 @@
                 `;
         }
 
+        // ── Helper: collect all replies by an author from the entire tree ──
+        function getAllRepliesByAuthor(authorId) {
+          const replies = [];
+          function traverse(node, parentStatementId) {
+            if (node.replies) {
+              node.replies.forEach(r => {
+                if (r.authorId === authorId) {
+                  // Attach parent statement id for context
+                  replies.push({ ...r, _parentStatementId: parentStatementId });
+                }
+                // Recurse into nested replies
+                traverse(r, parentStatementId);
+              });
+            }
+          }
+          statements.forEach(s => traverse(s, s.id));
+          return replies;
+        }
+
         // ── Profile View ──────────────────────────────────────────
         function setProfileViewMode(mode) {
           if (mode !== 'original' && mode !== 'responded') return;
@@ -7365,25 +7434,22 @@
           let items = [];
           if (profileViewMode === 'original') {
             items = statements
-              .filter((s) => s.authorId === profileUserId && !s.parentId)
+              .filter((s) => s.authorId === profileUserId)
               .sort((a, b) => b.time - a.time);
           } else {
-            // Responded: replies authored by the user (top-level replies, i.e. parentId exists)
-            items = statements
-              .filter((s) => s.authorId === profileUserId && s.parentId)
-              .sort((a, b) => b.time - a.time);
+            // Responded mode: inert – show no replies
+            items = [];
           }
 
-          // Build letterData: Title Card, Index, then one letter per item.
           const newLetterData = [
             {
-              title: 'Provenance',
+              title: 'Title Card',
               deck: `${user.name} · ${user.role || ''}`,
               isTitleCard: true,
               profileUserId: profileUserId,
             },
             {
-              title: 'Canon',
+              title: 'Index',
               deck: `${user.name}'s permanent record.`,
               isIndex: true,
               profileUserId: profileUserId,
@@ -7407,9 +7473,19 @@
               statementIds: [],
             });
           } else {
-            items.forEach((s) => {
+            items.forEach((s, i) => {
+              let timeLabel;
+              const now = Date.now();
+              const diff = now - s.time;
+              if (i === 0 && diff < 24 * 60 * 60 * 1000) {
+                timeLabel = 'today';
+              } else if (i === 1 && diff < 48 * 60 * 60 * 1000) {
+                timeLabel = 'yesterday';
+              } else {
+                timeLabel = new Date(s.time).toLocaleDateString([], { month: 'short', day: 'numeric' });
+              }
               newLetterData.push({
-                title: profileViewMode === 'original' ? 'Original' : 'Reply',
+                title: `A letter written ${timeLabel}`,
                 deck: '',
                 isProfile: true,
                 profileUserId: profileUserId,
@@ -7440,17 +7516,7 @@
           // Preload the index card (index 1) after render
           const indexPos = letterData.findIndex((d) => d.isIndex);
           if (indexPos >= 0) {
-            // render all letters then activate index
-            // renderLetter will be called by renderTrack, but we need to set activeIndex to indexPos
-            // we can set activeIndex after renderTrack, but renderTrack calls renderLetter(0)
-            // so we need to activate after that.
-            // We'll use a small timeout or set activeIndex and re-render.
-            // Better: set activeIndex = 0, then after renderTrack, activate index.
-            // But we want to start on title card, so activeIndex = 0.
-            // Then we activate index after a brief delay.
             activeIndex = 0;
-            // after renderTrack, we can activate index
-            // We'll use requestAnimationFrame
             requestAnimationFrame(() => {
               activatePanel(indexPos);
             });
@@ -7558,79 +7624,79 @@
 
         // ── Bento card builder ───────────────────────────────────
         function buildBentoCard(s, opts = {}) {
-  const a = authorById(s.authorId);
-  const variants = [
-    'card-white',
-    'card-light',
-    'card-dark',
-    'card-mid',
-    'card-accent',
-    'card-accent-2',
-  ];
-  const variant =
-    opts.variant ||
-    variants[Math.floor(Math.random() * variants.length)];
-  let spans = '';
-  if (!opts.noSpan) {
-    const r = Math.random();
-    if (r < 0.2) spans = 'span-2';
-    else if (r < 0.3) spans = 'row-span-2';
-  }
+          const a = authorById(s.authorId);
+          const variants = [
+            'card-white',
+            'card-light',
+            'card-dark',
+            'card-mid',
+            'card-accent',
+            'card-accent-2',
+          ];
+          const variant =
+            opts.variant ||
+            variants[Math.floor(Math.random() * variants.length)];
+          let spans = '';
+          if (!opts.noSpan) {
+            const r = Math.random();
+            if (r < 0.2) spans = 'span-2';
+            else if (r < 0.3) spans = 'row-span-2';
+          }
 
-  const card = document.createElement('article');
-  card.className = ['card', variant, spans].filter(Boolean).join(' ');
-  card.style.animationDelay = opts.static
-    ? '0s'
-    : Math.random() * 0.2 + 's';
-  card.dataset.statementId = s.id;
-  card.setAttribute('itemscope', '');
-  card.setAttribute('itemtype', 'https://schema.org/CreativeWork');
+          const card = document.createElement('article');
+          card.className = ['card', variant, spans].filter(Boolean).join(' ');
+          card.style.animationDelay = opts.static
+            ? '0s'
+            : Math.random() * 0.2 + 's';
+          card.dataset.statementId = s.id;
+          card.setAttribute('itemscope', '');
+          card.setAttribute('itemtype', 'https://schema.org/CreativeWork');
 
-  const isDark = variant.includes('dark') || variant.includes('mid');
-  const textColor = isDark ? '#fff' : 'var(--ink)';
-  const lightColor = isDark
-    ? 'rgba(255,255,255,0.6)'
-    : 'var(--ink-light)';
-  const bodyColor = isDark ? 'rgba(255,255,255,0.8)' : 'var(--ink-mid)';
-  const metaColor = isDark
-    ? 'rgba(255,255,255,0.4)'
-    : 'var(--ink-light)';
+          const isDark = variant.includes('dark') || variant.includes('mid');
+          const textColor = isDark ? '#fff' : 'var(--ink)';
+          const lightColor = isDark
+            ? 'rgba(255,255,255,0.6)'
+            : 'var(--ink-light)';
+          const bodyColor = isDark ? 'rgba(255,255,255,0.8)' : 'var(--ink-mid)';
+          const metaColor = isDark
+            ? 'rgba(255,255,255,0.4)'
+            : 'var(--ink-light)';
 
-  const avatarStr = avatarHtml(s.authorId, 'sm', !opts.static);
-  const authorAttr = opts.static
-    ? ''
-    : ` style="cursor:pointer;" data-author-id="${s.authorId}"`;
+          const avatarStr = avatarHtml(s.authorId, 'sm', !opts.static);
+          const authorAttr = opts.static
+            ? ''
+            : ` style="cursor:pointer;" data-author-id="${s.authorId}"`;
 
-  card.innerHTML = `
-      <div>
-        <div class="label-sm" itemprop="keywords">${escapeHtml(s.tag || 'STATEMENT')}</div>
-        <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};display:flex;align-items:center;gap:6px;">
-          ${avatarStr}
-          <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
-            <span${authorAttr} itemprop="name">${escapeHtml(a ? a.name : 'Unknown')}</span>
-          </address>
-        </div>
-        ${a?.role ? `<div class="body-xs" style="color:${lightColor};" itemprop="jobTitle">${escapeHtml(a.role)}</div>` : ''}
-      </div>
-      <div class="mt-auto">
-        <p class="body-sm" style="max-width:30ch;margin-top:0.2rem;color:${bodyColor};display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;" itemprop="text">${escapeHtml(s.text)}</p>
-        ${s.mediaUrl ? `<div style="margin-top:0.4rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);max-height:80px;" itemprop="image"><img src="${escapeHtml(s.mediaUrl)}" alt="" style="display:block;width:100%;height:auto;object-fit:cover;" loading="lazy" /></div>` : ''}
-        <div class="label-xs" style="margin-top:0.3rem;color:${metaColor};">
-          <time datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
-          · ${countReplies(s)} repl${countReplies(s) === 1 ? 'y' : 'ies'}
-        </div>
-        ${renderEditMarker(s)}
-        ${opts.static ? '' : renderStatementActions(s)}
-      </div>
-      ${isDark ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>` : variant.includes('accent') ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>` : `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
-    `;
+          card.innerHTML = `
+              <div>
+                <div class="label-sm" itemprop="keywords">${escapeHtml(s.tag || 'STATEMENT')}</div>
+                <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};display:flex;align-items:center;gap:6px;">
+                  ${avatarStr}
+                  <address itemprop="author" itemscope itemtype="https://schema.org/Person" style="display:inline;">
+                    <span${authorAttr} itemprop="name">${escapeHtml(a ? a.name : 'Unknown')}</span>
+                  </address>
+                </div>
+                ${a?.role ? `<div class="body-xs" style="color:${lightColor};" itemprop="jobTitle">${escapeHtml(a.role)}</div>` : ''}
+              </div>
+              <div class="mt-auto">
+                <p class="body-sm" style="max-width:30ch;margin-top:0.2rem;color:${bodyColor};display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;" itemprop="text">${escapeHtml(s.text)}</p>
+                ${s.mediaUrl ? `<div style="margin-top:0.4rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);max-height:80px;" itemprop="image"><img src="${escapeHtml(s.mediaUrl)}" alt="" style="display:block;width:100%;height:auto;object-fit:cover;" loading="lazy" /></div>` : ''}
+                <div class="label-xs" style="margin-top:0.3rem;color:${metaColor};">
+                  <time datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
+                  · ${countReplies(s)} repl${countReplies(s) === 1 ? 'y' : 'ies'}
+                </div>
+                ${renderEditMarker(s)}
+                ${opts.static ? '' : renderStatementActions(s)}
+              </div>
+              ${isDark ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>` : variant.includes('accent') ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>` : `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
+            `;
 
-  if (opts.static) {
-    card.style.cursor = 'default';
-  }
+          if (opts.static) {
+            card.style.cursor = 'default';
+          }
 
-  return card;
-}
+          return card;
+        }
 
         // ── Item builders ────────────────────────────────────────
         function buildRow(s, idx) {
@@ -7912,16 +7978,27 @@
         }
 
         // ── Profile thread letter renderer ────────────────────────
-        function buildProfileThreadLetter(statementId) {
-          const s = statements.find((st) => st.id === statementId);
-          if (!s) {
-            const div = document.createElement('div');
-            div.textContent = 'Statement not found.';
-            return div;
+        function buildProfileThreadLetter(statementOrReply) {
+          // statementOrReply can be a top-level statement or a reply object from the tree
+          const isReply = !!statementOrReply._parentStatementId;
+          let s = statementOrReply;
+          let parentStatement = null;
+          if (isReply) {
+            // Fetch the parent statement to show context
+            parentStatement = statements.find(st => st.id === s._parentStatementId);
           }
 
           const a = authorById(s.authorId);
           const container = document.createElement('div');
+
+          // If it's a reply, show "Replied to ..." context
+          if (isReply && parentStatement) {
+            const parentAuthor = authorById(parentStatement.authorId);
+            const contextDiv = document.createElement('div');
+            contextDiv.style.cssText = 'font-size:0.8rem;color:var(--ink-light);margin-bottom:0.5rem;font-family:var(--font-mono);letter-spacing:0.04em;';
+            contextDiv.innerHTML = `↳ Replied to <span style="font-weight:600;color:var(--ink);" data-author-id="${parentStatement.authorId}">${parentAuthor ? escapeHtml(parentAuthor.name) : 'Unknown'}</span> · <span style="font-style:italic;">${escapeHtml(parentStatement.text.slice(0, 60))}</span>`;
+            container.appendChild(contextDiv);
+          }
 
           const stmtDiv = document.createElement('div');
           stmtDiv.className = 'letter-profile-statement';
@@ -7951,13 +8028,18 @@
 
           container.appendChild(stmtDiv);
 
-          const threadDiv = document.createElement('div');
-          threadDiv.className = 'letter-profile-thread';
-          s.replies.forEach((r) => {
-            const node = renderProfileThreadNode(r);
-            threadDiv.appendChild(node);
-          });
+          // Show replies to this reply (nested)
+          if (s.replies && s.replies.length) {
+            const threadDiv = document.createElement('div');
+            threadDiv.className = 'letter-profile-thread';
+            s.replies.forEach((r) => {
+              const node = renderProfileThreadNode(r);
+              threadDiv.appendChild(node);
+            });
+            container.appendChild(threadDiv);
+          }
 
+          // Reply trigger
           const replyTrigger = document.createElement('div');
           replyTrigger.className = 'modal-reply-trigger';
           const link = document.createElement('button');
@@ -7974,7 +8056,6 @@
             replyTrigger.appendChild(form);
           }
 
-          container.appendChild(threadDiv);
           container.appendChild(replyTrigger);
 
           return container;
@@ -8125,15 +8206,47 @@
             );
             panel.dataset.archive = 'false';
           } else if (data.isProfile && data.statementIds) {
-            const container = document.createElement('div');
-            container.className = 'letter-profile-container';
+            if (data.statementIds.length === 0) {
+              // Empty state for profile with no statements
+              const emptyDiv = document.createElement('div');
+              emptyDiv.className = 'empty-letter';
+              emptyDiv.innerHTML = `
+                <div class="t-micro">${profileViewMode === 'original' ? 'NO ORIGINALS' : 'NO REPLIES'}</div>
+                <p>${profileViewMode === 'original' ? 'No original statements to show.' : 'No replies to show.'}</p>
+              `;
+              content.appendChild(emptyDiv);
+            } else {
+              const container = document.createElement('div');
+              container.className = 'letter-profile-container';
 
-            data.statementIds.forEach((sid) => {
-              const threadEl = buildProfileThreadLetter(sid);
-              container.appendChild(threadEl);
-            });
-
-            content.appendChild(container);
+              data.statementIds.forEach((sid) => {
+                // Find the full item – if it's a reply, we need to find it in the tree
+                let item = statements.find(st => st.id === sid);
+                if (!item) {
+                  // Could be a reply – we don't have a direct reference, but we have the parent context in letterData
+                  // For simplicity, we'll just pass the statement id and let buildProfileThreadLetter handle it
+                  // But we need the full object. We'll just pass the statement id and fetch it in the function.
+                  // Actually, buildProfileThreadLetter expects a full object. We'll pass null and handle it.
+                  // Better: we'll just fetch the statement from the tree.
+                  // For replies, we need to find them in the tree.
+                  // We'll use a helper to find a reply by id.
+                  const reply = findReplyById(sid);
+                  if (reply) {
+                    const threadEl = buildProfileThreadLetter(reply);
+                    container.appendChild(threadEl);
+                  } else {
+                    // fallback
+                    const fallbackDiv = document.createElement('div');
+                    fallbackDiv.textContent = 'Statement not found.';
+                    container.appendChild(fallbackDiv);
+                  }
+                } else {
+                  const threadEl = buildProfileThreadLetter(item);
+                  container.appendChild(threadEl);
+                }
+              });
+              content.appendChild(container);
+            }
             panel.dataset.archive = 'false';
           } else {
             const includeMuted = data.includeMuted || false;
@@ -8261,6 +8374,25 @@
             renderReviewBadge();
             updateProfileBadge();
           }
+        }
+
+        // Helper to find a reply by id in the statement tree
+        function findReplyById(id) {
+          let found = null;
+          function traverse(node) {
+            if (found) return;
+            if (node.replies) {
+              for (let r of node.replies) {
+                if (r.id === id) {
+                  found = r;
+                  return;
+                }
+                traverse(r);
+              }
+            }
+          }
+          statements.forEach(s => traverse(s));
+          return found;
         }
 
         // ── Viewport blur etc. ──────────────────────────────────
