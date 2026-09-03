@@ -453,6 +453,28 @@
       .logo-card-home {
         width: 100%;
       }
+      .logo-card-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .logo-card-actions .btn {
+        width: auto;
+        flex: 1;
+      }
+      .logo-card-info {
+        background: #E5E567;
+        border-color: #E5E567;
+        color: #1C1C1E;
+        border-radius: 999px;
+      }
+      .logo-card-info:hover {
+        background: #F5F557;
+        border-color: #F5F557;
+        color: #1C1C1E;
+      }
+      .logo-card-home {
+        border-radius: 999px;
+      }
 
       .topbar-right {
         display: flex;
@@ -3815,14 +3837,7 @@
       body.profile-view .hud-top .hud-profile-nav {
         display: flex;
       }
-      .hud-profile-nav .btn {
-        min-height: var(--hud-btn-min-h);
-        padding: 4px 8px;
-        font-size: var(--hud-btn-fs);
-        border-radius: var(--radius-sm);
-        font-family: var(--font-mono);
-        letter-spacing: 0.04em;
-      }
+
 
       /* ── INFO OVERLAY (spiral) ──────────────────────────────────────────── */
       .info-overlay {
@@ -4336,17 +4351,27 @@
               likes to chase — just what's true right now, in your own words, in
               public.
             </p>
-            <button
-              class="btn small logo-card-home"
-              id="logoReset"
-              type="button"
-            >
-              ↺ Reset demo
-            </button>
+            <div class="logo-card-actions">
+              <button
+                class="btn small logo-card-info"
+                id="infoToggleBtn"
+                type="button"
+                title="About this place"
+              >
+                ⓘ Info
+              </button>
+              <button
+                class="btn small logo-card-home"
+                id="logoReset"
+                type="button"
+              >
+                ↺ Reset demo
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Right: appearance, reviews, chips, info, attention -->
+        <!-- Right: appearance, reviews, chips, attention -->
         <div class="topbar-right">
 
 
@@ -4372,11 +4397,6 @@
           <!-- Chips -->
           <button class="btn" id="chipsToggleBtn" title="Manage chips">
             ⌨
-          </button>
-
-          <!-- Info (spiral) -->
-          <button class="btn" id="infoToggleBtn" title="About this place">
-            ⓘ
           </button>
 
           <!-- Attention (with wink eye) -->
@@ -4451,16 +4471,17 @@
       >
         ›
       </button>
+            <!-- Profile navigation buttons (hidden by default) -->
+            <div class="hud-profile-nav">
+              <button class="btn" id="hudTitleCardBtn" title="Title Card">Title Card</button>
+              <button class="btn" id="hudIndexBtn" title="Index Card">Index Card</button>
+            </div>
       <div class="hud-divider"></div>
       <span class="hud-label">View</span>
       <button class="btn active" id="hudViewList">List</button>
       <button class="btn" id="hudViewGrid">Grid</button>
       <button class="btn" id="hudViewBento">Bento</button>
-      <!-- Profile navigation buttons (hidden by default) -->
-      <div class="hud-profile-nav">
-        <button class="btn" id="hudTitleCardBtn" title="Title Card">⏺</button>
-        <button class="btn" id="hudIndexBtn" title="Index">☰</button>
-      </div>
+
     </div>
 
     <div class="wrap">
