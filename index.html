@@ -1865,6 +1865,15 @@
         top: max(24px, env(safe-area-inset-top));
       }
 
+      /* ── Profile view: hide bottom HUD, move top HUD to bottom ── */
+      body.profile-view .hud-bottom {
+        display: none;
+      }
+      body.profile-view .hud-top {
+        top: auto;
+        bottom: calc(12px + var(--scrollbar-height));
+      }
+
       .hud-divider {
         width: 1px;
         height: var(--hud-divider-h);
@@ -1993,6 +2002,9 @@
         .hud .hud-label {
           display: none;
         }
+        body.profile-view .hud-top {
+          bottom: calc(10px + var(--scrollbar-height));
+        }
       }
 
       @media (max-width: 480px) {
@@ -2021,6 +2033,9 @@
           --hud-icon-w: 28px;
           --hud-icon-fs: 11px;
           --hud-divider-h: 14px;
+        }
+        body.profile-view .hud-top {
+          bottom: calc(8px + var(--scrollbar-height));
         }
       }
 
