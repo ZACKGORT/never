@@ -257,6 +257,194 @@
         width: 100%;
       }
 
+      /* ── Breadcrumb ── */
+      .breadcrumb-wrap {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        position: relative;
+        overflow: hidden;
+        mask-image: linear-gradient(to right, black 68%, transparent 98%);
+        -webkit-mask-image: linear-gradient(to right, black 68%, transparent 98%);
+        mask-composite: add;
+        -webkit-mask-composite: add;
+        height: 32px;
+      }
+      .breadcrumb-scroll {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding: 2px 20px 2px 0;
+        flex: 1;
+        min-width: 0;
+        scroll-snap-type: x mandatory;
+      }
+      .breadcrumb-scroll::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+      }
+      .breadcrumb-scroll.dragging {
+        scroll-snap-type: none;
+        scroll-behavior: auto;
+        cursor: grabbing;
+      }
+
+      .breadcrumb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 6px 2px 4px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--card);
+        font-size: 9px;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        flex-shrink: 0;
+        scroll-snap-align: start;
+        box-shadow: var(--shadow);
+        min-height: 26px;
+        font-family: var(--font);
+        font-weight: 500;
+        color: var(--ink-mid);
+      }
+      .breadcrumb-badge .bb-avatar {
+        width: 18px;
+        height: 18px;
+        font-size: 7px;
+        border-radius: var(--radius-sm);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        flex-shrink: 0;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--ink);
+        transition: border-color 0.15s;
+      }
+      .breadcrumb-badge .bb-avatar.v0 {
+        background: var(--accent);
+        color: var(--ink);
+        border-color: rgba(28, 28, 30, 0.18);
+      }
+      .breadcrumb-badge .bb-avatar.v1 {
+        background: var(--bg);
+        color: var(--ink);
+      }
+      .breadcrumb-badge .bb-avatar.v2 {
+        background: var(--accent-2);
+        color: var(--ink);
+        border-color: rgba(28, 28, 30, 0.18);
+      }
+      .breadcrumb-badge .bb-avatar.v3 {
+        background: var(--ink);
+        color: var(--card);
+        border-color: var(--ink);
+      }
+      .breadcrumb-badge .bb-avatar.company::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        width: 5px;
+        height: 5px;
+        background: var(--accent);
+        border: 1px solid var(--card);
+        border-radius: 2px;
+      }
+      .breadcrumb-badge .bb-avatar-wrap {
+        position: relative;
+        display: inline-flex;
+      }
+      .breadcrumb-badge .bb-name {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 500;
+        color: var(--ink);
+        font-size: 9px;
+      }
+      .breadcrumb-badge .bb-remove {
+        background: none;
+        border: none;
+        color: var(--ink-light);
+        font-size: 10px;
+        cursor: pointer;
+        padding: 0 2px;
+        line-height: 1;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+        flex-shrink: 0;
+      }
+      .breadcrumb-badge .bb-remove:hover {
+        color: var(--ink);
+        background: var(--bg);
+      }
+      .breadcrumb-badge.active {
+        border-color: var(--ink);
+        background: var(--ink);
+        color: var(--card);
+        box-shadow: var(--shadow-hover);
+      }
+      .breadcrumb-badge.active .bb-name {
+        color: var(--card);
+      }
+      .breadcrumb-badge.active .bb-avatar {
+        border-color: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.15);
+        color: var(--card);
+      }
+      .breadcrumb-badge.active .bb-avatar.v0,
+      .breadcrumb-badge.active .bb-avatar.v2 {
+        background: var(--accent);
+        color: var(--ink);
+      }
+      .breadcrumb-badge.active .bb-remove {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      .breadcrumb-badge.active .bb-remove:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.15);
+      }
+      .breadcrumb-badge:hover:not(.active) {
+        border-color: var(--ink-light);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-hover);
+      }
+
+      /* fade gradient on right of breadcrumb */
+      .breadcrumb-fade {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 40px;
+        pointer-events: none;
+        background: linear-gradient(to right, transparent, var(--bg));
+        z-index: 2;
+        border-radius: 0 4px 4px 0;
+      }
+      body:not(.profile-view) .breadcrumb-wrap {
+        display: none;
+      }
+
       .profile-exit-btn {
         display: flex;
         align-items: center;
@@ -381,6 +569,7 @@
       .logo-tile {
         position: relative;
         cursor: pointer;
+        flex-shrink: 0;
       }
       .logo-tile .wordmark::after {
         content: '▾';
@@ -782,6 +971,33 @@
         .attention-btn .attention-eye {
           width: 18px;
           height: 18px;
+        }
+        .breadcrumb-badge .bb-name {
+          max-width: 48px;
+          font-size: 7px;
+        }
+        .breadcrumb-badge {
+          font-size: 7px;
+          padding: 1px 4px 1px 3px;
+          min-height: 20px;
+        }
+        .breadcrumb-badge .bb-avatar {
+          width: 14px;
+          height: 14px;
+          font-size: 6px;
+        }
+        .breadcrumb-badge .bb-remove {
+          width: 12px;
+          height: 12px;
+          font-size: 8px;
+        }
+        .breadcrumb-wrap {
+          height: 24px;
+          mask-image: linear-gradient(to right, black 60%, transparent 98%);
+          -webkit-mask-image: linear-gradient(to right, black 60%, transparent 98%);
+        }
+        .breadcrumb-fade {
+          width: 24px;
         }
       }
 
@@ -2959,9 +3175,6 @@
       .profile-modal.open .profile-card {
         transform: scale(1);
       }
-      /* Keep the attention icon visible above the profile modal's blur
-         instead of getting buried under it — the topbar is its nearest
-         stacking context, so we lift the whole bar while the modal is open. */
       body:has(.profile-modal.open) .topbar {
         z-index: 410;
       }
@@ -3262,7 +3475,6 @@
         color: var(--card);
         border-color: var(--ink);
       }
-      /* use count removed from display */
 
       @media (max-width: 480px) {
         .rapid-respond {
@@ -3778,7 +3990,6 @@
         opacity: 0;
       }
 
-      /* Wink state: eye closes, pupil fades, wink line appears */
       .attention-eye.wink .eye-shape {
         transform: scaleY(0.08) translateY(0px);
       }
@@ -3790,7 +4001,6 @@
         opacity: 1;
       }
 
-      /* Small bounce on the whole eye when winking */
       .attention-btn .attention-eye {
         transition: transform 0.15s ease;
       }
@@ -3904,12 +4114,11 @@
         }
       }
 
-      /* ── Spiral styles (scoped inside .info-overlay) ── */
       .info-overlay .js-spiral {
         position: fixed;
         inset: 0;
         pointer-events: none;
-        touch-action: none; /* prevent browser scrolling on touch */
+        touch-action: none;
       }
 
       .info-overlay .js-spiral .js-section {
@@ -3935,7 +4144,6 @@
         box-shadow: var(--shadow-hover);
       }
 
-      /* ── bookend special styling ── */
       .info-overlay .js-section.bookend {
         border: 2px solid var(--bg);
         background: var(--card-dark);
@@ -3976,7 +4184,6 @@
         border-radius: inherit;
       }
 
-      /* ── yellow content cards ── */
       .info-overlay .js-section.yellow-card {
         background: var(--accent) !important;
       }
@@ -3993,7 +4200,6 @@
         border-color: var(--bg);
       }
 
-      /* ── bookend index list ── */
       .info-overlay .bookend-index {
         display: grid;
         grid-template-rows: repeat(8, auto);
@@ -4033,7 +4239,6 @@
         font-weight: 500;
       }
 
-      /* ── panel content ── */
       .info-overlay .panel {
         position: absolute;
         width: 80%;
@@ -4128,7 +4333,6 @@
         color: var(--ink-light);
       }
 
-      /* ── Spiral cursor (scoped) ── */
       .info-overlay .write-cursor-dot,
       .info-overlay .write-cursor-ellipse {
         position: fixed;
@@ -4162,7 +4366,6 @@
         border-color: #f5f5f7;
       }
 
-      /* ── Spiral responsive tweaks ── */
       @media (max-width: 640px) {
         .info-overlay .panel {
           width: 90%;
@@ -4378,9 +4581,14 @@
           </div>
         </div>
 
+        <!-- ─── BREADCRUMB ─── -->
+        <div class="breadcrumb-wrap" id="breadcrumbWrap">
+          <div class="breadcrumb-scroll" id="breadcrumbScroll"></div>
+          <div class="breadcrumb-fade"></div>
+        </div>
+
         <!-- Right: appearance, reviews, chips, attention -->
         <div class="topbar-right">
-
 
           <!-- Appearance -->
           <div class="topbar-appearance-wrapper">
@@ -4423,9 +4631,7 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <!-- Eye shape (open) -->
                 <ellipse class="eye-shape" cx="20" cy="20" rx="14" ry="10" />
-                <!-- Pupil -->
                 <circle
                   class="eye-pupil"
                   cx="20"
@@ -4434,7 +4640,6 @@
                   fill="currentColor"
                   stroke="none"
                 />
-                <!-- Wink line (hidden by default) -->
                 <path
                   class="wink-line"
                   d="M6 20 Q20 16.5 34 20"
@@ -4478,17 +4683,15 @@
       >
         ›
       </button>
-            <!-- Profile navigation buttons (hidden by default) -->
-            <div class="hud-profile-nav">
-              <button class="btn" id="hudTitleCardBtn" title="Title Card">Title Card</button>
-              <button class="btn" id="hudIndexBtn" title="Index Card">Index Card</button>
-            </div>
+      <div class="hud-profile-nav">
+        <button class="btn" id="hudTitleCardBtn" title="Title Card">Title Card</button>
+        <button class="btn" id="hudIndexBtn" title="Index Card">Index Card</button>
+      </div>
       <div class="hud-divider"></div>
       <span class="hud-label">View</span>
       <button class="btn active" id="hudViewList">List</button>
       <button class="btn" id="hudViewGrid">Grid</button>
       <button class="btn" id="hudViewBento">Bento</button>
-
     </div>
 
     <div class="wrap">
@@ -4580,10 +4783,9 @@
         <span>⚡</span>
         <span class="badge" id="actionBadge" style="display: none">0</span>
       </button>
-                <!-- Thoughts toggle -->
-                <button class="btn" id="thoughtsToggleBtn" title="My Thoughts">
-                  ✎
-                </button>
+      <button class="btn" id="thoughtsToggleBtn" title="My Thoughts">
+        ✎
+      </button>
       <div class="hud-divider"></div>
       <button class="btn btn-primary" id="hudNew">+ New</button>
     </div>
@@ -4799,7 +5001,6 @@
         ✕
       </button>
       <div class="js-spiral" id="spiralContainer"></div>
-      <!-- custom cursor for spiral (scoped) -->
       <div class="write-cursor-dot" id="spiralCursorDot"></div>
       <div class="write-cursor-ellipse" id="spiralCursorEllipse"></div>
     </div>
@@ -5865,7 +6066,10 @@
         // ── Profile view state ────────────────────────────────────
         let isProfileView = false;
         let profileUserId = null;
-        let profileViewMode = 'original'; // 'original' | 'responded'
+        let profileViewMode = 'original';
+
+        // ── Profile stack (breadcrumb) ───────────────────────────
+        let profileStack = [];
 
         // ── Thoughts view ─────────────────────────────────────────
         let isThoughtsView = false;
@@ -6464,7 +6668,6 @@
           try {
             localStorage.setItem(THOUGHTS_KEY, JSON.stringify(thoughts));
           } catch (e) {}
-          // if we're in thoughts view, re‑render
           if (isThoughtsView) renderThoughtsLetter();
         }
 
@@ -6478,7 +6681,7 @@
             text: text.trim(),
             tag: tag || '',
             mediaUrl: mediaUrl || '',
-            status: 'draft', // draft | converted
+            status: 'draft',
             statementId: null,
           });
           saveThoughts();
@@ -6503,7 +6706,6 @@
         function convertThoughtToStatement(id) {
           const t = thoughts.find((th) => th.id === id);
           if (!t) return;
-          // Create a new statement
           statements.unshift({
             id: uid(),
             authorId: t.authorId,
@@ -6517,7 +6719,6 @@
             muteState: 'visible',
             sourceThoughtId: t.id,
           });
-          // Mark thought as converted
           t.status = 'converted';
           t.statementId = statements[0].id;
           saveData();
@@ -6530,13 +6731,11 @@
         }
 
         function renderThoughtsLetter() {
-          // This is a special letter that shows thoughts in a simple list
           const panel = document.querySelector('.letter-panel[data-thoughts="true"]');
           if (!panel) return;
           const frame = panel.querySelector('.letter-card-frame');
           if (!frame) return;
 
-          // Update cover
           const cover = frame.querySelector('.letter-cover');
           if (cover) {
             const kicker = cover.querySelector('.letter-cover-kicker');
@@ -6616,7 +6815,6 @@
                 editBtn.textContent = '✎';
                 editBtn.title = 'Edit thought';
                 editBtn.addEventListener('click', () => {
-                  // Populate composer with thought content
                   const composer = document.getElementById('composer');
                   const textArea = document.getElementById('c-text');
                   const tagInput = document.getElementById('c-tag');
@@ -6628,7 +6826,6 @@
                   mediaInput.value = t.mediaUrl;
                   authorSelect.value = t.authorId;
                   editingThoughtId = t.id;
-                  // Update composer title
                   document.querySelector('.composer-title').innerHTML =
                     `<span class="grip">⠿⠿</span> Edit thought`;
                   openComposer();
@@ -6765,19 +6962,18 @@
             { id: 'chip4', text: 'What’s the timeline here?', useCount: 1, createdAt: Date.now() },
             { id: 'chip5', text: 'Bookmarking this.', useCount: 4, createdAt: Date.now() },
           ];
-          // Pre-seed attention items
           const sampleStatement = statements.find(s => s.authorId === 'studio-north');
           attentionItems = [
             { id: 'att1', userId: 'user_self', objectType: 'company', objectId: 'studio-north', createdAt: Date.now(), active: true },
             { id: 'att2', userId: 'user_self', objectType: 'person', objectId: 'maya', createdAt: Date.now(), active: true },
             { id: 'att3', userId: 'user_self', objectType: 'statement', objectId: sampleStatement?.id || '', createdAt: Date.now(), active: true },
           ].filter(item => item.objectId);
-          // Pre-seed interactions
           interactions = [
             { targetId: 'studio-north', targetKind: 'company', type: 'save', lastInteracted: Date.now() - 10000, count: 1 },
             { targetId: 'maya', targetKind: 'person', type: 'view', lastInteracted: Date.now() - 50000, count: 2 },
             { targetId: 'zack', targetKind: 'person', type: 'reply', lastInteracted: Date.now() - 20000, count: 3 },
           ];
+          profileStack = [];
           await saveData();
           saveThoughts();
           saveAttention();
@@ -6792,6 +6988,7 @@
           renderTrack();
           renderAttention();
           updateProfileBadge();
+          updateBreadcrumb();
           console.log(
             'resetDemoContent: reseeded',
             authors.length,
@@ -6802,10 +6999,154 @@
         }
         window.resetDemoContent = resetDemoContent;
 
+        // ── Breadcrumb ────────────────────────────────────────────
+        function updateBreadcrumb() {
+          const wrap = document.getElementById('breadcrumbWrap');
+          const scroll = document.getElementById('breadcrumbScroll');
+          if (!wrap || !scroll) return;
+
+          if (!isProfileView || profileStack.length === 0) {
+            wrap.style.display = 'none';
+            return;
+          }
+          wrap.style.display = 'flex';
+
+          scroll.innerHTML = '';
+          const fragment = document.createDocumentFragment();
+
+          profileStack.forEach((userId, idx) => {
+            const user = authorById(userId);
+            if (!user) return;
+            const isActive = idx === profileStack.length - 1;
+            const varClass = avatarVariant(user.id);
+            const isCompany = user.kind === 'company';
+            const badge = document.createElement('span');
+            badge.className = 'breadcrumb-badge' + (isActive ? ' active' : '');
+            badge.dataset.userId = userId;
+            badge.dataset.index = String(idx);
+
+            const avatarWrap = document.createElement('span');
+            avatarWrap.className = 'bb-avatar-wrap';
+            const avatarEl = document.createElement('span');
+            avatarEl.className = `bb-avatar ${varClass}${isCompany ? ' company' : ''}`;
+            avatarEl.textContent = initialsFor(user);
+            avatarWrap.appendChild(avatarEl);
+            badge.appendChild(avatarWrap);
+
+            const nameEl = document.createElement('span');
+            nameEl.className = 'bb-name';
+            nameEl.textContent = user.name;
+            badge.appendChild(nameEl);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'bb-remove';
+            removeBtn.textContent = '×';
+            removeBtn.setAttribute('aria-label', `Remove ${user.name} from breadcrumb`);
+            removeBtn.dataset.userId = userId;
+            removeBtn.dataset.index = String(idx);
+            badge.appendChild(removeBtn);
+
+            badge.addEventListener('click', (e) => {
+              if (closestSafe(e.target, '.bb-remove')) return;
+              const targetIdx = parseInt(badge.dataset.index);
+              navigateToProfileInStack(targetIdx);
+            });
+
+            fragment.appendChild(badge);
+          });
+
+          scroll.appendChild(fragment);
+
+          // Remove listeners for remove buttons
+          scroll.querySelectorAll('.bb-remove').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const userId = btn.dataset.userId;
+              removeProfileFromStack(userId);
+            });
+          });
+
+          // Scroll to end (current profile)
+          requestAnimationFrame(() => {
+            scroll.scrollLeft = scroll.scrollWidth;
+          });
+        }
+
+        function pushProfile(userId) {
+          // If userId is already in the stack, remove it and all after it
+          const existingIdx = profileStack.indexOf(userId);
+          if (existingIdx !== -1) {
+            profileStack = profileStack.slice(0, existingIdx + 1);
+          } else {
+            profileStack.push(userId);
+          }
+          updateBreadcrumb();
+        }
+
+        function popProfile() {
+          if (profileStack.length === 0) return null;
+          const removed = profileStack.pop();
+          updateBreadcrumb();
+          return removed;
+        }
+
+        function removeProfileFromStack(userId) {
+          const idx = profileStack.indexOf(userId);
+          if (idx === -1) return;
+          // Remove this profile and all after it (to maintain a clean sequence)
+          profileStack = profileStack.slice(0, idx);
+          updateBreadcrumb();
+          // If the stack is now empty, exit profile view
+          if (profileStack.length === 0) {
+            exitProfileView();
+            return;
+          }
+          // Navigate to the last profile in the stack
+          const lastUserId = profileStack[profileStack.length - 1];
+          if (lastUserId !== profileUserId) {
+            navigateToProfileInStack(profileStack.length - 1);
+          }
+        }
+
+        function navigateToProfileInStack(index) {
+          if (index < 0 || index >= profileStack.length) return;
+          const targetId = profileStack[index];
+          // Truncate stack to this index + 1
+          profileStack = profileStack.slice(0, index + 1);
+          updateBreadcrumb();
+          if (targetId !== profileUserId) {
+            // We need to re-enter profile view for this user
+            // But we want to keep the stack as-is
+            const user = authorById(targetId);
+            if (!user) return;
+            // Set profile state without pushing to stack again
+            isProfileView = true;
+            profileUserId = targetId;
+            document.body.classList.add('profile-view');
+            rebuildProfileLetters();
+            renderTrack();
+            // Preload the index card
+            const indexPos = letterData.findIndex((d) => d.isIndex);
+            if (indexPos >= 0) {
+              activeIndex = 0;
+              requestAnimationFrame(() => {
+                activatePanel(indexPos);
+              });
+            }
+            updateProgressBar();
+            updateProfileBadge();
+            updateBreadcrumb();
+          }
+        }
+
+        function getPreviousProfileId() {
+          if (profileStack.length < 2) return null;
+          return profileStack[profileStack.length - 2];
+        }
+
         // ── Delegated events ─────────────────────────────────────
         function setupDelegatedEvents() {
           document.addEventListener('click', (e) => {
-            // Author name / avatar clicks
             const authorTarget = closestSafe(
               e.target,
               '[data-author-id], [data-profile-author-id]'
@@ -7431,10 +7772,8 @@
             if (node.replies) {
               node.replies.forEach(r => {
                 if (r.authorId === authorId) {
-                  // Attach parent statement id for context
                   replies.push({ ...r, _parentStatementId: parentStatementId });
                 }
-                // Recurse into nested replies
                 traverse(r, parentStatementId);
               });
             }
@@ -7445,17 +7784,15 @@
 
         // ── Profile View ──────────────────────────────────────────
         function setProfileViewMode(mode) {
-  // Ignore any mode other than 'original'
-  if (mode !== 'original') return;
-  // The rest of the function stays the same
-  profileViewMode = 'original';
-  rebuildProfileLetters();
-  renderTrack();
-  const indexPos = letterData.findIndex((d) => d.isIndex);
-  if (indexPos >= 0) {
-    activatePanel(indexPos);
-  }
-}
+          if (mode !== 'original') return;
+          profileViewMode = 'original';
+          rebuildProfileLetters();
+          renderTrack();
+          const indexPos = letterData.findIndex((d) => d.isIndex);
+          if (indexPos >= 0) {
+            activatePanel(indexPos);
+          }
+        }
 
         function rebuildProfileLetters() {
           const user = authorById(profileUserId);
@@ -7467,7 +7804,6 @@
               .filter((s) => s.authorId === profileUserId)
               .sort((a, b) => b.time - a.time);
           } else {
-            // Responded mode: inert – show no replies
             items = [];
           }
 
@@ -7535,15 +7871,17 @@
           // Exit thoughts view if active
           if (isThoughtsView) toggleThoughtsView();
 
+          // Push onto stack
+          pushProfile(userId);
+
           isProfileView = true;
           profileUserId = userId;
-          profileViewMode = 'original'; // default
+          profileViewMode = 'original';
           document.body.classList.add('profile-view');
 
           rebuildProfileLetters();
           renderTrack();
 
-          // Preload the index card (index 1) after render
           const indexPos = letterData.findIndex((d) => d.isIndex);
           if (indexPos >= 0) {
             activeIndex = 0;
@@ -7554,6 +7892,7 @@
 
           updateProgressBar();
           updateProfileBadge();
+          updateBreadcrumb();
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -7568,6 +7907,9 @@
           closeRapidRespond();
           closeComposer();
 
+          // Pop from stack
+          popProfile();
+
           isProfileView = false;
           profileUserId = null;
           document.body.classList.remove('profile-view');
@@ -7581,6 +7923,7 @@
             renderTrack();
           }
           updateProfileBadge();
+          updateBreadcrumb();
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         }
 
@@ -7617,13 +7960,10 @@
         function toggleThoughtsView() {
           isThoughtsView = !isThoughtsView;
           if (isThoughtsView) {
-            // Exit profile view if active
             if (isProfileView) {
               exitProfileView();
-              // re-enter thoughts view after profile exit
               isThoughtsView = true;
             }
-            // Build a single-letter view for thoughts
             letterData = [
               {
                 title: 'Thoughts',
@@ -7633,17 +7973,14 @@
               },
             ];
             renderTrack();
-            // Mark the panel as thoughts
             const panel = document.querySelector('.letter-panel');
             if (panel) panel.dataset.thoughts = 'true';
             renderThoughtsLetter();
             activeIndex = 0;
             updateProgressBar();
             updateProfileBadge();
-            // Update button style
             document.getElementById('thoughtsToggleBtn').classList.toggle('active', isThoughtsView);
           } else {
-            // Exit thoughts view
             initMainLetterData();
             renderTrack();
             activeIndex = 0;
@@ -7948,7 +8285,6 @@
           const user = authorById(userId);
           const container = document.createElement('div');
 
-          // Add toggle bar
           const toggleBar = document.createElement('div');
           toggleBar.className = 'index-toggle-bar';
           const toggleOriginal = document.createElement('button');
@@ -8010,19 +8346,16 @@
 
         // ── Profile thread letter renderer ────────────────────────
         function buildProfileThreadLetter(statementOrReply) {
-          // statementOrReply can be a top-level statement or a reply object from the tree
           const isReply = !!statementOrReply._parentStatementId;
           let s = statementOrReply;
           let parentStatement = null;
           if (isReply) {
-            // Fetch the parent statement to show context
             parentStatement = statements.find(st => st.id === s._parentStatementId);
           }
 
           const a = authorById(s.authorId);
           const container = document.createElement('div');
 
-          // If it's a reply, show "Replied to ..." context
           if (isReply && parentStatement) {
             const parentAuthor = authorById(parentStatement.authorId);
             const contextDiv = document.createElement('div');
@@ -8059,7 +8392,6 @@
 
           container.appendChild(stmtDiv);
 
-          // Show replies to this reply (nested)
           if (s.replies && s.replies.length) {
             const threadDiv = document.createElement('div');
             threadDiv.className = 'letter-profile-thread';
@@ -8070,7 +8402,6 @@
             container.appendChild(threadDiv);
           }
 
-          // Reply trigger
           const replyTrigger = document.createElement('div');
           replyTrigger.className = 'modal-reply-trigger';
           const link = document.createElement('button');
@@ -8150,7 +8481,6 @@
           const data = letterData[index];
           if (!data) return;
 
-          // If this is the thoughts panel, render it specially
           if (data.isThoughts) {
             renderThoughtsLetter();
             return;
@@ -8238,7 +8568,6 @@
             panel.dataset.archive = 'false';
           } else if (data.isProfile && data.statementIds) {
             if (data.statementIds.length === 0) {
-              // Empty state for profile with no statements
               const emptyDiv = document.createElement('div');
               emptyDiv.className = 'empty-letter';
               emptyDiv.innerHTML = `
@@ -8251,22 +8580,13 @@
               container.className = 'letter-profile-container';
 
               data.statementIds.forEach((sid) => {
-                // Find the full item – if it's a reply, we need to find it in the tree
                 let item = statements.find(st => st.id === sid);
                 if (!item) {
-                  // Could be a reply – we don't have a direct reference, but we have the parent context in letterData
-                  // For simplicity, we'll just pass the statement id and let buildProfileThreadLetter handle it
-                  // But we need the full object. We'll just pass the statement id and fetch it in the function.
-                  // Actually, buildProfileThreadLetter expects a full object. We'll pass null and handle it.
-                  // Better: we'll just fetch the statement from the tree.
-                  // For replies, we need to find them in the tree.
-                  // We'll use a helper to find a reply by id.
                   const reply = findReplyById(sid);
                   if (reply) {
                     const threadEl = buildProfileThreadLetter(reply);
                     container.appendChild(threadEl);
                   } else {
-                    // fallback
                     const fallbackDiv = document.createElement('div');
                     fallbackDiv.textContent = 'Statement not found.';
                     container.appendChild(fallbackDiv);
@@ -8407,7 +8727,6 @@
           }
         }
 
-        // Helper to find a reply by id in the statement tree
         function findReplyById(id) {
           let found = null;
           function traverse(node) {
@@ -8598,7 +8917,6 @@
           letterData.forEach((_, i) => renderLetter(i));
           updateProgressBar();
           updateProfileBadge();
-          // If thoughts view, render the thoughts letter after track is built
           if (isThoughtsView) {
             renderThoughtsLetter();
           }
@@ -9206,7 +9524,6 @@
           if (spiralInitialized) return;
           spiralInitialized = true;
 
-          // ─── content ──────────────────────────────────────────
           var PANELS = [
             {
               num: '01',
@@ -9799,7 +10116,6 @@
           rotation = 0;
           resizeHandler();
 
-          // ─── custom cursor (spiral) ─────────────────────────
           (function initSpiralCursor() {
             var dot = document.getElementById('spiralCursorDot');
             var ellipse = document.getElementById('spiralCursorEllipse');
@@ -9969,6 +10285,40 @@
           if (container) container.innerHTML = '';
         }
 
+        // ── Breadcrumb drag to scroll ─────────────────────────────
+        function setupBreadcrumbDrag() {
+          const scroll = document.getElementById('breadcrumbScroll');
+          if (!scroll) return;
+          let isDragging = false,
+            startX = 0,
+            startScroll = 0;
+
+          scroll.addEventListener('pointerdown', (e) => {
+            if (closestSafe(e.target, '.bb-remove')) return;
+            isDragging = true;
+            startX = e.clientX;
+            startScroll = scroll.scrollLeft;
+            scroll.classList.add('dragging');
+            scroll.setPointerCapture(e.pointerId);
+          });
+
+          scroll.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+            const delta = startX - e.clientX;
+            scroll.scrollLeft = startScroll + delta;
+          });
+
+          scroll.addEventListener('pointerup', () => {
+            isDragging = false;
+            scroll.classList.remove('dragging');
+          });
+
+          scroll.addEventListener('pointercancel', () => {
+            isDragging = false;
+            scroll.classList.remove('dragging');
+          });
+        }
+
         // ── Init ──────────────────────────────────────────────────
         window.__clearFilters = clearFilters;
         window.openProfileModal = openProfileModal;
@@ -9980,6 +10330,7 @@
             setupAttentionToggle();
             setupDelegatedEvents();
             setupViewportBlur();
+            setupBreadcrumbDrag();
 
             await loadData();
             loadThoughts();
@@ -9991,7 +10342,6 @@
               await resetDemoContent();
             }
 
-            // Update composer actions
             document.getElementById('c-save-thought').addEventListener('click', () => {
               const authorId = document.getElementById('c-author-select').value;
               const tag = document.getElementById('c-tag').value.trim().toUpperCase();
@@ -10010,10 +10360,8 @@
               if (isThoughtsView) renderThoughtsLetter();
             });
 
-            // Thoughts toggle
             document.getElementById('thoughtsToggleBtn').addEventListener('click', toggleThoughtsView);
 
-            // Composer "State" button
             document.getElementById('c-post').addEventListener('click', () => {
               const authorId = document.getElementById('c-author-select').value;
               const tag = document.getElementById('c-tag').value.trim().toUpperCase();
@@ -10021,11 +10369,9 @@
               const text = document.getElementById('c-text').value.trim();
               if (!text || !authorId) return;
 
-              // If editing a thought, convert it
               if (editingThoughtId) {
                 const thought = thoughts.find(t => t.id === editingThoughtId);
                 if (thought) {
-                  // Update thought text and media
                   thought.text = text;
                   thought.tag = tag;
                   thought.mediaUrl = mediaUrl;
@@ -10077,7 +10423,6 @@
               });
             });
 
-            // ─── HUD controls ─────────────────────────────────────
             document
               .getElementById('hudPrev')
               .addEventListener('click', () => activatePanel(activeIndex - 1));
@@ -10116,16 +10461,13 @@
                 renderLetter(activeIndex);
               });
 
-            // Profile navigation buttons
             document.getElementById('hudTitleCardBtn').addEventListener('click', function() {
               if (isProfileView) {
-                // Title card is always at index 0 in profile view
                 activatePanel(0);
               }
             });
             document.getElementById('hudIndexBtn').addEventListener('click', function() {
               if (isProfileView) {
-                // Index card is always at index 1 in profile view
                 activatePanel(1);
               }
             });
@@ -10228,10 +10570,8 @@
               track.classList.remove('dragging');
             });
 
-            // ─── Enhanced Escape key handling ───────────────────
             document.addEventListener('keydown', (e) => {
               if (e.key === 'Escape') {
-                // Close any open overlay
                 if (focusMode) {
                   setFocusMode(false);
                   e.preventDefault();
@@ -10299,9 +10639,7 @@
                   return;
                 }
               }
-              // Arrow keys for carousel navigation (only when no overlay is open)
               if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                // Check if any overlay is open
                 const overlays = [
                   'profileModal', 'conversationModal', 'bentoOverlay',
                   'reviewOverlay', 'chipsOverlay', 'titleCardOverlay',
@@ -10556,7 +10894,6 @@
                   document.getElementById('chipAddBtn').click();
               });
 
-            // ─── Info overlay ────────────────────────────────────
             document
               .getElementById('infoToggleBtn')
               .addEventListener('click', openInfoOverlay);
@@ -10579,9 +10916,8 @@
               }
             });
 
-            // ─── Start eye tracking ──────────────────────────────
             setupEyeTracking();
-
+            updateBreadcrumb();
             setTimeout(updateProgressBar, 100);
             renderLetter(0);
           } catch (err) {
@@ -10590,7 +10926,6 @@
         });
       })();
 
-      // ── custom cursor ─────────────────────────────────────────────
       (function initWriteCursor() {
         const writeCursorDot = document.getElementById('writeCursorDot');
         const writeCursorEllipse =
