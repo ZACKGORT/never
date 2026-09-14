@@ -1271,6 +1271,168 @@
         border-color: #e6e6e8;
       }
 
+      /* ── Contained thumbnail (used by narrow, non-dark media cards) ── */
+      .letter-bento .thumb-bento {
+        width: 100%;
+        height: 90px;
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        margin: 4px 0;
+        flex-shrink: 0;
+      }
+      .letter-bento .thumb-bento img,
+      .letter-bento .thumb-bento video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* ── Split layout: wide, non-dark media cards (text left, image right) ── */
+      .letter-bento .card.has-split {
+        padding: 1.5rem;
+      }
+      .letter-bento .card.has-split .card-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        align-items: stretch;
+        flex: 1;
+        min-height: 0;
+      }
+      .letter-bento .card.has-split .card-split-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 10px;
+        min-width: 0;
+      }
+      .letter-bento .card.has-split .card-split-media {
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        min-height: 180px;
+      }
+      .letter-bento .card.has-split .card-split-media img,
+      .letter-bento .card.has-split .card-split-media video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* ── Full-bleed media cards — reserved for DARK variants only ── */
+      .letter-bento .card.has-media {
+        overflow: hidden;
+        min-height: 220px;
+        padding: 1.25rem 1.25rem 1.25rem 1.25rem;
+      }
+      .letter-bento .card.has-media .card-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .letter-bento .card.has-media .card-bg img,
+      .letter-bento .card.has-media .card-bg video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .letter-bento .card.has-media .card-scrim {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        transition: background 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+      .letter-bento .card-dark.has-media .card-scrim {
+        background: linear-gradient(
+          180deg,
+          rgba(28, 28, 30, 0.45) 0%,
+          rgba(28, 28, 30, 0.9) 100%
+        );
+      }
+      .letter-bento .card-mid.has-media .card-scrim {
+        background: linear-gradient(
+          180deg,
+          rgba(58, 58, 60, 0.45) 0%,
+          rgba(58, 58, 60, 0.9) 100%
+        );
+      }
+
+      /* Hover: image takes precedence (scrim mostly lifts) */
+      .letter-bento .card-dark.has-media:hover .card-scrim {
+        background: linear-gradient(
+          180deg,
+          rgba(28, 28, 30, 0.05) 0%,
+          rgba(28, 28, 30, 0.35) 100%
+        );
+      }
+      .letter-bento .card-mid.has-media:hover .card-scrim {
+        background: linear-gradient(
+          180deg,
+          rgba(58, 58, 60, 0.05) 0%,
+          rgba(58, 58, 60, 0.35) 100%
+        );
+      }
+
+      .letter-bento .card.has-media .card-content {
+        position: relative;
+        z-index: 2;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      /* Constant padding + toggle fill = no layout shift on hover */
+      .letter-bento .card.has-media .card-top,
+      .letter-bento .card.has-media .card-bottom {
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: transparent;
+        transition: background 0.3s ease, backdrop-filter 0.3s ease,
+          -webkit-backdrop-filter 0.3s ease;
+      }
+
+      .letter-bento .card-dark.has-media:hover .card-top,
+      .letter-bento .card-dark.has-media:hover .card-bottom {
+        background: rgba(28, 28, 30, 0.82);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .letter-bento .card-mid.has-media:hover .card-top,
+      .letter-bento .card-mid.has-media:hover .card-bottom {
+        background: rgba(58, 58, 60, 0.82);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      /* Labels shrink on hover so the image takes precedence */
+      .letter-bento .card.has-media:hover .label-sm {
+        font-size: 0.48rem;
+        letter-spacing: 0.1em;
+      }
+      .letter-bento .card.has-media:hover .display-sm {
+        font-size: 1rem;
+      }
+      .letter-bento .card.has-media:hover .body-xs {
+        font-size: 0.62rem;
+      }
+      .letter-bento .card.has-media:hover .body-sm {
+        font-size: 0.78rem;
+      }
+      .letter-bento .card.has-media:hover .label-xs {
+        font-size: 0.48rem;
+      }
+
+      /* Label / body / display defaults (non-hover) */
       .letter-bento .label-sm {
         font-size: 0.65rem;
         letter-spacing: 0.12em;
@@ -1291,16 +1453,19 @@
         letter-spacing: -0.01em;
         line-height: 1.2;
         color: #1c1c1e;
+        transition: font-size 0.25s ease;
       }
       .letter-bento .body-sm {
         font-size: 0.85rem;
         line-height: 1.5;
         color: #6e6e73;
+        transition: font-size 0.25s ease;
       }
       .letter-bento .body-xs {
         font-size: 0.7rem;
         line-height: 1.4;
         color: #8e8e93;
+        transition: font-size 0.25s ease;
       }
       .letter-bento .mt-auto {
         margin-top: auto;
@@ -1784,6 +1949,12 @@
       .composer-preview-grid.letter-bento .card:hover {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
         transform: none;
+      }
+      .composer-preview-grid.letter-bento .card.has-media {
+        min-height: 160px;
+      }
+      .composer-preview-grid.letter-bento .card.has-split .card-content {
+        grid-template-columns: 1fr;
       }
 
       @media (max-width: 480px) {
@@ -2728,6 +2899,17 @@
           padding: 1.5rem;
           border-radius: 1.25rem;
         }
+        .letter-bento .card.has-media {
+          padding: 1rem;
+          min-height: 200px;
+        }
+        .letter-bento .card.has-split {
+          padding: 1.25rem;
+        }
+        .letter-bento .card.has-split .card-content {
+          grid-template-columns: 1fr 1fr;
+          gap: 1.1rem;
+        }
         .letter-grid {
           grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
           gap: 12px;
@@ -2788,6 +2970,20 @@
           padding: 1.25rem;
           border-radius: 1rem;
           min-height: 100px;
+        }
+        .letter-bento .card.has-media {
+          min-height: 200px;
+          padding: 1rem;
+        }
+        .letter-bento .card.has-split {
+          padding: 1rem;
+        }
+        .letter-bento .card.has-split .card-content {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+        .letter-bento .card.has-split .card-split-media {
+          min-height: 160px;
         }
         .letter-grid {
           grid-template-columns: 1fr;
@@ -8036,6 +8232,16 @@
           card.setAttribute('itemtype', 'https://schema.org/CreativeWork');
 
           const isDark = variant.includes('dark') || variant.includes('mid');
+          const hasMedia = !!s.mediaUrl;
+          const isWide = spans === 'span-2' || spans === 'span-3';
+          // Split layout: wide, non-dark media cards (text left, image right)
+          const isSplit = hasMedia && !isDark && isWide;
+          // Full-bleed: dark media cards only
+          const isFullBleed = hasMedia && isDark;
+
+          if (isFullBleed) card.classList.add('has-media');
+          if (isSplit) card.classList.add('has-split');
+
           const textColor = isDark ? '#fff' : 'var(--ink)';
           const lightColor = isDark
             ? 'rgba(255,255,255,0.6)'
@@ -8050,8 +8256,9 @@
             ? ''
             : ` style="cursor:pointer;" data-author-id="${s.authorId}"`;
 
-          card.innerHTML = `
-              <div>
+          // Reusable top-region markup
+          const topRegion = `
+              <div class="card-top">
                 <div class="label-sm" itemprop="keywords">${escapeHtml(s.tag || 'STATEMENT')}</div>
                 <div class="display-sm" style="font-weight:600;margin-top:0.15rem;color:${textColor};display:flex;align-items:center;gap:6px;">
                   ${avatarStr}
@@ -8061,18 +8268,59 @@
                 </div>
                 ${a?.role ? `<div class="body-xs" style="color:${lightColor};" itemprop="jobTitle">${escapeHtml(a.role)}</div>` : ''}
               </div>
-              <div class="mt-auto">
+          `;
+
+          // Reusable bottom-region markup
+          const decorative = isDark
+            ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>`
+            : variant.includes('accent')
+            ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>`
+            : `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`;
+
+          const bottomRegion = `
+              <div class="card-bottom mt-auto">
                 <p class="body-sm" style="max-width:30ch;margin-top:0.2rem;color:${bodyColor};display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;" itemprop="text">${escapeHtml(s.text)}</p>
-                ${s.mediaUrl ? `<div style="margin-top:0.4rem;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);border:1px solid var(--border);max-height:80px;" itemprop="image"><img src="${escapeHtml(s.mediaUrl)}" alt="" style="display:block;width:100%;height:auto;object-fit:cover;" loading="lazy" /></div>` : ''}
                 <div class="label-xs" style="margin-top:0.3rem;color:${metaColor};">
                   <time datetime="${new Date(s.time).toISOString()}" itemprop="dateCreated">${fmtTime(s.time)}</time>
                   · ${countReplies(s)} repl${countReplies(s) === 1 ? 'y' : 'ies'}
                 </div>
                 ${renderEditMarker(s)}
                 ${opts.static ? '' : renderStatementActions(s)}
+                ${decorative}
               </div>
-              ${isDark ? `<div class="hex-row" style="margin-top:0.15rem;"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>` : variant.includes('accent') ? `<div class="dot-grid" style="margin-top:0.15rem;"><span class="dot" style="background:#1C1C1E;"></span><span class="dot" style="background:#1C1C1E;opacity:0.6;"></span><span class="dot" style="background:#1C1C1E;opacity:0.3;"></span><span class="dot" style="background:#1C1C1E;opacity:0.1;"></span></div>` : `<div class="icon-row" style="margin-top:0.15rem;"><span>◈</span><span>◇</span><span>◈</span></div>`}
-            `;
+          `;
+
+          let inner = '';
+
+          if (isFullBleed) {
+            // Dark full-bleed: image fills card, scrim over it, text on top
+            inner += `<div class="card-bg" aria-hidden="true"><img src="${escapeHtml(s.mediaUrl)}" alt="" loading="lazy" /></div>`;
+            inner += `<div class="card-scrim" aria-hidden="true"></div>`;
+            inner += `<div class="card-content">`;
+            inner += topRegion;
+            inner += bottomRegion;
+            inner += `</div>`;
+          } else if (isSplit) {
+            // Wide + non-dark: text on left, image on right (side by side)
+            inner += `<div class="card-content">`;
+            inner += `<div class="card-split-text">`;
+            inner += topRegion;
+            inner += bottomRegion;
+            inner += `</div>`;
+            inner += `<div class="card-split-media" itemprop="image"><img src="${escapeHtml(s.mediaUrl)}" alt="" loading="lazy" /></div>`;
+            inner += `</div>`;
+          } else {
+            // Narrow non-dark (or no media): stacked, contained thumbnail under header
+            inner += `<div class="card-content">`;
+            inner += topRegion;
+            if (hasMedia) {
+              inner += `<div class="thumb-bento" itemprop="image"><img src="${escapeHtml(s.mediaUrl)}" alt="" loading="lazy" /></div>`;
+            }
+            inner += bottomRegion;
+            inner += `</div>`;
+          }
+
+          card.innerHTML = inner;
 
           if (opts.static) {
             card.style.cursor = 'default';
@@ -8909,7 +9157,7 @@
             },
             {
               title: 'Hiring',
-              deck: 'Companies and teams looking for talent.',
+              dek: 'Companies and teams looking for talent.',
               viewMode: 'list',
               filterTag: 'HIRING',
               includeMuted: false,
